@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.76.1",
     "@types/node": "^22.13.11",
     "axios": "^1.12.2",
     "cors": "^2.8.5",

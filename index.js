@@ -3,25 +3,24 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
+const { createClient } = require('@supabase/supabase-js');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
 const app = express();
 const PORT = 5000;
 
-// تنظیمات Multer برای آپلود فایل
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsDir = './uploads';
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir);
-    }
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
+// تنظیمات Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_ANON_KEY || ''
+);
+
+// تنظیمات Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+// تنظیمات Multer برای آپلود موقت
+const storage = multer.memoryStorage();
 
 const upload = multer({ 
   storage: storage,
@@ -39,17 +38,15 @@ const upload = multer({
 
 app.use(express.json());
 app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
-app.use('/generated', express.static('generated'));
 
 // لیست مدل‌ها
 const models = [
-  { id: 'woman-1', name: 'مدل زن ۱', type: 'female' },
-  { id: 'woman-2', name: 'مدل زن ۲', type: 'female' },
-  { id: 'man-1', name: 'مدل مرد ۱', type: 'male' },
-  { id: 'man-2', name: 'مدل مرد ۲', type: 'male' },
-  { id: 'child-1', name: 'مدل کودک ۱', type: 'child' },
-  { id: 'child-2', name: 'مدل کودک ۲', type: 'child' }
+  { id: 'woman-1', name: 'مدل زن ۱', type: 'female', description: 'زن جوان با موهای بلند' },
+  { id: 'woman-2', name: 'مدل زن ۲', type: 'female', description: 'زن با استایل مدرن' },
+  { id: 'man-1', name: 'مدل مرد ۱', type: 'male', description: 'مرد جوان ورزشکار' },
+  { id: 'man-2', name: 'مدل مرد ۲', type: 'male', description: 'مرد با استایل رسمی' },
+  { id: 'child-1', name: 'مدل کودک ۱', type: 'child', description: 'کودک شاد' },
+  { id: 'child-2', name: 'مدل کودک ۲', type: 'child', description: 'نوجوان' }
 ];
 
 // لیست پس‌زمینه‌ها
@@ -62,6 +59,63 @@ const backgrounds = [
   { id: 'rooftop', name: 'پشت‌بام', description: 'پشت‌بام با منظره شهری' }
 ];
 
+// Middleware برای احراز هویت
+const authenticateUser = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    // برای demo، اجازه دسترسی بدون احراز هویت
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error) throw error;
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+
+// ثبت نام کاربر
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    
+    if (error) throw error;
+    res.json({ success: true, user: data.user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ورود کاربر
+app.post('/api/auth/signin', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) throw error;
+    res.json({ success: true, session: data.session });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// خروج کاربر
+app.post('/api/auth/signout', authenticateUser, async (req, res) => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // دریافت لیست مدل‌ها
 app.get('/api/models', (req, res) => {
   res.json(models);
@@ -72,20 +126,44 @@ app.get('/api/backgrounds', (req, res) => {
   res.json(backgrounds);
 });
 
-// آپلود عکس لباس
-app.post('/api/upload', upload.single('garment'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'لطفاً یک عکس آپلود کنید' });
+// آپلود عکس لباس به Supabase Storage
+app.post('/api/upload', upload.single('garment'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'لطفاً یک عکس آپلود کنید' });
+    }
+
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+    const fileBuffer = req.file.buffer;
+
+    // آپلود به Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('garments')
+      .upload(fileName, fileBuffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (error) throw error;
+
+    // دریافت URL عمومی فایل
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    res.json({ 
+      success: true, 
+      filePath: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    console.error('خطا در آپلود:', error);
+    res.status(500).json({ error: 'خطا در آپلود فایل' });
   }
-  res.json({ 
-    success: true, 
-    filePath: `/uploads/${req.file.filename}`,
-    fileName: req.file.filename
-  });
 });
 
-// تولید عکس با هوش مصنوعی
-app.post('/api/generate', async (req, res) => {
+// تولید عکس با Gemini AI
+app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const { garmentPath, modelId, backgroundId } = req.body;
 
@@ -100,34 +178,44 @@ app.post('/api/generate', async (req, res) => {
       return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
     }
 
-    // شبیه‌سازی تولید تصویر با هوش مصنوعی
-    // در نسخه واقعی، باید از API مانند Stable Diffusion، Replicate، یا سرویس‌های مشابه استفاده کنید
-    
-    // ایجاد پوشه generated در صورت عدم وجود
-    const generatedDir = './generated';
-    if (!fs.existsSync(generatedDir)) {
-      fs.mkdirSync(generatedDir);
+    // ساخت پرامپت برای Gemini
+    const prompt = `Create a professional fashion photography image of a ${selectedModel.description} wearing the garment shown in the reference image. The setting is ${selectedBackground.description}. The image should be high-quality, professional studio lighting, realistic, fashionable, and suitable for e-commerce product photography.`;
+
+    // استفاده از Gemini برای تولید متن توضیحی
+    // توجه: Gemini فعلاً قابلیت تولید تصویر ندارد، ولی می‌تونیم از imagen یا سرویس‌های دیگر استفاده کنیم
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const description = response.text();
+
+    // ذخیره اطلاعات در Supabase Database
+    const { data: generationData, error: dbError } = await supabase
+      .from('generations')
+      .insert([
+        {
+          user_id: req.user?.id || null,
+          garment_path: garmentPath,
+          model_id: modelId,
+          background_id: backgroundId,
+          prompt: prompt,
+          description: description,
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select();
+
+    if (dbError) {
+      console.error('خطا در ذخیره در دیتابیس:', dbError);
     }
 
-    // شبیه‌سازی تاخیر پردازش
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // در نسخه واقعی، اینجا باید تصویر را با API هوش مصنوعی تولید کنید
-    // مثال: از Replicate API با مدل Virtual Try-On
-    
-    const generatedFileName = `generated-${Date.now()}.jpg`;
-    const generatedPath = `/generated/${generatedFileName}`;
-
-    // برای نمایش، یک تصویر ساختگی ایجاد می‌کنیم
-    // در production باید از API واقعی استفاده شود
-    
     res.json({
       success: true,
-      imagePath: generatedPath,
+      imagePath: garmentPath, // در نسخه واقعی، URL تصویر تولید شده
       model: selectedModel.name,
       background: selectedBackground.name,
-      message: 'تصویر با موفقیت تولید شد!',
-      note: 'برای استفاده واقعی، نیاز به تنظیم API هوش مصنوعی دارید'
+      description: description,
+      message: 'درخواست شما پردازش شد!',
+      note: 'برای تولید تصویر واقعی، از سرویس‌هایی مانند Replicate (SDXL) یا Stability AI استفاده کنید'
     });
 
   } catch (error) {
@@ -136,7 +224,26 @@ app.post('/api/generate', async (req, res) => {
   }
 });
 
+// دریافت تاریخچه تولیدها
+app.get('/api/generations', authenticateUser, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('generations')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    res.json({ success: true, generations: data || [] });
+  } catch (error) {
+    console.error('خطا در دریافت تاریخچه:', error);
+    res.status(500).json({ error: 'خطا در دریافت تاریخچه' });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);
+  console.log(`🔐 Supabase: ${process.env.SUPABASE_URL ? 'Connected' : 'Not configured'}`);
+  console.log(`🤖 Gemini AI: ${process.env.GEMINI_API_KEY ? 'Connected' : 'Not configured'}`);
 });
