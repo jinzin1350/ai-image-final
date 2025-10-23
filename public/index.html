@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عکاسی مد با هوش مصنوعی</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 عکاسی مد با هوش مصنوعی</h1>
+            <p class="subtitle">تولید عکس‌های حرفه‌ای محصول در چند ثانیه</p>
+        </header>
+
+        <div class="main-content">
+            <!-- بخش آپلود لباس -->
+            <section class="upload-section">
+                <h2>۱. آپلود عکس لباس</h2>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="garmentInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>کلیک کنید یا تصویر را بکشید</p>
+                        <span>PNG, JPG, WEBP (حداکثر 10MB)</span>
+                    </div>
+                    <img id="garmentPreview" class="preview-image" style="display: none;">
+                </div>
+            </section>
+
+            <!-- بخش انتخاب مدل -->
+            <section class="selection-section">
+                <h2>۲. انتخاب مدل</h2>
+                <div class="models-grid" id="modelsGrid">
+                    <!-- مدل‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- بخش انتخاب پس‌زمینه -->
+            <section class="selection-section">
+                <h2>۳. انتخاب پس‌زمینه</h2>
+                <div class="backgrounds-grid" id="backgroundsGrid">
+                    <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- دکمه تولید -->
+            <button class="generate-btn" id="generateBtn" disabled>
+                ✨ تولید عکس حرفه‌ای
+            </button>
+
+            <!-- نمایش نتیجه -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 نتیجه نهایی</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image">
+                    <div class="result-info" id="resultInfo"></div>
+                    <button class="download-btn" id="downloadBtn">دانلود تصویر</button>
+                </div>
+            </section>
+
+            <!-- بخش لودینگ -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
