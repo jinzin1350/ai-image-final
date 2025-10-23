@@ -135,8 +135,19 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
       return res.status(400).json({ error: 'لطفاً یک عکس آپلود کنید' });
     }
 
+    // بررسی تنظیمات Supabase
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.error('❌ Supabase تنظیم نشده است!');
+      return res.status(500).json({
+        error: 'خطا در تنظیمات سرور',
+        details: 'لطفاً فایل .env را با اطلاعات Supabase تنظیم کنید'
+      });
+    }
+
     const fileName = `${Date.now()}-${req.file.originalname}`;
     const fileBuffer = req.file.buffer;
+
+    console.log(`📤 در حال آپلود فایل: ${fileName}`);
 
     // آپلود به Supabase Storage
     const { data, error } = await supabase.storage
@@ -146,21 +157,33 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
         upsert: false
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ خطای Supabase Storage:', error);
+      return res.status(500).json({
+        error: 'خطا در آپلود به Supabase',
+        details: error.message,
+        hint: 'مطمئن شوید که bucket با نام "garments" ساخته شده و public است'
+      });
+    }
 
     // دریافت URL عمومی فایل
     const { data: urlData } = supabase.storage
       .from('garments')
       .getPublicUrl(fileName);
 
-    res.json({ 
-      success: true, 
+    console.log(`✅ آپلود موفق: ${urlData.publicUrl}`);
+
+    res.json({
+      success: true,
       filePath: urlData.publicUrl,
       fileName: fileName
     });
   } catch (error) {
-    console.error('خطا در آپلود:', error);
-    res.status(500).json({ error: 'خطا در آپلود فایل' });
+    console.error('❌ خطای سرور:', error);
+    res.status(500).json({
+      error: 'خطا در آپلود فایل',
+      details: error.message
+    });
   }
 });
 
