@@ -238,9 +238,9 @@ Important: Make sure the clothing from the reference image is accurately represe
 
     console.log('📝 Prompt:', prompt);
 
-    // استفاده از Gemini 2.0 Flash برای تولید تصویر
+    // استفاده از Gemini 2.5 Flash Image برای تولید تصویر
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-2.5-flash-image",
       generationConfig: {
         responseModalities: ["Image"] // Enable image generation
       }
