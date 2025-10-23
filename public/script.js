@@ -146,6 +146,12 @@ async function uploadFile(file) {
             garmentPreview.style.display = 'block';
             uploadPlaceholder.style.display = 'none';
             checkGenerateButton();
+        } else {
+            // Show detailed error message
+            console.error('Upload failed:', data);
+            const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
+            const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
+            alert(`Error: ${errorMsg}${hintMsg}`);
         }
     } catch (error) {
         console.error('خطا در آپلود فایل:', error);
