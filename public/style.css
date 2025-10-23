@@ -105,10 +105,11 @@ h2 {
 .background-card {
     border: 2px solid #e0e0e0;
     border-radius: 15px;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
+    overflow: hidden;
 }
 
 .model-card:hover,
@@ -123,6 +124,21 @@ h2 {
     border-color: #667eea;
     background: linear-gradient(135deg, #667eea15, #764ba215);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.model-image-container {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.model-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
 }
 
 .model-icon,

@@ -22,15 +22,11 @@ async function loadModels() {
         const response = await fetch('/api/models');
         const models = await response.json();
 
-        const modelIcons = {
-            'female': '👩',
-            'male': '👨',
-            'child': '🧒'
-        };
-
         modelsGrid.innerHTML = models.map(model => `
             <div class="model-card" data-id="${model.id}">
-                <div class="model-icon">${modelIcons[model.type]}</div>
+                <div class="model-image-container">
+                    <img src="${model.image}" alt="${model.name}" class="model-image">
+                </div>
                 <div class="card-title">${model.name}</div>
             </div>
         `).join('');

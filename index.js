@@ -44,12 +44,48 @@ app.use(express.static('public'));
 
 // لیست مدل‌ها
 const models = [
-  { id: 'woman-1', name: 'مدل زن ۱', type: 'female', description: 'زن جوان با موهای بلند' },
-  { id: 'woman-2', name: 'مدل زن ۲', type: 'female', description: 'زن با استایل مدرن' },
-  { id: 'man-1', name: 'مدل مرد ۱', type: 'male', description: 'مرد جوان ورزشکار' },
-  { id: 'man-2', name: 'مدل مرد ۲', type: 'male', description: 'مرد با استایل رسمی' },
-  { id: 'child-1', name: 'مدل کودک ۱', type: 'child', description: 'کودک شاد' },
-  { id: 'child-2', name: 'مدل کودک ۲', type: 'child', description: 'نوجوان' }
+  {
+    id: 'woman-1',
+    name: 'مدل زن ۱',
+    type: 'female',
+    description: 'زن جوان با موهای بلند',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'woman-2',
+    name: 'مدل زن ۲',
+    type: 'female',
+    description: 'زن با استایل مدرن',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'man-1',
+    name: 'مدل مرد ۱',
+    type: 'male',
+    description: 'مرد جوان ورزشکار',
+    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'man-2',
+    name: 'مدل مرد ۲',
+    type: 'male',
+    description: 'مرد با استایل رسمی',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'child-1',
+    name: 'مدل کودک ۱',
+    type: 'child',
+    description: 'کودک شاد',
+    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'child-2',
+    name: 'مدل کودک ۲',
+    type: 'child',
+    description: 'نوجوان',
+    image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=400&h=600&fit=crop'
+  }
 ];
 
 // لیست پس‌زمینه‌ها
