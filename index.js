@@ -4,6 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const aiplatform = require('@google-cloud/aiplatform');
+const { PredictionServiceClient } = aiplatform.v1;
+const { helpers } = aiplatform;
 require('dotenv').config();
 
 const app = express();
@@ -17,6 +20,14 @@ const supabase = createClient(
 
 // تنظیمات Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+// تنظیمات Vertex AI Imagen
+const predictionClient = new PredictionServiceClient({
+  apiEndpoint: 'us-central1-aiplatform.googleapis.com',
+  credentials: process.env.GOOGLE_APPLICATION_CREDENTIALS
+    ? JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'))
+    : undefined
+});
 
 // تنظیمات Multer برای آپلود موقت
 const storage = multer.memoryStorage();
@@ -187,7 +198,47 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
   }
 });
 
-// تولید عکس با Gemini AI
+// تابع تولید تصویر با Vertex AI Imagen
+async function generateImageWithImagen(prompt, projectId, location = 'us-central1') {
+  try {
+    const endpoint = `projects/${projectId}/locations/${location}/publishers/google/models/imagegeneration@006`;
+
+    const instanceValue = helpers.toValue({
+      prompt: prompt,
+      sampleCount: 1,
+      aspectRatio: "1:1",
+      negativePrompt: "low quality, blurry, distorted, unrealistic",
+      personGeneration: "allow_adult"
+    });
+
+    const instances = [instanceValue];
+    const parameter = helpers.toValue({
+      sampleCount: 1
+    });
+
+    const request = {
+      endpoint,
+      instances,
+      parameters: parameter,
+    };
+
+    const [response] = await predictionClient.predict(request);
+    const predictions = response.predictions;
+
+    if (predictions && predictions.length > 0) {
+      const prediction = predictions[0];
+      const imageBytes = prediction.structValue.fields.bytesBase64Encoded.stringValue;
+      return imageBytes; // Returns base64 encoded image
+    }
+
+    throw new Error('No image generated');
+  } catch (error) {
+    console.error('Vertex AI Imagen error:', error);
+    throw error;
+  }
+}
+
+// تولید عکس با Vertex AI Imagen
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const { garmentPath, modelId, backgroundId } = req.body;
@@ -203,15 +254,49 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
     }
 
-    // ساخت پرامپت برای Gemini
-    const prompt = `Create a professional fashion photography image of a ${selectedModel.description} wearing the garment shown in the reference image. The setting is ${selectedBackground.description}. The image should be high-quality, professional studio lighting, realistic, fashionable, and suitable for e-commerce product photography.`;
+    // ساخت پرامپت برای Imagen
+    const prompt = `Professional fashion photography: ${selectedModel.description} wearing elegant clothing. Setting: ${selectedBackground.description}. High-quality studio lighting, realistic, detailed, fashionable, e-commerce product photography style, 4K resolution`;
 
-    // استفاده از Gemini برای تولید متن توضیحی
-    // توجه: Gemini فعلاً قابلیت تولید تصویر ندارد، ولی می‌تونیم از imagen یا سرویس‌های دیگر استفاده کنیم
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const description = response.text();
+    console.log('🎨 Generating image with Vertex AI Imagen...');
+    console.log('📝 Prompt:', prompt);
+
+    // بررسی تنظیمات Vertex AI
+    if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
+      return res.status(500).json({
+        error: 'Vertex AI not configured',
+        details: 'Please set GOOGLE_CLOUD_PROJECT_ID in your environment variables'
+      });
+    }
+
+    // تولید تصویر با Vertex AI Imagen
+    const imageBase64 = await generateImageWithImagen(
+      prompt,
+      process.env.GOOGLE_CLOUD_PROJECT_ID
+    );
+
+    // تبدیل base64 به buffer
+    const imageBuffer = Buffer.from(imageBase64, 'base64');
+    const fileName = `generated-${Date.now()}.png`;
+
+    // آپلود تصویر تولید شده به Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('garments')
+      .upload(fileName, imageBuffer, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Error uploading generated image:', uploadError);
+      throw uploadError;
+    }
+
+    // دریافت URL عمومی
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    const generatedImageUrl = urlData.publicUrl;
 
     // ذخیره اطلاعات در Supabase Database
     const { data: generationData, error: dbError } = await supabase
@@ -223,7 +308,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
           model_id: modelId,
           background_id: backgroundId,
           prompt: prompt,
-          description: description,
+          generated_image_url: generatedImageUrl,
           created_at: new Date().toISOString()
         }
       ])
@@ -233,19 +318,23 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       console.error('خطا در ذخیره در دیتابیس:', dbError);
     }
 
+    console.log('✅ Image generated successfully!');
+
     res.json({
       success: true,
-      imagePath: garmentPath, // در نسخه واقعی، URL تصویر تولید شده
+      imagePath: generatedImageUrl,
       model: selectedModel.name,
       background: selectedBackground.name,
-      description: description,
-      message: 'درخواست شما پردازش شد!',
-      note: 'برای تولید تصویر واقعی، از سرویس‌هایی مانند Replicate (SDXL) یا Stability AI استفاده کنید'
+      prompt: prompt,
+      message: 'تصویر با موفقیت تولید شد!'
     });
 
   } catch (error) {
-    console.error('خطا در تولید تصویر:', error);
-    res.status(500).json({ error: 'خطا در تولید تصویر' });
+    console.error('❌ خطا در تولید تصویر:', error);
+    res.status(500).json({
+      error: 'خطا در تولید تصویر',
+      details: error.message
+    });
   }
 });
 
