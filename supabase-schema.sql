@@ -38,16 +38,36 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('garments', 'garments', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Policy برای آپلود به bucket
+-- حذف Policy‌های قبلی در صورت وجود
+DROP POLICY IF EXISTS "Anyone can upload garment images" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can download garment images" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can update garment images" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can delete garment images" ON storage.objects;
+
+-- Policy برای آپلود به bucket (INSERT)
 CREATE POLICY "Anyone can upload garment images"
   ON storage.objects
   FOR INSERT
   TO public
   WITH CHECK (bucket_id = 'garments');
 
--- Policy برای دانلود از bucket
+-- Policy برای دانلود از bucket (SELECT)
 CREATE POLICY "Anyone can download garment images"
   ON storage.objects
   FOR SELECT
+  TO public
+  USING (bucket_id = 'garments');
+
+-- Policy برای بروزرسانی (UPDATE)
+CREATE POLICY "Anyone can update garment images"
+  ON storage.objects
+  FOR UPDATE
+  TO public
+  USING (bucket_id = 'garments');
+
+-- Policy برای حذف (DELETE)
+CREATE POLICY "Anyone can delete garment images"
+  ON storage.objects
+  FOR DELETE
   TO public
   USING (bucket_id = 'garments');
