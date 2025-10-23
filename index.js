@@ -208,7 +208,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // استفاده از Gemini برای تولید متن توضیحی
     // توجه: Gemini فعلاً قابلیت تولید تصویر ندارد، ولی می‌تونیم از imagen یا سرویس‌های دیگر استفاده کنیم
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const description = response.text();
