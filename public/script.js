@@ -141,7 +141,7 @@ async function uploadFile(file) {
         const data = await response.json();
 
         if (data.success) {
-            uploadedGarmentPath = data.fileName;
+            uploadedGarmentPath = data.filePath; // Store full URL instead of just filename
             garmentPreview.src = data.filePath;
             garmentPreview.style.display = 'block';
             uploadPlaceholder.style.display = 'none';
