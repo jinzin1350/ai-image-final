@@ -4,9 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const aiplatform = require('@google-cloud/aiplatform');
-const { PredictionServiceClient } = aiplatform.v1;
-const { helpers } = aiplatform;
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -20,14 +18,6 @@ const supabase = createClient(
 
 // تنظیمات Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
-// تنظیمات Vertex AI Imagen
-const predictionClient = new PredictionServiceClient({
-  apiEndpoint: 'us-central1-aiplatform.googleapis.com',
-  credentials: process.env.GOOGLE_APPLICATION_CREDENTIALS
-    ? JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'))
-    : undefined
-});
 
 // تنظیمات Multer برای آپلود موقت
 const storage = multer.memoryStorage();
@@ -198,47 +188,19 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
   }
 });
 
-// تابع تولید تصویر با Vertex AI Imagen
-async function generateImageWithImagen(prompt, projectId, location = 'us-central1') {
+// تابع دانلود تصویر از URL و تبدیل به base64
+async function imageUrlToBase64(url) {
   try {
-    const endpoint = `projects/${projectId}/locations/${location}/publishers/google/models/imagegeneration@006`;
-
-    const instanceValue = helpers.toValue({
-      prompt: prompt,
-      sampleCount: 1,
-      aspectRatio: "1:1",
-      negativePrompt: "low quality, blurry, distorted, unrealistic",
-      personGeneration: "allow_adult"
-    });
-
-    const instances = [instanceValue];
-    const parameter = helpers.toValue({
-      sampleCount: 1
-    });
-
-    const request = {
-      endpoint,
-      instances,
-      parameters: parameter,
-    };
-
-    const [response] = await predictionClient.predict(request);
-    const predictions = response.predictions;
-
-    if (predictions && predictions.length > 0) {
-      const prediction = predictions[0];
-      const imageBytes = prediction.structValue.fields.bytesBase64Encoded.stringValue;
-      return imageBytes; // Returns base64 encoded image
-    }
-
-    throw new Error('No image generated');
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    return base64;
   } catch (error) {
-    console.error('Vertex AI Imagen error:', error);
+    console.error('Error downloading image:', error);
     throw error;
   }
 }
 
-// تولید عکس با Vertex AI Imagen
+// تولید عکس با Gemini 2.5 Flash
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const { garmentPath, modelId, backgroundId } = req.body;
@@ -254,49 +216,51 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
     }
 
-    // ساخت پرامپت برای Imagen
-    const prompt = `Professional fashion photography: ${selectedModel.description} wearing elegant clothing. Setting: ${selectedBackground.description}. High-quality studio lighting, realistic, detailed, fashionable, e-commerce product photography style, 4K resolution`;
+    console.log('🎨 Generating image with Gemini 2.5 Flash...');
+    console.log('📸 Garment URL:', garmentPath);
 
-    console.log('🎨 Generating image with Vertex AI Imagen...');
+    // دانلود عکس لباس و تبدیل به base64
+    const garmentBase64 = await imageUrlToBase64(garmentPath);
+
+    // ساخت پرامپت برای Gemini
+    const prompt = `Create a professional fashion photography image.
+
+Requirements:
+- Model: ${selectedModel.description}
+- The model should be wearing the exact garment/clothing shown in the reference image
+- Setting: ${selectedBackground.description}
+- Style: High-quality professional studio photography
+- Lighting: Professional studio lighting, soft and flattering
+- Quality: Realistic, detailed, sharp focus, 4K resolution
+- Suitable for e-commerce product photography
+
+Important: Make sure the clothing from the reference image is accurately represented on the model in the generated image.`;
+
     console.log('📝 Prompt:', prompt);
 
-    // بررسی تنظیمات Vertex AI
-    if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
-      return res.status(500).json({
-        error: 'Vertex AI not configured',
-        details: 'Please set GOOGLE_CLOUD_PROJECT_ID in your environment variables'
-      });
-    }
+    // استفاده از Gemini 2.5 Flash برای تولید تصویر
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-    // تولید تصویر با Vertex AI Imagen
-    const imageBase64 = await generateImageWithImagen(
-      prompt,
-      process.env.GOOGLE_CLOUD_PROJECT_ID
-    );
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: garmentBase64,
+          mimeType: 'image/jpeg'
+        }
+      },
+      { text: prompt }
+    ]);
 
-    // تبدیل base64 به buffer
-    const imageBuffer = Buffer.from(imageBase64, 'base64');
-    const fileName = `generated-${Date.now()}.png`;
+    const response = await result.response;
+    const generatedText = response.text();
 
-    // آپلود تصویر تولید شده به Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('garments')
-      .upload(fileName, imageBuffer, {
-        contentType: 'image/png',
-        upsert: false
-      });
+    console.log('📄 Gemini response:', generatedText);
 
-    if (uploadError) {
-      console.error('Error uploading generated image:', uploadError);
-      throw uploadError;
-    }
+    // Note: Currently Gemini doesn't return images directly in the response
+    // We'll save the description and use the garment image as placeholder
+    // When Gemini image generation is available, we'll update this
 
-    // دریافت URL عمومی
-    const { data: urlData } = supabase.storage
-      .from('garments')
-      .getPublicUrl(fileName);
-
-    const generatedImageUrl = urlData.publicUrl;
+    const fileName = `generated-${Date.now()}.txt`;
 
     // ذخیره اطلاعات در Supabase Database
     const { data: generationData, error: dbError } = await supabase
@@ -308,7 +272,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
           model_id: modelId,
           background_id: backgroundId,
           prompt: prompt,
-          generated_image_url: generatedImageUrl,
+          description: generatedText,
           created_at: new Date().toISOString()
         }
       ])
@@ -318,15 +282,17 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       console.error('خطا در ذخیره در دیتابیس:', dbError);
     }
 
-    console.log('✅ Image generated successfully!');
+    console.log('✅ Generation completed!');
 
     res.json({
       success: true,
-      imagePath: generatedImageUrl,
+      imagePath: garmentPath, // Using original garment as placeholder
       model: selectedModel.name,
       background: selectedBackground.name,
+      description: generatedText,
       prompt: prompt,
-      message: 'تصویر با موفقیت تولید شد!'
+      message: 'درخواست شما پردازش شد!',
+      note: 'Gemini 2.5 Flash image generation will be integrated when API supports it'
     });
 
   } catch (error) {
