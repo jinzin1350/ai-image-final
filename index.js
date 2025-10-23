@@ -1,4 +1,3 @@
-
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -26,13 +25,16 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
+    const allowedTypes = /jpeg|jpg|png|webp|avif/;
+    const allowedMimetypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
+
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const mimetype = allowedMimetypes.includes(file.mimetype);
+
     if (extname && mimetype) {
       return cb(null, true);
     }
-    cb(new Error('فقط فایل‌های تصویری مجاز هستند!'));
+    cb(new Error(`فقط فایل‌های تصویری (JPG, PNG, WEBP, AVIF) مجاز هستند. فرمت فایل شما: ${file.mimetype}`));
   }
 });
 
@@ -62,7 +64,7 @@ const backgrounds = [
 // Middleware برای احراز هویت
 const authenticateUser = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  
+
   if (!token) {
     // برای demo، اجازه دسترسی بدون احراز هویت
     req.user = null;
@@ -84,7 +86,7 @@ app.post('/api/auth/signup', async (req, res) => {
   try {
     const { email, password } = req.body;
     const { data, error } = await supabase.auth.signUp({ email, password });
-    
+
     if (error) throw error;
     res.json({ success: true, user: data.user });
   } catch (error) {
@@ -97,7 +99,7 @@ app.post('/api/auth/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
+
     if (error) throw error;
     res.json({ success: true, session: data.session });
   } catch (error) {

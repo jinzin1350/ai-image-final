@@ -1,4 +1,3 @@
-
 let uploadedGarmentPath = null;
 let selectedModelId = null;
 let selectedBackgroundId = null;
@@ -22,7 +21,7 @@ async function loadModels() {
     try {
         const response = await fetch('/api/models');
         const models = await response.json();
-        
+
         const modelIcons = {
             'female': '👩',
             'male': '👨',
@@ -50,7 +49,7 @@ async function loadBackgrounds() {
     try {
         const response = await fetch('/api/backgrounds');
         const backgrounds = await response.json();
-        
+
         const backgroundIcons = {
             'studio': '🏢',
             'beach': '🏖️',
@@ -140,7 +139,7 @@ async function uploadFile(file) {
         });
 
         const data = await response.json();
-        
+
         if (data.success) {
             uploadedGarmentPath = data.fileName;
             garmentPreview.src = data.filePath;
@@ -150,7 +149,7 @@ async function uploadFile(file) {
         }
     } catch (error) {
         console.error('خطا در آپلود فایل:', error);
-        alert('خطا در آپلود فایل. لطفاً دوباره تلاش کنید.');
+        alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
     }
 }
 
@@ -173,7 +172,7 @@ generateBtn.addEventListener('click', async () => {
         });
 
         const data = await response.json();
-        
+
         if (data.success) {
             // نمایش نتیجه
             // در نسخه واقعی، تصویر تولید شده را نمایش می‌دهد
