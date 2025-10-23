@@ -176,22 +176,19 @@ generateBtn.addEventListener('click', async () => {
         const data = await response.json();
 
         if (data.success) {
-            // نمایش نتیجه
-            // در نسخه واقعی، تصویر تولید شده را نمایش می‌دهد
-            resultImage.src = garmentPreview.src; // موقتی از تصویر آپلودی استفاده می‌کنیم
+            // نمایش تصویر تولید شده
+            resultImage.src = data.imagePath;
             resultInfo.innerHTML = `
                 <p><strong>مدل:</strong> ${data.model}</p>
                 <p><strong>پس‌زمینه:</strong> ${data.background}</p>
-                <p><strong>⚠️ توجه:</strong> ${data.note}</p>
-                <p style="margin-top: 15px; color: #666;">
-                    برای استفاده واقعی از این ابزار، نیاز است که یک API هوش مصنوعی مانند:
-                    <br>• Replicate (Virtual Try-On models)
-                    <br>• Stability AI
-                    <br>• یا سرویس‌های مشابه را پیکربندی کنید.
-                </p>
+                <p><strong>✅ وضعیت:</strong> ${data.message}</p>
+                ${data.description ? `<p style="margin-top: 10px; color: #666; font-size: 0.9rem;">${data.description}</p>` : ''}
             `;
             resultSection.style.display = 'block';
             resultSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // Show error message
+            alert(`خطا: ${data.error}\n${data.details || ''}`);
         }
     } catch (error) {
         console.error('خطا در تولید تصویر:', error);
