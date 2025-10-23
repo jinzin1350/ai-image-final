@@ -254,23 +254,33 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     console.log('🎨 Generating image with Gemini 2.5 Flash...');
     console.log('📸 Garment URL:', garmentPath);
+    console.log('👤 Model:', selectedModel.name);
+    console.log('📍 Location:', selectedBackground.name);
 
-    // دانلود عکس لباس و تبدیل به base64
+    // دانلود عکس لباس و مدل و تبدیل به base64
     const garmentBase64 = await imageUrlToBase64(garmentPath);
+    const modelBase64 = await imageUrlToBase64(selectedModel.image);
 
-    // ساخت پرامپت برای Gemini
-    const prompt = `Create a professional fashion photography image.
+    // ساخت پرامپت برای Virtual Try-On
+    const prompt = `You are a professional fashion photographer and image editor. Create a realistic virtual try-on image.
 
-Requirements:
-- Model: ${selectedModel.description}
-- The model should be wearing the exact garment/clothing shown in the reference image
-- Setting: ${selectedBackground.description}
-- Style: High-quality professional studio photography
-- Lighting: Professional studio lighting, soft and flattering
-- Quality: Realistic, detailed, sharp focus, 4K resolution
-- Suitable for e-commerce product photography
+TASK: Place the garment/clothing from the first image onto the model shown in the second image.
 
-Important: Make sure the clothing from the reference image is accurately represented on the model in the generated image.`;
+REQUIREMENTS:
+1. The model from the second image should wear the exact garment/clothing from the first image
+2. Location/Setting: ${selectedBackground.description}
+3. Keep the model's pose, face, and overall appearance from the reference image
+4. The clothing must fit naturally on the model's body
+5. Maintain realistic shadows, wrinkles, and fabric draping
+6. Professional studio lighting - soft and flattering
+7. High-quality, sharp focus, 4K resolution
+8. Suitable for e-commerce product photography
+
+IMPORTANT:
+- Do NOT change the model's appearance, just dress them in the garment from the first image
+- Make sure the clothing looks natural and realistic on the model
+- Blend the clothing seamlessly with the model's body
+- Use the specified location/background setting`;
 
     console.log('📝 Prompt:', prompt);
 
@@ -283,9 +293,17 @@ Important: Make sure the clothing from the reference image is accurately represe
     });
 
     const result = await model.generateContent([
+      { text: "GARMENT/CLOTHING IMAGE:" },
       {
         inlineData: {
           data: garmentBase64,
+          mimeType: 'image/jpeg'
+        }
+      },
+      { text: "MODEL IMAGE:" },
+      {
+        inlineData: {
+          data: modelBase64,
           mimeType: 'image/jpeg'
         }
       },
