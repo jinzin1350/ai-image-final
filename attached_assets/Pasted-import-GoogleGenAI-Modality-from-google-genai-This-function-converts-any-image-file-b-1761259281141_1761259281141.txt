@@ -1,0 +1,129 @@
+import { GoogleGenAI, Modality } from "@google/genai";
+
+// This function converts any image file/blob to a base64 JPEG string.
+// It also resizes the image to a max dimension to optimize for API calls.
+export const processImage = (file: File | Blob): Promise<{ base64: string, mimeType: string }> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      if (!event.target?.result) {
+        return reject(new Error("FileReader failed to read file."));
+      }
+      const img = new Image();
+      img.src = event.target.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_DIMENSION = 1024;
+        let { width, height } = img;
+
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIMENSION) / width);
+            width = MAX_DIMENSION;
+          } else {
+            width = Math.round((width * MAX_DIMENSION) / height);
+            height = MAX_DIMENSION;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Could not get canvas context.'));
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const base64 = dataUrl.split(',')[1];
+        
+        if (!base64) {
+          return reject(new Error('Failed to create base64 string from canvas.'));
+        }
+
+        resolve({ base64, mimeType: 'image/jpeg' });
+      };
+      img.onerror = (error) => reject(new Error(`Image loading failed: ${error}`));
+    };
+    reader.onerror = (error) => reject(new Error(`FileReader error: ${error}`));
+  });
+};
+
+
+export const generatePhotoshootImage = async (
+  clothingImageBase64: string,
+  clothingMimeType: string,
+  modelImageBase64: string,
+  modelMimeType: string,
+  backgroundDescription: string
+): Promise<string> => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+
+    const prompt = `Your task is to create a photorealistic fashion photoshoot image. You are provided with two images: the first contains a single clothing item, and the second shows a human model. Your primary goal is to realistically 'dress' the model from the second image with the clothing item from the first. The clothing must fit the model's body naturally, conforming to their posture and shape as if they were actually wearing it. After dressing the model, place them in the following setting: "${backgroundDescription}". The final image must be a high-quality, professional, and well-lit photograph. Do not include any text or logos. The composition should be a full-body or three-quarter shot of the model.`;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+            parts: [
+                {
+                    inlineData: {
+                        data: clothingImageBase64,
+                        mimeType: clothingMimeType,
+                    },
+                },
+                {
+                    inlineData: {
+                        data: modelImageBase64,
+                        mimeType: modelMimeType,
+                    },
+                },
+                {
+                    text: prompt,
+                },
+            ],
+        },
+        config: {
+            responseModalities: [Modality.IMAGE],
+        },
+    });
+
+    const candidate = response.candidates?.[0];
+
+    if (!candidate || !candidate.content?.parts) {
+      let errorMessage = "The AI returned an invalid response.";
+      // Check for block reason, which is common when no candidates are returned.
+      if (response.promptFeedback?.blockReason) {
+        errorMessage = `Request was blocked: ${response.promptFeedback.blockReason}.`;
+        if (response.promptFeedback.blockReason === 'SAFETY' && response.promptFeedback.safetyRatings) {
+            const harmfulCategories = response.promptFeedback.safetyRatings
+                .filter(rating => rating.probability !== 'NEGLIGIBLE' && rating.probability !== 'LOW')
+                .map(rating => rating.category.replace('HARM_CATEGORY_', ''));
+            if (harmfulCategories.length > 0) {
+                errorMessage += ` Potentially harmful categories detected: ${harmfulCategories.join(', ')}. Please adjust your images or background description.`;
+            }
+        }
+      } else {
+        // Log the whole response for debugging if the structure is unexpected
+        console.error("Unexpected Gemini API response:", JSON.stringify(response, null, 2));
+      }
+      throw new Error(errorMessage);
+    }
+    
+    for (const part of candidate.content.parts) {
+        if (part.inlineData?.data) {
+            return part.inlineData.data;
+        }
+    }
+    
+    throw new Error("No image data found in the AI's response.");
+  } catch (error) {
+    console.error("Error generating image with Gemini:", error);
+    if (error instanceof Error) {
+        throw new Error(`Failed to generate AI image: ${error.message}`);
+    }
+    throw new Error("Failed to generate AI image due to an unknown error.");
+  }
+};

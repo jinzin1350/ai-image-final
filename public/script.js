@@ -22,15 +22,11 @@ async function loadModels() {
         const response = await fetch('/api/models');
         const models = await response.json();
 
-        const modelIcons = {
-            'female': '👩',
-            'male': '👨',
-            'child': '🧒'
-        };
-
         modelsGrid.innerHTML = models.map(model => `
             <div class="model-card" data-id="${model.id}">
-                <div class="model-icon">${modelIcons[model.type]}</div>
+                <div class="model-image-container">
+                    <img src="${model.image}" alt="${model.name}" class="model-image">
+                </div>
                 <div class="card-title">${model.name}</div>
             </div>
         `).join('');
@@ -141,11 +137,17 @@ async function uploadFile(file) {
         const data = await response.json();
 
         if (data.success) {
-            uploadedGarmentPath = data.fileName;
+            uploadedGarmentPath = data.filePath; // Store full URL instead of just filename
             garmentPreview.src = data.filePath;
             garmentPreview.style.display = 'block';
             uploadPlaceholder.style.display = 'none';
             checkGenerateButton();
+        } else {
+            // Show detailed error message
+            console.error('Upload failed:', data);
+            const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
+            const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
+            alert(`Error: ${errorMsg}${hintMsg}`);
         }
     } catch (error) {
         console.error('خطا در آپلود فایل:', error);

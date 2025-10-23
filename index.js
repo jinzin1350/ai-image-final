@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -43,12 +44,48 @@ app.use(express.static('public'));
 
 // لیست مدل‌ها
 const models = [
-  { id: 'woman-1', name: 'مدل زن ۱', type: 'female', description: 'زن جوان با موهای بلند' },
-  { id: 'woman-2', name: 'مدل زن ۲', type: 'female', description: 'زن با استایل مدرن' },
-  { id: 'man-1', name: 'مدل مرد ۱', type: 'male', description: 'مرد جوان ورزشکار' },
-  { id: 'man-2', name: 'مدل مرد ۲', type: 'male', description: 'مرد با استایل رسمی' },
-  { id: 'child-1', name: 'مدل کودک ۱', type: 'child', description: 'کودک شاد' },
-  { id: 'child-2', name: 'مدل کودک ۲', type: 'child', description: 'نوجوان' }
+  {
+    id: 'woman-1',
+    name: 'مدل زن ۱',
+    type: 'female',
+    description: 'زن جوان با موهای بلند',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'woman-2',
+    name: 'مدل زن ۲',
+    type: 'female',
+    description: 'زن با استایل مدرن',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'man-1',
+    name: 'مدل مرد ۱',
+    type: 'male',
+    description: 'مرد جوان ورزشکار',
+    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'man-2',
+    name: 'مدل مرد ۲',
+    type: 'male',
+    description: 'مرد با استایل رسمی',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'child-1',
+    name: 'مدل کودک ۱',
+    type: 'child',
+    description: 'کودک شاد',
+    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'child-2',
+    name: 'مدل کودک ۲',
+    type: 'child',
+    description: 'نوجوان',
+    image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=400&h=600&fit=crop'
+  }
 ];
 
 // لیست پس‌زمینه‌ها
@@ -135,8 +172,19 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
       return res.status(400).json({ error: 'لطفاً یک عکس آپلود کنید' });
     }
 
+    // بررسی تنظیمات Supabase
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.error('❌ Supabase تنظیم نشده است!');
+      return res.status(500).json({
+        error: 'خطا در تنظیمات سرور',
+        details: 'لطفاً فایل .env را با اطلاعات Supabase تنظیم کنید'
+      });
+    }
+
     const fileName = `${Date.now()}-${req.file.originalname}`;
     const fileBuffer = req.file.buffer;
+
+    console.log(`📤 در حال آپلود فایل: ${fileName}`);
 
     // آپلود به Supabase Storage
     const { data, error } = await supabase.storage
@@ -146,25 +194,49 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
         upsert: false
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ خطای Supabase Storage:', error);
+      return res.status(500).json({
+        error: 'خطا در آپلود به Supabase',
+        details: error.message,
+        hint: 'مطمئن شوید که bucket با نام "garments" ساخته شده و public است'
+      });
+    }
 
     // دریافت URL عمومی فایل
     const { data: urlData } = supabase.storage
       .from('garments')
       .getPublicUrl(fileName);
 
-    res.json({ 
-      success: true, 
+    console.log(`✅ آپلود موفق: ${urlData.publicUrl}`);
+
+    res.json({
+      success: true,
       filePath: urlData.publicUrl,
       fileName: fileName
     });
   } catch (error) {
-    console.error('خطا در آپلود:', error);
-    res.status(500).json({ error: 'خطا در آپلود فایل' });
+    console.error('❌ خطای سرور:', error);
+    res.status(500).json({
+      error: 'خطا در آپلود فایل',
+      details: error.message
+    });
   }
 });
 
-// تولید عکس با Gemini AI
+// تابع دانلود تصویر از URL و تبدیل به base64
+async function imageUrlToBase64(url) {
+  try {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    return base64;
+  } catch (error) {
+    console.error('Error downloading image:', error);
+    throw error;
+  }
+}
+
+// تولید عکس با Gemini 2.5 Flash
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const { garmentPath, modelId, backgroundId } = req.body;
@@ -180,15 +252,118 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
     }
 
-    // ساخت پرامپت برای Gemini
-    const prompt = `Create a professional fashion photography image of a ${selectedModel.description} wearing the garment shown in the reference image. The setting is ${selectedBackground.description}. The image should be high-quality, professional studio lighting, realistic, fashionable, and suitable for e-commerce product photography.`;
+    console.log('🎨 Generating image with Gemini 2.5 Flash...');
+    console.log('📸 Garment URL:', garmentPath);
+    console.log('👤 Model:', selectedModel.name);
+    console.log('📍 Location:', selectedBackground.name);
 
-    // استفاده از Gemini برای تولید متن توضیحی
-    // توجه: Gemini فعلاً قابلیت تولید تصویر ندارد، ولی می‌تونیم از imagen یا سرویس‌های دیگر استفاده کنیم
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent(prompt);
+    // دانلود عکس لباس و مدل و تبدیل به base64
+    const garmentBase64 = await imageUrlToBase64(garmentPath);
+    const modelBase64 = await imageUrlToBase64(selectedModel.image);
+
+    // ساخت پرامپت برای Virtual Try-On
+    const prompt = `You are a professional fashion photographer and image editor. Create a realistic virtual try-on image.
+
+TASK: Place the garment/clothing from the first image onto the model shown in the second image.
+
+REQUIREMENTS:
+1. The model from the second image should wear the exact garment/clothing from the first image
+2. Location/Setting: ${selectedBackground.description}
+3. Keep the model's pose, face, and overall appearance from the reference image
+4. The clothing must fit naturally on the model's body
+5. Maintain realistic shadows, wrinkles, and fabric draping
+6. Professional studio lighting - soft and flattering
+7. High-quality, sharp focus, 4K resolution
+8. Suitable for e-commerce product photography
+
+IMPORTANT:
+- Do NOT change the model's appearance, just dress them in the garment from the first image
+- Make sure the clothing looks natural and realistic on the model
+- Blend the clothing seamlessly with the model's body
+- Use the specified location/background setting`;
+
+    console.log('📝 Prompt:', prompt);
+
+    // استفاده از Gemini 2.5 Flash Image برای تولید تصویر
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash-image",
+      generationConfig: {
+        responseModalities: ["Image"] // Enable image generation
+      }
+    });
+
+    const result = await model.generateContent([
+      { text: "GARMENT/CLOTHING IMAGE:" },
+      {
+        inlineData: {
+          data: garmentBase64,
+          mimeType: 'image/jpeg'
+        }
+      },
+      { text: "MODEL IMAGE:" },
+      {
+        inlineData: {
+          data: modelBase64,
+          mimeType: 'image/jpeg'
+        }
+      },
+      { text: prompt }
+    ]);
+
     const response = await result.response;
-    const description = response.text();
+
+    console.log('📦 Response structure:', JSON.stringify({
+      candidates: response.candidates?.length,
+      hasParts: !!response.candidates?.[0]?.content?.parts
+    }));
+
+    // Extract generated image from response
+    let generatedImageBase64 = null;
+    let generatedText = '';
+
+    if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+      console.error('❌ Invalid response structure:', JSON.stringify(response, null, 2));
+      throw new Error('Invalid response from Gemini API');
+    }
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        // This is the generated image
+        generatedImageBase64 = part.inlineData.data;
+        console.log('✅ Image generated successfully!');
+      } else if (part.text) {
+        generatedText += part.text;
+      }
+    }
+
+    if (!generatedImageBase64) {
+      console.error('❌ No image in response. Parts:', JSON.stringify(response.candidates[0].content.parts, null, 2));
+      throw new Error('No image was generated by Gemini. Response only contains text.');
+    }
+
+    // تبدیل base64 به buffer
+    const imageBuffer = Buffer.from(generatedImageBase64, 'base64');
+    const fileName = `generated-${Date.now()}.png`;
+
+    // آپلود تصویر تولید شده به Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('garments')
+      .upload(fileName, imageBuffer, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Error uploading generated image:', uploadError);
+      throw uploadError;
+    }
+
+    // دریافت URL عمومی
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    const generatedImageUrl = urlData.publicUrl;
 
     // ذخیره اطلاعات در Supabase Database
     const { data: generationData, error: dbError } = await supabase
@@ -200,7 +375,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
           model_id: modelId,
           background_id: backgroundId,
           prompt: prompt,
-          description: description,
+          description: generatedText,
+          generated_image_url: generatedImageUrl,
           created_at: new Date().toISOString()
         }
       ])
@@ -210,19 +386,24 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       console.error('خطا در ذخیره در دیتابیس:', dbError);
     }
 
+    console.log('✅ Image generated and uploaded successfully!');
+
     res.json({
       success: true,
-      imagePath: garmentPath, // در نسخه واقعی، URL تصویر تولید شده
+      imagePath: generatedImageUrl,
       model: selectedModel.name,
       background: selectedBackground.name,
-      description: description,
-      message: 'درخواست شما پردازش شد!',
-      note: 'برای تولید تصویر واقعی، از سرویس‌هایی مانند Replicate (SDXL) یا Stability AI استفاده کنید'
+      description: generatedText,
+      prompt: prompt,
+      message: 'تصویر با موفقیت تولید شد!'
     });
 
   } catch (error) {
-    console.error('خطا در تولید تصویر:', error);
-    res.status(500).json({ error: 'خطا در تولید تصویر' });
+    console.error('❌ خطا در تولید تصویر:', error);
+    res.status(500).json({
+      error: 'خطا در تولید تصویر',
+      details: error.message
+    });
   }
 });
 
