@@ -64,7 +64,7 @@
                 <!-- اطلاعات تصویر -->
             </div>
             <div class="modal-actions">
-                <button onclick="generateInstagramCaption()" class="action-btn caption-btn">
+                <button onclick="openProductForm()" class="action-btn caption-btn">
                     ✨ تولید کپشن اینستاگرام
                 </button>
                 <button onclick="downloadImage()" class="action-btn download-btn">
@@ -75,14 +75,168 @@
                 </button>
             </div>
             <div class="caption-section" id="captionSection" style="display: none;">
+                <!-- فرم اطلاعات محصول -->
+                <div class="product-info-form" id="productInfoForm" style="display: none;">
+                    <h3>📦 اطلاعات محصول</h3>
+                    <p class="form-hint">برای تولید کپشن دقیق‌تر، اطلاعات محصول را وارد کنید:</p>
+
+                    <div class="form-group">
+                        <label>🏷️ نام محصول</label>
+                        <input type="text" id="productName" placeholder="مثال: تی‌شرت مشکی یقه گرد" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>🎨 رنگ‌های موجود (حداقل یکی انتخاب کنید)</label>
+                        <div class="color-checkboxes">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="مشکی">
+                                <span class="color-dot" style="background: #000"></span>
+                                مشکی
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="سفید">
+                                <span class="color-dot" style="background: #fff; border: 1px solid #ddd"></span>
+                                سفید
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="خاکستری">
+                                <span class="color-dot" style="background: #808080"></span>
+                                خاکستری
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="قرمز">
+                                <span class="color-dot" style="background: #ff0000"></span>
+                                قرمز
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="آبی">
+                                <span class="color-dot" style="background: #0066ff"></span>
+                                آبی
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="سبز">
+                                <span class="color-dot" style="background: #00cc00"></span>
+                                سبز
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="زرد">
+                                <span class="color-dot" style="background: #ffd700"></span>
+                                زرد
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="صورتی">
+                                <span class="color-dot" style="background: #ff69b4"></span>
+                                صورتی
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="بنفش">
+                                <span class="color-dot" style="background: #9370db"></span>
+                                بنفش
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="قهوه‌ای">
+                                <span class="color-dot" style="background: #8b4513"></span>
+                                قهوه‌ای
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="نارنجی">
+                                <span class="color-dot" style="background: #ff8c00"></span>
+                                نارنجی
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="color" value="کرم">
+                                <span class="color-dot" style="background: #fffdd0"></span>
+                                کرم
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📏 سایزهای موجود (حداقل یکی انتخاب کنید)</label>
+                        <div class="size-checkboxes">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="XS"> XS
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="S"> S
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="M"> M
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="L"> L
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="XL"> XL
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="XXL"> XXL
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="size" value="XXXL"> XXXL
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>💰 قیمت (تومان)</label>
+                            <input type="number" id="productPrice" placeholder="مثال: 250000" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>🎁 تخفیف (درصد)</label>
+                            <input type="number" id="productDiscount" placeholder="مثال: 20" min="0" max="100" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🏪 دسته‌بندی محصول</label>
+                        <select id="productCategory" class="form-input">
+                            <option value="">انتخاب کنید...</option>
+                            <option value="تی‌شرت">تی‌شرت</option>
+                            <option value="شلوار">شلوار</option>
+                            <option value="کت و شلوار">کت و شلوار</option>
+                            <option value="پیراهن">پیراهن</option>
+                            <option value="مانتو">مانتو</option>
+                            <option value="کفش">کفش</option>
+                            <option value="کلاه">کلاه</option>
+                            <option value="اکسسوری">اکسسوری</option>
+                            <option value="کیف">کیف</option>
+                            <option value="سایر">سایر</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📝 توضیحات اضافی (اختیاری)</label>
+                        <textarea id="productDescription" placeholder="مثال: جنس پنبه، مناسب برای فصل تابستان..." class="form-textarea"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button onclick="submitProductInfo()" class="caption-btn primary">
+                            ✨ تولید کپشن
+                        </button>
+                        <button onclick="closeProductForm()" class="caption-btn secondary">
+                            انصراف
+                        </button>
+                    </div>
+                </div>
+
                 <div class="caption-loading" id="captionLoading" style="display: none;">
                     <div class="loading-spinner"></div>
                     <p>در حال تولید کپشن...</p>
                 </div>
                 <div class="caption-result" id="captionResult" style="display: none;">
-                    <h4>کپشن اینستاگرام:</h4>
+                    <h3>📱 کپشن اینستاگرام</h3>
                     <div class="caption-text" id="captionText"></div>
-                    <button onclick="copyCaption()" class="copy-btn">📋 کپی کردن</button>
+                    <div class="caption-actions">
+                        <button onclick="copyCaption()" class="caption-btn">
+                            📋 کپی کردن
+                        </button>
+                        <button onclick="shareToInstagram()" class="caption-btn">
+                            📤 اشتراک‌گذاری
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

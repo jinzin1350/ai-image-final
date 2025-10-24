@@ -263,27 +263,103 @@ sortSelect.addEventListener('change', () => {
     displayGallery();
 });
 
-// تولید کپشن اینستاگرام
+// تولید کپشن اینستاگرام - نمایش فرم
 async function generateInstagramCaption() {
     if (!currentImageId) return;
+
+    const captionSection = document.getElementById('captionSection');
+    const productInfoForm = document.getElementById('productInfoForm');
+
+    // نمایش فرم اطلاعات محصول
+    captionSection.style.display = 'block';
+    productInfoForm.style.display = 'block';
+    document.getElementById('captionLoading').style.display = 'none';
+    document.getElementById('captionResult').style.display = 'none';
+}
+
+// بستن فرم اطلاعات محصول
+function closeProductForm() {
+    const captionSection = document.getElementById('captionSection');
+    const productInfoForm = document.getElementById('productInfoForm');
+
+    captionSection.style.display = 'none';
+    productInfoForm.style.display = 'none';
+
+    // پاک کردن فرم
+    document.getElementById('productName').value = '';
+    document.getElementById('productPrice').value = '';
+    document.getElementById('productDiscount').value = '';
+    document.getElementById('productCategory').value = '';
+    document.getElementById('productDescription').value = '';
+    document.querySelectorAll('input[name="color"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('input[name="size"]').forEach(cb => cb.checked = false);
+}
+
+// ارسال اطلاعات محصول و تولید کپشن
+async function submitProductInfo() {
+    const productName = document.getElementById('productName').value.trim();
+    const productPrice = document.getElementById('productPrice').value.trim();
+    const productDiscount = document.getElementById('productDiscount').value.trim();
+    const productCategory = document.getElementById('productCategory').value;
+    const productDescription = document.getElementById('productDescription').value.trim();
+
+    // دریافت رنگ‌های انتخاب شده
+    const selectedColors = Array.from(document.querySelectorAll('input[name="color"]:checked'))
+        .map(cb => cb.value);
+
+    // دریافت سایزهای انتخاب شده
+    const selectedSizes = Array.from(document.querySelectorAll('input[name="size"]:checked'))
+        .map(cb => cb.value);
+
+    // اعتبارسنجی
+    if (!productName) {
+        alert('لطفاً نام محصول را وارد کنید');
+        return;
+    }
+
+    if (selectedColors.length === 0) {
+        alert('لطفاً حداقل یک رنگ انتخاب کنید');
+        return;
+    }
+
+    if (selectedSizes.length === 0) {
+        alert('لطفاً حداقل یک سایز انتخاب کنید');
+        return;
+    }
+
+    if (!productPrice) {
+        alert('لطفاً قیمت محصول را وارد کنید');
+        return;
+    }
 
     const generation = generations.find(g => g.id === currentImageId);
     if (!generation) return;
 
     const imageUrl = generation.imagePath || generation.generated_image_url;
 
-    const captionSection = document.getElementById('captionSection');
     const captionLoading = document.getElementById('captionLoading');
     const captionResult = document.getElementById('captionResult');
     const captionText = document.getElementById('captionText');
+    const productInfoForm = document.getElementById('productInfoForm');
 
     try {
-        // نمایش بخش کپشن و loading
-        captionSection.style.display = 'block';
+        // مخفی کردن فرم و نمایش loading
+        productInfoForm.style.display = 'none';
         captionLoading.style.display = 'block';
         captionResult.style.display = 'none';
 
-        console.log('📝 درخواست تولید کپشن برای:', imageUrl);
+        console.log('📝 درخواست تولید کپشن با اطلاعات محصول:', {
+            productName,
+            selectedColors,
+            selectedSizes,
+            productPrice,
+            productDiscount
+        });
+
+        // محاسبه قیمت نهایی
+        const finalPrice = productDiscount
+            ? Math.round(productPrice * (1 - productDiscount / 100))
+            : productPrice;
 
         const response = await fetch('/api/generate-caption', {
             method: 'POST',
@@ -292,7 +368,17 @@ async function generateInstagramCaption() {
             },
             body: JSON.stringify({
                 imageUrl: imageUrl,
-                imageId: currentImageId
+                imageId: currentImageId,
+                productInfo: {
+                    name: productName,
+                    colors: selectedColors,
+                    sizes: selectedSizes,
+                    price: productPrice,
+                    discount: productDiscount,
+                    finalPrice: finalPrice,
+                    category: productCategory,
+                    description: productDescription
+                }
             })
         });
 
@@ -311,22 +397,18 @@ async function generateInstagramCaption() {
         if (imageIndex !== -1) {
             savedImages[imageIndex].instagramCaption = data.caption;
             localStorage.setItem('generatedImages', JSON.stringify(savedImages));
-            console.log('✅ کپشن در localStorage ذخیره شد');
         }
 
-        // به‌روزرسانی آبجکت generation در حافظه
-        generation.instagramCaption = data.caption;
-
-        // نمایش نتیجه
+        // نمایش کپشن
+        captionText.textContent = data.caption;
         captionLoading.style.display = 'none';
         captionResult.style.display = 'block';
-        captionText.textContent = data.caption;
 
     } catch (error) {
-        console.error('خطا در تولید کپشن:', error);
+        console.error('❌ خطا در تولید کپشن:', error);
+        alert('خطا در تولید کپشن. لطفاً دوباره تلاش کنید.');
         captionLoading.style.display = 'none';
-        captionResult.style.display = 'block';
-        captionText.innerHTML = '<span style="color: red;">❌ خطا در تولید کپشن. لطفاً دوباره تلاش کنید.</span>';
+        productInfoForm.style.display = 'block';
     }
 }
 
