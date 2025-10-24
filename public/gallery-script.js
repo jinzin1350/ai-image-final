@@ -1,3 +1,11 @@
+// Supabase client
+const SUPABASE_URL = 'https://trrjixlshamhuhlcevtx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRycmppeGxzaGFtaHVobGNldnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNDg5MDYsImV4cCI6MjA3NjgyNDkwNn0.BRFbUkbvqGg4J-mMM8p1oilUHfO6cWe3A3xsIVdWcjI';
+
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
 let generations = [];
 let currentImageId = null;
 
@@ -324,5 +332,24 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Check authentication
+async function checkAuth() {
+    try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        
+        if (error) throw error;
+        
+        if (data.session) {
+            currentUser = data.session.user;
+            loadGallery();
+        } else {
+            window.location.href = '/auth.html';
+        }
+    } catch (error) {
+        console.error('خطا در بررسی احراز هویت:', error);
+        window.location.href = '/auth.html';
+    }
+}
+
 // بارگذاری اولیه
-loadGallery();
+checkAuth();

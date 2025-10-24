@@ -1,3 +1,11 @@
+// Supabase client
+const SUPABASE_URL = 'https://trrjixlshamhuhlcevtx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRycmppeGxzaGFtaHVobGNldnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNDg5MDYsImV4cCI6MjA3NjgyNDkwNn0.BRFbUkbvqGg4J-mMM8p1oilUHfO6cWe3A3xsIVdWcjI';
+
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
 let uploadedGarmentPaths = []; // Changed to array for multiple garments
 let selectedModelId = null;
 let selectedBackgroundId = null;
@@ -653,24 +661,71 @@ function saveToLocalStorage(imageData) {
     }
 }
 
-// بارگذاری اولیه
-loadModels();
-loadBackgrounds();
-loadPoses();
-loadCameraAngles();
-loadStyles();
-loadLightings();
+// Check authentication
+async function checkAuth() {
+    try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        
+        if (error) throw error;
+        
+        if (data.session) {
+            currentUser = data.session.user;
+            displayUserInfo();
+        } else {
+            // Redirect to auth page
+            window.location.href = '/auth.html';
+        }
+    } catch (error) {
+        console.error('خطا در بررسی احراز هویت:', error);
+        window.location.href = '/auth.html';
+    }
+}
 
-// بارگذاری پارامترهای کیفیت حرفه‌ای
-loadColorTemperatures();
-loadDepthOfFields();
-loadFabricTypes();
-loadShadowQualities();
-loadAspectRatios();
-loadLightingRatios();
-loadBackgroundBlurs();
-loadGarmentFits();
-loadPostProcessingPresets();
-loadEnvironmentalReflections();
-loadWeatherEffects();
-loadMotionElements();
+// Display user info
+function displayUserInfo() {
+    const userSection = document.getElementById('userSection');
+    const userEmail = document.getElementById('userEmail');
+    
+    if (currentUser && userSection && userEmail) {
+        userEmail.textContent = currentUser.email;
+        userSection.style.display = 'flex';
+    }
+}
+
+// Handle logout
+async function handleLogout() {
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        
+        localStorage.removeItem('supabase_session');
+        window.location.href = '/auth.html';
+    } catch (error) {
+        console.error('خطا در خروج:', error);
+        alert('خطا در خروج. لطفاً دوباره تلاش کنید.');
+    }
+}
+
+// بارگذاری اولیه
+checkAuth().then(() => {
+    loadModels();
+    loadBackgrounds();
+    loadPoses();
+    loadCameraAngles();
+    loadStyles();
+    loadLightings();
+
+    // بارگذاری پارامترهای کیفیت حرفه‌ای
+    loadColorTemperatures();
+    loadDepthOfFields();
+    loadFabricTypes();
+    loadShadowQualities();
+    loadAspectRatios();
+    loadLightingRatios();
+    loadBackgroundBlurs();
+    loadGarmentFits();
+    loadPostProcessingPresets();
+    loadEnvironmentalReflections();
+    loadWeatherEffects();
+    loadMotionElements();
+});
