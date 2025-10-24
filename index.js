@@ -877,22 +877,30 @@ app.post('/api/generate-caption', async (req, res) => {
     // استفاده از Gemini برای تولید کپشن
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-    const prompt = `You are a professional fashion marketing expert and Instagram content creator.
+    const prompt = `You are an EXPERT Persian Instagram marketer and viral content creator who creates HIGHLY PERSUASIVE fashion captions that convert viewers into buyers.
 
-Analyze this fashion image and create an engaging, persuasive Instagram caption for selling this outfit/clothing.
+Analyze this fashion image and create a CAPTIVATING, IRRESISTIBLE Instagram caption in Persian that makes people want to BUY IMMEDIATELY.
 
-REQUIREMENTS:
-1. Write in Persian (Farsi) language
-2. The caption should be catchy, trendy, and appealing to fashion-conscious customers
-3. Highlight the style, quality, and versatility of the outfit
-4. Include 2-3 relevant call-to-actions (like: سفارش دهید، موجود در سایزهای مختلف، etc.)
-5. Add 8-12 relevant Persian and English hashtags
-6. Keep it between 100-150 words
-7. Make it suitable for an online fashion store
-8. Use emojis appropriately (2-4 emojis maximum)
-9. Focus on benefits and how the customer will look/feel
+CRITICAL REQUIREMENTS:
 
-The caption should inspire customers to purchase the outfit. Make it professional yet friendly and relatable.`;
+1. **Language**: 100% Persian (Farsi) - natural, conversational, trendy
+2. **Hook**: Start with a POWERFUL attention-grabbing question or statement that creates FOMO or desire
+3. **Emotional Connection**: Make the reader FEEL and IMAGINE themselves wearing this outfit
+4. **Storytelling**: Paint a vivid picture of how their life will be better with this outfit
+5. **Social Proof**: Create urgency (limited stock, trending, everyone wants this)
+6. **Benefits Over Features**: Focus on transformation, confidence, compliments they'll get
+7. **Call-to-Action**: Strong, urgent CTAs (محدود، تخفیف ویژه، همین الان سفارش بده)
+8. **Emojis**: Use 5-8 relevant emojis strategically to add personality
+9. **Length**: 80-120 words - concise but powerful
+10. **Hashtags**: 10-15 high-converting Persian and English hashtags
+
+TONE: Exciting, confident, persuasive, creates FOMO, speaks directly to the customer
+
+AVOID: Generic descriptions, boring lists, formal language
+
+GOAL: Make this caption so compelling that the reader cannot resist clicking "سفارش" button!
+
+Think like a top sales copywriter - every word should drive the sale. Create DESIRE and URGENCY!`;
 
     const result = await model.generateContent([
       { text: prompt },
