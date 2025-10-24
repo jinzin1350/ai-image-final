@@ -1272,11 +1272,396 @@ app.post('/api/generate-caption', async (req, res) => {
   }
 });
 
+// ============================================
+// ADMIN DASHBOARD ROUTES
+// ============================================
+
+// Admin authentication middleware
+const adminAuth = (req, res, next) => {
+  const adminEmail = req.headers['admin-email'];
+  const adminPassword = req.headers['admin-password'];
+
+  // Check admin credentials from environment variables
+  if (adminEmail === process.env.ADMIN_EMAIL && adminPassword === process.env.ADMIN_PASSWORD) {
+    next();
+  } else {
+    res.status(401).json({ error: 'Unauthorized: Invalid admin credentials' });
+  }
+};
+
+// Admin login route
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check credentials
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      res.json({
+        success: true,
+        admin: {
+          email: email,
+          role: 'super_admin'
+        }
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+  } catch (error) {
+    console.error('Error in admin login:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// Get admin dashboard statistics
+app.get('/api/admin/stats', adminAuth, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    // Total users
+    const { count: totalUsers, error: usersError } = await supabase
+      .from('user_limits')
+      .select('*', { count: 'exact', head: true });
+
+    // Total images generated
+    const { count: totalImages, error: imagesError } = await supabase
+      .from('generated_images')
+      .select('*', { count: 'exact', head: true });
+
+    // Premium users
+    const { count: premiumUsers, error: premiumError } = await supabase
+      .from('user_limits')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_premium', true);
+
+    // Today's images
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const { count: todayImages, error: todayError } = await supabase
+      .from('generated_images')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', today.toISOString());
+
+    // Content library stats
+    const { count: totalModels, error: modelsError } = await supabase
+      .from('content_library')
+      .select('*', { count: 'exact', head: true })
+      .eq('content_type', 'model');
+
+    const { count: totalBackgrounds, error: backgroundsError } = await supabase
+      .from('content_library')
+      .select('*', { count: 'exact', head: true })
+      .eq('content_type', 'background');
+
+    res.json({
+      success: true,
+      stats: {
+        totalUsers: totalUsers || 0,
+        premiumUsers: premiumUsers || 0,
+        freeUsers: (totalUsers || 0) - (premiumUsers || 0),
+        totalImages: totalImages || 0,
+        todayImages: todayImages || 0,
+        totalModels: totalModels || 0,
+        totalBackgrounds: totalBackgrounds || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
+  }
+});
+
+// Get all users with limits
+app.get('/api/admin/users', adminAuth, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { data, error } = await supabase
+      .from('user_limits')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Get email from auth.users for each user_id
+    const usersWithEmails = await Promise.all(
+      data.map(async (user) => {
+        const { data: authData } = await supabase.auth.admin.getUserById(user.user_id);
+        return {
+          ...user,
+          email: authData?.user?.email || 'Unknown'
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      users: usersWithEmails
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// Update user premium status and limits
+app.put('/api/admin/users/:userId', adminAuth, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { userId } = req.params;
+    const { is_premium, images_limit, captions_limit, descriptions_limit, notes } = req.body;
+
+    const updateData = {};
+    if (is_premium !== undefined) updateData.is_premium = is_premium;
+    if (images_limit !== undefined) updateData.images_limit = images_limit;
+    if (captions_limit !== undefined) updateData.captions_limit = captions_limit;
+    if (descriptions_limit !== undefined) updateData.descriptions_limit = descriptions_limit;
+    if (notes !== undefined) updateData.notes = notes;
+    updateData.updated_at = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('user_limits')
+      .update(updateData)
+      .eq('user_id', userId)
+      .select();
+
+    if (error) throw error;
+
+    // Log activity
+    await supabase.from('admin_activity_logs').insert({
+      action_type: 'user_update',
+      target_type: 'user',
+      target_id: userId,
+      description: `Updated user limits and premium status`,
+      metadata: updateData
+    });
+
+    res.json({
+      success: true,
+      user: data[0]
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// Get content library
+app.get('/api/admin/content', adminAuth, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { content_type, tier } = req.query;
+
+    let query = supabase.from('content_library').select('*');
+
+    if (content_type) query = query.eq('content_type', content_type);
+    if (tier) query = query.eq('tier', tier);
+
+    query = query.order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      content: data
+    });
+  } catch (error) {
+    console.error('Error fetching content:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
+// Upload content (model or background)
+app.post('/api/admin/content/upload', adminAuth, upload.single('content'), async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const { content_type, tier, category, name, description } = req.body;
+
+    // Upload to Supabase Storage
+    const fileName = `${content_type}-${tier}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
+    const { data: storageData, error: storageError } = await supabase.storage
+      .from('admin-content')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (storageError) throw storageError;
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    // Insert into content_library
+    const { data, error } = await supabase
+      .from('content_library')
+      .insert({
+        content_type,
+        tier,
+        category,
+        name,
+        description,
+        image_url: publicUrlData.publicUrl,
+        storage_path: fileName,
+        is_active: true,
+        metadata: {
+          file_size: req.file.size,
+          mime_type: req.file.mimetype
+        }
+      })
+      .select();
+
+    if (error) throw error;
+
+    // Log activity
+    await supabase.from('admin_activity_logs').insert({
+      action_type: 'content_upload',
+      target_type: 'content',
+      target_id: data[0].id.toString(),
+      description: `Uploaded ${content_type}: ${name} (${tier})`,
+      metadata: { content_type, tier, category }
+    });
+
+    res.json({
+      success: true,
+      content: data[0]
+    });
+  } catch (error) {
+    console.error('Error uploading content:', error);
+    res.status(500).json({ error: 'Failed to upload content', details: error.message });
+  }
+});
+
+// Delete content
+app.delete('/api/admin/content/:contentId', adminAuth, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { contentId } = req.params;
+
+    // Get content details first
+    const { data: content, error: fetchError } = await supabase
+      .from('content_library')
+      .select('*')
+      .eq('id', contentId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete from storage
+    if (content.storage_path) {
+      await supabase.storage
+        .from('admin-content')
+        .remove([content.storage_path]);
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('content_library')
+      .delete()
+      .eq('id', contentId);
+
+    if (deleteError) throw deleteError;
+
+    // Log activity
+    await supabase.from('admin_activity_logs').insert({
+      action_type: 'content_delete',
+      target_type: 'content',
+      target_id: contentId,
+      description: `Deleted ${content.content_type}: ${content.name}`,
+      metadata: { content }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting content:', error);
+    res.status(500).json({ error: 'Failed to delete content' });
+  }
+});
+
+// Get activity logs
+app.get('/api/admin/logs', adminAuth, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { limit = 50 } = req.query;
+
+    const { data, error } = await supabase
+      .from('admin_activity_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(parseInt(limit));
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      logs: data
+    });
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+});
+
+// Admin page routes
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
+});
+
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+});
+
+app.get('/admin/users', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-users.html'));
+});
+
+app.get('/admin/content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
+});
+
+app.get('/admin/analytics', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-analytics.html'));
+});
+
+// ============================================
+// START SERVER
+// ============================================
+
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);
   console.log(`🔐 Supabase: ${supabase ? 'Connected' : 'Not configured'}`);
   console.log(`🤖 Gemini AI: ${process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key' ? 'Connected' : 'Not configured'}`);
+  console.log(`👨‍💼 Admin Dashboard: http://0.0.0.0:${PORT}/admin`);
 
   // بارگذاری مدل‌های ذخیره شده یا تولید مدل‌های جدید
   const modelsLoaded = loadSavedModels();
