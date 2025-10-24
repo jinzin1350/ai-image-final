@@ -6,14 +6,21 @@
 
 ### مراحل به‌روزرسانی:
 
-#### روش ۱: استفاده از SQL Editor در Supabase Dashboard
+#### روش ۱: استفاده از SQL Editor (ساده‌ترین روش) ⭐
+
+**اگر جدول `generated_images` دارید:**
 
 1. به [Supabase Dashboard](https://app.supabase.com) بروید
 2. پروژه خود را باز کنید
 3. از منوی سمت چپ، روی **SQL Editor** کلیک کنید
-4. محتوای فایل `supabase-migration-add-caption.sql` را کپی کنید
+4. محتوای فایل **`supabase-add-caption-simple.sql`** را کپی کنید
 5. در SQL Editor پیست کنید
 6. روی **Run** کلیک کنید
+
+**اگر جدول `generations` دارید (نام قدیمی):**
+
+1. همان مراحل بالا اما از فایل **`supabase-migration-add-caption.sql`** استفاده کنید
+2. این اسکریپت خودکار جدول رو به `generated_images` تغییر نام می‌ده و ستون رو اضافه می‌کنه
 
 #### روش ۲: استفاده از Table Editor
 
