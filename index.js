@@ -50,6 +50,10 @@ const upload = multer({
 });
 
 app.use(express.json());
+
+// Serve attached_assets folder
+app.use('/attached_assets', express.static(path.join(__dirname, 'attached_assets')));
+
 // Landing page as homepage - MUST come before static files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
