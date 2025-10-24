@@ -32,7 +32,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 // تنظیمات Multer برای آپلود موقت
 const storage = multer.memoryStorage();
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
@@ -50,7 +50,13 @@ const upload = multer({
 });
 
 app.use(express.json());
+// Static files
 app.use(express.static('public'));
+
+// Landing page route
+app.get('/landing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
 const modelPrompts = [
@@ -229,21 +235,21 @@ const fallbackModels = [
   { id: 'woman-1', name: 'مدل ۱', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop' },
   { id: 'woman-2', name: 'مدل ۲', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop' },
   { id: 'woman-3', name: 'مدل ۳', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=600&fit=crop' },
-  { id: 'woman-4', name: 'مدل ۴', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop' },
+  { id: 'woman-4', name: 'مدل ۴', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1524504388940-8e864400a348?w=400&h=600&fit=crop' },
   { id: 'woman-5', name: 'مدل ۵', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop' },
 
   // مردان
   { id: 'man-1', name: 'مدل ۱', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop' },
   { id: 'man-2', name: 'مدل ۲', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop' },
   { id: 'man-3', name: 'مدل ۳', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=600&fit=crop' },
-  { id: 'man-4', name: 'مدل ۴', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=600&fit=crop' },
+  { id: 'man-4', name: 'مدل ۴', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1519085360753-5a69c17a67c6?w=400&h=600&fit=crop' },
   { id: 'man-5', name: 'مدل ۵', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=600&fit=crop' },
 
   // دختران
   { id: 'girl-1', name: 'مدل ۱', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop' },
   { id: 'girl-2', name: 'مدل ۲', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=600&fit=crop' },
   { id: 'girl-3', name: 'مدل ۳', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=600&fit=crop' },
-  { id: 'girl-4', name: 'مدل ۴', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=400&h=600&fit=crop' },
+  { id: 'girl-4', name: 'مدل ۴', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1554080353-a576cf80bda?w=400&h=600&fit=crop' },
   { id: 'girl-5', name: 'مدل ۵', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=600&fit=crop' },
 
   // پسران
@@ -410,7 +416,7 @@ const postProcessingPresets = [
   { id: 'natural', name: '🌿 طبیعی', description: 'Natural processing, true colors, minimal editing, authentic look' },
   { id: 'editorial', name: '📰 ادیتوریال', description: 'Editorial magazine style, high contrast, vibrant colors, punchy saturation, Vogue aesthetic' },
   { id: 'ecommerce', name: '🛍️ فروشگاهی', description: 'E-commerce clean look, neutral accurate colors, even lighting, product-focused' },
-  { id: 'vintage', name: '📼 وینتیج', description: 'Vintage retro film look, faded colors, grain texture, nostalgic 70s-90s aesthetic' },
+  { id: 'vintage', name: '📼وینتیج', description: 'Vintage retro film look, faded colors, grain texture, nostalgic 70s-90s aesthetic' },
   { id: 'cinematic', name: '🎬 سینمایی', description: 'Cinematic color grading, teal and orange, film-like contrast, movie poster quality' },
   { id: 'portra', name: '🎞️ کداک پرترا', description: 'Kodak Portra 400 film emulation, warm skin tones, soft pastels, professional portrait film' },
   { id: 'velvia', name: '🌄 فوجی ولویا', description: 'Fuji Velvia film emulation, hyper-saturated, rich colors, landscape film aesthetic' },
@@ -860,10 +866,9 @@ TASK: Place ${garmentDescription} onto the model shown in the ${garments.length 
 
 CORE REQUIREMENTS:
 1. The model should wear ${garmentDescription}
-${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Location/Setting: ${selectedBackground.description}
-${garments.length > 1 ? '4' : '3'}. Keep the model's face and overall appearance from the reference image
-${garments.length > 1 ? '5' : '4'}. Garment Fit: ${selectedFit.description}
-${garments.length > 1 ? '6' : '5'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
+${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Keep the model's face and overall appearance from the reference image
+${garments.length > 1 ? '4' : '3'}. Garment Fit: ${selectedFit.description}
+${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
 
 POSE & COMPOSITION:
 - Pose: ${selectedPose.description}
