@@ -18,11 +18,44 @@ async function loadGallery() {
         emptyState.style.display = 'none';
         galleryGrid.innerHTML = '';
 
-        const response = await fetch('/api/generations');
-        const data = await response.json();
+        // ابتدا از localStorage بارگذاری می‌کنیم
+        const localImages = JSON.parse(localStorage.getItem('generatedImages') || '[]');
 
-        if (data.success && data.generations && data.generations.length > 0) {
-            generations = data.generations;
+        // سپس از API تلاش می‌کنیم
+        try {
+            const response = await fetch('/api/generations');
+            const data = await response.json();
+
+            if (data.success && data.generations && data.generations.length > 0) {
+                // ترکیب تصاویر localStorage و API
+                const apiImages = data.generations.map(gen => ({
+                    ...gen,
+                    imagePath: gen.generated_image_url,
+                    source: 'api'
+                }));
+
+                const localImagesWithSource = localImages.map(img => ({
+                    ...img,
+                    source: 'local'
+                }));
+
+                // حذف تکراری‌ها بر اساس imagePath
+                const allImages = [...localImagesWithSource, ...apiImages];
+                const uniqueImages = allImages.filter((img, index, self) =>
+                    index === self.findIndex((t) => t.imagePath === img.imagePath)
+                );
+
+                generations = uniqueImages;
+            } else {
+                // فقط از localStorage استفاده می‌کنیم
+                generations = localImages.map(img => ({ ...img, source: 'local' }));
+            }
+        } catch (apiError) {
+            console.log('API در دسترس نیست، از localStorage استفاده می‌شود');
+            generations = localImages.map(img => ({ ...img, source: 'local' }));
+        }
+
+        if (generations.length > 0) {
             sortGenerations();
             displayGallery();
         } else {
@@ -131,31 +164,39 @@ async function deleteImage() {
     }
 
     try {
-        const response = await fetch(`/api/generations/${currentImageId}`, {
-            method: 'DELETE'
-        });
+        const generation = generations.find(g => g.id === currentImageId);
 
-        const data = await response.json();
+        // حذف از localStorage
+        const savedImages = JSON.parse(localStorage.getItem('generatedImages') || '[]');
+        const updatedImages = savedImages.filter(img => img.id !== currentImageId);
+        localStorage.setItem('generatedImages', JSON.stringify(updatedImages));
 
-        if (data.success) {
-            // حذف از لیست محلی
-            generations = generations.filter(g => g.id !== currentImageId);
-
-            closeModal();
-
-            // به‌روزرسانی گالری
-            if (generations.length === 0) {
-                emptyState.style.display = 'block';
-                galleryGrid.innerHTML = '';
-                totalCount.textContent = '0 تصویر';
-            } else {
-                displayGallery();
+        // اگر از API بود، سعی کن از API هم حذف کن
+        if (generation && generation.source === 'api') {
+            try {
+                await fetch(`/api/generations/${currentImageId}`, {
+                    method: 'DELETE'
+                });
+            } catch (apiError) {
+                console.log('خطا در حذف از API، ولی از localStorage حذف شد');
             }
-
-            alert('تصویر با موفقیت حذف شد');
-        } else {
-            alert('خطا در حذف تصویر');
         }
+
+        // حذف از لیست محلی
+        generations = generations.filter(g => g.id !== currentImageId);
+
+        closeModal();
+
+        // به‌روزرسانی گالری
+        if (generations.length === 0) {
+            emptyState.style.display = 'block';
+            galleryGrid.innerHTML = '';
+            totalCount.textContent = '0 تصویر';
+        } else {
+            displayGallery();
+        }
+
+        alert('تصویر با موفقیت حذف شد');
     } catch (error) {
         console.error('خطا در حذف تصویر:', error);
         alert('خطا در حذف تصویر');

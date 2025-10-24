@@ -288,6 +288,9 @@ generateBtn.addEventListener('click', async () => {
         const data = await response.json();
 
         if (data.success) {
+            // ذخیره در localStorage برای گالری
+            saveToLocalStorage(data);
+
             // نمایش تصویر تولید شده
             resultImage.src = data.imagePath;
             resultInfo.innerHTML = `
@@ -317,6 +320,44 @@ downloadBtn.addEventListener('click', () => {
     link.download = 'fashion-ai-result.jpg';
     link.click();
 });
+
+// ذخیره تصویر در localStorage
+function saveToLocalStorage(imageData) {
+    try {
+        // دریافت تصاویر قبلی
+        const savedImages = JSON.parse(localStorage.getItem('generatedImages') || '[]');
+
+        // اضافه کردن تصویر جدید
+        const newImage = {
+            id: Date.now(),
+            imagePath: imageData.imagePath,
+            model: imageData.model,
+            background: imageData.background,
+            description: imageData.description || '',
+            modelId: selectedModelId,
+            backgroundId: selectedBackgroundId,
+            poseId: selectedPoseId,
+            cameraAngleId: selectedCameraAngleId,
+            styleId: selectedStyleId,
+            lightingId: selectedLightingId,
+            created_at: new Date().toISOString()
+        };
+
+        savedImages.unshift(newImage); // اضافه کردن به اول لیست
+
+        // محدود کردن به 100 تصویر
+        if (savedImages.length > 100) {
+            savedImages.splice(100);
+        }
+
+        // ذخیره در localStorage
+        localStorage.setItem('generatedImages', JSON.stringify(savedImages));
+
+        console.log('✅ تصویر در localStorage ذخیره شد');
+    } catch (error) {
+        console.error('خطا در ذخیره تصویر:', error);
+    }
+}
 
 // بارگذاری اولیه
 loadModels();
