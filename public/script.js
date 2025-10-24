@@ -3,6 +3,10 @@ let selectedModelId = null;
 let selectedBackgroundId = null;
 let allModels = [];
 let currentCategory = 'woman';
+let selectedPoseId = 'standing-front';
+let selectedCameraAngleId = 'eye-level';
+let selectedStyleId = 'professional';
+let selectedLightingId = 'studio';
 
 // المان‌ها
 const garmentInput = document.getElementById('garmentInput');
@@ -12,6 +16,10 @@ const garmentPreview = document.getElementById('garmentPreview');
 const categorySelect = document.getElementById('categorySelect');
 const modelsGrid = document.getElementById('modelsGrid');
 const backgroundsGrid = document.getElementById('backgroundsGrid');
+const poseSelect = document.getElementById('poseSelect');
+const cameraAngleSelect = document.getElementById('cameraAngleSelect');
+const styleSelect = document.getElementById('styleSelect');
+const lightingSelect = document.getElementById('lightingSelect');
 const generateBtn = document.getElementById('generateBtn');
 const resultSection = document.getElementById('resultSection');
 const resultImage = document.getElementById('resultImage');
@@ -90,6 +98,87 @@ async function loadBackgrounds() {
         console.error('خطا در بارگذاری پس‌زمینه‌ها:', error);
     }
 }
+
+// بارگذاری حالت‌های بدن
+async function loadPoses() {
+    try {
+        const response = await fetch('/api/poses');
+        const poses = await response.json();
+
+        poseSelect.innerHTML = poses.map(pose => `
+            <option value="${pose.id}">${pose.name}</option>
+        `).join('');
+
+        selectedPoseId = poses[0]?.id || 'standing-front';
+    } catch (error) {
+        console.error('خطا در بارگذاری حالت‌های بدن:', error);
+    }
+}
+
+// بارگذاری زاویه‌های دوربین
+async function loadCameraAngles() {
+    try {
+        const response = await fetch('/api/camera-angles');
+        const angles = await response.json();
+
+        cameraAngleSelect.innerHTML = angles.map(angle => `
+            <option value="${angle.id}">${angle.name}</option>
+        `).join('');
+
+        selectedCameraAngleId = angles[0]?.id || 'eye-level';
+    } catch (error) {
+        console.error('خطا در بارگذاری زاویه‌های دوربین:', error);
+    }
+}
+
+// بارگذاری استایل‌ها
+async function loadStyles() {
+    try {
+        const response = await fetch('/api/styles');
+        const styles = await response.json();
+
+        styleSelect.innerHTML = styles.map(style => `
+            <option value="${style.id}">${style.name}</option>
+        `).join('');
+
+        selectedStyleId = styles[0]?.id || 'professional';
+    } catch (error) {
+        console.error('خطا در بارگذاری استایل‌ها:', error);
+    }
+}
+
+// بارگذاری نورپردازی‌ها
+async function loadLightings() {
+    try {
+        const response = await fetch('/api/lightings');
+        const lightings = await response.json();
+
+        lightingSelect.innerHTML = lightings.map(lighting => `
+            <option value="${lighting.id}">${lighting.name}</option>
+        `).join('');
+
+        selectedLightingId = lightings[0]?.id || 'studio';
+    } catch (error) {
+        console.error('خطا در بارگذاری نورپردازی‌ها:', error);
+    }
+}
+
+// Event listeners برای پارامترهای پیشرفته
+poseSelect.addEventListener('change', (e) => {
+    selectedPoseId = e.target.value;
+});
+
+cameraAngleSelect.addEventListener('change', (e) => {
+    selectedCameraAngleId = e.target.value;
+});
+
+styleSelect.addEventListener('change', (e) => {
+    selectedStyleId = e.target.value;
+});
+
+lightingSelect.addEventListener('change', (e) => {
+    selectedLightingId = e.target.value;
+});
 
 // انتخاب مدل
 function selectModel(modelId) {
@@ -188,7 +277,11 @@ generateBtn.addEventListener('click', async () => {
             body: JSON.stringify({
                 garmentPath: uploadedGarmentPath,
                 modelId: selectedModelId,
-                backgroundId: selectedBackgroundId
+                backgroundId: selectedBackgroundId,
+                poseId: selectedPoseId,
+                cameraAngleId: selectedCameraAngleId,
+                styleId: selectedStyleId,
+                lightingId: selectedLightingId
             })
         });
 
@@ -228,3 +321,7 @@ downloadBtn.addEventListener('click', () => {
 // بارگذاری اولیه
 loadModels();
 loadBackgrounds();
+loadPoses();
+loadCameraAngles();
+loadStyles();
+loadLightings();

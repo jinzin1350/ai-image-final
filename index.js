@@ -267,6 +267,46 @@ const backgrounds = [
   { id: 'rooftop', name: 'پشت‌بام', description: 'پشت‌بام با منظره شهری' }
 ];
 
+// لیست حالت‌های بدن (Poses)
+const poses = [
+  { id: 'standing-front', name: 'ایستاده رو به جلو', description: 'Standing straight facing camera' },
+  { id: 'standing-side', name: 'ایستاده نیمرخ', description: 'Standing with side profile, 45 degree angle' },
+  { id: 'walking', name: 'در حال راه رفتن', description: 'Walking pose, natural movement' },
+  { id: 'sitting', name: 'نشسته', description: 'Sitting pose, relaxed position' },
+  { id: 'casual-lean', name: 'تکیه داده کژوال', description: 'Casual leaning pose, one hand in pocket' },
+  { id: 'hands-on-hips', name: 'دست به کمر', description: 'Confident pose with hands on hips' },
+  { id: 'crossed-arms', name: 'دست به سینه', description: 'Arms crossed, confident stance' },
+  { id: 'dynamic', name: 'پویا و متحرک', description: 'Dynamic, energetic pose with movement' }
+];
+
+// لیست زاویه‌های دوربین
+const cameraAngles = [
+  { id: 'eye-level', name: 'هم‌سطح چشم', description: 'Camera at eye level, straight on' },
+  { id: 'slightly-low', name: 'کمی از پایین', description: 'Slightly low angle, looking up' },
+  { id: 'slightly-high', name: 'کمی از بالا', description: 'Slightly high angle, looking down' },
+  { id: 'three-quarter', name: 'سه‌چهارم', description: 'Three-quarter view, 45 degree angle' }
+];
+
+// لیست استایل‌ها و حال و هوا
+const styles = [
+  { id: 'professional', name: 'حرفه‌ای', description: 'Professional, business style, formal' },
+  { id: 'casual', name: 'کژوال روزمره', description: 'Casual everyday style, relaxed' },
+  { id: 'elegant', name: 'شیک و اِلِگانت', description: 'Elegant, sophisticated, classy' },
+  { id: 'sporty', name: 'اسپرت', description: 'Sporty, athletic, dynamic' },
+  { id: 'trendy', name: 'مد روز', description: 'Trendy, modern, fashionable' },
+  { id: 'artistic', name: 'هنری', description: 'Artistic, creative, unique' }
+];
+
+// لیست نورپردازی
+const lightings = [
+  { id: 'natural', name: 'طبیعی روز', description: 'Natural daylight, soft shadows' },
+  { id: 'studio', name: 'استودیو حرفه‌ای', description: 'Professional studio lighting, balanced' },
+  { id: 'golden-hour', name: 'طلایی (Golden Hour)', description: 'Golden hour, warm sunset light' },
+  { id: 'dramatic', name: 'دراماتیک', description: 'Dramatic lighting, strong contrasts' },
+  { id: 'soft-diffused', name: 'نرم و پخش شده', description: 'Soft diffused light, minimal shadows' },
+  { id: 'backlit', name: 'نور پشت', description: 'Backlit, rim lighting effect' }
+];
+
 // Middleware برای احراز هویت
 const authenticateUser = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -332,6 +372,26 @@ app.get('/api/models', (req, res) => {
 // دریافت لیست پس‌زمینه‌ها
 app.get('/api/backgrounds', (req, res) => {
   res.json(backgrounds);
+});
+
+// دریافت لیست حالت‌های بدن
+app.get('/api/poses', (req, res) => {
+  res.json(poses);
+});
+
+// دریافت لیست زاویه‌های دوربین
+app.get('/api/camera-angles', (req, res) => {
+  res.json(cameraAngles);
+});
+
+// دریافت لیست استایل‌ها
+app.get('/api/styles', (req, res) => {
+  res.json(styles);
+});
+
+// دریافت لیست نورپردازی
+app.get('/api/lightings', (req, res) => {
+  res.json(lightings);
 });
 
 // آپلود عکس لباس به Supabase Storage
@@ -525,7 +585,15 @@ function loadSavedModels() {
 // تولید عکس با Gemini 2.5 Flash
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
-    const { garmentPath, modelId, backgroundId } = req.body;
+    const {
+      garmentPath,
+      modelId,
+      backgroundId,
+      poseId = 'standing-front',
+      cameraAngleId = 'eye-level',
+      styleId = 'professional',
+      lightingId = 'studio'
+    } = req.body;
 
     if (!garmentPath || !modelId || !backgroundId) {
       return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
@@ -533,6 +601,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     const selectedModel = models.find(m => m.id === modelId);
     const selectedBackground = backgrounds.find(b => b.id === backgroundId);
+    const selectedPose = poses.find(p => p.id === poseId) || poses[0];
+    const selectedCameraAngle = cameraAngles.find(c => c.id === cameraAngleId) || cameraAngles[0];
+    const selectedStyle = styles.find(s => s.id === styleId) || styles[0];
+    const selectedLighting = lightings.find(l => l.id === lightingId) || lightings[0];
 
     if (!selectedModel || !selectedBackground) {
       return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
@@ -542,31 +614,54 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('📸 Garment URL:', garmentPath);
     console.log('👤 Model:', selectedModel.name);
     console.log('📍 Location:', selectedBackground.name);
+    console.log('🎭 Pose:', selectedPose.name);
+    console.log('📷 Camera:', selectedCameraAngle.name);
+    console.log('✨ Style:', selectedStyle.name);
+    console.log('💡 Lighting:', selectedLighting.name);
 
     // دانلود عکس لباس و مدل و تبدیل به base64
     const garmentBase64 = await imageUrlToBase64(garmentPath);
     const modelBase64 = await imageUrlToBase64(selectedModel.image);
 
-    // ساخت پرامپت برای Virtual Try-On
-    const prompt = `You are a professional fashion photographer and image editor. Create a realistic virtual try-on image.
+    // ساخت پرامپت برای Virtual Try-On با پارامترهای جدید
+    const prompt = `You are a professional fashion photographer and image editor. Create a realistic, high-quality virtual try-on image.
 
 TASK: Place the garment/clothing from the first image onto the model shown in the second image.
 
-REQUIREMENTS:
+CORE REQUIREMENTS:
 1. The model from the second image should wear the exact garment/clothing from the first image
 2. Location/Setting: ${selectedBackground.description}
-3. Keep the model's pose, face, and overall appearance from the reference image
-4. The clothing must fit naturally on the model's body
-5. Maintain realistic shadows, wrinkles, and fabric draping
-6. Professional studio lighting - soft and flattering
-7. High-quality, sharp focus, 4K resolution
-8. Suitable for e-commerce product photography
+3. Keep the model's face and overall appearance from the reference image
+4. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping
+
+POSE & COMPOSITION:
+- Pose: ${selectedPose.description}
+- Camera Angle: ${selectedCameraAngle.description}
+- Framing: Full body or three-quarter shot, well-composed
+
+STYLE & MOOD:
+- Overall Style: ${selectedStyle.description}
+- The image should convey this mood and aesthetic
+- Make it look professional and magazine-quality
+
+LIGHTING:
+- Lighting Style: ${selectedLighting.description}
+- Create depth and dimension with proper shadows and highlights
+- Ensure the lighting matches the location and enhances the garment
+
+TECHNICAL SPECS:
+- High-quality, sharp focus, 4K resolution
+- Professional color grading
+- Photorealistic rendering
+- Suitable for e-commerce and editorial use
+- No text, watermarks, or logos
 
 IMPORTANT:
-- Do NOT change the model's appearance, just dress them in the garment from the first image
-- Make sure the clothing looks natural and realistic on the model
+- Do NOT change the model's facial features or body type
+- Make sure the clothing looks natural and realistic
 - Blend the clothing seamlessly with the model's body
-- Use the specified location/background setting`;
+- Maintain consistency with the specified parameters
+- The final image should look like a professional photoshoot`;
 
     console.log('📝 Prompt:', prompt);
 
