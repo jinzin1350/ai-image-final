@@ -45,6 +45,9 @@ generated/
 .env/
 jspm_packages/
 
+# Generated model images
+generated-models.json
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

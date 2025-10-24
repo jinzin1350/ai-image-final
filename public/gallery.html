@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گالری تصاویر - عکاسی مد با هوش مصنوعی</title>
+    <link rel="stylesheet" href="gallery-style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🖼️ گالری تصاویر من</h1>
+                <p class="subtitle">تمام تصاویر تولید شده شما</p>
+            </div>
+            <a href="/" class="back-btn">← بازگشت به صفحه اصلی</a>
+        </header>
+
+        <div class="main-content">
+            <!-- فیلترها و جستجو -->
+            <section class="filters-section">
+                <div class="filter-group">
+                    <label for="sortSelect">مرتب‌سازی:</label>
+                    <select id="sortSelect" class="filter-dropdown">
+                        <option value="newest">جدیدترین</option>
+                        <option value="oldest">قدیمی‌ترین</option>
+                    </select>
+                </div>
+
+                <div class="stats">
+                    <span id="totalCount">0 تصویر</span>
+                </div>
+            </section>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>در حال بارگذاری...</p>
+            </div>
+
+            <!-- پیام خالی -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">📭</div>
+                <h2>هنوز تصویری تولید نکرده‌اید</h2>
+                <p>برای شروع، به صفحه اصلی بروید و اولین تصویر خود را بسازید!</p>
+                <a href="/" class="create-btn">ساخت تصویر جدید</a>
+            </div>
+
+            <!-- Grid تصاویر -->
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- تصاویر به صورت پویا اضافه می‌شوند -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal نمایش تصویر -->
+    <div class="modal" id="imageModal" style="display: none;">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <img id="modalImage" src="" alt="تصویر">
+            <div class="modal-info" id="modalInfo">
+                <!-- اطلاعات تصویر -->
+            </div>
+            <div class="modal-actions">
+                <button onclick="generateInstagramCaption()" class="action-btn caption-btn">
+                    ✨ تولید کپشن اینستاگرام
+                </button>
+                <button onclick="downloadImage()" class="action-btn download-btn">
+                    📥 دانلود
+                </button>
+                <button onclick="deleteImage()" class="action-btn delete-btn">
+                    🗑️ حذف
+                </button>
+            </div>
+            <div class="caption-section" id="captionSection" style="display: none;">
+                <div class="caption-loading" id="captionLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>در حال تولید کپشن...</p>
+                </div>
+                <div class="caption-result" id="captionResult" style="display: none;">
+                    <h4>کپشن اینستاگرام:</h4>
+                    <div class="caption-text" id="captionText"></div>
+                    <button onclick="copyCaption()" class="copy-btn">📋 کپی کردن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="gallery-script.js"></script>
+</body>
+</html>
