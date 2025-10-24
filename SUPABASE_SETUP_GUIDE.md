@@ -34,7 +34,7 @@
 2. یک Query جدید ایجاد کنید
 
 ### ۲.۲ اجرای Script
-1. فایل **`supabase-setup-complete.sql`** را باز کنید
+1. فایل **`supabase-setup-final.sql`** را باز کنید
 2. **تمام** محتوای فایل را کپی کنید (`Ctrl+A` → `Ctrl+C`)
 3. در SQL Editor پیست کنید (`Ctrl+V`)
 4. روی دکمه **"Run"** یا `Ctrl+Enter` کلیک کنید
@@ -120,7 +120,7 @@ node index.js
 
 ### مشکل ۱: خطای "Policy already exists"
 **راه حل:**
-- اسکریپت `supabase-setup-complete.sql` خودکار این خطا را رفع می‌کند
+- اسکریپت `supabase-setup-final.sql` خودکار این خطا را رفع می‌کند
 - اگر باز هم خطا داد، ابتدا Policy‌ها را دستی حذف کنید:
 ```sql
 DROP POLICY IF EXISTS "Users can view their own generations" ON generated_images;
