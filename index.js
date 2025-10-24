@@ -330,6 +330,119 @@ const lightings = [
   { id: 'backlit', name: 'نور پشت', description: 'Backlit, rim lighting effect' }
 ];
 
+// PHASE 1: Critical Quality Parameters
+
+// دمای رنگ (Color Temperature)
+const colorTemperatures = [
+  { id: 'warm', name: '🔥 گرم (2700K-3500K)', description: 'Warm color temperature 2700K-3500K, cozy sunset feel, golden orange tones' },
+  { id: 'neutral', name: '☀️ خنثی (5000K-5500K)', description: 'Neutral color temperature 5000K-5500K, natural daylight, true-to-life colors' },
+  { id: 'cool', name: '❄️ سرد (6000K-7000K)', description: 'Cool color temperature 6000K-7000K, modern crisp look, blue-tinted highlights' },
+  { id: 'auto', name: '🎨 خودکار', description: 'Auto white balance matched to location and lighting for natural look' }
+];
+
+// عمق میدان (Depth of Field)
+const depthOfFields = [
+  { id: 'shallow', name: '🎯 کم (f/1.4-2.8)', description: 'Shallow depth of field f/1.4-f/2.8, blurred background bokeh, subject pops out, professional portrait look' },
+  { id: 'medium', name: '⚖️ متوسط (f/4-5.6)', description: 'Medium depth of field f/4-f/5.6, balanced focus, slight background blur, versatile' },
+  { id: 'deep', name: '📐 زیاد (f/8-16)', description: 'Deep depth of field f/8-f/16, everything sharp and in focus, product photography style' }
+];
+
+// بافت پارچه (Fabric Texture)
+const fabricTypes = [
+  { id: 'cotton', name: '👕 نخی (Cotton)', description: 'Cotton fabric: matte finish, soft texture, natural wrinkles, breathable appearance' },
+  { id: 'denim', name: '👖 جین (Denim)', description: 'Denim fabric: rugged texture, visible weave pattern, structured folds, indigo color depth' },
+  { id: 'silk', name: '👗 ابریشم (Silk)', description: 'Silk fabric: lustrous sheen, smooth drape, fluid movement, reflective highlights' },
+  { id: 'wool', name: '🧥 پشمی (Wool)', description: 'Wool fabric: textured surface, warm appearance, structured shape, subtle fiber detail' },
+  { id: 'leather', name: '🧥 چرم (Leather)', description: 'Leather material: glossy or matte finish, natural grain texture, firm structure, environmental reflections' },
+  { id: 'synthetic', name: '🏃 مصنوعی (Synthetic)', description: 'Synthetic fabric: smooth surface, consistent texture, slight sheen, athletic appearance' },
+  { id: 'linen', name: '🌾 کتان (Linen)', description: 'Linen fabric: natural creases, textured weave, relaxed drape, casual elegance' },
+  { id: 'auto', name: '🤖 تشخیص خودکار', description: 'Auto-detect fabric type from garment image and render appropriate texture' }
+];
+
+// کیفیت سایه (Shadow Quality)
+const shadowQualities = [
+  { id: 'hard', name: '⚫ سخت', description: 'Hard shadows: sharp edges, high contrast, direct light source, dramatic effect' },
+  { id: 'medium', name: '🌗 متوسط', description: 'Medium shadows: moderately soft edges, balanced contrast, natural appearance' },
+  { id: 'soft', name: '⚪ نرم', description: 'Soft shadows: diffused edges, low contrast, gentle transitions, flattering look' },
+  { id: 'studio', name: '🎬 استودیو', description: 'Studio shadows: controlled density, proper direction, color temperature shifted cooler, professional quality' }
+];
+
+// PHASE 2: Professional Touch Parameters
+
+// نسبت تصویر (Aspect Ratio)
+const aspectRatios = [
+  { id: '1:1', name: '⬜ مربع 1:1', description: 'Square 1:1 ratio, perfect for Instagram feed posts', width: 1024, height: 1024 },
+  { id: '4:5', name: '📱 پرتره 4:5', description: 'Portrait 4:5 ratio, ideal for Instagram portrait posts', width: 1024, height: 1280 },
+  { id: '16:9', name: '🖥️ افقی 16:9', description: 'Landscape 16:9 ratio, widescreen for websites and banners', width: 1920, height: 1080 },
+  { id: '9:16', name: '📲 استوری 9:16', description: 'Vertical 9:16 ratio, Instagram/TikTok stories and reels', width: 1080, height: 1920 },
+  { id: '3:4', name: '📸 کلاسیک 3:4', description: 'Classic 3:4 portrait ratio, traditional photography', width: 1536, height: 2048 }
+];
+
+// نسبت نوری (Lighting Ratio)
+const lightingRatios = [
+  { id: 'low', name: '📉 کم (2:1)', description: 'Low contrast 2:1 lighting ratio, flat even lighting, minimal shadows, commercial look' },
+  { id: 'medium', name: '⚖️ متوسط (4:1)', description: 'Medium contrast 4:1 lighting ratio, balanced shadows and highlights, natural depth' },
+  { id: 'high', name: '📈 زیاد (8:1)', description: 'High contrast 8:1 lighting ratio, dramatic shadows, strong depth, editorial style' },
+  { id: 'rembrandt', name: '🎨 رامبراند', description: 'Rembrandt lighting, triangular highlight on cheek, artistic portrait style, 6:1 ratio' }
+];
+
+// تاری پس‌زمینه (Background Blur)
+const backgroundBlurs = [
+  { id: 'none', name: '⛔ بدون تاری', description: 'No background blur, everything sharp, product photography' },
+  { id: 'subtle', name: '🌫️ ملایم (20%)', description: 'Subtle background blur 20%, slight separation, natural look' },
+  { id: 'medium', name: '🌁 متوسط (50%)', description: 'Medium background blur 50%, clear subject focus, professional portraits' },
+  { id: 'heavy', name: '☁️ زیاد (80%)', description: 'Heavy background blur 80%, strong bokeh effect, subject isolation' },
+  { id: 'cinematic', name: '🎬 سینمایی (100%)', description: 'Cinematic blur 100%, creamy bokeh, hexagonal highlights, film-like quality' }
+];
+
+// برازش لباس (Garment Fit)
+const garmentFits = [
+  { id: 'tight', name: '⚡ تنگ/Fitted', description: 'Tight fitted garment, body-hugging, minimal fabric slack, athletic fit' },
+  { id: 'regular', name: '👔 معمولی/Regular', description: 'Regular fit garment, natural comfort, standard proportions, everyday wear' },
+  { id: 'loose', name: '🌊 گشاد/Loose', description: 'Loose oversized fit, relaxed drape, extra fabric, streetwear style' },
+  { id: 'tailored', name: '✂️ خیاطی شده/Tailored', description: 'Tailored custom fit, precise measurements, structured shape, luxury appearance' }
+];
+
+// PHASE 3: Advanced Features
+
+// پیش‌تنظیم پردازش (Post-Processing Presets)
+const postProcessingPresets = [
+  { id: 'natural', name: '🌿 طبیعی', description: 'Natural processing, true colors, minimal editing, authentic look' },
+  { id: 'editorial', name: '📰 ادیتوریال', description: 'Editorial magazine style, high contrast, vibrant colors, punchy saturation, Vogue aesthetic' },
+  { id: 'ecommerce', name: '🛍️ فروشگاهی', description: 'E-commerce clean look, neutral accurate colors, even lighting, product-focused' },
+  { id: 'vintage', name: '📼 وینتیج', description: 'Vintage retro film look, faded colors, grain texture, nostalgic 70s-90s aesthetic' },
+  { id: 'cinematic', name: '🎬 سینمایی', description: 'Cinematic color grading, teal and orange, film-like contrast, movie poster quality' },
+  { id: 'portra', name: '🎞️ کداک پرترا', description: 'Kodak Portra 400 film emulation, warm skin tones, soft pastels, professional portrait film' },
+  { id: 'velvia', name: '🌄 فوجی ولویا', description: 'Fuji Velvia film emulation, hyper-saturated, rich colors, landscape film aesthetic' },
+  { id: 'bw-classic', name: '⬛ سیاه‌سفید کلاسیک', description: 'Classic black and white, rich tones, proper contrast, timeless monochrome' }
+];
+
+// بازتاب محیط (Environmental Reflections)
+const environmentalReflections = [
+  { id: 'none', name: '⛔ بدون بازتاب', description: 'No environmental reflections, isolated subject' },
+  { id: 'subtle', name: '✨ ملایم', description: 'Subtle environmental reflections, slight color cast from surroundings, natural integration' },
+  { id: 'realistic', name: '🌍 واقع‌گرایانه', description: 'Realistic environmental reflections, ambient light influence, proper color temperature shift, location-based lighting' },
+  { id: 'enhanced', name: '💎 تقویت شده', description: 'Enhanced environmental reflections, visible on reflective materials like silk and leather, strong ambient occlusion' }
+];
+
+// جلوه‌های آب و هوا (Weather Effects)
+const weatherEffects = [
+  { id: 'clear', name: '☀️ صاف', description: 'Clear weather, bright sunlight, crisp shadows, perfect visibility' },
+  { id: 'overcast', name: '☁️ ابری', description: 'Overcast cloudy day, soft diffused light, gentle shadows, even illumination' },
+  { id: 'mist', name: '🌫️ مه ملایم', description: 'Light mist or fog, atmospheric depth, soft focus on background, dreamy mood' },
+  { id: 'golden', name: '🌅 طلایی', description: 'Golden hour atmosphere, warm sunlight, long shadows, magical quality' },
+  { id: 'dramatic', name: '⛈️ دراماتیک', description: 'Dramatic stormy atmosphere, moody clouds, dynamic contrast, editorial impact' }
+];
+
+// حرکت و پویایی (Motion Elements)
+const motionElements = [
+  { id: 'static', name: '🗿 ثابت', description: 'Static pose, no motion, perfectly sharp, classic studio shot' },
+  { id: 'hair', name: '💨 حرکت مو', description: 'Hair movement from gentle wind, natural flow, adds life and energy' },
+  { id: 'fabric', name: '🌊 حرکت پارچه', description: 'Fabric flow and movement, dynamic draping, flowing garments, editorial drama' },
+  { id: 'action', name: '⚡ اکشن', description: 'Action photography feel, slight motion blur, frozen movement, dynamic energy' },
+  { id: 'wind', name: '🌬️ باد قوی', description: 'Strong wind effect, dramatic fabric and hair movement, high-energy fashion editorial' }
+];
+
 // Middleware برای احراز هویت
 const authenticateUser = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -415,6 +528,57 @@ app.get('/api/styles', (req, res) => {
 // دریافت لیست نورپردازی
 app.get('/api/lightings', (req, res) => {
   res.json(lightings);
+});
+
+// PHASE 1: New API endpoints for critical quality parameters
+app.get('/api/color-temperatures', (req, res) => {
+  res.json(colorTemperatures);
+});
+
+app.get('/api/depth-of-fields', (req, res) => {
+  res.json(depthOfFields);
+});
+
+app.get('/api/fabric-types', (req, res) => {
+  res.json(fabricTypes);
+});
+
+app.get('/api/shadow-qualities', (req, res) => {
+  res.json(shadowQualities);
+});
+
+// PHASE 2: Professional touch parameters
+app.get('/api/aspect-ratios', (req, res) => {
+  res.json(aspectRatios);
+});
+
+app.get('/api/lighting-ratios', (req, res) => {
+  res.json(lightingRatios);
+});
+
+app.get('/api/background-blurs', (req, res) => {
+  res.json(backgroundBlurs);
+});
+
+app.get('/api/garment-fits', (req, res) => {
+  res.json(garmentFits);
+});
+
+// PHASE 3: Advanced features
+app.get('/api/post-processing-presets', (req, res) => {
+  res.json(postProcessingPresets);
+});
+
+app.get('/api/environmental-reflections', (req, res) => {
+  res.json(environmentalReflections);
+});
+
+app.get('/api/weather-effects', (req, res) => {
+  res.json(weatherEffects);
+});
+
+app.get('/api/motion-elements', (req, res) => {
+  res.json(motionElements);
 });
 
 // آپلود عکس لباس به Supabase Storage
@@ -616,7 +780,22 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       poseId = 'standing-front',
       cameraAngleId = 'eye-level',
       styleId = 'professional',
-      lightingId = 'studio'
+      lightingId = 'studio',
+      // PHASE 1: Critical quality parameters
+      colorTemperatureId = 'auto',
+      depthOfFieldId = 'medium',
+      fabricTypeId = 'auto',
+      shadowQualityId = 'medium',
+      // PHASE 2: Professional touch
+      aspectRatioId = '1:1',
+      lightingRatioId = 'medium',
+      backgroundBlurId = 'medium',
+      garmentFitId = 'regular',
+      // PHASE 3: Advanced features
+      postProcessingId = 'natural',
+      environmentalReflectionId = 'subtle',
+      weatherEffectId = 'clear',
+      motionElementId = 'static'
     } = req.body;
 
     // Support both single garment (old) and multiple garments (new)
@@ -632,6 +811,24 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     const selectedCameraAngle = cameraAngles.find(c => c.id === cameraAngleId) || cameraAngles[0];
     const selectedStyle = styles.find(s => s.id === styleId) || styles[0];
     const selectedLighting = lightings.find(l => l.id === lightingId) || lightings[0];
+
+    // PHASE 1: Select critical quality parameters
+    const selectedColorTemp = colorTemperatures.find(ct => ct.id === colorTemperatureId) || colorTemperatures[3]; // auto
+    const selectedDoF = depthOfFields.find(d => d.id === depthOfFieldId) || depthOfFields[1]; // medium
+    const selectedFabric = fabricTypes.find(f => f.id === fabricTypeId) || fabricTypes[7]; // auto
+    const selectedShadow = shadowQualities.find(sq => sq.id === shadowQualityId) || shadowQualities[1]; // medium
+
+    // PHASE 2: Select professional touch parameters
+    const selectedAspectRatio = aspectRatios.find(ar => ar.id === aspectRatioId) || aspectRatios[0]; // 1:1
+    const selectedLightingRatio = lightingRatios.find(lr => lr.id === lightingRatioId) || lightingRatios[1]; // medium
+    const selectedBgBlur = backgroundBlurs.find(bb => bb.id === backgroundBlurId) || backgroundBlurs[2]; // medium
+    const selectedFit = garmentFits.find(gf => gf.id === garmentFitId) || garmentFits[1]; // regular
+
+    // PHASE 3: Select advanced features
+    const selectedPostProcessing = postProcessingPresets.find(pp => pp.id === postProcessingId) || postProcessingPresets[0]; // natural
+    const selectedEnvReflection = environmentalReflections.find(er => er.id === environmentalReflectionId) || environmentalReflections[1]; // subtle
+    const selectedWeather = weatherEffects.find(we => we.id === weatherEffectId) || weatherEffects[0]; // clear
+    const selectedMotion = motionElements.find(me => me.id === motionElementId) || motionElements[0]; // static
 
     if (!selectedModel || !selectedBackground) {
       return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
@@ -657,7 +854,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       ? 'the garment/clothing from the first image'
       : `ALL ${garments.length} garments/clothing items from the first ${garments.length} images (combine them on the model - e.g., if there's pants, shirt, and jacket, the model should wear all of them together)`;
 
-    const prompt = `You are a professional fashion photographer and image editor. Create a realistic, high-quality virtual try-on image.
+    const prompt = `You are a world-class professional fashion photographer and expert image editor with mastery in color science, fabric rendering, and photographic composition. Create an ultra-realistic, high-quality virtual try-on image.
 
 TASK: Place ${garmentDescription} onto the model shown in the ${garments.length === 1 ? 'second' : 'last'} image.
 
@@ -665,36 +862,113 @@ CORE REQUIREMENTS:
 1. The model should wear ${garmentDescription}
 ${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Location/Setting: ${selectedBackground.description}
 ${garments.length > 1 ? '4' : '3'}. Keep the model's face and overall appearance from the reference image
-${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n6. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
+${garments.length > 1 ? '5' : '4'}. Garment Fit: ${selectedFit.description}
+${garments.length > 1 ? '6' : '5'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
 
 POSE & COMPOSITION:
 - Pose: ${selectedPose.description}
 - Camera Angle: ${selectedCameraAngle.description}
-- Framing: Full body or three-quarter shot, well-composed
+- Framing: Full body or three-quarter shot, well-composed, rule of thirds
+- ${selectedMotion.description}
 
 STYLE & MOOD:
 - Overall Style: ${selectedStyle.description}
 - The image should convey this mood and aesthetic
 - Make it look professional and magazine-quality
 
-LIGHTING:
-- Lighting Style: ${selectedLighting.description}
-- Create depth and dimension with proper shadows and highlights
-- Ensure the lighting matches the location and enhances the garment
+===== PHASE 1: CRITICAL QUALITY PARAMETERS =====
 
-TECHNICAL SPECS:
-- High-quality, sharp focus, 4K resolution
-- Professional color grading
-- Photorealistic rendering
-- Suitable for e-commerce and editorial use
-- No text, watermarks, or logos
+COLOR TEMPERATURE & WHITE BALANCE:
+- Color Temperature: ${selectedColorTemp.description}
+- Ensure proper white balance for natural skin tones
+- Color harmony between garment, model, and environment
+- No unnatural color casts unless intentional for mood
 
-IMPORTANT:
+DEPTH OF FIELD:
+- ${selectedDoF.description}
+- Create proper bokeh if shallow DoF is selected
+- Ensure subject is in sharp focus while background matches DoF setting
+- Natural lens characteristics and optical quality
+
+FABRIC TEXTURE & MATERIAL RENDERING:
+- ${selectedFabric.description}
+- Render fabric with proper surface characteristics and texture detail
+- Show natural fabric behavior: how it wrinkles, folds, reflects light
+- Micro-details: stitching, weave pattern, fabric grain visible
+- Material-specific properties (cotton matte vs silk sheen)
+- Proper subsurface scattering for translucent fabrics
+
+SHADOW QUALITY & DIRECTION:
+- ${selectedShadow.description}
+- Shadow color should be slightly cooler than highlights
+- Shadows should follow light source direction logically
+- Proper shadow density and transition zones
+- Ambient occlusion in folds and creases
+
+===== PHASE 2: PROFESSIONAL TOUCH =====
+
+LIGHTING SETUP:
+- Main Lighting: ${selectedLighting.description}
+- Lighting Ratio: ${selectedLightingRatio.description}
+- Create dimensional depth with proper key, fill, and rim lighting
+- Catchlights in eyes for lifelike appearance
+- Ensure lighting enhances garment texture and form
+
+BACKGROUND TREATMENT:
+- Background Blur: ${selectedBgBlur.description}
+- Natural subject-background separation
+- Proper bokeh characteristics if blur is applied
+- Background should complement not distract from subject
+
+IMAGE OUTPUT SPECS:
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Sharp focus on subject, proper edge sharpness
+- No digital artifacts or compression issues
+
+===== PHASE 3: ADVANCED FEATURES =====
+
+POST-PROCESSING & COLOR GRADING:
+- ${selectedPostProcessing.description}
+- Professional color science and grading
+- Proper contrast curves and tonal distribution
+- Skin tone rendering with natural warmth
+- Color harmony and palette cohesion
+
+ENVIRONMENTAL INTERACTION:
+- ${selectedEnvReflection.description}
+- Ambient light from surroundings affecting subject
+- Proper color temperature shift based on environment
+- Reflective materials show environment (silk, leather, synthetics)
+- Natural light bounce and fill from surroundings
+
+ATMOSPHERE & WEATHER:
+- ${selectedWeather.description}
+- Atmospheric perspective and depth cues
+- Proper haze, mist, or clarity based on conditions
+- Weather-appropriate lighting characteristics
+
+SKIN RENDERING:
+- Natural skin texture with pores and detail
+- Proper subsurface scattering for skin translucency
+- Skin tone matched to lighting conditions
+- NO over-smoothing or "plastic" appearance
+- Realistic skin-to-fabric transitions
+
+FINAL TECHNICAL SPECIFICATIONS:
+- Photorealistic rendering, indistinguishable from real photography
+- Professional color accuracy for e-commerce use
+- Suitable for editorial, advertising, and product photography
+- Film-like quality with proper grain structure if applicable
+- No text, watermarks, logos, or artificial elements
+- Natural lens characteristics (slight vignette if shallow DoF)
+
+CRITICAL IMPERATIVES:
 - Do NOT change the model's facial features or body type
-- Make sure the clothing looks natural and realistic
-- Blend the clothing seamlessly with the model's body
-- Maintain consistency with the specified parameters
-- The final image should look like a professional photoshoot`;
+- Preserve authentic garment colors with accurate material rendering
+- Seamless clothing integration with realistic physics
+- All parameters must work together harmoniously
+- The final image should look like a $10,000 professional photoshoot from a top fashion photographer`;
 
     console.log('📝 Prompt:', prompt);
 

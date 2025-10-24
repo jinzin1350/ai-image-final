@@ -504,6 +504,63 @@ button,
    ======================================== */
 
 /* ========================================
+   Professional Quality Settings
+   ======================================== */
+
+.quality-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 1.5px solid var(--border-light);
+    margin-top: var(--space-lg);
+}
+
+.quality-group {
+    background: white;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.quality-group:hover {
+    border-color: var(--accent-blue);
+    box-shadow: var(--shadow-sm);
+}
+
+.quality-group[open] {
+    box-shadow: var(--shadow-md);
+}
+
+.quality-header {
+    padding: var(--space-md);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: var(--font-weight-semibold);
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    transition: all 0.2s ease;
+}
+
+.quality-header:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b3fa0 100%);
+}
+
+.quality-group details[open] .quality-header {
+    border-bottom: 1px solid var(--border-light);
+}
+
+.quality-group .params-grid {
+    padding: var(--space-md);
+    background: #fafafa;
+}
+
+/* ========================================
    Multi-Garment Preview Grid
    ======================================== */
 

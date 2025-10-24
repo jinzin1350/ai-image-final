@@ -8,6 +8,24 @@ let selectedCameraAngleId = 'eye-level';
 let selectedStyleId = 'professional';
 let selectedLightingId = 'studio';
 
+// PHASE 1: Critical Quality Parameters
+let selectedColorTempId = 'auto';
+let selectedDofId = 'medium';
+let selectedFabricId = 'auto';
+let selectedShadowId = 'medium';
+
+// PHASE 2: Professional Touch
+let selectedAspectRatioId = '1:1';
+let selectedLightingRatioId = 'medium';
+let selectedBgBlurId = 'medium';
+let selectedFitId = 'regular';
+
+// PHASE 3: Advanced Features
+let selectedPostProcId = 'natural';
+let selectedEnvReflectId = 'subtle';
+let selectedWeatherId = 'clear';
+let selectedMotionId = 'static';
+
 // المان‌ها
 const garmentInput = document.getElementById('garmentInput');
 const uploadArea = document.getElementById('uploadArea');
@@ -26,6 +44,20 @@ const resultImage = document.getElementById('resultImage');
 const resultInfo = document.getElementById('resultInfo');
 const downloadBtn = document.getElementById('downloadBtn');
 const loadingOverlay = document.getElementById('loadingOverlay');
+
+// Professional Quality Elements
+const colorTempSelect = document.getElementById('colorTempSelect');
+const dofSelect = document.getElementById('dofSelect');
+const fabricSelect = document.getElementById('fabricSelect');
+const shadowSelect = document.getElementById('shadowSelect');
+const aspectRatioSelect = document.getElementById('aspectRatioSelect');
+const lightingRatioSelect = document.getElementById('lightingRatioSelect');
+const bgBlurSelect = document.getElementById('bgBlurSelect');
+const fitSelect = document.getElementById('fitSelect');
+const postProcSelect = document.getElementById('postProcSelect');
+const envReflectSelect = document.getElementById('envReflectSelect');
+const weatherSelect = document.getElementById('weatherSelect');
+const motionSelect = document.getElementById('motionSelect');
 
 // بارگذاری مدل‌ها
 async function loadModels() {
@@ -176,6 +208,214 @@ lightingSelect.addEventListener('change', (e) => {
     selectedLightingId = e.target.value;
 });
 
+// PHASE 1: Event listeners for critical quality parameters
+colorTempSelect.addEventListener('change', (e) => {
+    selectedColorTempId = e.target.value;
+});
+
+dofSelect.addEventListener('change', (e) => {
+    selectedDofId = e.target.value;
+});
+
+fabricSelect.addEventListener('change', (e) => {
+    selectedFabricId = e.target.value;
+});
+
+shadowSelect.addEventListener('change', (e) => {
+    selectedShadowId = e.target.value;
+});
+
+// PHASE 2: Event listeners for professional touch
+aspectRatioSelect.addEventListener('change', (e) => {
+    selectedAspectRatioId = e.target.value;
+});
+
+lightingRatioSelect.addEventListener('change', (e) => {
+    selectedLightingRatioId = e.target.value;
+});
+
+bgBlurSelect.addEventListener('change', (e) => {
+    selectedBgBlurId = e.target.value;
+});
+
+fitSelect.addEventListener('change', (e) => {
+    selectedFitId = e.target.value;
+});
+
+// PHASE 3: Event listeners for advanced features
+postProcSelect.addEventListener('change', (e) => {
+    selectedPostProcId = e.target.value;
+});
+
+envReflectSelect.addEventListener('change', (e) => {
+    selectedEnvReflectId = e.target.value;
+});
+
+weatherSelect.addEventListener('change', (e) => {
+    selectedWeatherId = e.target.value;
+});
+
+motionSelect.addEventListener('change', (e) => {
+    selectedMotionId = e.target.value;
+});
+
+// Load functions for new quality parameters
+async function loadColorTemperatures() {
+    try {
+        const response = await fetch('/api/color-temperatures');
+        const items = await response.json();
+        colorTempSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedColorTempId = items[3]?.id || 'auto';
+    } catch (error) {
+        console.error('خطا در بارگذاری دمای رنگ:', error);
+    }
+}
+
+async function loadDepthOfFields() {
+    try {
+        const response = await fetch('/api/depth-of-fields');
+        const items = await response.json();
+        dofSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedDofId = items[1]?.id || 'medium';
+    } catch (error) {
+        console.error('خطا در بارگذاری عمق میدان:', error);
+    }
+}
+
+async function loadFabricTypes() {
+    try {
+        const response = await fetch('/api/fabric-types');
+        const items = await response.json();
+        fabricSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedFabricId = items[7]?.id || 'auto';
+    } catch (error) {
+        console.error('خطا در بارگذاری نوع پارچه:', error);
+    }
+}
+
+async function loadShadowQualities() {
+    try {
+        const response = await fetch('/api/shadow-qualities');
+        const items = await response.json();
+        shadowSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedShadowId = items[1]?.id || 'medium';
+    } catch (error) {
+        console.error('خطا در بارگذاری کیفیت سایه:', error);
+    }
+}
+
+async function loadAspectRatios() {
+    try {
+        const response = await fetch('/api/aspect-ratios');
+        const items = await response.json();
+        aspectRatioSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedAspectRatioId = items[0]?.id || '1:1';
+    } catch (error) {
+        console.error('خطا در بارگذاری نسبت تصویر:', error);
+    }
+}
+
+async function loadLightingRatios() {
+    try {
+        const response = await fetch('/api/lighting-ratios');
+        const items = await response.json();
+        lightingRatioSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedLightingRatioId = items[1]?.id || 'medium';
+    } catch (error) {
+        console.error('خطا در بارگذاری نسبت نوری:', error);
+    }
+}
+
+async function loadBackgroundBlurs() {
+    try {
+        const response = await fetch('/api/background-blurs');
+        const items = await response.json();
+        bgBlurSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedBgBlurId = items[2]?.id || 'medium';
+    } catch (error) {
+        console.error('خطا در بارگذاری تاری پس‌زمینه:', error);
+    }
+}
+
+async function loadGarmentFits() {
+    try {
+        const response = await fetch('/api/garment-fits');
+        const items = await response.json();
+        fitSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedFitId = items[1]?.id || 'regular';
+    } catch (error) {
+        console.error('خطا در بارگذاری برازش لباس:', error);
+    }
+}
+
+async function loadPostProcessingPresets() {
+    try {
+        const response = await fetch('/api/post-processing-presets');
+        const items = await response.json();
+        postProcSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedPostProcId = items[0]?.id || 'natural';
+    } catch (error) {
+        console.error('خطا در بارگذاری پردازش رنگ:', error);
+    }
+}
+
+async function loadEnvironmentalReflections() {
+    try {
+        const response = await fetch('/api/environmental-reflections');
+        const items = await response.json();
+        envReflectSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedEnvReflectId = items[1]?.id || 'subtle';
+    } catch (error) {
+        console.error('خطا در بارگذاری بازتاب محیط:', error);
+    }
+}
+
+async function loadWeatherEffects() {
+    try {
+        const response = await fetch('/api/weather-effects');
+        const items = await response.json();
+        weatherSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedWeatherId = items[0]?.id || 'clear';
+    } catch (error) {
+        console.error('خطا در بارگذاری آب و هوا:', error);
+    }
+}
+
+async function loadMotionElements() {
+    try {
+        const response = await fetch('/api/motion-elements');
+        const items = await response.json();
+        motionSelect.innerHTML = items.map(item => `
+            <option value="${item.id}">${item.name}</option>
+        `).join('');
+        selectedMotionId = items[0]?.id || 'static';
+    } catch (error) {
+        console.error('خطا در بارگذاری حرکت:', error);
+    }
+}
+
 // انتخاب مدل
 function selectModel(modelId) {
     selectedModelId = modelId;
@@ -314,13 +554,28 @@ generateBtn.addEventListener('click', async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                garmentPaths: uploadedGarmentPaths, // Changed to array
+                garmentPaths: uploadedGarmentPaths,
                 modelId: selectedModelId,
                 backgroundId: selectedBackgroundId,
                 poseId: selectedPoseId,
                 cameraAngleId: selectedCameraAngleId,
                 styleId: selectedStyleId,
-                lightingId: selectedLightingId
+                lightingId: selectedLightingId,
+                // PHASE 1: Critical Quality
+                colorTemperatureId: selectedColorTempId,
+                depthOfFieldId: selectedDofId,
+                fabricTypeId: selectedFabricId,
+                shadowQualityId: selectedShadowId,
+                // PHASE 2: Professional Touch
+                aspectRatioId: selectedAspectRatioId,
+                lightingRatioId: selectedLightingRatioId,
+                backgroundBlurId: selectedBgBlurId,
+                garmentFitId: selectedFitId,
+                // PHASE 3: Advanced Features
+                postProcessingId: selectedPostProcId,
+                environmentalReflectionId: selectedEnvReflectId,
+                weatherEffectId: selectedWeatherId,
+                motionElementId: selectedMotionId
             })
         });
 
@@ -405,3 +660,17 @@ loadPoses();
 loadCameraAngles();
 loadStyles();
 loadLightings();
+
+// بارگذاری پارامترهای کیفیت حرفه‌ای
+loadColorTemperatures();
+loadDepthOfFields();
+loadFabricTypes();
+loadShadowQualities();
+loadAspectRatios();
+loadLightingRatios();
+loadBackgroundBlurs();
+loadGarmentFits();
+loadPostProcessingPresets();
+loadEnvironmentalReflections();
+loadWeatherEffects();
+loadMotionElements();
