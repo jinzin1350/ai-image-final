@@ -748,7 +748,7 @@ IMPORTANT:
 
     // ذخیره اطلاعات در Supabase Database
     const { data: generationData, error: dbError } = await supabase
-      .from('generations')
+      .from('generated_images')
       .insert([
         {
           user_id: req.user?.id || null,
@@ -797,7 +797,7 @@ app.get('/api/generations', authenticateUser, async (req, res) => {
     }
 
     const { data, error } = await supabase
-      .from('generations')
+      .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
@@ -821,7 +821,7 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
 
     // حذف از database
     const { error } = await supabase
-      .from('generations')
+      .from('generated_images')
       .delete()
       .eq('id', id);
 
