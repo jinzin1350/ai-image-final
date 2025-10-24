@@ -95,9 +95,12 @@ function displayGallery() {
             minute: '2-digit'
         });
 
+        // استفاده از imagePath یا generated_image_url
+        const imageUrl = gen.imagePath || gen.generated_image_url;
+
         return `
             <div class="gallery-item" onclick="openModal(${gen.id})">
-                <img src="${gen.generated_image_url}" alt="تصویر تولید شده" loading="lazy">
+                <img src="${imageUrl}" alt="تصویر تولید شده" loading="lazy">
                 <div class="gallery-item-info">
                     <div class="gallery-item-date">${dateStr}</div>
                 </div>
@@ -112,7 +115,9 @@ function openModal(imageId) {
     if (!generation) return;
 
     currentImageId = imageId;
-    modalImage.src = generation.generated_image_url;
+    // استفاده از imagePath یا generated_image_url
+    const imageUrl = generation.imagePath || generation.generated_image_url;
+    modalImage.src = imageUrl;
 
     const date = new Date(generation.created_at);
     const dateStr = date.toLocaleDateString('fa-IR', {
@@ -123,11 +128,15 @@ function openModal(imageId) {
         minute: '2-digit'
     });
 
+    // استفاده از modelId یا model_id
+    const modelId = generation.modelId || generation.model_id || 'نامشخص';
+    const backgroundId = generation.backgroundId || generation.background_id || 'نامشخص';
+
     modalInfo.innerHTML = `
         <h3>جزئیات تصویر</h3>
         <p><strong>تاریخ تولید:</strong> ${dateStr}</p>
-        <p><strong>شناسه مدل:</strong> ${generation.model_id || 'نامشخص'}</p>
-        <p><strong>پس‌زمینه:</strong> ${generation.background_id || 'نامشخص'}</p>
+        <p><strong>شناسه مدل:</strong> ${modelId}</p>
+        <p><strong>پس‌زمینه:</strong> ${backgroundId}</p>
         ${generation.description ? `<p><strong>توضیحات:</strong> ${generation.description}</p>` : ''}
     `;
 
@@ -149,8 +158,11 @@ function downloadImage() {
     const generation = generations.find(g => g.id === currentImageId);
     if (!generation) return;
 
+    // استفاده از imagePath یا generated_image_url
+    const imageUrl = generation.imagePath || generation.generated_image_url;
+
     const link = document.createElement('a');
-    link.href = generation.generated_image_url;
+    link.href = imageUrl;
     link.download = `fashion-ai-${currentImageId}.jpg`;
     link.click();
 }
