@@ -82,6 +82,23 @@ app.get('/rules', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'rules.html'));
 });
 
+// Support pages routes
+app.get('/help', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'help.html'));
+});
+
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'faq.html'));
+});
+
+app.get('/api-docs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api-docs.html'));
+});
+
+app.get('/status', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'status.html'));
+});
+
 // Static files - MUST come after specific routes
 app.use(express.static('public'));
 
