@@ -1,19 +1,25 @@
 
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+// Mobile Menu Toggle
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+        mobileMenuBtn.classList.toggle('active');
+    });
+}
+
+// Close mobile menu when clicking on a link
+const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+mobileMenuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        mobileMenuBtn.classList.remove('active');
     });
 });
 
-// Navbar scroll effect
+// Navbar Scroll Effect
 const navbar = document.querySelector('.navbar');
 let lastScroll = 0;
 
@@ -21,15 +27,202 @@ window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 100) {
-        navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+        navbar.classList.add('scrolled');
     } else {
-        navbar.style.boxShadow = 'none';
+        navbar.classList.remove('scrolled');
     }
     
     lastScroll = currentScroll;
 });
 
-// Intersection Observer for fade-in animations
+// Before/After Image Slider
+const comparisonContainer = document.querySelector('.comparison-container');
+const sliderHandle = document.querySelector('.slider-handle');
+const afterImage = document.querySelector('.comparison-image.after');
+
+if (comparisonContainer && sliderHandle) {
+    let isDragging = false;
+
+    function updateSlider(e) {
+        if (!isDragging) return;
+        
+        const rect = comparisonContainer.getBoundingClientRect();
+        const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        let position = ((x - rect.right) / rect.width) * 100;
+        
+        position = Math.max(0, Math.min(100, position));
+        
+        sliderHandle.style.right = position + '%';
+        afterImage.style.clipPath = `inset(0 0 0 ${position}%)`;
+    }
+
+    // Mouse events
+    sliderHandle.addEventListener('mousedown', () => {
+        isDragging = true;
+    });
+
+    document.addEventListener('mousemove', updateSlider);
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Touch events
+    sliderHandle.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        e.preventDefault();
+    });
+
+    document.addEventListener('touchmove', updateSlider);
+
+    document.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+
+    // Auto-slide animation on page load
+    let autoSlidePosition = 50;
+    let autoSlideDirection = 1;
+    const autoSlide = setInterval(() => {
+        autoSlidePosition += autoSlideDirection;
+        
+        if (autoSlidePosition >= 70 || autoSlidePosition <= 30) {
+            autoSlideDirection *= -1;
+        }
+        
+        sliderHandle.style.right = autoSlidePosition + '%';
+        afterImage.style.clipPath = `inset(0 0 0 ${autoSlidePosition}%)`;
+    }, 50);
+
+    // Stop auto-slide when user interacts
+    sliderHandle.addEventListener('mousedown', () => {
+        clearInterval(autoSlide);
+    });
+
+    sliderHandle.addEventListener('touchstart', () => {
+        clearInterval(autoSlide);
+    });
+}
+
+// Showcase Tabs Filter
+const tabButtons = document.querySelectorAll('.tab-btn');
+const showcaseItems = document.querySelectorAll('.showcase-item');
+
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const category = button.getAttribute('data-category');
+        
+        // Update active button
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Filter items
+        showcaseItems.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+            
+            if (category === 'all' || itemCategory === category) {
+                item.style.display = 'block';
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'scale(1)';
+                }, 10);
+            } else {
+                item.style.opacity = '0';
+                item.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    item.style.display = 'none';
+                }, 300);
+            }
+        });
+    });
+});
+
+// Watch Demo Button (Video Modal)
+const watchDemoBtn = document.getElementById('watchDemo');
+
+if (watchDemoBtn) {
+    watchDemoBtn.addEventListener('click', () => {
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        `;
+        
+        modalContent.innerHTML = `
+            <h3 style="font-size: 24px; margin-bottom: 16px; color: #1a202c;">ویدیوی معرفی</h3>
+            <p style="color: #718096; margin-bottom: 24px;">به زودی ویدیوی کامل معرفی محصول منتشر خواهد شد</p>
+            <button id="closeModal" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 12px 32px;
+                border: none;
+                border-radius: 12px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            ">بستن</button>
+        `;
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        // Close modal
+        const closeModal = () => {
+            modal.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(modal);
+            }, 300);
+        };
+        
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    });
+}
+
+// Smooth Scroll for Anchor Links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        
+        if (target) {
+            const navbarHeight = navbar.offsetHeight;
+            const targetPosition = target.offsetTop - navbarHeight - 20;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// Intersection Observer for Animations
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -44,49 +237,110 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Apply fade-in to elements
-document.querySelectorAll('.feature-card, .gallery-item').forEach(el => {
+// Observe elements for animation
+const animateElements = document.querySelectorAll('.feature-card, .showcase-item, .step, .pricing-card, .testimonial-card');
+animateElements.forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(30px)';
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(el);
 });
 
-// Stats counter animation
-function animateCounter(element, target) {
+// Stats Counter Animation
+const statsNumbers = document.querySelectorAll('.stat-number');
+
+const animateCounter = (element) => {
+    const target = element.textContent;
+    const isNumber = /^\d+/.test(target);
+    
+    if (!isNumber) return;
+    
+    const number = parseInt(target.replace(/[^\d]/g, ''));
     const duration = 2000;
-    const increment = target / (duration / 16);
+    const increment = number / (duration / 16);
     let current = 0;
-
-    const timer = setInterval(() => {
+    
+    const updateCounter = () => {
         current += increment;
-        if (current >= target) {
-            element.textContent = target.toLocaleString('fa-IR');
-            clearInterval(timer);
+        if (current < number) {
+            element.textContent = Math.floor(current).toLocaleString('fa-IR') + target.replace(/^\d+/, '').replace(/[,۰-۹]/g, '');
+            requestAnimationFrame(updateCounter);
         } else {
-            element.textContent = Math.floor(current).toLocaleString('fa-IR');
+            element.textContent = target;
         }
-    }, 16);
-}
+    };
+    
+    updateCounter();
+};
 
-// Trigger counter animation when stats are visible
+// Observe stats for counter animation
 const statsObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const numbers = entry.target.querySelectorAll('.stat-number');
-            numbers.forEach(num => {
-                const text = num.textContent.replace(/[^0-9]/g, '');
-                const target = parseInt(text);
-                if (!isNaN(target)) {
-                    animateCounter(num, target);
-                }
-            });
-            statsObserver.unobserve(entry.target);
+        if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+            animateCounter(entry.target);
+            entry.target.classList.add('animated');
         }
     });
 }, { threshold: 0.5 });
 
-const statsSection = document.querySelector('.hero-stats');
-if (statsSection) {
-    statsObserver.observe(statsSection);
+statsNumbers.forEach(stat => {
+    statsObserver.observe(stat);
+});
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    
+    .mobile-menu-btn.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .mobile-menu-btn.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .mobile-menu-btn.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+    
+    .showcase-item {
+        transition: opacity 0.3s ease, transform 0.3s ease, display 0.3s ease;
+    }
+`;
+document.head.appendChild(style);
+
+// Performance optimization: Lazy load images
+if ('loading' in HTMLImageElement.prototype) {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(img => {
+        img.src = img.src;
+    });
+} else {
+    // Fallback for browsers that don't support lazy loading
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js';
+    document.body.appendChild(script);
 }
+
+// Add loading state to buttons
+const buttons = document.querySelectorAll('.btn-primary, .btn-large, .btn-pricing');
+buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+        if (this.href && !this.href.includes('#')) {
+            this.style.opacity = '0.7';
+            this.style.pointerEvents = 'none';
+        }
+    });
+});
+
+console.log('🎨 استودیو AI آماده است!');
+console.log('✨ تمام قابلیت‌های تعاملی فعال شدند');

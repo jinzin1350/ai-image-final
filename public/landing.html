@@ -4,219 +4,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>استودیو هوش مصنوعی مد - دستیار حرفه‌ای عکاسی محصول</title>
+    <title>استودیو هوش مصنوعی مد | عکاسی حرفه‌ای بدون استودیو</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="landing-style.css">
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <span class="logo-icon">📸</span>
-                <span class="logo-text">AI Fashion Studio</span>
-            </div>
-            <div class="nav-links">
-                <a href="#features" class="nav-link">امکانات</a>
-                <a href="#gallery" class="nav-link">نمونه کارها</a>
-                <a href="#pricing" class="nav-link">قیمت‌ها</a>
-                <a href="/app" class="btn-primary">شروع کنید</a>
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="12" fill="url(#gradient1)"/>
+                        <path d="M20 10L12 18L20 26L28 18L20 10Z" fill="white" opacity="0.9"/>
+                        <circle cx="20" cy="20" r="3" fill="white"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>استودیو AI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">امکانات</a>
+                    <a href="#showcase">نمونه‌کارها</a>
+                    <a href="#how-it-works">نحوه کار</a>
+                    <a href="#pricing">قیمت‌گذاری</a>
+                </div>
+                <a href="/app" class="btn-primary">شروع رایگان</a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#features">امکانات</a>
+        <a href="#showcase">نمونه‌کارها</a>
+        <a href="#how-it-works">نحوه کار</a>
+        <a href="#pricing">قیمت‌گذاری</a>
+        <a href="/app" class="btn-primary">شروع رایگان</a>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <div class="hero-badge">
-                    <span>✨</span>
-                    <span>تکنولوژی هوش مصنوعی پیشرفته</span>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span>
+                        <span>قدرت هوش مصنوعی در خدمت کسب‌وکار شما</span>
+                    </div>
+                    <h1 class="hero-title">
+                        استودیو عکاسی در
+                        <span class="gradient-text">جیب شما</span>
+                    </h1>
+                    <p class="hero-description">
+                        دیگر نیازی به استودیو گران‌قیمت، مدل حرفه‌ای و تجهیزات پیچیده نیست. 
+                        با هوش مصنوعی پیشرفته، در عرض ثانیه‌ها عکس‌های استودیویی باکیفیت از محصولات خود بگیرید.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-number">۲۵,۰۰۰+</div>
+                            <div class="stat-label">عکس تولید شده</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">۱,۲۰۰+</div>
+                            <div class="stat-label">کسب‌وکار فعال</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">۴.۹/۵</div>
+                            <div class="stat-label">امتیاز کاربران</div>
+                        </div>
+                    </div>
+                    <div class="hero-cta">
+                        <a href="/app" class="btn-large btn-gradient">
+                            <span>شروع رایگان</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <button class="btn-large btn-outline" id="watchDemo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.1"/>
+                                <path d="M10 8l6 4-6 4V8z"/>
+                            </svg>
+                            <span>مشاهده ویدیو</span>
+                        </button>
+                    </div>
+                    <div class="trust-badges">
+                        <span>🔒 امنیت تضمین شده</span>
+                        <span>⚡ پردازش سریع</span>
+                        <span>✨ کیفیت حرفه‌ای</span>
+                    </div>
                 </div>
-                <h1 class="hero-title">
-                    دستیار استودیویی شما برای
-                    <span class="gradient-text">عکاسی حرفه‌ای محصول</span>
-                </h1>
-                <p class="hero-subtitle">
-                    با هوش مصنوعی، در عرض چند ثانیه عکس‌های استودیویی با کیفیت بالا از محصولات خود بسازید.
-                    بدون نیاز به مدل، استودیو یا عکاس حرفه‌ای.
-                </p>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">10,000+</div>
-                        <div class="stat-label">عکس تولید شده</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">500+</div>
-                        <div class="stat-label">فروشنده فعال</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">99%</div>
-                        <div class="stat-label">رضایت مشتریان</div>
-                    </div>
-                </div>
-                <div class="hero-cta">
-                    <a href="/app" class="btn-large btn-primary">
-                        <span>شروع رایگان</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                    <a href="#demo" class="btn-large btn-secondary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        <span>مشاهده دمو</span>
-                    </a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="showcase-grid">
-                    <div class="showcase-item large">
-                        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=1200&fit=crop" alt="Fashion Model 1" loading="lazy">
-                        <div class="showcase-badge">تولید شده با AI</div>
-                    </div>
-                    <div class="showcase-item">
-                        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=900&fit=crop" alt="Fashion Model 2" loading="lazy">
-                    </div>
-                    <div class="showcase-item">
-                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=900&fit=crop" alt="Fashion Model 3" loading="lazy">
+                <div class="hero-visual">
+                    <div class="before-after-slider">
+                        <div class="comparison-container">
+                            <div class="comparison-image before">
+                                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&h=1000&fit=crop&q=90" alt="عکس معمولی محصول">
+                                <div class="image-label">عکس معمولی</div>
+                            </div>
+                            <div class="comparison-image after">
+                                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=1000&fit=crop&q=90" alt="عکس استودیویی با AI">
+                                <div class="image-label ai-label">
+                                    <span>✨</span>
+                                    <span>نتیجه AI</span>
+                                </div>
+                            </div>
+                            <div class="slider-handle">
+                                <div class="slider-button">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                        <path d="M15.5 5l-7 7 7 7"/>
+                                        <path d="M8.5 5l7 7-7 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="hero-gradient"></div>
+        <div class="hero-bg-elements">
+            <div class="floating-element el-1"></div>
+            <div class="floating-element el-2"></div>
+            <div class="floating-element el-3"></div>
+        </div>
     </section>
 
     <!-- Features Section -->
     <section id="features" class="features">
-        <div class="section-header">
-            <h2 class="section-title">چرا استودیو هوش مصنوعی مد؟</h2>
-            <p class="section-subtitle">تکنولوژی پیشرفته برای نتایج حرفه‌ای</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon gradient-bg-1">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M12 6v6l4 2"></path>
-                    </svg>
-                </div>
-                <h3 class="feature-title">تولید سریع</h3>
-                <p class="feature-desc">عکس‌های حرفه‌ای در کمتر از 30 ثانیه</p>
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">چرا استودیو AI؟</div>
+                <h2 class="section-title">امکاناتی که کسب‌وکار شما را متحول می‌کند</h2>
+                <p class="section-description">
+                    تکنولوژی پیشرفته هوش مصنوعی برای ایجاد تصاویر حرفه‌ای که فروش شما را افزایش می‌دهد
+                </p>
             </div>
-
-            <div class="feature-card">
-                <div class="feature-icon gradient-bg-2">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                    </svg>
+            <div class="features-grid">
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                    </div>
+                    <h3>سرعت باورنکردنی</h3>
+                    <p>تولید عکس در کمتر از ۳۰ ثانیه. بدون انتظار، بدون تاخیر</p>
+                    <div class="feature-highlight">
+                        <span class="highlight-number">۱۰×</span>
+                        <span>سریع‌تر از استودیو سنتی</span>
+                    </div>
                 </div>
-                <h3 class="feature-title">چند لایه پوشش</h3>
-                <p class="feature-desc">ترکیب خودکار چند قطعه لباس روی هم</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon gradient-bg-3">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                        <path d="M21 15l-5-5L5 21"></path>
-                    </svg>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <h3>کیفیت استودیویی</h3>
+                    <p>نورپردازی حرفه‌ای و جزئیات واقعی در هر عکس</p>
                 </div>
-                <h3 class="feature-title">کیفیت استودیویی</h3>
-                <p class="feature-desc">نورپردازی حرفه‌ای و بافت واقعی پارچه</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon gradient-bg-4">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    </svg>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18M9 21V9"/>
+                        </svg>
+                    </div>
+                    <h3>پس‌زمینه‌های متنوع</h3>
+                    <p>بیش از ۵۰ محیط و پس‌زمینه برای انتخاب شما</p>
                 </div>
-                <h3 class="feature-title">پس‌زمینه‌های متنوع</h3>
-                <p class="feature-desc">بیش از 20 محیط و پس‌زمینه مختلف</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon gradient-bg-5">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"></path>
-                    </svg>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h3>ترکیب چند لایه</h3>
+                    <p>قرار دادن خودکار چندین قطعه لباس روی یکدیگر</p>
                 </div>
-                <h3 class="feature-title">تنظیمات پیشرفته</h3>
-                <p class="feature-desc">کنترل کامل روی نور، زاویه و استایل</p>
-            </div>
 
-            <div class="feature-card">
-                <div class="feature-icon gradient-bg-6">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3>مدل‌های متنوع</h3>
+                    <p>انتخاب از میان مدل‌های مختلف زن، مرد و کودک</p>
                 </div>
-                <h3 class="feature-title">مدل‌های متنوع</h3>
-                <p class="feature-desc">مدل‌های زن، مرد، دختر و پسر</p>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                    <h3>دانلود با کیفیت بالا</h3>
+                    <p>دریافت عکس‌ها در رزولوشن ۴K آماده چاپ</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section id="gallery" class="gallery-section">
-        <div class="section-header">
-            <h2 class="section-title">نمونه کارهای تولید شده</h2>
-            <p class="section-subtitle">کیفیت استودیویی، بدون هزینه استودیو</p>
+    <!-- Showcase Section -->
+    <section id="showcase" class="showcase">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">نمونه کارها</div>
+                <h2 class="section-title">نتایج واقعی از مشتریان ما</h2>
+                <p class="section-description">
+                    کیفیت استودیویی بدون هزینه‌های سنگین
+                </p>
+            </div>
+            
+            <div class="showcase-tabs">
+                <button class="tab-btn active" data-category="all">همه</button>
+                <button class="tab-btn" data-category="studio">استودیو سفید</button>
+                <button class="tab-btn" data-category="outdoor">فضای باز</button>
+                <button class="tab-btn" data-category="lifestyle">لایف‌استایل</button>
+            </div>
+
+            <div class="showcase-grid">
+                <div class="showcase-item" data-category="studio">
+                    <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&h=1000&fit=crop&q=90" alt="استودیو سفید" loading="lazy">
+                    <div class="showcase-overlay">
+                        <div class="showcase-info">
+                            <span class="showcase-tag">استودیو سفید</span>
+                            <span class="showcase-tag">حرفه‌ای</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-item" data-category="outdoor">
+                    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=1000&fit=crop&q=90" alt="فضای باز" loading="lazy">
+                    <div class="showcase-overlay">
+                        <div class="showcase-info">
+                            <span class="showcase-tag">فضای باز</span>
+                            <span class="showcase-tag">طبیعی</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-item" data-category="lifestyle">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=1000&fit=crop&q=90" alt="لایف استایل" loading="lazy">
+                    <div class="showcase-overlay">
+                        <div class="showcase-info">
+                            <span class="showcase-tag">کافه</span>
+                            <span class="showcase-tag">مدرن</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-item" data-category="studio">
+                    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=1000&fit=crop&q=90" alt="استودیو" loading="lazy">
+                    <div class="showcase-overlay">
+                        <div class="showcase-info">
+                            <span class="showcase-tag">مینیمال</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-item" data-category="outdoor">
+                    <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=1000&fit=crop&q=90" alt="خیابان" loading="lazy">
+                    <div class="showcase-overlay">
+                        <div class="showcase-info">
+                            <span class="showcase-tag">خیابان شهری</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-item" data-category="lifestyle">
+                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=1000&fit=crop&q=90" alt="لایف استایل" loading="lazy">
+                    <div class="showcase-overlay">
+                        <div class="showcase-info">
+                            <span class="showcase-tag">داخلی</span>
+                            <span class="showcase-tag">گرم</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="gallery-grid">
-            <div class="gallery-item tall">
-                <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=900&fit=crop" alt="Fashion 1" loading="lazy">
-                <div class="gallery-overlay">
-                    <div class="gallery-info">
-                        <span class="gallery-tag">استودیو سفید</span>
-                        <span class="gallery-tag">حرفه‌ای</span>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">نحوه کار</div>
+                <h2 class="section-title">در ۳ قدم ساده به نتیجه برسید</h2>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">۱</div>
+                    <div class="step-content">
+                        <h3>آپلود محصول</h3>
+                        <p>عکس لباس یا محصول خود را آپلود کنید. هر فرمتی قابل قبول است</p>
+                    </div>
+                    <div class="step-image">
+                        <img src="https://images.unsplash.com/photo-1558769132-cb1aea9c0b41?w=400&h=300&fit=crop&q=90" alt="آپلود">
+                    </div>
+                </div>
+                <div class="step-divider">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step">
+                    <div class="step-number">۲</div>
+                    <div class="step-content">
+                        <h3>تنظیمات دلخواه</h3>
+                        <p>مدل، پس‌زمینه و استایل مورد نظر خود را انتخاب کنید</p>
+                    </div>
+                    <div class="step-image">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&q=90" alt="تنظیمات">
+                    </div>
+                </div>
+                <div class="step-divider">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step">
+                    <div class="step-number">۳</div>
+                    <div class="step-content">
+                        <h3>دانلود نتیجه</h3>
+                        <p>در عرض ثانیه‌ها عکس حرفه‌ای خود را دریافت کنید</p>
+                    </div>
+                    <div class="step-image">
+                        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=300&fit=crop&q=90" alt="نتیجه">
                     </div>
                 </div>
             </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1495385794356-15371f348c31?w=600&h=600&fit=crop" alt="Fashion 2" loading="lazy">
-                <div class="gallery-overlay">
-                    <div class="gallery-info">
-                        <span class="gallery-tag">کافه مدرن</span>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">قیمت‌گذاری</div>
+                <h2 class="section-title">پلنی متناسب با نیاز شما</h2>
+                <p class="section-description">بدون هزینه پنهان، لغو در هر زمان</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>استارتر</h3>
+                        <p>برای شروع کار</p>
                     </div>
+                    <div class="pricing-price">
+                        <span class="price">رایگان</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>۱۰ عکس در ماه</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>۵ پس‌زمینه</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>کیفیت HD</span>
+                        </li>
+                    </ul>
+                    <a href="/app" class="btn-pricing">شروع رایگان</a>
+                </div>
+
+                <div class="pricing-card popular">
+                    <div class="popular-badge">محبوب‌ترین</div>
+                    <div class="pricing-header">
+                        <h3>حرفه‌ای</h3>
+                        <p>برای کسب‌وکارهای متوسط</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="price">۲۹۹,۰۰۰</span>
+                        <span class="period">تومان/ماه</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>۲۰۰ عکس در ماه</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>تمام پس‌زمینه‌ها</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>کیفیت ۴K</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>پشتیبانی اولویت‌دار</span>
+                        </li>
+                    </ul>
+                    <a href="/app" class="btn-pricing">شروع کنید</a>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>سازمانی</h3>
+                        <p>برای کسب‌وکارهای بزرگ</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="price">۷۹۹,۰۰۰</span>
+                        <span class="period">تومان/ماه</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>نامحدود</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>API اختصاصی</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>مدل‌های سفارشی</span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>مدیر اختصاصی</span>
+                        </li>
+                    </ul>
+                    <a href="/app" class="btn-pricing">تماس با فروش</a>
                 </div>
             </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=600&h=600&fit=crop" alt="Fashion 3" loading="lazy">
-                <div class="gallery-overlay">
-                    <div class="gallery-info">
-                        <span class="gallery-tag">خیابان شهری</span>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">نظر مشتریان</div>
+                <h2 class="section-title">چرا کسب‌وکارها ما را دوست دارند</h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                    <p class="testimonial-text">
+                        "با استودیو AI توانستیم هزینه عکاسی را ۸۰٪ کاهش دهیم. کیفیت عکس‌ها فوق‌العاده است و مشتریان ما تفاوتی با عکس‌های استودیویی نمی‌بینند."
+                    </p>
+                    <div class="testimonial-author">
+                        <img src="https://i.pravatar.cc/100?img=1" alt="سارا احمدی">
+                        <div>
+                            <div class="author-name">سارا احمدی</div>
+                            <div class="author-role">مدیر فروشگاه آنلاین مد</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="gallery-item wide">
-                <img src="https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=900&h=600&fit=crop" alt="Fashion 4" loading="lazy">
-                <div class="gallery-overlay">
-                    <div class="gallery-info">
-                        <span class="gallery-tag">ساحل</span>
-                        <span class="gallery-tag">طبیعی</span>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                    <p class="testimonial-text">
+                        "سرعت و کیفیت این ابزار باورنکردنی است. حالا می‌توانیم روزانه ده‌ها محصول جدید را به فروشگاهمان اضافه کنیم بدون نگرانی از عکاسی."
+                    </p>
+                    <div class="testimonial-author">
+                        <img src="https://i.pravatar.cc/100?img=33" alt="امیر رضایی">
+                        <div>
+                            <div class="author-name">امیر رضایی</div>
+                            <div class="author-role">صاحب برند پوشاک</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="gallery-item">
-                <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop" alt="Fashion 5" loading="lazy">
-                <div class="gallery-overlay">
-                    <div class="gallery-info">
-                        <span class="gallery-tag">لوکس</span>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        ⭐⭐⭐⭐⭐
                     </div>
-                </div>
-            </div>
-            <div class="gallery-item tall">
-                <img src="https://images.unsplash.com/photo-1494955464529-790512c65305?w=600&h=900&fit=crop" alt="Fashion 6" loading="lazy">
-                <div class="gallery-overlay">
-                    <div class="gallery-info">
-                        <span class="gallery-tag">مینیمال</span>
+                    <p class="testimonial-text">
+                        "به‌عنوان یک استارتاپ، بودجه محدودی داشتیم. استودیو AI به ما کمک کرد تا با ظاهری حرفه‌ای شروع کنیم و اعتماد مشتریان را جلب کنیم."
+                    </p>
+                    <div class="testimonial-author">
+                        <img src="https://i.pravatar.cc/100?img=5" alt="مریم کریمی">
+                        <div>
+                            <div class="author-name">مریم کریمی</div>
+                            <div class="author-role">بنیانگذار برند کفش</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -224,45 +537,117 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="cta-content">
-            <h2 class="cta-title">آماده برای شروع هستید؟</h2>
-            <p class="cta-subtitle">امروز عکس‌های حرفه‌ای از محصولات خود بسازید</p>
-            <a href="/app" class="btn-large btn-white">
-                <span>شروع رایگان کنید</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </a>
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">آماده برای تحول در کسب‌وکار خود هستید؟</h2>
+                <p class="cta-subtitle">امروز شروع کنید و تفاوت را تجربه کنید</p>
+                <div class="cta-buttons">
+                    <a href="/app" class="btn-large btn-white">
+                        <span>شروع رایگان</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#pricing" class="btn-large btn-outline-white">مشاهده قیمت‌ها</a>
+                </div>
+                <div class="cta-features">
+                    <span>✓ بدون نیاز به کارت اعتباری</span>
+                    <span>✓ لغو در هر زمان</span>
+                    <span>✓ پشتیبانی ۲۴/۷</span>
+                </div>
+            </div>
         </div>
-        <div class="cta-gradient"></div>
+        <div class="cta-background"></div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <div class="logo">
-                    <span class="logo-icon">📸</span>
-                    <span class="logo-text">AI Fashion Studio</span>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <div class="footer-logo">
+                        <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="12" fill="url(#gradient2)"/>
+                            <path d="M20 10L12 18L20 26L28 18L20 10Z" fill="white" opacity="0.9"/>
+                            <circle cx="20" cy="20" r="3" fill="white"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="40" y2="40">
+                                    <stop offset="0%" stop-color="#667eea"/>
+                                    <stop offset="100%" stop-color="#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>استودیو AI</span>
+                    </div>
+                    <p class="footer-description">
+                        دستیار هوش مصنوعی شما برای تولید عکس‌های حرفه‌ای محصول. 
+                        ساده، سریع و با کیفیت استودیویی.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="اینستاگرام">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="none" stroke="white" stroke-width="2"/>
+                                <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="تلگرام">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="لینکدین">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
-                <p class="footer-desc">دستیار هوش مصنوعی برای تولید عکس‌های حرفه‌ای محصول</p>
+                
+                <div class="footer-column">
+                    <h4>محصول</h4>
+                    <a href="#features">امکانات</a>
+                    <a href="#showcase">نمونه‌کارها</a>
+                    <a href="#pricing">قیمت‌گذاری</a>
+                    <a href="#">به‌روزرسانی‌ها</a>
+                </div>
+
+                <div class="footer-column">
+                    <h4>شرکت</h4>
+                    <a href="#">درباره ما</a>
+                    <a href="#">وبلاگ</a>
+                    <a href="#">فرصت‌های شغلی</a>
+                    <a href="#">تماس با ما</a>
+                </div>
+
+                <div class="footer-column">
+                    <h4>پشتیبانی</h4>
+                    <a href="#">مرکز راهنمایی</a>
+                    <a href="#">سوالات متداول</a>
+                    <a href="#">API Documentation</a>
+                    <a href="#">وضعیت سرویس</a>
+                </div>
+
+                <div class="footer-column">
+                    <h4>قانونی</h4>
+                    <a href="#">حریم خصوصی</a>
+                    <a href="#">شرایط استفاده</a>
+                    <a href="#">قوانین</a>
+                    <a href="#">لایسنس</a>
+                </div>
             </div>
-            <div class="footer-section">
-                <h4 class="footer-title">محصول</h4>
-                <a href="#features" class="footer-link">امکانات</a>
-                <a href="#gallery" class="footer-link">نمونه کارها</a>
-                <a href="#pricing" class="footer-link">قیمت‌ها</a>
+            
+            <div class="footer-bottom">
+                <p>© ۱۴۰۳ استودیو AI. تمامی حقوق محفوظ است.</p>
+                <div class="footer-links">
+                    <a href="#">حریم خصوصی</a>
+                    <span>•</span>
+                    <a href="#">شرایط استفاده</a>
+                    <span>•</span>
+                    <a href="#">کوکی‌ها</a>
+                </div>
             </div>
-            <div class="footer-section">
-                <h4 class="footer-title">پشتیبانی</h4>
-                <a href="#" class="footer-link">راهنما</a>
-                <a href="#" class="footer-link">پرسش‌های متداول</a>
-                <a href="#" class="footer-link">تماس با ما</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2024 AI Fashion Studio. تمامی حقوق محفوظ است.</p>
         </div>
     </footer>
 
