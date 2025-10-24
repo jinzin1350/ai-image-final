@@ -257,14 +257,37 @@ const fallbackModels = [
 // لیست مدل‌ها با URL‌های تولید شده (در ابتدا از fallback استفاده می‌شود)
 let models = [...fallbackModels];
 
-// لیست پس‌زمینه‌ها
+// لیست پس‌زمینه‌ها - 20 موقعیت واقعی و متنوع
 const backgrounds = [
-  { id: 'studio', name: 'استودیو حرفه‌ای', description: 'پس‌زمینه سفید استودیو' },
-  { id: 'beach', name: 'ساحل', description: 'ساحل زیبا در روز آفتابی' },
-  { id: 'street', name: 'خیابان شهری', description: 'خیابان مدرن شهری' },
-  { id: 'park', name: 'پارک', description: 'پارک سرسبز' },
-  { id: 'cafe', name: 'کافه', description: 'کافه مدرن' },
-  { id: 'rooftop', name: 'پشت‌بام', description: 'پشت‌بام با منظره شهری' }
+  // استودیو و داخلی (Indoor)
+  { id: 'studio-white', name: 'استودیو سفید', description: 'Professional white studio background, clean minimalist photography studio', image: 'https://images.unsplash.com/photo-1606146485010-7e2e2f72027e?w=800&h=600&fit=crop' },
+  { id: 'studio-gray', name: 'استودیو خاکستری', description: 'Modern gray studio background with professional lighting', image: 'https://images.unsplash.com/photo-1554844453-7ea2a562a6c8?w=800&h=600&fit=crop' },
+  { id: 'luxury-hotel', name: 'هتل لوکس', description: 'Luxury hotel lobby with elegant interior design', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop' },
+  { id: 'modern-office', name: 'دفتر مدرن', description: 'Modern minimalist office with glass walls', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop' },
+  { id: 'art-gallery', name: 'گالری هنری', description: 'Contemporary art gallery with white walls', image: 'https://images.unsplash.com/photo-1567281880862-4c3d9c1c4e88?w=800&h=600&fit=crop' },
+
+  // کافه و رستوران (Cafe & Restaurant)
+  { id: 'cafe-modern', name: 'کافه مدرن', description: 'Trendy modern cafe with large windows and natural light', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop' },
+  { id: 'cafe-vintage', name: 'کافه وینتیج', description: 'Vintage style cafe with warm lighting and cozy atmosphere', image: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=800&h=600&fit=crop' },
+  { id: 'restaurant-elegant', name: 'رستوران شیک', description: 'Elegant fine dining restaurant interior', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop' },
+
+  // فضای باز شهری (Urban Outdoor)
+  { id: 'street-urban', name: 'خیابان شهری', description: 'Modern city street with contemporary architecture', image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop' },
+  { id: 'rooftop-city', name: 'پشت‌بام شهری', description: 'Rooftop terrace with city skyline view', image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&h=600&fit=crop' },
+  { id: 'downtown-night', name: 'مرکز شهر شب', description: 'Downtown city at night with bright lights', image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&h=600&fit=crop' },
+  { id: 'alley-brick', name: 'کوچه آجری', description: 'Charming brick alley with urban character', image: 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&h=600&fit=crop' },
+
+  // طبیعت (Nature)
+  { id: 'beach-sunset', name: 'ساحل غروب', description: 'Beautiful beach at sunset with golden light', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop' },
+  { id: 'park-green', name: 'پارک سبز', description: 'Lush green park with trees and natural lighting', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop' },
+  { id: 'garden-flower', name: 'باغ گل', description: 'Colorful flower garden with blooming plants', image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800&h=600&fit=crop' },
+  { id: 'forest-path', name: 'جنگل', description: 'Forest path with natural greenery and soft light', image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&h=600&fit=crop' },
+
+  // معماری و ساختمان (Architecture)
+  { id: 'building-modern', name: 'ساختمان مدرن', description: 'Modern architectural building with geometric design', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop' },
+  { id: 'stairs-marble', name: 'پله‌های مرمر', description: 'Elegant marble staircase in modern building', image: 'https://images.unsplash.com/photo-1505798577917-a65157d3320a?w=800&h=600&fit=crop' },
+  { id: 'plaza-public', name: 'میدان عمومی', description: 'Open public plaza with contemporary design', image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&h=600&fit=crop' },
+  { id: 'bridge-urban', name: 'پل شهری', description: 'Modern urban bridge with architectural interest', image: 'https://images.unsplash.com/photo-1470114716159-e389f8712fda?w=800&h=600&fit=crop' }
 ];
 
 // لیست حالت‌های بدن (Poses)

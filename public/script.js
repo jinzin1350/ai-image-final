@@ -73,20 +73,16 @@ async function loadBackgrounds() {
         const response = await fetch('/api/backgrounds');
         const backgrounds = await response.json();
 
-        const backgroundIcons = {
-            'studio': '🏢',
-            'beach': '🏖️',
-            'street': '🏙️',
-            'park': '🌳',
-            'cafe': '☕',
-            'rooftop': '🌆'
-        };
-
         backgroundsGrid.innerHTML = backgrounds.map(bg => `
             <div class="background-card" data-id="${bg.id}">
-                <div class="background-icon">${backgroundIcons[bg.id]}</div>
-                <div class="card-title">${bg.name}</div>
-                <div class="card-description">${bg.description}</div>
+                ${bg.image ? `
+                    <img src="${bg.image}" alt="${bg.name}" class="background-image" loading="lazy">
+                ` : `
+                    <div class="background-placeholder"></div>
+                `}
+                <div class="background-overlay">
+                    <div class="card-title">${bg.name}</div>
+                </div>
             </div>
         `).join('');
 
