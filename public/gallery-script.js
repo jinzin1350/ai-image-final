@@ -162,6 +162,18 @@ function renderGallery() {
         <div class="gallery-item" onclick="openModal(${index})" style="animation: fadeInUp 0.5s ease ${index * 0.05}s backwards;">
             <img src="${image.generated_image_url}" alt="تصویر ${index + 1}" class="gallery-item-image" loading="lazy">
             <div class="gallery-item-overlay">
+                <div class="overlay-top">
+                    <div class="view-details-btn">
+                        <div class="view-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="view-text">مشاهده جزئیات</div>
+                        <div class="view-hint">💡 کلیک کنید</div>
+                    </div>
+                </div>
                 <div class="item-info">
                     <div class="item-date">${formatDate(image.created_at)}</div>
                     <div class="item-params">${image.model_id || 'مدل'} • ${image.background_id || 'پس‌زمینه'}</div>
