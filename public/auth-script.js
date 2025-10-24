@@ -6,15 +6,24 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// DOM Elements
-const signInForm = document.getElementById('signInForm');
-const signUpForm = document.getElementById('signUpForm');
-const loadingOverlay = document.getElementById('loadingOverlay');
-const errorMessage = document.getElementById('errorMessage');
+// DOM Elements - بعد از لود شدن صفحه
+let signInForm, signUpForm, loadingOverlay, errorMessage;
+
+// Wait for DOM to load
+document.addEventListener('DOMContentLoaded', () => {
+    signInForm = document.getElementById('signInForm');
+    signUpForm = document.getElementById('signUpForm');
+    loadingOverlay = document.getElementById('loadingOverlay');
+    errorMessage = document.getElementById('errorMessage');
+    
+    // Check auth after elements are loaded
+    checkAuth();
+});
 
 // Toggle between sign in and sign up forms
 function toggleForms(event) {
     event.preventDefault();
+    if (!signInForm || !signUpForm) return;
     signInForm.style.display = signInForm.style.display === 'none' ? 'block' : 'none';
     signUpForm.style.display = signUpForm.style.display === 'none' ? 'block' : 'none';
     hideError();
@@ -22,23 +31,25 @@ function toggleForms(event) {
 
 // Show loading
 function showLoading() {
-    loadingOverlay.style.display = 'flex';
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
 }
 
 // Hide loading
 function hideLoading() {
-    loadingOverlay.style.display = 'none';
+    if (loadingOverlay) loadingOverlay.style.display = 'none';
 }
 
 // Show error
 function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.style.display = 'block';
+    if (errorMessage) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+    }
 }
 
 // Hide error
 function hideError() {
-    errorMessage.style.display = 'none';
+    if (errorMessage) errorMessage.style.display = 'none';
 }
 
 // Handle Sign In
@@ -138,5 +149,4 @@ async function checkAuth() {
     }
 }
 
-// Check auth on page load
-checkAuth();
+// Check auth will be called in DOMContentLoaded event
