@@ -1,11 +1,28 @@
-// Supabase client
-const SUPABASE_URL = 'https://trrjixlshamhuhlcevtx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRycmppeGxzaGFtaHVobGNldnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNDg5MDYsImV4cCI6MjA3NjgyNDkwNn0.BRFbUkbvqGg4J-mMM8p1oilUHfO6cWe3A3xsIVdWcjI';
-
-const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+// Initialize Supabase client - will be set after fetching config
+let supabaseClient = null;
 let currentUser = null;
+
+// Fetch Supabase config from server
+async function initSupabase() {
+  try {
+    const response = await fetch('/api/supabase-config');
+    const config = await response.json();
+
+    if (!config.configured) {
+      console.error('❌ Supabase is not configured on server');
+      return false;
+    }
+
+    const { createClient } = supabase;
+    supabaseClient = createClient(config.url, config.anonKey);
+    console.log('✅ Supabase client initialized');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to initialize Supabase:', error);
+    return false;
+  }
+}
+
 let uploadedGarmentPaths = []; // Changed to array for multiple garments
 let selectedModelId = null;
 let selectedBackgroundId = null;
@@ -664,10 +681,16 @@ function saveToLocalStorage(imageData) {
 // Check authentication
 async function checkAuth() {
     try {
+        const initialized = await initSupabase();
+        if (!initialized) {
+            window.location.href = '/auth.html';
+            return;
+        }
+
         const { data, error } = await supabaseClient.auth.getSession();
-        
+
         if (error) throw error;
-        
+
         if (data.session) {
             currentUser = data.session.user;
             displayUserInfo();
@@ -685,7 +708,7 @@ async function checkAuth() {
 function displayUserInfo() {
     const userSection = document.getElementById('userSection');
     const userEmail = document.getElementById('userEmail');
-    
+
     if (currentUser && userSection && userEmail) {
         userEmail.textContent = currentUser.email;
         userSection.style.display = 'flex';
@@ -697,7 +720,7 @@ async function handleLogout() {
     try {
         const { error } = await supabaseClient.auth.signOut();
         if (error) throw error;
-        
+
         localStorage.removeItem('supabase_session');
         window.location.href = '/auth.html';
     } catch (error) {

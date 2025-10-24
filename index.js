@@ -529,6 +529,24 @@ app.get('/api/camera-angles', (req, res) => {
 // دریافت لیست استایل‌ها
 app.get('/api/styles', (req, res) => {
   res.json(styles);
+
+
+// دریافت تنظیمات Supabase برای frontend
+app.get('/api/supabase-config', (req, res) => {
+  if (!supabase || !process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    return res.status(500).json({ 
+      error: 'Supabase is not configured',
+      configured: false 
+    });
+  }
+  
+  res.json({
+    configured: true,
+    url: process.env.SUPABASE_URL,
+    anonKey: process.env.SUPABASE_ANON_KEY
+  });
+});
+
 });
 
 // دریافت لیست نورپردازی

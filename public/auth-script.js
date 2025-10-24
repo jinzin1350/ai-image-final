@@ -1,22 +1,46 @@
 
-const SUPABASE_URL = 'https://trrjixlshamhuhlcevtx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRycmppeGxzaGFtaHVobGNldnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNDg5MDYsImV4cCI6MjA3NjgyNDkwNn0.BRFbUkbvqGg4J-mMM8p1oilUHfO6cWe3A3xsIVdWcjI';
+// Initialize Supabase client - will be set after fetching config
+let supabaseClient = null;
 
-// Initialize Supabase client
-const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Fetch Supabase config from server
+async function initSupabase() {
+  try {
+    const response = await fetch('/api/supabase-config');
+    const config = await response.json();
+    
+    if (!config.configured) {
+      console.error('❌ Supabase is not configured on server');
+      return false;
+    }
+    
+    const { createClient } = supabase;
+    supabaseClient = createClient(config.url, config.anonKey);
+    console.log('✅ Supabase client initialized');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to initialize Supabase:', error);
+    return false;
+  }
+}
 
 // DOM Elements - بعد از لود شدن صفحه
 let signInForm, signUpForm, loadingOverlay, errorMessage;
 
 // Wait for DOM to load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     signInForm = document.getElementById('signInForm');
     signUpForm = document.getElementById('signUpForm');
     loadingOverlay = document.getElementById('loadingOverlay');
     errorMessage = document.getElementById('errorMessage');
     
-    // Check auth after elements are loaded
+    // Initialize Supabase first
+    const initialized = await initSupabase();
+    if (!initialized) {
+        showError('خطا در اتصال به سرور. لطفاً صفحه را رفرش کنید.');
+        return;
+    }
+    
+    // Check auth after Supabase is initialized
     checkAuth();
 });
 
@@ -58,6 +82,12 @@ async function handleSignIn(event) {
     hideError();
     showLoading();
 
+    if (!supabaseClient) {
+        showError('در حال اتصال به سرور...');
+        hideLoading();
+        return;
+    }
+
     const email = document.getElementById('signInEmail').value;
     const password = document.getElementById('signInPassword').value;
 
@@ -88,6 +118,11 @@ async function handleSignIn(event) {
 async function handleSignUp(event) {
     event.preventDefault();
     hideError();
+
+    if (!supabaseClient) {
+        showError('در حال اتصال به سرور...');
+        return;
+    }
 
     const email = document.getElementById('signUpEmail').value;
     const password = document.getElementById('signUpPassword').value;
@@ -135,6 +170,11 @@ async function handleSignUp(event) {
 
 // Check if user is already logged in
 async function checkAuth() {
+    if (!supabaseClient) {
+        console.log('Supabase not initialized yet');
+        return;
+    }
+    
     const session = localStorage.getItem('supabase_session');
     if (session) {
         try {
