@@ -234,6 +234,23 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       throw error;
     }
 
+    // If we have data, enrich it with auth.users emails if email is missing
+    if (data && data.length > 0) {
+      for (let user of data) {
+        // If email is missing, try to get it from auth.users
+        if (!user.email && user.user_id) {
+          try {
+            const { data: authUser } = await supabase.auth.admin.getUserById(user.user_id);
+            if (authUser && authUser.user) {
+              user.email = authUser.user.email;
+            }
+          } catch (err) {
+            console.warn(`Could not fetch email for user ${user.user_id}`);
+          }
+        }
+      }
+    }
+
     console.log(`✅ Found ${data?.length || 0} users in database`);
     res.json({ success: true, users: data || [] });
   } catch (error) {

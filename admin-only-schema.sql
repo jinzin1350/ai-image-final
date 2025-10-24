@@ -60,6 +60,7 @@ CREATE INDEX idx_content_library_active ON content_library(is_active);
 CREATE TABLE IF NOT EXISTS user_limits (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT, -- Store email for display purposes
   is_premium BOOLEAN DEFAULT false,
   images_limit INTEGER DEFAULT 10,
   images_used INTEGER DEFAULT 0,
@@ -76,6 +77,7 @@ CREATE TABLE IF NOT EXISTS user_limits (
 
 CREATE INDEX idx_user_limits_user_id ON user_limits(user_id);
 CREATE INDEX idx_user_limits_premium ON user_limits(is_premium);
+CREATE INDEX idx_user_limits_email ON user_limits(email);
 
 -- ============================================
 -- 4. Admin Activity Logs Table
@@ -137,7 +139,7 @@ CREATE POLICY "Admins can delete content" ON content_library FOR DELETE USING (t
 
 -- User Limits policies
 DROP POLICY IF EXISTS "Users can view their own limits" ON user_limits;
-CREATE POLICY "Users can view their own limits" ON user_limits FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can view their own limits" ON user_limits FOR SELECT USING (auth.uid() = user_id OR user_id IS NULL);
 
 DROP POLICY IF EXISTS "Admins can manage all limits" ON user_limits;
 CREATE POLICY "Admins can manage all limits" ON user_limits FOR ALL USING (true);
@@ -174,8 +176,29 @@ CREATE POLICY "Public can delete from admin-content" ON storage.objects
   FOR DELETE TO public USING (bucket_id = 'admin-content');
 
 -- ============================================
+-- 8. Function to Auto-create User Limits on Signup
+-- ============================================
+CREATE OR REPLACE FUNCTION create_user_limits_on_signup()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO user_limits (user_id, email, is_premium, images_limit, captions_limit, descriptions_limit)
+  VALUES (NEW.id, NEW.email, false, 10, 5, 3)
+  ON CONFLICT (user_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create trigger for auto-creating user limits
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION create_user_limits_on_signup();
+
+-- ============================================
 -- Setup Complete!
 -- ============================================
 SELECT '✅ Admin Dashboard Schema Created Successfully!' AS status;
 SELECT '📊 4 Tables Created' AS info;
 SELECT '🔐 Default Admin: admin@example.com / admin123' AS credentials;
+SELECT '🔄 Auto-create user limits trigger enabled' AS trigger_status;
