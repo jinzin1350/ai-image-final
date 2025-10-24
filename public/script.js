@@ -1,4 +1,4 @@
-let uploadedGarmentPath = null;
+let uploadedGarmentPaths = []; // Changed to array for multiple garments
 let selectedModelId = null;
 let selectedBackgroundId = null;
 let allModels = [];
@@ -12,7 +12,7 @@ let selectedLightingId = 'studio';
 const garmentInput = document.getElementById('garmentInput');
 const uploadArea = document.getElementById('uploadArea');
 const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-const garmentPreview = document.getElementById('garmentPreview');
+const garmentPreviews = document.getElementById('garmentPreviews');
 const categorySelect = document.getElementById('categorySelect');
 const modelsGrid = document.getElementById('modelsGrid');
 const backgroundsGrid = document.getElementById('backgroundsGrid');
@@ -196,7 +196,7 @@ function selectBackground(backgroundId) {
 
 // بررسی فعال بودن دکمه تولید
 function checkGenerateButton() {
-    generateBtn.disabled = !(uploadedGarmentPath && selectedModelId && selectedBackgroundId);
+    generateBtn.disabled = !(uploadedGarmentPaths.length > 0 && selectedModelId && selectedBackgroundId);
 }
 
 // رویدادهای آپلود فایل
@@ -214,49 +214,92 @@ uploadArea.addEventListener('dragleave', () => {
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadArea.style.borderColor = '#667eea';
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-        uploadFile(file);
+    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+    if (files.length > 0) {
+        uploadFiles(files);
     }
 });
 
 garmentInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        uploadFile(file);
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+        uploadFiles(files);
     }
 });
 
-// آپلود فایل
-async function uploadFile(file) {
-    const formData = new FormData();
-    formData.append('garment', file);
+// آپلود چند فایل
+async function uploadFiles(files) {
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('garment', file);
 
-    try {
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.success) {
-            uploadedGarmentPath = data.filePath; // Store full URL instead of just filename
-            garmentPreview.src = data.filePath;
-            garmentPreview.style.display = 'block';
-            uploadPlaceholder.style.display = 'none';
-            checkGenerateButton();
-        } else {
-            // Show detailed error message
-            console.error('Upload failed:', data);
-            const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
-            const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
-            alert(`Error: ${errorMsg}${hintMsg}`);
+            if (data.success) {
+                // Add to uploadedGarmentPaths array
+                uploadedGarmentPaths.push(data.filePath);
+
+                // Add preview thumbnail
+                addGarmentPreview(data.filePath, uploadedGarmentPaths.length - 1);
+
+                // Hide placeholder and show preview grid
+                uploadPlaceholder.style.display = 'none';
+                garmentPreviews.style.display = 'grid';
+
+                checkGenerateButton();
+            } else {
+                // Show detailed error message
+                console.error('Upload failed:', data);
+                const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
+                const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
+                alert(`Error: ${errorMsg}${hintMsg}`);
+            }
+        } catch (error) {
+            console.error('خطا در آپلود فایل:', error);
+            alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
         }
-    } catch (error) {
-        console.error('خطا در آپلود فایل:', error);
-        alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
     }
+}
+
+// افزودن پیش‌نمایش لباس
+function addGarmentPreview(filePath, index) {
+    const previewItem = document.createElement('div');
+    previewItem.className = 'garment-preview-item';
+    previewItem.dataset.index = index;
+
+    previewItem.innerHTML = `
+        <img src="${filePath}" alt="لباس ${index + 1}">
+        <button class="garment-preview-remove" onclick="removeGarment(${index})" title="حذف">×</button>
+        <div class="garment-preview-label">لباس ${index + 1}</div>
+    `;
+
+    garmentPreviews.appendChild(previewItem);
+}
+
+// حذف لباس
+function removeGarment(index) {
+    // Remove from array
+    uploadedGarmentPaths.splice(index, 1);
+
+    // Rebuild preview grid
+    garmentPreviews.innerHTML = '';
+    uploadedGarmentPaths.forEach((path, idx) => {
+        addGarmentPreview(path, idx);
+    });
+
+    // If no garments left, show placeholder
+    if (uploadedGarmentPaths.length === 0) {
+        garmentPreviews.style.display = 'none';
+        uploadPlaceholder.style.display = 'block';
+    }
+
+    checkGenerateButton();
 }
 
 // تولید تصویر
@@ -271,7 +314,7 @@ generateBtn.addEventListener('click', async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                garmentPath: uploadedGarmentPath,
+                garmentPaths: uploadedGarmentPaths, // Changed to array
                 modelId: selectedModelId,
                 backgroundId: selectedBackgroundId,
                 poseId: selectedPoseId,

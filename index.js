@@ -609,7 +609,8 @@ function loadSavedModels() {
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const {
-      garmentPath,
+      garmentPath,      // For backward compatibility (single garment)
+      garmentPaths,     // New: array of garment paths
       modelId,
       backgroundId,
       poseId = 'standing-front',
@@ -618,7 +619,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       lightingId = 'studio'
     } = req.body;
 
-    if (!garmentPath || !modelId || !backgroundId) {
+    // Support both single garment (old) and multiple garments (new)
+    const garments = garmentPaths || (garmentPath ? [garmentPath] : []);
+
+    if (!garments.length || !modelId || !backgroundId) {
       return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
     }
 
@@ -634,7 +638,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     console.log('🎨 Generating image with Gemini 2.5 Flash...');
-    console.log('📸 Garment URL:', garmentPath);
+    console.log('📸 Garment URLs:', garments);
     console.log('👤 Model:', selectedModel.name);
     console.log('📍 Location:', selectedBackground.name);
     console.log('🎭 Pose:', selectedPose.name);
@@ -642,20 +646,26 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('✨ Style:', selectedStyle.name);
     console.log('💡 Lighting:', selectedLighting.name);
 
-    // دانلود عکس لباس و مدل و تبدیل به base64
-    const garmentBase64 = await imageUrlToBase64(garmentPath);
+    // دانلود عکس‌های لباس (چند تایی) و مدل و تبدیل به base64
+    const garmentBase64Array = await Promise.all(
+      garments.map(path => imageUrlToBase64(path))
+    );
     const modelBase64 = await imageUrlToBase64(selectedModel.image);
 
     // ساخت پرامپت برای Virtual Try-On با پارامترهای جدید
+    const garmentDescription = garments.length === 1
+      ? 'the garment/clothing from the first image'
+      : `ALL ${garments.length} garments/clothing items from the first ${garments.length} images (combine them on the model - e.g., if there's pants, shirt, and jacket, the model should wear all of them together)`;
+
     const prompt = `You are a professional fashion photographer and image editor. Create a realistic, high-quality virtual try-on image.
 
-TASK: Place the garment/clothing from the first image onto the model shown in the second image.
+TASK: Place ${garmentDescription} onto the model shown in the ${garments.length === 1 ? 'second' : 'last'} image.
 
 CORE REQUIREMENTS:
-1. The model from the second image should wear the exact garment/clothing from the first image
-2. Location/Setting: ${selectedBackground.description}
-3. Keep the model's face and overall appearance from the reference image
-4. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping
+1. The model should wear ${garmentDescription}
+${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Location/Setting: ${selectedBackground.description}
+${garments.length > 1 ? '4' : '3'}. Keep the model's face and overall appearance from the reference image
+${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n6. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
 
 POSE & COMPOSITION:
 - Pose: ${selectedPose.description}
@@ -696,23 +706,33 @@ IMPORTANT:
       }
     });
 
-    const result = await model.generateContent([
-      { text: "GARMENT/CLOTHING IMAGE:" },
-      {
+    // Build content array with all garments + model
+    const contentParts = [];
+
+    // Add all garment images
+    garmentBase64Array.forEach((garmentBase64, index) => {
+      contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1}:` });
+      contentParts.push({
         inlineData: {
           data: garmentBase64,
           mimeType: 'image/jpeg'
         }
-      },
-      { text: "MODEL IMAGE:" },
-      {
-        inlineData: {
-          data: modelBase64,
-          mimeType: 'image/jpeg'
-        }
-      },
-      { text: prompt }
-    ]);
+      });
+    });
+
+    // Add model image
+    contentParts.push({ text: "MODEL IMAGE:" });
+    contentParts.push({
+      inlineData: {
+        data: modelBase64,
+        mimeType: 'image/jpeg'
+      }
+    });
+
+    // Add prompt
+    contentParts.push({ text: prompt });
+
+    const result = await model.generateContent(contentParts);
 
     const response = await result.response;
 
@@ -770,12 +790,15 @@ IMPORTANT:
     const generatedImageUrl = urlData.publicUrl;
 
     // ذخیره اطلاعات در Supabase Database
+    // Store garments as JSON array if multiple, or single string if one
+    const garmentPathToStore = garments.length === 1 ? garments[0] : JSON.stringify(garments);
+
     const { data: generationData, error: dbError } = await supabase
       .from('generated_images')
       .insert([
         {
           user_id: req.user?.id || null,
-          garment_path: garmentPath,
+          garment_path: garmentPathToStore,
           model_id: modelId,
           background_id: backgroundId,
           prompt: prompt,

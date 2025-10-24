@@ -22,7 +22,7 @@
             <section class="upload-section">
                 <h2>۱. آپلود تصویر لباس</h2>
                 <div class="upload-area" id="uploadArea">
-                    <input type="file" id="garmentInput" accept="image/*" hidden>
+                    <input type="file" id="garmentInput" accept="image/*" multiple hidden>
                     <div class="upload-placeholder" id="uploadPlaceholder">
                         <div class="upload-icon">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -33,13 +33,14 @@
                         </div>
                         <h3>انتخاب تصویر</h3>
                         <p>کلیک کنید یا فایل را بکشید و رها کنید</p>
+                        <p class="multi-hint">می‌توانید چند تصویر انتخاب کنید (شلوار + تی‌شرت + کت و...)</p>
                         <div class="upload-formats">
                             <span class="format-tag">JPG</span>
                             <span class="format-tag">PNG</span>
                             <span class="format-tag">WEBP</span>
                         </div>
                     </div>
-                    <img id="garmentPreview" class="preview-image" style="display: none;">
+                    <div id="garmentPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
             </section>
 
