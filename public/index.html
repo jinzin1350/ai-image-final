@@ -20,17 +20,24 @@
         <div class="main-content">
             <!-- بخش آپلود لباس -->
             <section class="upload-section">
-                <h2>۱. آپلود عکس لباس</h2>
+                <h2>۱. آپلود تصویر لباس</h2>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="garmentInput" accept="image/*" hidden>
                     <div class="upload-placeholder" id="uploadPlaceholder">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                        <p>کلیک کنید یا تصویر را بکشید</p>
-                        <span>PNG, JPG, WEBP, AVIF (حداکثر 10MB)</span>
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصویر</h3>
+                        <p>کلیک کنید یا فایل را بکشید و رها کنید</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
                     </div>
                     <img id="garmentPreview" class="preview-image" style="display: none;">
                 </div>

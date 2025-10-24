@@ -344,6 +344,75 @@ button,
     outline: none;
 }
 
+/* Upload Area Styles */
+.upload-area {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-placeholder {
+    width: 100%;
+    padding: var(--space-xl);
+    background: var(--primary-bg);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upload-placeholder:hover {
+    border-color: var(--accent-blue);
+    background: rgba(0, 113, 227, 0.02);
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(0, 113, 227, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 50%;
+    color: var(--accent-blue);
+}
+
+.upload-placeholder h3 {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.upload-placeholder p {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.upload-formats {
+    display: flex;
+    gap: var(--space-xs);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.format-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(0, 113, 227, 0.08);
+    color: var(--accent-blue);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-medium);
+}
+
 .upload-btn {
     width: 100%;
     background: var(--primary-bg);
