@@ -50,6 +50,36 @@ h2 {
     font-size: 1.5rem;
 }
 
+/* دسته‌بندی مدل */
+.category-selector {
+    margin-bottom: 25px;
+}
+
+.category-dropdown {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.category-dropdown:hover {
+    border-color: #764ba2;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.category-dropdown:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 /* بخش آپلود */
 .upload-area {
     border: 3px dashed #667eea;

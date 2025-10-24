@@ -1,12 +1,15 @@
 let uploadedGarmentPath = null;
 let selectedModelId = null;
 let selectedBackgroundId = null;
+let allModels = [];
+let currentCategory = 'woman';
 
 // المان‌ها
 const garmentInput = document.getElementById('garmentInput');
 const uploadArea = document.getElementById('uploadArea');
 const uploadPlaceholder = document.getElementById('uploadPlaceholder');
 const garmentPreview = document.getElementById('garmentPreview');
+const categorySelect = document.getElementById('categorySelect');
 const modelsGrid = document.getElementById('modelsGrid');
 const backgroundsGrid = document.getElementById('backgroundsGrid');
 const generateBtn = document.getElementById('generateBtn');
@@ -20,25 +23,41 @@ const loadingOverlay = document.getElementById('loadingOverlay');
 async function loadModels() {
     try {
         const response = await fetch('/api/models');
-        const models = await response.json();
+        allModels = await response.json();
 
-        modelsGrid.innerHTML = models.map(model => `
-            <div class="model-card" data-id="${model.id}">
-                <div class="model-image-container">
-                    <img src="${model.image}" alt="${model.name}" class="model-image">
-                </div>
-                <div class="card-title">${model.name}</div>
-            </div>
-        `).join('');
-
-        // افزودن رویداد کلیک به مدل‌ها
-        document.querySelectorAll('.model-card').forEach(card => {
-            card.addEventListener('click', () => selectModel(card.dataset.id));
-        });
+        // نمایش مدل‌های دسته‌بندی فعلی
+        displayModelsByCategory(currentCategory);
     } catch (error) {
         console.error('خطا در بارگذاری مدل‌ها:', error);
     }
 }
+
+// نمایش مدل‌های یک دسته‌بندی خاص
+function displayModelsByCategory(category) {
+    const filteredModels = allModels.filter(model => model.category === category);
+
+    modelsGrid.innerHTML = filteredModels.map(model => `
+        <div class="model-card" data-id="${model.id}">
+            <div class="model-image-container">
+                <img src="${model.image}" alt="${model.name}" class="model-image">
+            </div>
+            <div class="card-title">${model.name}</div>
+        </div>
+    `).join('');
+
+    // افزودن رویداد کلیک به مدل‌ها
+    document.querySelectorAll('.model-card').forEach(card => {
+        card.addEventListener('click', () => selectModel(card.dataset.id));
+    });
+}
+
+// تغییر دسته‌بندی
+categorySelect.addEventListener('change', (e) => {
+    currentCategory = e.target.value;
+    selectedModelId = null; // پاک کردن انتخاب قبلی
+    displayModelsByCategory(currentCategory);
+    checkGenerateButton();
+});
 
 // بارگذاری پس‌زمینه‌ها
 async function loadBackgrounds() {

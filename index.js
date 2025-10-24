@@ -54,94 +54,204 @@ app.use(express.static('public'));
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
 const modelPrompts = [
+  // زنان (35 ساله)
   {
     id: 'woman-1',
-    name: 'مدل زن ۱',
-    type: 'female',
-    description: 'زن جوان با موهای بلند',
-    prompt: 'A professional fashion model portrait, young woman with long hair, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    name: 'مدل ۱',
+    category: 'woman',
+    categoryName: 'زن',
+    description: 'زن 35 ساله با موهای بلند',
+    prompt: 'A professional fashion model portrait, 35 year old woman with long hair, elegant appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
     id: 'woman-2',
-    name: 'مدل زن ۲',
-    type: 'female',
-    description: 'زن با استایل مدرن',
-    prompt: 'A professional fashion model portrait, stylish young woman with modern hairstyle, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    name: 'مدل ۲',
+    category: 'woman',
+    categoryName: 'زن',
+    description: 'زن 35 ساله با استایل مدرن',
+    prompt: 'A professional fashion model portrait, 35 year old stylish woman with modern hairstyle, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
+    id: 'woman-3',
+    name: 'مدل ۳',
+    category: 'woman',
+    categoryName: 'زن',
+    description: 'زن 35 ساله با موهای کوتاه',
+    prompt: 'A professional fashion model portrait, 35 year old woman with short hair, professional appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'woman-4',
+    name: 'مدل ۴',
+    category: 'woman',
+    categoryName: 'زن',
+    description: 'زن 35 ساله با موهای فر',
+    prompt: 'A professional fashion model portrait, 35 year old woman with curly hair, natural beauty, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'woman-5',
+    name: 'مدل ۵',
+    category: 'woman',
+    categoryName: 'زن',
+    description: 'زن 35 ساله با استایل کلاسیک',
+    prompt: 'A professional fashion model portrait, 35 year old woman with classic style, sophisticated look, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+
+  // مردان (35 ساله)
+  {
     id: 'man-1',
-    name: 'مدل مرد ۱',
-    type: 'male',
-    description: 'مرد جوان ورزشکار',
-    prompt: 'A professional fashion model portrait, athletic young man with fit physique, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    name: 'مدل ۱',
+    category: 'man',
+    categoryName: 'مرد',
+    description: 'مرد 35 ساله ورزشکار',
+    prompt: 'A professional fashion model portrait, 35 year old athletic man with fit physique, confident posture, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
     id: 'man-2',
-    name: 'مدل مرد ۲',
-    type: 'male',
-    description: 'مرد با استایل رسمی',
-    prompt: 'A professional fashion model portrait, professional businessman look, young man with formal appearance, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    name: 'مدل ۲',
+    category: 'man',
+    categoryName: 'مرد',
+    description: 'مرد 35 ساله با ظاهر رسمی',
+    prompt: 'A professional fashion model portrait, 35 year old professional businessman, formal appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
-    id: 'child-1',
-    name: 'مدل کودک ۱',
-    type: 'child',
-    description: 'کودک شاد',
-    prompt: 'A professional fashion model portrait, happy child with friendly smile, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on, age 8-10 years'
+    id: 'man-3',
+    name: 'مدل ۳',
+    category: 'man',
+    categoryName: 'مرد',
+    description: 'مرد 35 ساله با ریش',
+    prompt: 'A professional fashion model portrait, 35 year old man with beard, casual confident style, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
-    id: 'child-2',
-    name: 'مدل کودک ۲',
-    type: 'child',
-    description: 'نوجوان',
-    prompt: 'A professional fashion model portrait, teenager with confident pose, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on, age 13-15 years'
+    id: 'man-4',
+    name: 'مدل ۴',
+    category: 'man',
+    categoryName: 'مرد',
+    description: 'مرد 35 ساله با موهای کوتاه',
+    prompt: 'A professional fashion model portrait, 35 year old man with short hair, modern style, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'man-5',
+    name: 'مدل ۵',
+    category: 'man',
+    categoryName: 'مرد',
+    description: 'مرد 35 ساله با استایل اسپرت',
+    prompt: 'A professional fashion model portrait, 35 year old sporty man, athletic casual style, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+
+  // دختران (13-15 ساله)
+  {
+    id: 'girl-1',
+    name: 'مدل ۱',
+    category: 'girl',
+    categoryName: 'دختر',
+    description: 'دختر نوجوان 13-15 ساله',
+    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old, friendly smile, youthful appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'girl-2',
+    name: 'مدل ۲',
+    category: 'girl',
+    categoryName: 'دختر',
+    description: 'دختر نوجوان 13-15 ساله با موهای بلند',
+    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old with long hair, cheerful expression, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'girl-3',
+    name: 'مدل ۳',
+    category: 'girl',
+    categoryName: 'دختر',
+    description: 'دختر نوجوان 13-15 ساله با استایل مدرن',
+    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old, modern style, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'girl-4',
+    name: 'مدل ۴',
+    category: 'girl',
+    categoryName: 'دختر',
+    description: 'دختر نوجوان 13-15 ساله با موهای کوتاه',
+    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old with short hair, sporty look, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'girl-5',
+    name: 'مدل ۵',
+    category: 'girl',
+    categoryName: 'دختر',
+    description: 'دختر نوجوان 13-15 ساله با لبخند',
+    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old, happy smile, natural beauty, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+
+  // پسران (13-15 ساله)
+  {
+    id: 'boy-1',
+    name: 'مدل ۱',
+    category: 'boy',
+    categoryName: 'پسر',
+    description: 'پسر نوجوان 13-15 ساله',
+    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, friendly expression, youthful appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'boy-2',
+    name: 'مدل ۲',
+    category: 'boy',
+    categoryName: 'پسر',
+    description: 'پسر نوجوان 13-15 ساله ورزشکار',
+    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, athletic build, sporty appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'boy-3',
+    name: 'مدل ۳',
+    category: 'boy',
+    categoryName: 'پسر',
+    description: 'پسر نوجوان 13-15 ساله با موهای کوتاه',
+    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old with short hair, casual style, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'boy-4',
+    name: 'مدل ۴',
+    category: 'boy',
+    categoryName: 'پسر',
+    description: 'پسر نوجوان 13-15 ساله با لبخند',
+    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, happy smile, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+  },
+  {
+    id: 'boy-5',
+    name: 'مدل ۵',
+    category: 'boy',
+    categoryName: 'پسر',
+    description: 'پسر نوجوان 13-15 ساله با استایل مدرن',
+    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, modern casual style, friendly appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   }
 ];
 
 // لیست مدل‌های پیش‌فرض (fallback) - تا زمانی که مدل‌های AI تولید شوند
 const fallbackModels = [
-  {
-    id: 'woman-1',
-    name: 'مدل زن ۱',
-    type: 'female',
-    description: 'زن جوان با موهای بلند',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop'
-  },
-  {
-    id: 'woman-2',
-    name: 'مدل زن ۲',
-    type: 'female',
-    description: 'زن با استایل مدرن',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop'
-  },
-  {
-    id: 'man-1',
-    name: 'مدل مرد ۱',
-    type: 'male',
-    description: 'مرد جوان ورزشکار',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop'
-  },
-  {
-    id: 'man-2',
-    name: 'مدل مرد ۲',
-    type: 'male',
-    description: 'مرد با استایل رسمی',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop'
-  },
-  {
-    id: 'child-1',
-    name: 'مدل کودک ۱',
-    type: 'child',
-    description: 'کودک شاد',
-    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop'
-  },
-  {
-    id: 'child-2',
-    name: 'مدل کودک ۲',
-    type: 'child',
-    description: 'نوجوان',
-    image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=400&h=600&fit=crop'
-  }
+  // زنان
+  { id: 'woman-1', name: 'مدل ۱', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop' },
+  { id: 'woman-2', name: 'مدل ۲', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop' },
+  { id: 'woman-3', name: 'مدل ۳', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=600&fit=crop' },
+  { id: 'woman-4', name: 'مدل ۴', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop' },
+  { id: 'woman-5', name: 'مدل ۵', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop' },
+
+  // مردان
+  { id: 'man-1', name: 'مدل ۱', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop' },
+  { id: 'man-2', name: 'مدل ۲', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop' },
+  { id: 'man-3', name: 'مدل ۳', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=600&fit=crop' },
+  { id: 'man-4', name: 'مدل ۴', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=600&fit=crop' },
+  { id: 'man-5', name: 'مدل ۵', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=600&fit=crop' },
+
+  // دختران
+  { id: 'girl-1', name: 'مدل ۱', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop' },
+  { id: 'girl-2', name: 'مدل ۲', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=600&fit=crop' },
+  { id: 'girl-3', name: 'مدل ۳', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=600&fit=crop' },
+  { id: 'girl-4', name: 'مدل ۴', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=400&h=600&fit=crop' },
+  { id: 'girl-5', name: 'مدل ۵', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=600&fit=crop' },
+
+  // پسران
+  { id: 'boy-1', name: 'مدل ۱', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=400&h=600&fit=crop' },
+  { id: 'boy-2', name: 'مدل ۲', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?w=400&h=600&fit=crop' },
+  { id: 'boy-3', name: 'مدل ۳', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=400&h=600&fit=crop' },
+  { id: 'boy-4', name: 'مدل ۴', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1542178243-bc20204b769f?w=400&h=600&fit=crop' },
+  { id: 'boy-5', name: 'مدل ۵', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop' }
 ];
 
 // لیست مدل‌ها با URL‌های تولید شده (در ابتدا از fallback استفاده می‌شود)
