@@ -791,17 +791,46 @@ IMPORTANT:
 // دریافت تاریخچه تولیدها
 app.get('/api/generations', authenticateUser, async (req, res) => {
   try {
+    if (!supabase) {
+      // اگر Supabase تنظیم نشده، یک آرایه خالی برمی‌گردانیم
+      return res.json({ success: true, generations: [] });
+    }
+
     const { data, error } = await supabase
       .from('generations')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(100);
 
     if (error) throw error;
     res.json({ success: true, generations: data || [] });
   } catch (error) {
     console.error('خطا در دریافت تاریخچه:', error);
     res.status(500).json({ error: 'خطا در دریافت تاریخچه' });
+  }
+});
+
+// حذف یک تصویر
+app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!supabase) {
+      return res.status(500).json({ error: 'Supabase تنظیم نشده است' });
+    }
+
+    // حذف از database
+    const { error } = await supabase
+      .from('generations')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.json({ success: true, message: 'تصویر با موفقیت حذف شد' });
+  } catch (error) {
+    console.error('خطا در حذف تصویر:', error);
+    res.status(500).json({ error: 'خطا در حذف تصویر' });
   }
 });
 
