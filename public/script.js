@@ -102,11 +102,12 @@ function displayModelsByCategory(category) {
     const filteredModels = allModels.filter(model => model.category === category);
 
     modelsGrid.innerHTML = filteredModels.map(model => `
-        <div class="model-card" data-id="${model.id}">
-            <div class="model-image-container">
-                <img src="${model.image}" alt="${model.name}" class="model-image">
+        <div class="model-card ${selectedModelId === model.id ? 'selected' : ''}" data-id="${model.id}">
+            <img src="${model.image}" alt="${model.name}" class="model-image">
+            <span class="model-badge">${selectedModelId === model.id ? '✓ انتخاب شده' : 'انتخاب'}</span>
+            <div class="model-info">
+                <div class="model-name">${model.name}</div>
             </div>
-            <div class="card-title">${model.name}</div>
         </div>
     `).join('');
 
@@ -117,11 +118,23 @@ function displayModelsByCategory(category) {
 }
 
 // تغییر دسته‌بندی
-categorySelect.addEventListener('change', (e) => {
+categorySelect?.addEventListener('change', (e) => {
     currentCategory = e.target.value;
     selectedModelId = null; // پاک کردن انتخاب قبلی
     displayModelsByCategory(currentCategory);
     checkGenerateButton();
+});
+
+// رویداد برای category tabs
+document.querySelectorAll('.category-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentCategory = tab.dataset.category;
+        selectedModelId = null;
+        displayModelsByCategory(currentCategory);
+        checkGenerateButton();
+    });
 });
 
 // بارگذاری پس‌زمینه‌ها
@@ -131,14 +144,14 @@ async function loadBackgrounds() {
         const backgrounds = await response.json();
 
         backgroundsGrid.innerHTML = backgrounds.map(bg => `
-            <div class="background-card" data-id="${bg.id}">
+            <div class="background-card ${selectedBackgroundId === bg.id ? 'selected' : ''}" data-id="${bg.id}">
                 ${bg.image ? `
                     <img src="${bg.image}" alt="${bg.name}" class="background-image" loading="lazy">
                 ` : `
                     <div class="background-placeholder"></div>
                 `}
                 <div class="background-overlay">
-                    <div class="card-title">${bg.name}</div>
+                    <div class="background-name">${bg.name}</div>
                 </div>
             </div>
         `).join('');
@@ -465,20 +478,24 @@ function checkGenerateButton() {
 }
 
 // رویدادهای آپلود فایل
-uploadArea.addEventListener('click', () => garmentInput.click());
+uploadArea.addEventListener('click', (e) => {
+    if (!e.target.closest('.garment-preview-remove')) {
+        garmentInput.click();
+    }
+});
 
 uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
-    uploadArea.style.borderColor = '#764ba2';
+    uploadArea.classList.add('drag-over');
 });
 
 uploadArea.addEventListener('dragleave', () => {
-    uploadArea.style.borderColor = '#667eea';
+    uploadArea.classList.remove('drag-over');
 });
 
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
-    uploadArea.style.borderColor = '#667eea';
+    uploadArea.classList.remove('drag-over');
     const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
     if (files.length > 0) {
         uploadFiles(files);
@@ -535,13 +552,17 @@ async function uploadFiles(files) {
 // افزودن پیش‌نمایش لباس
 function addGarmentPreview(filePath, index) {
     const previewItem = document.createElement('div');
-    previewItem.className = 'garment-preview-item';
+    previewItem.className = 'preview-item';
     previewItem.dataset.index = index;
 
     previewItem.innerHTML = `
-        <img src="${filePath}" alt="لباس ${index + 1}">
-        <button class="garment-preview-remove" onclick="removeGarment(${index})" title="حذف">×</button>
-        <div class="garment-preview-label">لباس ${index + 1}</div>
+        <img src="${filePath}" alt="لباس ${index + 1}" class="preview-image">
+        <button class="preview-remove" onclick="removeGarment(${index})" title="حذف">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
     `;
 
     garmentPreviews.appendChild(previewItem);
@@ -613,10 +634,24 @@ generateBtn.addEventListener('click', async () => {
             // نمایش تصویر تولید شده
             resultImage.src = data.imagePath;
             resultInfo.innerHTML = `
-                <p><strong>مدل:</strong> ${data.model}</p>
-                <p><strong>پس‌زمینه:</strong> ${data.background}</p>
-                <p><strong>✅ وضعیت:</strong> ${data.message}</p>
-                ${data.description ? `<p style="margin-top: 10px; color: #666; font-size: 0.9rem;">${data.description}</p>` : ''}
+                <div class="info-row">
+                    <span class="info-label">مدل:</span>
+                    <span class="info-value">${data.model}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">پس‌زمینه:</span>
+                    <span class="info-value">${data.background}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">وضعیت:</span>
+                    <span class="info-value">✅ ${data.message}</span>
+                </div>
+                ${data.description ? `
+                <div class="info-row">
+                    <span class="info-label">توضیحات:</span>
+                    <span class="info-value">${data.description}</span>
+                </div>
+                ` : ''}
             `;
             resultSection.style.display = 'block';
             resultSection.scrollIntoView({ behavior: 'smooth' });
