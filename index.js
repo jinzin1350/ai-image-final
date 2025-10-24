@@ -53,9 +53,14 @@ app.use(express.json());
 // Static files
 app.use(express.static('public'));
 
-// Landing page route
-app.get('/landing', (req, res) => {
+// Landing page as homepage
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+// App page route
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
