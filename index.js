@@ -98,8 +98,54 @@ const modelPrompts = [
   }
 ];
 
-// لیست مدل‌ها با URL‌های تولید شده (در ابتدا خالی است)
-let models = [];
+// لیست مدل‌های پیش‌فرض (fallback) - تا زمانی که مدل‌های AI تولید شوند
+const fallbackModels = [
+  {
+    id: 'woman-1',
+    name: 'مدل زن ۱',
+    type: 'female',
+    description: 'زن جوان با موهای بلند',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'woman-2',
+    name: 'مدل زن ۲',
+    type: 'female',
+    description: 'زن با استایل مدرن',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'man-1',
+    name: 'مدل مرد ۱',
+    type: 'male',
+    description: 'مرد جوان ورزشکار',
+    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'man-2',
+    name: 'مدل مرد ۲',
+    type: 'male',
+    description: 'مرد با استایل رسمی',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'child-1',
+    name: 'مدل کودک ۱',
+    type: 'child',
+    description: 'کودک شاد',
+    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop'
+  },
+  {
+    id: 'child-2',
+    name: 'مدل کودک ۲',
+    type: 'child',
+    description: 'نوجوان',
+    image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=400&h=600&fit=crop'
+  }
+];
+
+// لیست مدل‌ها با URL‌های تولید شده (در ابتدا از fallback استفاده می‌شود)
+let models = [...fallbackModels];
 
 // لیست پس‌زمینه‌ها
 const backgrounds = [
@@ -257,6 +303,9 @@ async function generateModelImages() {
     console.error('❌ Supabase تنظیم نشده است. امکان آپلود تصاویر وجود ندارد.');
     throw new Error('Supabase is not configured');
   }
+
+  // پاک کردن مدل‌های قبلی (fallback یا قدیمی)
+  models = [];
 
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash-image",
@@ -587,11 +636,12 @@ app.listen(PORT, '0.0.0.0', async () => {
   const modelsLoaded = loadSavedModels();
 
   if (!modelsLoaded) {
-    console.log('⚠️  هیچ مدلی یافت نشد. برای تولید مدل‌ها، به /api/generate-models درخواست POST ارسال کنید');
+    console.log(`⚠️  از ${models.length} مدل پیش‌فرض (Unsplash) استفاده می‌شود`);
+    console.log('💡 برای استفاده از مدل‌های AI، به /api/generate-models درخواست POST ارسال کنید');
     if (!supabase) {
-      console.log('⚠️  توجه: برای تولید مدل‌ها، باید Supabase را در .env تنظیم کنید');
+      console.log('⚠️  توجه: برای تولید مدل‌های AI، باید Supabase را در .env تنظیم کنید');
     }
   } else {
-    console.log(`✅ ${models.length} مدل آماده استفاده است`);
+    console.log(`✅ ${models.length} مدل AI آماده استفاده است`);
   }
 });
