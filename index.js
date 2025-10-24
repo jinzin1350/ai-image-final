@@ -50,10 +50,7 @@ const upload = multer({
 });
 
 app.use(express.json());
-// Static files
-app.use(express.static('public'));
-
-// Landing page as homepage
+// Landing page as homepage - MUST come before static files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
@@ -62,6 +59,14 @@ app.get('/', (req, res) => {
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+// Auth page route
+app.get('/auth', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'auth.html'));
+});
+
+// Static files - MUST come after specific routes
+app.use(express.static('public'));
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
 const modelPrompts = [
