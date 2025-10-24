@@ -246,6 +246,11 @@ function openModal(index) {
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    
+    // نمایش نوتیفیکیشن راهنما
+    setTimeout(() => {
+        showNotification('💡 با کلیک روی دکمه "تولید کپشن اینستاگرام" می‌توانید کپشن حرفه‌ای بسازید', 'info');
+    }, 800);
 }
 
 // Close Modal
