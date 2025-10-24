@@ -434,6 +434,166 @@ function editCaption() {
     showNotification('می‌توانید کپشن را ویرایش کنید', 'info');
 }
 
+// Generate Product Description for Website
+function generateProductDescription() {
+    const descriptionSection = document.getElementById('descriptionSection');
+    const descriptionProductForm = document.getElementById('descriptionProductForm');
+
+    descriptionSection.style.display = 'block';
+    descriptionProductForm.style.display = 'block';
+
+    // Smooth scroll to form
+    setTimeout(() => {
+        descriptionSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+// Close Product Description Form
+function closeDescriptionForm() {
+    const descriptionSection = document.getElementById('descriptionSection');
+    descriptionSection.style.display = 'none';
+
+    // Reset form
+    document.getElementById('descProductName').value = '';
+    document.getElementById('descProductPrice').value = '';
+    document.getElementById('descProductDiscount').value = '';
+    document.getElementById('descProductCategory').value = '';
+    document.getElementById('descFabricType').value = '';
+    document.getElementById('descProductDescription').value = '';
+    document.querySelectorAll('input[name="desc-color"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('input[name="desc-size"]').forEach(cb => cb.checked = false);
+}
+
+// Submit Product Description Request
+async function submitProductDescription() {
+    const productName = document.getElementById('descProductName').value;
+    const productPrice = document.getElementById('descProductPrice').value;
+    const productDiscount = document.getElementById('descProductDiscount').value;
+    const productCategory = document.getElementById('descProductCategory').value;
+    const fabricType = document.getElementById('descFabricType').value;
+    const productDescription = document.getElementById('descProductDescription').value;
+
+    const selectedColors = Array.from(document.querySelectorAll('input[name="desc-color"]:checked'))
+        .map(cb => cb.value);
+    const selectedSizes = Array.from(document.querySelectorAll('input[name="desc-size"]:checked'))
+        .map(cb => cb.value);
+
+    // Validation
+    if (!productName) {
+        alert('لطفاً نام محصول را وارد کنید');
+        return;
+    }
+
+    if (selectedColors.length === 0) {
+        alert('لطفاً حداقل یک رنگ را انتخاب کنید');
+        return;
+    }
+
+    if (selectedSizes.length === 0) {
+        alert('لطفاً حداقل یک سایز را انتخاب کنید');
+        return;
+    }
+
+    // Show loading
+    document.getElementById('descriptionProductForm').style.display = 'none';
+    document.getElementById('descriptionLoading').style.display = 'block';
+
+    console.log('📝 درخواست تولید توضیحات محصول:', {
+        productName,
+        selectedColors,
+        selectedSizes,
+        productPrice,
+        productDiscount,
+        fabricType
+    });
+
+    try {
+        // Calculate final price if discount exists
+        let finalPrice = productPrice;
+        if (productDiscount && productDiscount > 0) {
+            finalPrice = productPrice * (1 - productDiscount / 100);
+        }
+
+        // Call backend API to generate product description
+        const response = await fetch('/api/generate-product-description', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                imageUrl: currentImage.generated_image_url,
+                imageId: currentImage.id,
+                productInfo: {
+                    name: productName,
+                    colors: selectedColors,
+                    sizes: selectedSizes,
+                    price: productPrice,
+                    discount: productDiscount || 0,
+                    finalPrice: finalPrice,
+                    category: productCategory,
+                    fabricType: fabricType,
+                    description: productDescription
+                }
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Show result
+            document.getElementById('descriptionLoading').style.display = 'none';
+            document.getElementById('descriptionResult').style.display = 'block';
+            document.getElementById('descriptionText').textContent = data.description;
+            console.log('✅ توضیحات محصول تولید شد');
+        } else {
+            throw new Error(data.error || 'خطا در تولید توضیحات');
+        }
+    } catch (error) {
+        console.error('Error generating description:', error);
+        alert('خطا در تولید توضیحات. لطفاً دوباره تلاش کنید.');
+        document.getElementById('descriptionLoading').style.display = 'none';
+        document.getElementById('descriptionProductForm').style.display = 'block';
+    }
+}
+
+// Copy Product Description
+function copyDescription() {
+    const descriptionText = document.getElementById('descriptionText').textContent;
+
+    navigator.clipboard.writeText(descriptionText).then(() => {
+        showNotification('توضیحات کپی شد', 'success');
+    }).catch(err => {
+        console.error('Error copying description:', err);
+        showNotification('خطا در کپی کردن', 'error');
+    });
+}
+
+// Download Product Description as File
+function downloadDescription() {
+    const descriptionText = document.getElementById('descriptionText').textContent;
+    const blob = new Blob([descriptionText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `product-description-${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showNotification('فایل دانلود شد', 'success');
+}
+
+// Edit Description
+function editDescription() {
+    const descriptionText = document.getElementById('descriptionText');
+    descriptionText.contentEditable = true;
+    descriptionText.focus();
+    descriptionText.style.border = '2px dashed var(--primary)';
+
+    showNotification('می‌توانید توضیحات را ویرایش کنید', 'info');
+}
+
 // Download Image
 function downloadImage() {
     if (!currentImage) return;

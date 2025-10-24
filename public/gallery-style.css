@@ -833,6 +833,15 @@ body {
     border-radius: 16px;
 }
 
+/* Description Section */
+.description-section {
+    margin-top: 24px;
+    padding: 24px;
+    background: #fff5f8;
+    border-radius: 16px;
+    border: 2px solid #f093fb;
+}
+
 .product-form {
     background: white;
     border-radius: 12px;
