@@ -1,18 +1,43 @@
-// Supabase Configuration
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Initialize Supabase client - will be set after fetching config
+let supabaseClient = null;
 
 // Global Variables
 let allImages = [];
 let currentImage = null;
 let currentView = 'grid';
 
+// Fetch Supabase config from server
+async function initSupabase() {
+  try {
+    const response = await fetch('/api/supabase-config');
+    const config = await response.json();
+
+    if (!config.configured) {
+      console.error('❌ Supabase is not configured on server');
+      return false;
+    }
+
+    const { createClient } = supabase;
+    supabaseClient = createClient(config.url, config.anonKey);
+    console.log('✅ Supabase client initialized');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to initialize Supabase:', error);
+    return false;
+  }
+}
+
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadImages();
-    setupEventListeners();
-    updateStats();
+document.addEventListener('DOMContentLoaded', async () => {
+    const initialized = await initSupabase();
+    if (initialized) {
+        loadImages();
+        setupEventListeners();
+        updateStats();
+    } else {
+        showError('خطا در اتصال به سرور. لطفاً صفحه را رفرش کنید.');
+    }
 });
 
 // Setup Event Listeners
@@ -60,13 +85,18 @@ async function loadImages() {
     const emptyState = document.getElementById('emptyState');
     const galleryGrid = document.getElementById('galleryGrid');
 
+    if (!supabaseClient) {
+        showError('اتصال به دیتابیس برقرار نیست');
+        return;
+    }
+
     try {
         loadingState.style.display = 'block';
         emptyState.style.display = 'none';
         galleryGrid.style.display = 'none';
 
         // Fetch images from Supabase
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('generated_images')
             .select('*')
             .order('created_at', { ascending: false });
@@ -101,6 +131,23 @@ async function loadImages() {
     }
 }
 
+// Show Error
+function showError(message) {
+    const loadingState = document.getElementById('loadingState');
+    loadingState.innerHTML = `
+        <div class="error-state">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff4757" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <h3>خطا</h3>
+            <p>${message}</p>
+            <button onclick="location.reload()" class="btn-create">تلاش مجدد</button>
+        </div>
+    `;
+}
+
 // Render Gallery
 function renderGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
@@ -113,11 +160,11 @@ function renderGallery() {
 
     galleryGrid.innerHTML = allImages.map((image, index) => `
         <div class="gallery-item" onclick="openModal(${index})" style="animation: fadeInUp 0.5s ease ${index * 0.05}s backwards;">
-            <img src="${image.image_url}" alt="تصویر ${index + 1}" class="gallery-item-image" loading="lazy">
+            <img src="${image.generated_image_url}" alt="تصویر ${index + 1}" class="gallery-item-image" loading="lazy">
             <div class="gallery-item-overlay">
                 <div class="item-info">
                     <div class="item-date">${formatDate(image.created_at)}</div>
-                    <div class="item-params">${image.model_type || 'استاندارد'} • ${image.background || 'استودیو'}</div>
+                    <div class="item-params">${image.model_id || 'مدل'} • ${image.background_id || 'پس‌زمینه'}</div>
                 </div>
             </div>
         </div>
@@ -140,7 +187,7 @@ function filterImages(searchTerm) {
 
     items.forEach((item, index) => {
         const image = allImages[index];
-        const searchText = `${image.model_type} ${image.background} ${formatDate(image.created_at)}`.toLowerCase();
+        const searchText = `${image.model_id} ${image.background_id} ${formatDate(image.created_at)}`.toLowerCase();
 
         if (searchText.includes(searchTerm.toLowerCase())) {
             item.style.display = 'block';
@@ -179,21 +226,17 @@ function openModal(index) {
     const modalDate = document.getElementById('modalDate');
     const modalInfo = document.getElementById('modalInfo');
 
-    modalImage.src = currentImage.image_url;
+    modalImage.src = currentImage.generated_image_url;
     modalDate.textContent = formatDate(currentImage.created_at);
 
     modalInfo.innerHTML = `
         <div class="info-item">
-            <span class="info-label">نوع مدل:</span>
-            <span class="info-value">${currentImage.model_type || 'استاندارد'}</span>
+            <span class="info-label">مدل:</span>
+            <span class="info-value">${currentImage.model_id || 'نامشخص'}</span>
         </div>
         <div class="info-item">
             <span class="info-label">پس‌زمینه:</span>
-            <span class="info-value">${currentImage.background || 'استودیو سفید'}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">وضوح:</span>
-            <span class="info-value">4K</span>
+            <span class="info-value">${currentImage.background_id || 'نامشخص'}</span>
         </div>
         <div class="info-item">
             <span class="info-label">تاریخ ساخت:</span>
@@ -256,9 +299,9 @@ async function submitProductInfo() {
     const productCategory = document.getElementById('productCategory').value;
     const productDescription = document.getElementById('productDescription').value;
 
-    const colors = Array.from(document.querySelectorAll('input[name="color"]:checked'))
+    const selectedColors = Array.from(document.querySelectorAll('input[name="color"]:checked'))
         .map(cb => cb.value);
-    const sizes = Array.from(document.querySelectorAll('input[name="size"]:checked'))
+    const selectedSizes = Array.from(document.querySelectorAll('input[name="size"]:checked'))
         .map(cb => cb.value);
 
     // Validation
@@ -267,12 +310,12 @@ async function submitProductInfo() {
         return;
     }
 
-    if (colors.length === 0) {
+    if (selectedColors.length === 0) {
         alert('لطفاً حداقل یک رنگ را انتخاب کنید');
         return;
     }
 
-    if (sizes.length === 0) {
+    if (selectedSizes.length === 0) {
         alert('لطفاً حداقل یک سایز را انتخاب کنید');
         return;
     }
@@ -281,78 +324,60 @@ async function submitProductInfo() {
     document.getElementById('productForm').style.display = 'none';
     document.getElementById('captionLoading').style.display = 'block';
 
-    try {
-        // Simulate AI caption generation
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log('📝 درخواست تولید کپشن با اطلاعات محصول:', {
+        productName,
+        selectedColors,
+        selectedSizes,
+        productPrice,
+        productDiscount
+    });
 
-        const caption = generateCaptionText({
-            name: productName,
-            colors: colors,
-            sizes: sizes,
-            price: productPrice,
-            discount: productDiscount,
-            category: productCategory,
-            description: productDescription
+    try {
+        // Calculate final price if discount exists
+        let finalPrice = productPrice;
+        if (productDiscount && productDiscount > 0) {
+            finalPrice = productPrice * (1 - productDiscount / 100);
+        }
+
+        // Call backend API to generate caption with AI
+        const response = await fetch('/api/generate-caption', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                imageUrl: currentImage.generated_image_url,
+                imageId: currentImage.id,
+                productInfo: {
+                    name: productName,
+                    colors: selectedColors,
+                    sizes: selectedSizes,
+                    price: productPrice,
+                    discount: productDiscount || 0,
+                    finalPrice: finalPrice,
+                    category: productCategory,
+                    description: productDescription
+                }
+            })
         });
 
-        // Show result
-        document.getElementById('captionLoading').style.display = 'none';
-        document.getElementById('captionResult').style.display = 'block';
-        document.getElementById('captionText').textContent = caption;
+        const data = await response.json();
+
+        if (data.success) {
+            // Show result
+            document.getElementById('captionLoading').style.display = 'none';
+            document.getElementById('captionResult').style.display = 'block';
+            document.getElementById('captionText').textContent = data.caption;
+            console.log('✅ کپشن تولید شد');
+        } else {
+            throw new Error(data.error || 'خطا در تولید کپشن');
+        }
     } catch (error) {
         console.error('Error generating caption:', error);
         alert('خطا در تولید کپشن. لطفاً دوباره تلاش کنید.');
         document.getElementById('captionLoading').style.display = 'none';
         document.getElementById('productForm').style.display = 'block';
     }
-}
-
-// Generate Caption Text
-function generateCaptionText(product) {
-    const emojis = ['✨', '🔥', '💎', '⭐', '🎯', '💫'];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-
-    let caption = `${randomEmoji} ${product.name}\n\n`;
-
-    if (product.description) {
-        caption += `${product.description}\n\n`;
-    }
-
-    caption += `🎨 رنگ‌های موجود: ${product.colors.join('، ')}\n`;
-    caption += `📏 سایزهای موجود: ${product.sizes.join('، ')}\n\n`;
-
-    if (product.price) {
-        const formattedPrice = parseInt(product.price).toLocaleString('fa-IR');
-        if (product.discount && product.discount > 0) {
-            const discountedPrice = product.price * (1 - product.discount / 100);
-            const formattedDiscountPrice = Math.round(discountedPrice).toLocaleString('fa-IR');
-            caption += `💰 قیمت: ${formattedPrice} تومان\n`;
-            caption += `🎁 با ${product.discount}% تخفیف: ${formattedDiscountPrice} تومان\n\n`;
-        } else {
-            caption += `💰 قیمت: ${formattedPrice} تومان\n\n`;
-        }
-    }
-
-    caption += `📦 ارسال به سراسر کشور\n`;
-    caption += `✅ ضمانت اصالت کالا\n`;
-    caption += `🎁 پشتیبانی ۲۴ ساعته\n\n`;
-
-    caption += `برای سفارش در دایرکت پیام دهید 💌\n\n`;
-
-    const hashtags = [
-        '#فشن',
-        '#مد',
-        '#استایل',
-        '#پوشاک',
-        product.category ? `#${product.category}` : '',
-        '#فروشگاه_آنلاین',
-        '#خرید_اینترنتی',
-        '#ارسال_رایگان'
-    ].filter(Boolean);
-
-    caption += hashtags.join(' ');
-
-    return caption;
 }
 
 // Copy Caption
@@ -397,7 +422,7 @@ function downloadImage() {
     if (!currentImage) return;
 
     const link = document.createElement('a');
-    link.href = currentImage.image_url;
+    link.href = currentImage.generated_image_url;
     link.download = `AI-Fashion-${Date.now()}.jpg`;
     document.body.appendChild(link);
     link.click();
@@ -411,7 +436,7 @@ function shareImage() {
     if (!currentImage) return;
 
     if (navigator.share) {
-        fetch(currentImage.image_url)
+        fetch(currentImage.generated_image_url)
             .then(res => res.blob())
             .then(blob => {
                 const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
@@ -444,7 +469,7 @@ async function confirmDelete() {
     if (!currentImage) return;
 
     try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('generated_images')
             .delete()
             .eq('id', currentImage.id);
@@ -469,9 +494,9 @@ function regenerateImage() {
 
     // Store current settings in localStorage
     localStorage.setItem('regenerateSettings', JSON.stringify({
-        model_type: currentImage.model_type,
-        background: currentImage.background,
-        clothing_item: currentImage.clothing_item
+        model_id: currentImage.model_id,
+        background_id: currentImage.background_id,
+        garment_path: currentImage.garment_path
     }));
 
     // Redirect to main page
