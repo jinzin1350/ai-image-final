@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود / ثبت نام - استودیو هوش مصنوعی مد</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="auth-style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="logo-section">
+                <span class="logo-icon">📸</span>
+                <h1>AI Fashion Studio</h1>
+                <p class="subtitle">استودیو هوش مصنوعی مد</p>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="signInForm" class="auth-form">
+                <h2>ورود به حساب کاربری</h2>
+                <form onsubmit="handleSignIn(event)">
+                    <div class="form-group">
+                        <label for="signInEmail">ایمیل</label>
+                        <input type="email" id="signInEmail" required placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signInPassword">رمز عبور</label>
+                        <input type="password" id="signInPassword" required placeholder="رمز عبور خود را وارد کنید">
+                    </div>
+                    <button type="submit" class="btn-primary" id="signInBtn">ورود</button>
+                </form>
+                <p class="toggle-form">
+                    حساب کاربری ندارید؟ 
+                    <a href="#" onclick="toggleForms(event)">ثبت نام کنید</a>
+                </p>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signUpForm" class="auth-form" style="display: none;">
+                <h2>ثبت نام</h2>
+                <form onsubmit="handleSignUp(event)">
+                    <div class="form-group">
+                        <label for="signUpEmail">ایمیل</label>
+                        <input type="email" id="signUpEmail" required placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPassword">رمز عبور</label>
+                        <input type="password" id="signUpPassword" required placeholder="حداقل 6 کاراکتر">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPasswordConfirm">تکرار رمز عبور</label>
+                        <input type="password" id="signUpPasswordConfirm" required placeholder="رمز عبور را دوباره وارد کنید">
+                    </div>
+                    <button type="submit" class="btn-primary" id="signUpBtn">ثبت نام</button>
+                </form>
+                <p class="toggle-form">
+                    قبلاً ثبت نام کرده‌اید؟ 
+                    <a href="#" onclick="toggleForms(event)">وارد شوید</a>
+                </p>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="auth-script.js"></script>
+</body>
+</html>

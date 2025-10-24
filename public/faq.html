@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سوالات متداول | استودیو هوش مصنوعی مد</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="landing-style.css">
+    <style>
+        .faq-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .faq-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .faq-categories {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .faq-list {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            padding: 24px 32px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: var(--bg-light);
+        }
+
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 32px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 32px 24px;
+            max-height: 500px;
+        }
+
+        .faq-answer p {
+            font-size: 16px;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .faq-header h1 {
+                font-size: 32px;
+            }
+
+            .faq-question {
+                padding: 20px;
+                font-size: 16px;
+            }
+
+            .faq-answer {
+                padding: 0 20px;
+            }
+
+            .faq-item.active .faq-answer {
+                padding: 0 20px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="12" fill="url(#gradient1)"/>
+                        <path d="M20 10L12 18L20 26L28 18L20 10Z" fill="white" opacity="0.9"/>
+                        <circle cx="20" cy="20" r="3" fill="white"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>استودیو Fusion</span>
+                </div>
+                <div class="nav-links">
+                    <a href="/">صفحه اصلی</a>
+                    <a href="/app">برنامه</a>
+                </div>
+                <a href="/app" class="btn-primary">شروع رایگان</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="faq-page">
+        <div class="faq-header">
+            <h1>سوالات متداول</h1>
+            <p style="font-size: 18px; color: var(--text-light); margin-top: 12px;">پاسخ سوالات رایج درباره استودیو AI</p>
+        </div>
+
+        <div class="faq-categories">
+            <button class="category-btn active" data-category="all">همه</button>
+            <button class="category-btn" data-category="general">عمومی</button>
+            <button class="category-btn" data-category="technical">فنی</button>
+            <button class="category-btn" data-category="pricing">قیمت‌گذاری</button>
+            <button class="category-btn" data-category="account">حساب کاربری</button>
+        </div>
+
+        <div class="faq-list">
+            <div class="faq-item" data-category="general">
+                <div class="faq-question">
+                    استودیو AI چیست و چطور کار می‌کند؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>استودیو AI یک ابزار هوش مصنوعی است که به شما امکان می‌دهد بدون نیاز به استودیو عکاسی، مدل و تجهیزات گران‌قیمت، عکس‌های حرفه‌ای از لباس‌ها و محصولات مد خود تولید کنید. کافیست عکس محصول را آپلود کنید، مدل و پس‌زمینه مورد نظر را انتخاب کنید و هوش مصنوعی در عرض ثانیه‌ها یک عکس استودیویی باکیفیت برای شما ایجاد می‌کند.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    چه نوع فایل‌هایی را می‌توانم آپلود کنم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>ما از فرمت‌های JPG، JPEG، PNG، WEBP و AVIF پشتیبانی می‌کنیم. حجم فایل نباید بیشتر از 10MB باشد. برای بهترین نتیجه، توصیه می‌کنیم از تصاویری با وضوح بالا و نورپردازی مناسب استفاده کنید.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    چقدر طول می‌کشد تا عکس تولید شود؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>معمولاً تولید یک عکس حدود 20-30 ثانیه زمان می‌برد. این زمان ممکن است بسته به پیچیدگی تصویر، تعداد لایه‌ها و بار سرور کمی متفاوت باشد.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="pricing">
+                <div class="faq-question">
+                    پلن رایگان چه محدودیت‌هایی دارد؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>پلن رایگان شامل 10 عکس در ماه، دسترسی به 5 پس‌زمینه محدود، کیفیت HD و امکانات پایه است. برای دسترسی به تعداد بیشتر عکس، کیفیت 4K، پس‌زمینه‌های نامحدود و مدل‌های سفارشی، می‌توانید به پلن‌های پولی ارتقا دهید.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="pricing">
+                <div class="faq-question">
+                    آیا می‌توانم پلن خود را تغییر دهم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>بله، می‌توانید در هر زمان پلن خود را ارتقا یا کاهش دهید. تغییرات در دوره پرداخت بعدی اعمال می‌شود و می‌توانید در هر زمان اشتراک خود را لغو کنید.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="general">
+                <div class="faq-question">
+                    آیا می‌توانم تصاویر تولید شده را تجاری استفاده کنم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>بله! تمام تصاویر تولید شده کاملاً متعلق به شما هستند و می‌توانید آنها را برای هر منظور تجاری یا شخصی بدون هیچ محدودیتی استفاده کنید. این شامل فروشگاه‌های آنلاین، تبلیغات، شبکه‌های اجتماعی و چاپ می‌شود.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    چطور حساب کاربری بسازم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>روی دکمه "شروع رایگان" کلیک کنید و ایمیل و رمز عبور خود را وارد کنید. سپس ایمیل تأیید را چک کنید و حساب خود را فعال کنید. همین!</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    آیا می‌توانم عکس‌های خود را حذف کنم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>بله، می‌توانید در هر زمان از پنل کاربری، تصاویر آپلود شده یا تولید شده خود را مشاهده و حذف کنید. ما حریم خصوصی شما را جدی می‌گیریم.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    چطور می‌توانم کیفیت عکس‌های تولیدی را بهبود بخشم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>برای بهترین نتایج: (1) از عکس‌های با وضوح بالا استفاده کنید، (2) مطمئن شوید لباس روی پس‌زمینه ساده قرار دارد، (3) از نورپردازی خوب استفاده کنید، (4) با پارامترهای مختلف آزمایش کنید (پوز، زاویه، استایل)، (5) از گزینه‌های پیشرفته مانند عمق میدان و نورپردازی استفاده کنید.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="technical">
+                <div class="faq-question">
+                    آیا می‌توانم چند لباس را همزمان روی یک مدل ببینم؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>بله! سیستم ما از ترکیب چند لایه پشتیبانی می‌کند. می‌توانید چندین قطعه لباس (مثلاً شلوار، پیراهن، کت) را آپلود کنید و مدل همه آنها را همزمان به تن خواهد داشت.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="pricing">
+                <div class="faq-question">
+                    روش‌های پرداخت چیست؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>ما از کارت‌های اعتباری بین‌المللی (Visa, Mastercard) و درگاه‌های پرداخت محلی ایران پشتیبانی می‌کنیم. پرداخت‌ها کاملاً امن و رمزنگاری شده هستند.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="general">
+                <div class="faq-question">
+                    آیا پشتیبانی فارسی دارید؟
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p>بله! تمام برنامه و پشتیبانی ما به زبان فارسی است. تیم پشتیبانی ما آماده پاسخگویی به سوالات شماست.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('.faq-question').addEventListener('click', () => {
+                const wasActive = item.classList.contains('active');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                if (!wasActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    if (category === 'all' || item.dataset.category === category) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
