@@ -877,30 +877,32 @@ app.post('/api/generate-caption', async (req, res) => {
     // استفاده از Gemini برای تولید کپشن
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-    const prompt = `You are an EXPERT Persian Instagram marketer and viral content creator who creates HIGHLY PERSUASIVE fashion captions that convert viewers into buyers.
+    const prompt = `شما یک متخصص بازاریابی اینستاگرامی هستید که کپشن‌های فوق‌العاده جذاب و فروش‌محور می‌نویسید.
 
-Analyze this fashion image and create a CAPTIVATING, IRRESISTIBLE Instagram caption in Persian that makes people want to BUY IMMEDIATELY.
+این تصویر مد را تحلیل کن و یک کپشن اینستاگرام فارسی فوق‌العاده جذاب و غیرقابل مقاومت بنویس که مشتری را فوراً به خرید ترغیب کند.
 
-CRITICAL REQUIREMENTS:
+الزامات مهم:
 
-1. **Language**: 100% Persian (Farsi) - natural, conversational, trendy
-2. **Hook**: Start with a POWERFUL attention-grabbing question or statement that creates FOMO or desire
-3. **Emotional Connection**: Make the reader FEEL and IMAGINE themselves wearing this outfit
-4. **Storytelling**: Paint a vivid picture of how their life will be better with this outfit
-5. **Social Proof**: Create urgency (limited stock, trending, everyone wants this)
-6. **Benefits Over Features**: Focus on transformation, confidence, compliments they'll get
-7. **Call-to-Action**: Strong, urgent CTAs (محدود، تخفیف ویژه، همین الان سفارش بده)
-8. **Emojis**: Use 5-8 relevant emojis strategically to add personality
-9. **Length**: 80-120 words - concise but powerful
-10. **Hashtags**: 10-15 high-converting Persian and English hashtags
+1. زبان: 100% فارسی - طبیعی، صمیمی، ترند
+2. شروع قوی: با سوال یا جمله‌ای شروع کن که FOMO ایجاد کنه و توجه رو جلب کنه
+3. احساسی: خواننده باید خودش رو با این لباس تصور کنه
+4. داستان: تصویر زنده‌ای از اینکه با این لباس چقدر بهتر به نظر میاد و احساس میکنه
+5. فوریت: موجودی محدود، ترند روز، همه می‌خوانش
+6. منافع: تمرکز روی اعتماد به نفس، تعریف‌هایی که می‌شنوه، تحول ظاهری
+7. دعوت به اقدام: قوی و فوری (محدود، تخفیف ویژه، همین الان سفارش بده، دایرکت کن)
+8. ایموجی: 5-8 تا ایموجی مرتبط به صورت استراتژیک
+9. طول: 80-120 کلمه - کوتاه اما قدرتمند
+10. هشتگ: 10-15 هشتگ فارسی و انگلیسی پرطرفدار
 
-TONE: Exciting, confident, persuasive, creates FOMO, speaks directly to the customer
+لحن: هیجان‌انگیز، پرانرژی، ترغیب‌کننده، ایجاد FOMO، مستقیم با مشتری صحبت کن
 
-AVOID: Generic descriptions, boring lists, formal language
+اجتناب کن از: توضیحات کلیشه‌ای، لیست خسته‌کننده، زبان رسمی
 
-GOAL: Make this caption so compelling that the reader cannot resist clicking "سفارش" button!
+هدف: کپشنی بنویس که خواننده نتونه مقاومت کنه و حتماً دکمه سفارش رو بزنه!
 
-Think like a top sales copywriter - every word should drive the sale. Create DESIRE and URGENCY!`;
+مثل یک کپی‌رایتر حرفه‌ای فکر کن - هر کلمه باید به فروش کمک کنه. میل و فوریت ایجاد کن!
+
+فقط کپشن فارسی رو بنویس، بدون هیچ توضیح یا متن انگلیسی اضافه. فقط و فقط کپشن!`;
 
     const result = await model.generateContent([
       { text: prompt },
