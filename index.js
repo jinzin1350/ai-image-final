@@ -99,6 +99,32 @@ app.get('/status', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'status.html'));
 });
 
+// Gallery page route
+app.get('/gallery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'gallery.html'));
+});
+
+// Admin panel routes
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
+});
+
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+});
+
+app.get('/admin/users', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-users.html'));
+});
+
+app.get('/admin/content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
+});
+
+app.get('/admin/analytics', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-analytics.html'));
+});
+
 // Static files - MUST come after specific routes
 app.use(express.static('public'));
 
@@ -1071,6 +1097,290 @@ CRITICAL IMPERATIVES:
     });
 
     // Add prompt
+
+
+// ================== ADMIN PANEL API ENDPOINTS ==================
+
+// Admin authentication middleware
+const authenticateAdmin = (req, res, next) => {
+  const adminEmail = req.headers['admin-email'];
+  const adminPassword = req.headers['admin-password'];
+  
+  const validEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const validPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  
+  if (adminEmail === validEmail && adminPassword === validPassword) {
+    next();
+  } else {
+    res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+};
+
+// Admin login
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const validEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+    const validPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    
+    if (email === validEmail && password === validPassword) {
+      res.json({ 
+        success: true, 
+        admin: { 
+          email: email, 
+          role: 'admin' 
+        } 
+      });
+    } else {
+      res.status(401).json({ success: false, error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get admin stats
+app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({
+        success: true,
+        stats: {
+          totalUsers: 0,
+          premiumUsers: 0,
+          totalImages: 0,
+          todayImages: 0,
+          totalModels: models.length,
+          totalBackgrounds: backgrounds.length,
+          freeUsers: 0
+        }
+      });
+    }
+
+    // Get user counts
+    const { data: users, error: usersError } = await supabase
+      .from('user_limits')
+      .select('is_premium');
+    
+    const totalUsers = users?.length || 0;
+    const premiumUsers = users?.filter(u => u.is_premium).length || 0;
+    const freeUsers = totalUsers - premiumUsers;
+
+    // Get image counts
+    const { data: images, error: imagesError } = await supabase
+      .from('generated_images')
+      .select('created_at');
+    
+    const totalImages = images?.length || 0;
+    
+    // Count today's images
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayImages = images?.filter(img => new Date(img.created_at) >= today).length || 0;
+
+    res.json({
+      success: true,
+      stats: {
+        totalUsers,
+        premiumUsers,
+        totalImages,
+        todayImages,
+        totalModels: models.length,
+        totalBackgrounds: backgrounds.length,
+        freeUsers
+      }
+    });
+  } catch (error) {
+    console.error('Error getting admin stats:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get all users
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, users: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('user_limits')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, users: data || [] });
+  } catch (error) {
+    console.error('Error getting users:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update user limits/premium
+app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updates = req.body;
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { data, error } = await supabase
+      .from('user_limits')
+      .update(updates)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get content library
+app.get('/api/admin/content', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, content: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('content_library')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, content: data || [] });
+  } catch (error) {
+    console.error('Error getting content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Upload content (model/background)
+app.post('/api/admin/content/upload', authenticateAdmin, upload.single('content'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { content_type, tier, category, name, description } = req.body;
+    const fileName = `admin-content-${Date.now()}-${req.file.originalname}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('admin-content')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    // Save to database
+    const { data: contentData, error: dbError } = await supabase
+      .from('content_library')
+      .insert([{
+        content_type,
+        tier,
+        category,
+        name,
+        description,
+        image_url: urlData.publicUrl,
+        storage_path: fileName
+      }])
+      .select();
+
+    if (dbError) throw dbError;
+
+    res.json({ success: true, content: contentData[0] });
+  } catch (error) {
+    console.error('Error uploading content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete content
+app.delete('/api/admin/content/:contentId', authenticateAdmin, async (req, res) => {
+  try {
+    const { contentId } = req.params;
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    // Get content info first
+    const { data: content, error: fetchError } = await supabase
+      .from('content_library')
+      .select('storage_path')
+      .eq('id', contentId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete from storage
+    if (content.storage_path) {
+      await supabase.storage
+        .from('admin-content')
+        .remove([content.storage_path]);
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('content_library')
+      .delete()
+      .eq('id', contentId);
+
+    if (deleteError) throw deleteError;
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get activity logs
+app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+
+    if (!supabase) {
+      return res.json({ success: true, logs: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('admin_activity_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    res.json({ success: true, logs: data || [] });
+  } catch (error) {
+    console.error('Error getting logs:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ================== END OF ADMIN PANEL API ==================
+
     contentParts.push({ text: prompt });
 
     const result = await model.generateContent(contentParts);
