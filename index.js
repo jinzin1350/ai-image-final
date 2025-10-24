@@ -213,13 +213,28 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       return res.json({ success: true, users: [] });
     }
 
+    // First check if table exists by trying to query it
     const { data, error } = await supabase
       .from('user_limits')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    // If error is about table not existing, return empty array
+    if (error && error.message.includes('does not exist')) {
+      console.warn('⚠️ Table user_limits does not exist. Please run admin-only-schema.sql in Supabase');
+      return res.json({ 
+        success: true, 
+        users: [],
+        warning: 'Database not set up. Please run SQL schema in Supabase.' 
+      });
+    }
 
+    if (error) {
+      console.error('Error getting users:', error);
+      throw error;
+    }
+
+    console.log(`✅ Found ${data?.length || 0} users in database`);
     res.json({ success: true, users: data || [] });
   } catch (error) {
     console.error('Error getting users:', error);

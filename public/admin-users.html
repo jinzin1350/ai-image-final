@@ -81,11 +81,15 @@
         async function loadUsers() {
             try {
                 const response = await fetchWithAuth('/api/admin/users');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
-
                 const container = document.getElementById('usersTable');
 
-                if (data.success && data.users.length > 0) {
+                if (data.success && data.users && data.users.length > 0) {
                     container.innerHTML = `
                         <table style="width:100%; border-collapse:collapse;">
                             <thead style="background:#f3f4f6;">
