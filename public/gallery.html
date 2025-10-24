@@ -63,12 +63,26 @@
                 <!-- اطلاعات تصویر -->
             </div>
             <div class="modal-actions">
+                <button onclick="generateInstagramCaption()" class="action-btn caption-btn">
+                    ✨ تولید کپشن اینستاگرام
+                </button>
                 <button onclick="downloadImage()" class="action-btn download-btn">
                     📥 دانلود
                 </button>
                 <button onclick="deleteImage()" class="action-btn delete-btn">
                     🗑️ حذف
                 </button>
+            </div>
+            <div class="caption-section" id="captionSection" style="display: none;">
+                <div class="caption-loading" id="captionLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>در حال تولید کپشن...</p>
+                </div>
+                <div class="caption-result" id="captionResult" style="display: none;">
+                    <h4>کپشن اینستاگرام:</h4>
+                    <div class="caption-text" id="captionText"></div>
+                    <button onclick="copyCaption()" class="copy-btn">📋 کپی کردن</button>
+                </div>
             </div>
         </div>
     </div>

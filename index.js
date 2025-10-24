@@ -860,6 +860,69 @@ app.post('/api/generate-models', async (req, res) => {
   }
 });
 
+// تولید کپشن اینستاگرام برای تصویر
+app.post('/api/generate-caption', async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'URL تصویر الزامی است' });
+    }
+
+    console.log('📝 Generating Instagram caption for image:', imageUrl);
+
+    // دانلود تصویر و تبدیل به base64
+    const imageBase64 = await imageUrlToBase64(imageUrl);
+
+    // استفاده از Gemini برای تولید کپشن
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    const prompt = `You are a professional fashion marketing expert and Instagram content creator.
+
+Analyze this fashion image and create an engaging, persuasive Instagram caption for selling this outfit/clothing.
+
+REQUIREMENTS:
+1. Write in Persian (Farsi) language
+2. The caption should be catchy, trendy, and appealing to fashion-conscious customers
+3. Highlight the style, quality, and versatility of the outfit
+4. Include 2-3 relevant call-to-actions (like: سفارش دهید، موجود در سایزهای مختلف، etc.)
+5. Add 8-12 relevant Persian and English hashtags
+6. Keep it between 100-150 words
+7. Make it suitable for an online fashion store
+8. Use emojis appropriately (2-4 emojis maximum)
+9. Focus on benefits and how the customer will look/feel
+
+The caption should inspire customers to purchase the outfit. Make it professional yet friendly and relatable.`;
+
+    const result = await model.generateContent([
+      { text: prompt },
+      {
+        inlineData: {
+          data: imageBase64,
+          mimeType: 'image/jpeg'
+        }
+      }
+    ]);
+
+    const response = await result.response;
+    const caption = response.text();
+
+    console.log('✅ Instagram caption generated successfully');
+
+    res.json({
+      success: true,
+      caption: caption
+    });
+
+  } catch (error) {
+    console.error('❌ خطا در تولید کپشن:', error);
+    res.status(500).json({
+      error: 'خطا در تولید کپشن',
+      details: error.message
+    });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);

@@ -296,10 +296,12 @@ header {
     display: flex;
     gap: 15px;
     padding: 0 30px 30px;
+    flex-wrap: wrap;
 }
 
 .action-btn {
     flex: 1;
+    min-width: 150px;
     padding: 15px;
     border: none;
     border-radius: 12px;
@@ -307,6 +309,16 @@ header {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.caption-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.caption-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
 }
 
 .download-btn {
@@ -326,6 +338,62 @@ header {
 
 .delete-btn:hover {
     background: #ee3744;
+    transform: translateY(-2px);
+}
+
+/* Caption Section */
+.caption-section {
+    padding: 0 30px 30px;
+    border-top: 2px solid #f0f0f0;
+    margin-top: 20px;
+}
+
+.caption-loading {
+    text-align: center;
+    padding: 30px;
+}
+
+.caption-loading p {
+    color: #667eea;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.caption-result {
+    margin-top: 20px;
+}
+
+.caption-result h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.caption-text {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+    line-height: 1.8;
+    color: #333;
+    font-size: 1rem;
+}
+
+.copy-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: #218838;
     transform: translateY(-2px);
 }
 

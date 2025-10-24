@@ -149,6 +149,10 @@ function closeModal() {
     imageModal.style.display = 'none';
     document.body.style.overflow = 'auto';
     currentImageId = null;
+
+    // پاک کردن بخش کپشن
+    const captionSection = document.getElementById('captionSection');
+    captionSection.style.display = 'none';
 }
 
 // دانلود تصویر
@@ -220,6 +224,69 @@ sortSelect.addEventListener('change', () => {
     sortGenerations();
     displayGallery();
 });
+
+// تولید کپشن اینستاگرام
+async function generateInstagramCaption() {
+    if (!currentImageId) return;
+
+    const generation = generations.find(g => g.id === currentImageId);
+    if (!generation) return;
+
+    const imageUrl = generation.imagePath || generation.generated_image_url;
+
+    const captionSection = document.getElementById('captionSection');
+    const captionLoading = document.getElementById('captionLoading');
+    const captionResult = document.getElementById('captionResult');
+    const captionText = document.getElementById('captionText');
+
+    try {
+        // نمایش بخش کپشن و loading
+        captionSection.style.display = 'block';
+        captionLoading.style.display = 'block';
+        captionResult.style.display = 'none';
+
+        console.log('📝 درخواست تولید کپشن برای:', imageUrl);
+
+        const response = await fetch('/api/generate-caption', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ imageUrl: imageUrl })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'خطا در تولید کپشن');
+        }
+
+        console.log('✅ کپشن تولید شد');
+
+        // نمایش نتیجه
+        captionLoading.style.display = 'none';
+        captionResult.style.display = 'block';
+        captionText.textContent = data.caption;
+
+    } catch (error) {
+        console.error('خطا در تولید کپشن:', error);
+        captionLoading.style.display = 'none';
+        captionResult.style.display = 'block';
+        captionText.innerHTML = '<span style="color: red;">❌ خطا در تولید کپشن. لطفاً دوباره تلاش کنید.</span>';
+    }
+}
+
+// کپی کردن کپشن
+function copyCaption() {
+    const captionText = document.getElementById('captionText').textContent;
+
+    navigator.clipboard.writeText(captionText).then(() => {
+        alert('✅ کپشن کپی شد!');
+    }).catch(err => {
+        console.error('خطا در کپی کردن:', err);
+        alert('❌ خطا در کپی کردن');
+    });
+}
 
 // بستن Modal با کلید Escape
 document.addEventListener('keydown', (e) => {
