@@ -863,7 +863,7 @@ app.post('/api/generate-models', async (req, res) => {
 // تولید کپشن اینستاگرام برای تصویر
 app.post('/api/generate-caption', async (req, res) => {
   try {
-    const { imageUrl } = req.body;
+    const { imageUrl, imageId } = req.body;
 
     if (!imageUrl) {
       return res.status(400).json({ error: 'URL تصویر الزامی است' });
@@ -919,9 +919,28 @@ app.post('/api/generate-caption', async (req, res) => {
 
     console.log('✅ Instagram caption generated successfully');
 
+    // ذخیره کپشن در دیتابیس (اگر supabase فعال باشد و imageId وجود داشته باشد)
+    if (supabase && imageId) {
+      try {
+        const { error: updateError } = await supabase
+          .from('generated_images')
+          .update({ instagram_caption: caption })
+          .eq('id', imageId);
+
+        if (updateError) {
+          console.error('خطا در ذخیره کپشن در دیتابیس:', updateError);
+        } else {
+          console.log('✅ کپشن در دیتابیس ذخیره شد');
+        }
+      } catch (dbError) {
+        console.error('خطا در ذخیره کپشن:', dbError);
+      }
+    }
+
     res.json({
       success: true,
-      caption: caption
+      caption: caption,
+      imageId: imageId
     });
 
   } catch (error) {

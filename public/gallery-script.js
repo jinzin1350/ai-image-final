@@ -140,6 +140,19 @@ function openModal(imageId) {
         ${generation.description ? `<p><strong>توضیحات:</strong> ${generation.description}</p>` : ''}
     `;
 
+    // بررسی اینکه آیا کپشن قبلاً تولید شده
+    const captionSection = document.getElementById('captionSection');
+    const captionResult = document.getElementById('captionResult');
+    const captionText = document.getElementById('captionText');
+
+    if (generation.instagramCaption || generation.instagram_caption) {
+        // نمایش کپشن ذخیره شده
+        const savedCaption = generation.instagramCaption || generation.instagram_caption;
+        captionSection.style.display = 'block';
+        captionResult.style.display = 'block';
+        captionText.textContent = savedCaption;
+    }
+
     imageModal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -252,7 +265,10 @@ async function generateInstagramCaption() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ imageUrl: imageUrl })
+            body: JSON.stringify({
+                imageUrl: imageUrl,
+                imageId: currentImageId
+            })
         });
 
         const data = await response.json();
@@ -262,6 +278,19 @@ async function generateInstagramCaption() {
         }
 
         console.log('✅ کپشن تولید شد');
+
+        // ذخیره کپشن در localStorage
+        const savedImages = JSON.parse(localStorage.getItem('generatedImages') || '[]');
+        const imageIndex = savedImages.findIndex(img => img.id === currentImageId);
+
+        if (imageIndex !== -1) {
+            savedImages[imageIndex].instagramCaption = data.caption;
+            localStorage.setItem('generatedImages', JSON.stringify(savedImages));
+            console.log('✅ کپشن در localStorage ذخیره شد');
+        }
+
+        // به‌روزرسانی آبجکت generation در حافظه
+        generation.instagramCaption = data.caption;
 
         // نمایش نتیجه
         captionLoading.style.display = 'none';
