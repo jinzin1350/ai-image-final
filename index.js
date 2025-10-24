@@ -11,10 +11,20 @@ const app = express();
 const PORT = 5000;
 
 // تنظیمات Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_ANON_KEY || ''
-);
+let supabase = null;
+try {
+  if (process.env.SUPABASE_URL &&
+      process.env.SUPABASE_URL !== 'your_supabase_project_url' &&
+      process.env.SUPABASE_ANON_KEY &&
+      process.env.SUPABASE_ANON_KEY !== 'your_supabase_anon_key') {
+    supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY
+    );
+  }
+} catch (error) {
+  console.error('⚠️  خطا در اتصال به Supabase:', error.message);
+}
 
 // تنظیمات Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -42,51 +52,54 @@ const upload = multer({
 app.use(express.json());
 app.use(express.static('public'));
 
-// لیست مدل‌ها
-const models = [
+// لیست مدل‌ها - تعریف model prompts برای تولید تصویر
+const modelPrompts = [
   {
     id: 'woman-1',
     name: 'مدل زن ۱',
     type: 'female',
     description: 'زن جوان با موهای بلند',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop'
+    prompt: 'A professional fashion model portrait, young woman with long hair, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
     id: 'woman-2',
     name: 'مدل زن ۲',
     type: 'female',
     description: 'زن با استایل مدرن',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop'
+    prompt: 'A professional fashion model portrait, stylish young woman with modern hairstyle, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
     id: 'man-1',
     name: 'مدل مرد ۱',
     type: 'male',
     description: 'مرد جوان ورزشکار',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop'
+    prompt: 'A professional fashion model portrait, athletic young man with fit physique, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
     id: 'man-2',
     name: 'مدل مرد ۲',
     type: 'male',
     description: 'مرد با استایل رسمی',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop'
+    prompt: 'A professional fashion model portrait, professional businessman look, young man with formal appearance, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
   },
   {
     id: 'child-1',
     name: 'مدل کودک ۱',
     type: 'child',
     description: 'کودک شاد',
-    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop'
+    prompt: 'A professional fashion model portrait, happy child with friendly smile, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on, age 8-10 years'
   },
   {
     id: 'child-2',
     name: 'مدل کودک ۲',
     type: 'child',
     description: 'نوجوان',
-    image: 'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=400&h=600&fit=crop'
+    prompt: 'A professional fashion model portrait, teenager with confident pose, standing in neutral pose, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on, age 13-15 years'
   }
 ];
+
+// لیست مدل‌ها با URL‌های تولید شده (در ابتدا خالی است)
+let models = [];
 
 // لیست پس‌زمینه‌ها
 const backgrounds = [
@@ -173,7 +186,7 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
     }
 
     // بررسی تنظیمات Supabase
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    if (!supabase) {
       console.error('❌ Supabase تنظیم نشده است!');
       return res.status(500).json({
         error: 'خطا در تنظیمات سرور',
@@ -234,6 +247,120 @@ async function imageUrlToBase64(url) {
     console.error('Error downloading image:', error);
     throw error;
   }
+}
+
+// تابع تولید تصاویر مدل‌ها با Gemini AI
+async function generateModelImages() {
+  console.log('🎨 شروع تولید تصاویر مدل‌ها با Gemini AI...');
+
+  if (!supabase) {
+    console.error('❌ Supabase تنظیم نشده است. امکان آپلود تصاویر وجود ندارد.');
+    throw new Error('Supabase is not configured');
+  }
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash-image",
+    generationConfig: {
+      responseModalities: ["Image"]
+    }
+  });
+
+  for (const modelPrompt of modelPrompts) {
+    try {
+      console.log(`📸 در حال تولید تصویر برای: ${modelPrompt.name}`);
+
+      const result = await model.generateContent([
+        { text: modelPrompt.prompt }
+      ]);
+
+      const response = await result.response;
+
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        console.error(`❌ خطا در تولید تصویر ${modelPrompt.name}`);
+        continue;
+      }
+
+      let generatedImageBase64 = null;
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          generatedImageBase64 = part.inlineData.data;
+          break;
+        }
+      }
+
+      if (!generatedImageBase64) {
+        console.error(`❌ تصویری برای ${modelPrompt.name} تولید نشد`);
+        continue;
+      }
+
+      // تبدیل base64 به buffer و آپلود به Supabase
+      const imageBuffer = Buffer.from(generatedImageBase64, 'base64');
+      const fileName = `model-${modelPrompt.id}-${Date.now()}.png`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('garments')
+        .upload(fileName, imageBuffer, {
+          contentType: 'image/png',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error(`❌ خطا در آپلود ${modelPrompt.name}:`, uploadError);
+        continue;
+      }
+
+      // دریافت URL عمومی
+      const { data: urlData } = supabase.storage
+        .from('garments')
+        .getPublicUrl(fileName);
+
+      // افزودن به لیست مدل‌ها
+      models.push({
+        id: modelPrompt.id,
+        name: modelPrompt.name,
+        type: modelPrompt.type,
+        description: modelPrompt.description,
+        image: urlData.publicUrl
+      });
+
+      console.log(`✅ تصویر ${modelPrompt.name} با موفقیت تولید و آپلود شد`);
+
+      // تاخیر کوتاه بین درخواست‌ها برای جلوگیری از rate limiting
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    } catch (error) {
+      console.error(`❌ خطا در تولید ${modelPrompt.name}:`, error.message);
+    }
+  }
+
+  console.log(`✅ تولید مدل‌ها تمام شد. تعداد: ${models.length}`);
+
+  // ذخیره مدل‌ها در فایل برای استفاده بعدی
+  try {
+    fs.writeFileSync(
+      path.join(__dirname, 'generated-models.json'),
+      JSON.stringify(models, null, 2)
+    );
+    console.log('💾 مدل‌ها در فایل ذخیره شدند');
+  } catch (error) {
+    console.error('❌ خطا در ذخیره فایل:', error);
+  }
+}
+
+// بارگذاری مدل‌های ذخیره شده (اگر وجود دارند)
+function loadSavedModels() {
+  const modelsFilePath = path.join(__dirname, 'generated-models.json');
+  if (fs.existsSync(modelsFilePath)) {
+    try {
+      const savedModels = JSON.parse(fs.readFileSync(modelsFilePath, 'utf8'));
+      models = savedModels;
+      console.log(`✅ ${models.length} مدل از فایل بارگذاری شد`);
+      return true;
+    } catch (error) {
+      console.error('❌ خطا در بارگذاری مدل‌ها از فایل:', error);
+      return false;
+    }
+  }
+  return false;
 }
 
 // تولید عکس با Gemini 2.5 Flash
@@ -424,9 +551,47 @@ app.get('/api/generations', authenticateUser, async (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+// تولید تصاویر مدل‌ها (endpoint برای اجرای دستی)
+app.post('/api/generate-models', async (req, res) => {
+  try {
+    if (models.length > 0) {
+      return res.json({
+        success: true,
+        message: 'مدل‌ها قبلاً تولید شده‌اند',
+        models: models
+      });
+    }
+
+    // اجرای تولید مدل‌ها در پس‌زمینه
+    generateModelImages().then(() => {
+      console.log('✅ تولید مدل‌ها کامل شد');
+    });
+
+    res.json({
+      success: true,
+      message: 'تولید مدل‌ها شروع شد. لطفاً چند دقیقه صبر کنید...'
+    });
+  } catch (error) {
+    console.error('خطا در شروع تولید مدل‌ها:', error);
+    res.status(500).json({ error: 'خطا در شروع تولید مدل‌ها' });
+  }
+});
+
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);
-  console.log(`🔐 Supabase: ${process.env.SUPABASE_URL ? 'Connected' : 'Not configured'}`);
-  console.log(`🤖 Gemini AI: ${process.env.GEMINI_API_KEY ? 'Connected' : 'Not configured'}`);
+  console.log(`🔐 Supabase: ${supabase ? 'Connected' : 'Not configured'}`);
+  console.log(`🤖 Gemini AI: ${process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key' ? 'Connected' : 'Not configured'}`);
+
+  // بارگذاری مدل‌های ذخیره شده یا تولید مدل‌های جدید
+  const modelsLoaded = loadSavedModels();
+
+  if (!modelsLoaded) {
+    console.log('⚠️  هیچ مدلی یافت نشد. برای تولید مدل‌ها، به /api/generate-models درخواست POST ارسال کنید');
+    if (!supabase) {
+      console.log('⚠️  توجه: برای تولید مدل‌ها، باید Supabase را در .env تنظیم کنید');
+    }
+  } else {
+    console.log(`✅ ${models.length} مدل آماده استفاده است`);
+  }
 });
