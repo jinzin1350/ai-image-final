@@ -1,3 +1,14 @@
+// Check authentication on page load
+(function checkAuth() {
+    const token = localStorage.getItem('supabase_token');
+    if (!token) {
+        console.log('⚠️ No auth token found - redirecting to login');
+        window.location.href = '/auth';
+        return;
+    }
+    console.log('✅ User is authenticated');
+})();
+
 let uploadedGarmentPaths = []; // Changed to array for multiple garments
 let selectedModelId = null;
 let selectedBackgroundId = null;
