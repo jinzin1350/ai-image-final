@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Generation Studio | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .studio-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .studio-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .studio-card-inner {
+            background: white;
+            padding: 30px;
+            border-radius: 13px;
+        }
+        .studio-section {
+            margin-bottom: 20px;
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .studio-section summary {
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        @media (max-width: 1024px) {
+            .param-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .param-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+            font-size: 14px;
+        }
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-generate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .preview-container {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #667eea;
+        }
+        .preview-image {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin/dashboard" class="nav-item"><span>Dashboard</span></a>
+            <a href="/admin/users" class="nav-item"><span>Users</span></a>
+            <a href="/admin/content" class="nav-item"><span>Content</span></a>
+            <a href="/admin/user-content" class="nav-item"><span>User Content</span></a>
+            <a href="/admin/model-studio" class="nav-item active"><span>Model Studio</span></a>
+            <a href="/admin/analytics" class="nav-item"><span>Analytics</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()"><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1>🎨 Professional Model Generation Studio</h1>
+                <p>Create custom fashion models with detailed appearance controls</p>
+            </div>
+        </header>
+
+        <div class="studio-container">
+            <!-- User Selection -->
+            <div class="content-section">
+                <h2>Select User</h2>
+                <select id="selectedUser" onchange="handleUserSelect()" class="form-control" style="font-size: 15px; padding: 12px;">
+                    <option value="">-- Select a user to create model for --</option>
+                </select>
+            </div>
+
+            <!-- Model Studio -->
+            <div class="studio-card">
+                <div class="studio-card-inner">
+
+                    <!-- Basic Info -->
+                    <details open class="studio-section" style="background: #f0f9ff;">
+                        <summary style="color: #0369a1;">📋 Basic Information</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select id="modelGender">
+                                    <option value="female">Female</option>
+                                    <option value="male">Male</option>
+                                    <option value="non-binary">Non-Binary</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Age Range</label>
+                                <select id="modelAge">
+                                    <option value="child">Child (5-12)</option>
+                                    <option value="teen">Teen (13-17)</option>
+                                    <option value="young-adult" selected>Young Adult (18-25)</option>
+                                    <option value="adult">Adult (26-40)</option>
+                                    <option value="middle-aged">Middle Aged (41-60)</option>
+                                    <option value="elderly">Elderly (60+)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ethnicity</label>
+                                <select id="modelEthnicity">
+                                    <option value="caucasian">Caucasian</option>
+                                    <option value="african">African</option>
+                                    <option value="asian">Asian</option>
+                                    <option value="hispanic">Hispanic</option>
+                                    <option value="middle-eastern">Middle Eastern</option>
+                                    <option value="mixed">Mixed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Face Features -->
+                    <details open class="studio-section" style="background: #fff5f5;">
+                        <summary style="color: #e53e3e;">😊 Facial Features</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>Face Shape</label>
+                                <select id="faceShape">
+                                    <option value="oval" selected>Oval</option>
+                                    <option value="round">Round</option>
+                                    <option value="square">Square</option>
+                                    <option value="heart">Heart</option>
+                                    <option value="diamond">Diamond</option>
+                                    <option value="long">Long</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Eye Color</label>
+                                <select id="eyeColor">
+                                    <option value="brown">Brown</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="green">Green</option>
+                                    <option value="hazel">Hazel</option>
+                                    <option value="gray">Gray</option>
+                                    <option value="amber">Amber</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Eye Shape</label>
+                                <select id="eyeShape">
+                                    <option value="almond" selected>Almond</option>
+                                    <option value="round">Round</option>
+                                    <option value="hooded">Hooded</option>
+                                    <option value="upturned">Upturned</option>
+                                    <option value="downturned">Downturned</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Eyebrows</label>
+                                <select id="eyebrows">
+                                    <option value="natural">Natural</option>
+                                    <option value="thick">Thick</option>
+                                    <option value="thin">Thin</option>
+                                    <option value="arched">Arched</option>
+                                    <option value="straight">Straight</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nose Type</label>
+                                <select id="noseType">
+                                    <option value="straight">Straight</option>
+                                    <option value="button">Button</option>
+                                    <option value="roman">Roman</option>
+                                    <option value="greek">Greek</option>
+                                    <option value="upturned">Upturned</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Lip Fullness</label>
+                                <select id="lipFullness">
+                                    <option value="thin">Thin</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="full">Full</option>
+                                    <option value="very-full">Very Full</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Cheekbones</label>
+                                <select id="cheekbones">
+                                    <option value="subtle">Subtle</option>
+                                    <option value="defined" selected>Defined</option>
+                                    <option value="high">High & Prominent</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Jawline</label>
+                                <select id="jawline">
+                                    <option value="soft">Soft</option>
+                                    <option value="defined" selected>Defined</option>
+                                    <option value="sharp">Sharp</option>
+                                    <option value="square">Square</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Chin</label>
+                                <select id="chin">
+                                    <option value="rounded">Rounded</option>
+                                    <option value="pointed">Pointed</option>
+                                    <option value="square">Square</option>
+                                    <option value="cleft">Cleft</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Hair Style -->
+                    <details open class="studio-section" style="background: #fffbeb;">
+                        <summary style="color: #d97706;">💇 Hair & Style</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>Hair Color</label>
+                                <select id="hairColor">
+                                    <option value="black">Black</option>
+                                    <option value="dark-brown">Dark Brown</option>
+                                    <option value="light-brown">Light Brown</option>
+                                    <option value="blonde">Blonde</option>
+                                    <option value="platinum">Platinum Blonde</option>
+                                    <option value="red">Red</option>
+                                    <option value="auburn">Auburn</option>
+                                    <option value="gray">Gray</option>
+                                    <option value="white">White</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Hair Length</label>
+                                <select id="hairLength">
+                                    <option value="bald">Bald</option>
+                                    <option value="very-short">Very Short</option>
+                                    <option value="short">Short</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="long" selected>Long</option>
+                                    <option value="very-long">Very Long</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Hair Texture</label>
+                                <select id="hairTexture">
+                                    <option value="straight" selected>Straight</option>
+                                    <option value="wavy">Wavy</option>
+                                    <option value="curly">Curly</option>
+                                    <option value="coily">Coily</option>
+                                    <option value="kinky">Kinky</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Hairstyle</label>
+                                <select id="hairstyle">
+                                    <option value="loose" selected>Loose & Natural</option>
+                                    <option value="ponytail">Ponytail</option>
+                                    <option value="bun">Bun</option>
+                                    <option value="braids">Braids</option>
+                                    <option value="updo">Updo</option>
+                                    <option value="bob">Bob Cut</option>
+                                    <option value="pixie">Pixie Cut</option>
+                                    <option value="slicked-back">Slicked Back</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Facial Hair (Male)</label>
+                                <select id="facialHair">
+                                    <option value="none" selected>None</option>
+                                    <option value="stubble">Light Stubble</option>
+                                    <option value="beard">Full Beard</option>
+                                    <option value="goatee">Goatee</option>
+                                    <option value="mustache">Mustache</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Skin & Body -->
+                    <details open class="studio-section" style="background: #f0fdf4;">
+                        <summary style="color: #16a34a;">🎨 Skin & Body Type</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>Skin Tone</label>
+                                <select id="skinTone">
+                                    <option value="very-fair">Very Fair</option>
+                                    <option value="fair">Fair</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="olive">Olive</option>
+                                    <option value="tan">Tan</option>
+                                    <option value="brown">Brown</option>
+                                    <option value="dark-brown">Dark Brown</option>
+                                    <option value="deep">Deep</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Skin Texture</label>
+                                <select id="skinTexture">
+                                    <option value="smooth" selected>Smooth & Flawless</option>
+                                    <option value="natural">Natural</option>
+                                    <option value="freckled">Freckled</option>
+                                    <option value="with-beauty-marks">With Beauty Marks</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Body Type</label>
+                                <select id="bodyType">
+                                    <option value="slim">Slim</option>
+                                    <option value="athletic" selected>Athletic</option>
+                                    <option value="average">Average</option>
+                                    <option value="curvy">Curvy</option>
+                                    <option value="plus-size">Plus Size</option>
+                                    <option value="muscular">Muscular</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Height</label>
+                                <select id="height">
+                                    <option value="petite">Petite (< 5'4")</option>
+                                    <option value="average" selected>Average (5'4" - 5'8")</option>
+                                    <option value="tall">Tall (5'8" - 6'0")</option>
+                                    <option value="very-tall">Very Tall (> 6'0")</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Expression & Pose -->
+                    <details open class="studio-section" style="background: #fef2f2;">
+                        <summary style="color: #dc2626;">😃 Expression & Pose</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>Expression</label>
+                                <select id="expression">
+                                    <option value="neutral-confident" selected>Neutral & Confident</option>
+                                    <option value="smiling">Smiling</option>
+                                    <option value="laughing">Laughing</option>
+                                    <option value="serious">Serious</option>
+                                    <option value="mysterious">Mysterious</option>
+                                    <option value="seductive">Seductive</option>
+                                    <option value="friendly">Friendly</option>
+                                    <option value="fierce">Fierce</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Pose</label>
+                                <select id="modelPose">
+                                    <option value="standing-front" selected>Standing Front</option>
+                                    <option value="standing-side">Standing Side Profile</option>
+                                    <option value="walking">Walking</option>
+                                    <option value="sitting">Sitting</option>
+                                    <option value="leaning">Leaning</option>
+                                    <option value="hands-on-hips">Hands on Hips</option>
+                                    <option value="crossed-arms">Crossed Arms</option>
+                                    <option value="dynamic">Dynamic Pose</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Head Angle</label>
+                                <select id="headAngle">
+                                    <option value="straight" selected>Straight On</option>
+                                    <option value="tilted-left">Tilted Left</option>
+                                    <option value="tilted-right">Tilted Right</option>
+                                    <option value="looking-up">Looking Up</option>
+                                    <option value="looking-down">Looking Down</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Photography Settings -->
+                    <details open class="studio-section" style="background: #ede9fe;">
+                        <summary style="color: #7c3aed;">📸 Photography & Lighting</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>Camera Angle</label>
+                                <select id="cameraAngle">
+                                    <option value="eye-level" selected>Eye Level</option>
+                                    <option value="slightly-above">Slightly Above</option>
+                                    <option value="slightly-below">Slightly Below</option>
+                                    <option value="high-angle">High Angle</option>
+                                    <option value="low-angle">Low Angle</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Shot Type</label>
+                                <select id="shotType">
+                                    <option value="full-body" selected>Full Body</option>
+                                    <option value="three-quarter">Three Quarter</option>
+                                    <option value="waist-up">Waist Up</option>
+                                    <option value="headshot">Headshot</option>
+                                    <option value="close-up">Close Up Face</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Lighting</label>
+                                <select id="lighting">
+                                    <option value="studio" selected>Studio Lighting</option>
+                                    <option value="natural">Natural Light</option>
+                                    <option value="soft">Soft Lighting</option>
+                                    <option value="dramatic">Dramatic</option>
+                                    <option value="backlit">Backlit</option>
+                                    <option value="golden-hour">Golden Hour</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Background Style</label>
+                                <select id="bgStyle">
+                                    <option value="white" selected>White Studio</option>
+                                    <option value="gray">Gray Studio</option>
+                                    <option value="black">Black Studio</option>
+                                    <option value="gradient">Gradient</option>
+                                    <option value="bokeh">Bokeh/Blurred</option>
+                                    <option value="outdoor">Outdoor Natural</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Image Quality</label>
+                                <select id="imageQuality">
+                                    <option value="professional" selected>Professional Fashion</option>
+                                    <option value="editorial">Editorial Magazine</option>
+                                    <option value="commercial">Commercial</option>
+                                    <option value="artistic">Artistic</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Aspect Ratio</label>
+                                <select id="aspectRatio">
+                                    <option value="1:1">Square (1:1)</option>
+                                    <option value="3:4" selected>Portrait (3:4)</option>
+                                    <option value="4:3">Landscape (4:3)</option>
+                                    <option value="16:9">Wide (16:9)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Additional Details -->
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label>Additional Details (Optional)</label>
+                        <textarea id="additionalDetails" rows="3" placeholder="Specific details like accessories, makeup style, brand aesthetic, special features..." style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: 'Inter', sans-serif;"></textarea>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button onclick="generateModel()" class="btn-generate" id="generateBtn">
+                        ✨ Generate Professional Model
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewSection" style="display: none; margin-top: 30px;">
+                <div class="preview-container">
+                    <h3 style="margin-bottom: 20px; color: #667eea; font-size: 20px;">Generated Model Preview</h3>
+                    <img id="generatedImage" src="" alt="Generated Model" class="preview-image">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Category (دسته‌بندی) *</label>
+                            <select id="saveCategory">
+                                <option value="woman">👩 زن (Woman)</option>
+                                <option value="man">👨 مرد (Man)</option>
+                                <option value="girl">👧 دختر (Girl)</option>
+                                <option value="boy">👦 پسر (Boy)</option>
+                                <option value="child">👶 کودک (Child)</option>
+                                <option value="couple">💑 زوج (Couple)</option>
+                                <option value="group">👥 گروه (Group)</option>
+                                <option value="elderly">👴 سالمند (Elderly)</option>
+                                <option value="teen">🧑 نوجوان (Teen)</option>
+                                <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" id="saveName" placeholder="Model name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Visibility *</label>
+                        <select id="saveVisibility">
+                            <option value="private">Private (Only This User)</option>
+                            <option value="public">Public (All Users Can See)</option>
+                        </select>
+                        <small style="color: #6b7280; display: block; margin-top: 4px;">
+                            ⚠️ Private = Only selected user sees it | Public = Everyone sees it
+                        </small>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                        <button onclick="saveModel()" class="btn-primary">💾 Save to User Content</button>
+                        <button onclick="discardModel()" style="background: #6c757d; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                            ❌ Discard
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="/admin-common.js"></script>
+    <script>
+        let allUsers = [];
+        let selectedUserId = null;
+        let generatedImageData = null;
+
+        // Load users on page load
+        async function loadUsers() {
+            try {
+                const response = await fetchWithAuth('/api/admin/users');
+                const data = await response.json();
+
+                if (data.success) {
+                    allUsers = data.users;
+                    const select = document.getElementById('selectedUser');
+                    select.innerHTML = '<option value="">-- Select a user to create model for --</option>' +
+                        allUsers.map(user =>
+                            `<option value="${user.user_id}">${user.email}${user.is_premium ? ' ⭐ Premium' : ''}</option>`
+                        ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('Failed to load users', 'error');
+            }
+        }
+
+        function handleUserSelect() {
+            selectedUserId = document.getElementById('selectedUser').value;
+            if (selectedUserId) {
+                console.log('Selected user:', selectedUserId);
+            }
+        }
+
+        async function generateModel() {
+            if (!selectedUserId) {
+                showNotification('Please select a user first', 'error');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+
+            try {
+                // Build comprehensive prompt from all form fields
+                const prompt = buildModelPrompt();
+                console.log('Generated prompt:', prompt);
+
+                const response = await fetchWithAuth('/api/generate-image-only', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        contentType: 'model',
+                        aspectRatio: document.getElementById('aspectRatio').value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    generatedImageData = {
+                        imageUrl: data.imageUrl,
+                        prompt: prompt
+                    };
+
+                    document.getElementById('generatedImage').src = data.imageUrl;
+                    document.getElementById('previewSection').style.display = 'block';
+                    document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+                    showNotification('Model generated successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Generation failed');
+                }
+            } catch (error) {
+                console.error('Generation error:', error);
+                showNotification('Failed to generate model: ' + error.message, 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Generate Professional Model';
+            }
+        }
+
+        function buildModelPrompt() {
+            // Basic info
+            const gender = document.getElementById('modelGender').value;
+            const age = document.getElementById('modelAge').value;
+            const ethnicity = document.getElementById('modelEthnicity').value;
+
+            // Face
+            const faceShape = document.getElementById('faceShape').value;
+            const eyeColor = document.getElementById('eyeColor').value;
+            const eyeShape = document.getElementById('eyeShape').value;
+            const eyebrows = document.getElementById('eyebrows').value;
+            const noseType = document.getElementById('noseType').value;
+            const lipFullness = document.getElementById('lipFullness').value;
+            const cheekbones = document.getElementById('cheekbones').value;
+            const jawline = document.getElementById('jawline').value;
+            const chin = document.getElementById('chin').value;
+
+            // Hair
+            const hairColor = document.getElementById('hairColor').value;
+            const hairLength = document.getElementById('hairLength').value;
+            const hairTexture = document.getElementById('hairTexture').value;
+            const hairstyle = document.getElementById('hairstyle').value;
+            const facialHair = document.getElementById('facialHair').value;
+
+            // Skin & Body
+            const skinTone = document.getElementById('skinTone').value;
+            const skinTexture = document.getElementById('skinTexture').value;
+            const bodyType = document.getElementById('bodyType').value;
+            const height = document.getElementById('height').value;
+
+            // Expression & Pose
+            const expression = document.getElementById('expression').value;
+            const pose = document.getElementById('modelPose').value;
+            const headAngle = document.getElementById('headAngle').value;
+
+            // Photography
+            const cameraAngle = document.getElementById('cameraAngle').value;
+            const shotType = document.getElementById('shotType').value;
+            const lighting = document.getElementById('lighting').value;
+            const bgStyle = document.getElementById('bgStyle').value;
+            const quality = document.getElementById('imageQuality').value;
+
+            // Additional
+            const additional = document.getElementById('additionalDetails').value;
+
+            // Build comprehensive prompt
+            let prompt = `Professional ${quality} fashion photograph of a ${age.replace('-', ' ')} ${ethnicity} ${gender} model. `;
+
+            prompt += `Face: ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
+
+            prompt += `Hair: ${hairLength} ${hairTexture} ${hairColor} hair styled in ${hairstyle}. `;
+            if (gender === 'male' && facialHair !== 'none') {
+                prompt += `${facialHair} facial hair. `;
+            }
+
+            prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
+            prompt += `Body: ${bodyType} ${height} build. `;
+
+            prompt += `Expression: ${expression.replace('-', ' ')} expression. `;
+            prompt += `Pose: ${pose.replace('-', ' ')} pose, head ${headAngle.replace('-', ' ')}. `;
+
+            prompt += `Photography: ${shotType.replace('-', ' ')} shot from ${cameraAngle.replace('-', ' ')} angle, ${lighting} lighting, ${bgStyle.replace('-', ' ')} background. `;
+
+            prompt += `Professional fashion photography, high-end editorial quality, sharp focus, perfect lighting, detailed features, photorealistic, 8K resolution. `;
+
+            if (additional) {
+                prompt += additional + ' ';
+            }
+
+            return prompt;
+        }
+
+        async function saveModel() {
+            if (!generatedImageData || !selectedUserId) {
+                showNotification('Missing required data', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/save-generated-to-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageUrl: generatedImageData.imageUrl,
+                        user_id: selectedUserId,
+                        content_type: 'model',
+                        visibility: document.getElementById('saveVisibility').value,
+                        category: document.getElementById('saveCategory').value,
+                        name: document.getElementById('saveName').value || 'AI Generated Model',
+                        description: `AI Generated Model: ${generatedImageData.prompt}`,
+                        prompt: generatedImageData.prompt
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Model saved to user content!', 'success');
+                    discardModel();
+                } else {
+                    throw new Error(data.error || 'Save failed');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('Failed to save model: ' + error.message, 'error');
+            }
+        }
+
+        function discardModel() {
+            generatedImageData = null;
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('saveName').value = '';
+        }
+
+        // Load users on page load
+        loadUsers();
+    </script>
+</body>
+</html>

@@ -851,6 +851,10 @@ app.get('/admin/user-content', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-user-content.html'));
 });
 
+app.get('/admin/model-studio', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-model-studio.html'));
+});
+
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
 const modelPrompts = [
   // زنان (35 ساله)
