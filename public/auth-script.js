@@ -100,12 +100,13 @@ async function handleSignIn(event) {
         if (error) throw error;
 
         console.log('✅ ورود موفقیت‌آمیز:', data);
-        
-        // Save session
+
+        // Save session and token
         localStorage.setItem('supabase_session', JSON.stringify(data.session));
-        
+        localStorage.setItem('supabase_token', data.session.access_token);
+
         // Redirect to main app
-        window.location.href = '/index.html';
+        window.location.href = '/app';
     } catch (error) {
         console.error('❌ خطا در ورود:', error);
         showError(error.message || 'خطا در ورود. لطفاً دوباره تلاش کنید.');
@@ -151,11 +152,12 @@ async function handleSignUp(event) {
         if (error) throw error;
 
         console.log('✅ ثبت نام موفقیت‌آمیز:', data);
-        
-        // Save session
+
+        // Save session and token
         if (data.session) {
             localStorage.setItem('supabase_session', JSON.stringify(data.session));
-            window.location.href = '/index.html';
+            localStorage.setItem('supabase_token', data.session.access_token);
+            window.location.href = '/app';
         } else {
             // Email confirmation required
             showError('لطفاً ایمیل خود را تأیید کنید و سپس وارد شوید.');
@@ -180,11 +182,12 @@ async function checkAuth() {
         try {
             const { data, error } = await supabaseClient.auth.getSession();
             if (data.session) {
-                window.location.href = '/index.html';
+                window.location.href = '/app';
             }
         } catch (error) {
             console.log('Session expired');
             localStorage.removeItem('supabase_session');
+            localStorage.removeItem('supabase_token');
         }
     }
 }
