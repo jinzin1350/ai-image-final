@@ -20,6 +20,14 @@
     console.log('✅ User is authenticated');
 })();
 
+// Logout function
+function handleLogout() {
+    console.log('🚪 Logging out...');
+    localStorage.removeItem('supabase_token');
+    localStorage.removeItem('supabase_session');
+    window.location.replace('/auth');
+}
+
 let uploadedGarmentPaths = []; // Changed to array for multiple garments
 let selectedModelId = null;
 let selectedBackgroundId = null;
