@@ -213,46 +213,47 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       return res.json({ success: true, users: [] });
     }
 
-    // First check if table exists by trying to query it
-    const { data, error } = await supabase
-      .from('user_limits')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Fetch ALL users from auth.users using admin API
+    const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
 
-    // If error is about table not existing, return empty array
-    if (error && error.message.includes('does not exist')) {
-      console.warn('⚠️ Table user_limits does not exist. Please run admin-only-schema.sql in Supabase');
-      return res.json({ 
-        success: true, 
-        users: [],
-        warning: 'Database not set up. Please run SQL schema in Supabase.' 
+    if (authError) {
+      console.error('Error fetching auth users:', authError);
+      throw authError;
+    }
+
+    const allUsers = authData?.users || [];
+
+    // Fetch all user_limits data
+    const { data: limitsData, error: limitsError } = await supabase
+      .from('user_limits')
+      .select('*');
+
+    // If user_limits table doesn't exist, still show all users with default limits
+    const userLimitsMap = {};
+    if (!limitsError && limitsData) {
+      limitsData.forEach(limit => {
+        userLimitsMap[limit.user_id] = limit;
       });
     }
 
-    if (error) {
-      console.error('Error getting users:', error);
-      throw error;
-    }
+    // Combine auth users with their limits (or default values)
+    const usersWithLimits = allUsers.map(authUser => {
+      const limits = userLimitsMap[authUser.id];
 
-    // If we have data, enrich it with auth.users emails if email is missing
-    if (data && data.length > 0) {
-      for (let user of data) {
-        // If email is missing, try to get it from auth.users
-        if (!user.email && user.user_id) {
-          try {
-            const { data: authUser } = await supabase.auth.admin.getUserById(user.user_id);
-            if (authUser && authUser.user) {
-              user.email = authUser.user.email;
-            }
-          } catch (err) {
-            console.warn(`Could not fetch email for user ${user.user_id}`);
-          }
-        }
-      }
-    }
+      return {
+        user_id: authUser.id,
+        email: authUser.email,
+        is_premium: limits?.is_premium || false,
+        images_used: limits?.images_used || 0,
+        images_limit: limits?.images_limit || 10,
+        captions_used: limits?.captions_used || 0,
+        captions_limit: limits?.captions_limit || 5,
+        created_at: authUser.created_at
+      };
+    });
 
-    console.log(`✅ Found ${data?.length || 0} users in database`);
-    res.json({ success: true, users: data || [] });
+    console.log(`✅ Found ${usersWithLimits.length} users in database`);
+    res.json({ success: true, users: usersWithLimits });
   } catch (error) {
     console.error('Error getting users:', error);
     res.status(500).json({ success: false, error: error.message });
@@ -269,13 +270,20 @@ app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase not configured' });
     }
 
+    // Use upsert to create entry if it doesn't exist
     const { data, error } = await supabase
       .from('user_limits')
-      .update(updates)
-      .eq('user_id', userId);
+      .upsert({
+        user_id: userId,
+        ...updates
+      }, {
+        onConflict: 'user_id'
+      })
+      .select();
 
     if (error) throw error;
 
+    console.log(`✅ Updated user ${userId} with premium status: ${updates.is_premium}`);
     res.json({ success: true, data });
   } catch (error) {
     console.error('Error updating user:', error);
