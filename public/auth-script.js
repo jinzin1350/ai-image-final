@@ -97,7 +97,18 @@ async function handleSignIn(event) {
             password: password
         });
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ خطا در ورود:', error);
+
+            // Check if it's an email confirmation issue
+            if (error.message.includes('Email not confirmed') || error.message.includes('Invalid login credentials')) {
+                showError('ایمیل شما تایید نشده است. لطفاً ایمیل خود را چک کنید یا با ادمین تماس بگیرید.');
+            } else {
+                showError(error.message || 'خطا در ورود. لطفاً دوباره تلاش کنید.');
+            }
+            hideLoading();
+            return;
+        }
 
         console.log('✅ ورود موفقیت‌آمیز:', data);
 
@@ -108,8 +119,8 @@ async function handleSignIn(event) {
         // Redirect to main app
         window.location.href = '/app';
     } catch (error) {
-        console.error('❌ خطا در ورود:', error);
-        showError(error.message || 'خطا در ورود. لطفاً دوباره تلاش کنید.');
+        console.error('❌ خطای غیرمنتظره:', error);
+        showError('خطا در ورود. لطفاً دوباره تلاش کنید.');
     } finally {
         hideLoading();
     }
