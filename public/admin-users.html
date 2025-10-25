@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="/admin-style.css">
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
@@ -76,16 +76,20 @@
         </div>
     </main>
 
-    <script src="admin-common.js"></script>
+    <script src="/admin-common.js"></script>
     <script>
         async function loadUsers() {
             try {
                 const response = await fetchWithAuth('/api/admin/users');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
-
                 const container = document.getElementById('usersTable');
 
-                if (data.success && data.users.length > 0) {
+                if (data.success && data.users && data.users.length > 0) {
                     container.innerHTML = `
                         <table style="width:100%; border-collapse:collapse;">
                             <thead style="background:#f3f4f6;">

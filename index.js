@@ -32,7 +32,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 // تنظیمات Multer برای آپلود موقت
 const storage = multer.memoryStorage();
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
@@ -50,7 +50,398 @@ const upload = multer({
 });
 
 app.use(express.json());
+
+// Serve attached_assets folder
+app.use('/attached_assets', express.static(path.join(__dirname, 'attached_assets')));
+
+// Landing page as homepage - MUST come before static files
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+// App page route
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Auth page route
+app.get('/auth', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'auth.html'));
+});
+
+// Legal pages routes
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+});
+
+app.get('/rules', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'rules.html'));
+});
+
+// Support pages routes
+app.get('/help', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'help.html'));
+});
+
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'faq.html'));
+});
+
+app.get('/api-docs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api-docs.html'));
+});
+
+app.get('/status', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'status.html'));
+});
+
+// Gallery page route
+app.get('/gallery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'gallery.html'));
+});
+
+// Static files - MUST come after specific routes
 app.use(express.static('public'));
+
+// ================== ADMIN PANEL API ENDPOINTS ==================
+// IMPORTANT: These must come AFTER static files but BEFORE admin page routes
+
+// Admin authentication middleware
+const authenticateAdmin = (req, res, next) => {
+  const adminEmail = req.headers['admin-email'];
+  const adminPassword = req.headers['admin-password'];
+  
+  const validEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const validPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  
+  if (adminEmail === validEmail && adminPassword === validPassword) {
+    next();
+  } else {
+    res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+};
+
+// Admin login
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const validEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+    const validPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    
+    if (email === validEmail && password === validPassword) {
+      res.json({ 
+        success: true, 
+        admin: { 
+          email: email, 
+          role: 'admin' 
+        } 
+      });
+    } else {
+      res.status(401).json({ success: false, error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get admin stats
+app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({
+        success: true,
+        stats: {
+          totalUsers: 0,
+          premiumUsers: 0,
+          totalImages: 0,
+          todayImages: 0,
+          totalModels: models.length,
+          totalBackgrounds: backgrounds.length,
+          freeUsers: 0
+        }
+      });
+    }
+
+    // Get user counts
+    const { data: users, error: usersError } = await supabase
+      .from('user_limits')
+      .select('is_premium');
+    
+    const totalUsers = users?.length || 0;
+    const premiumUsers = users?.filter(u => u.is_premium).length || 0;
+    const freeUsers = totalUsers - premiumUsers;
+
+    // Get image counts
+    const { data: images, error: imagesError } = await supabase
+      .from('generated_images')
+      .select('created_at');
+    
+    const totalImages = images?.length || 0;
+    
+    // Count today's images
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayImages = images?.filter(img => new Date(img.created_at) >= today).length || 0;
+
+    res.json({
+      success: true,
+      stats: {
+        totalUsers,
+        premiumUsers,
+        totalImages,
+        todayImages,
+        totalModels: models.length,
+        totalBackgrounds: backgrounds.length,
+        freeUsers
+      }
+    });
+  } catch (error) {
+    console.error('Error getting admin stats:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get all users
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, users: [] });
+    }
+
+    // First check if table exists by trying to query it
+    const { data, error } = await supabase
+      .from('user_limits')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    // If error is about table not existing, return empty array
+    if (error && error.message.includes('does not exist')) {
+      console.warn('⚠️ Table user_limits does not exist. Please run admin-only-schema.sql in Supabase');
+      return res.json({ 
+        success: true, 
+        users: [],
+        warning: 'Database not set up. Please run SQL schema in Supabase.' 
+      });
+    }
+
+    if (error) {
+      console.error('Error getting users:', error);
+      throw error;
+    }
+
+    // If we have data, enrich it with auth.users emails if email is missing
+    if (data && data.length > 0) {
+      for (let user of data) {
+        // If email is missing, try to get it from auth.users
+        if (!user.email && user.user_id) {
+          try {
+            const { data: authUser } = await supabase.auth.admin.getUserById(user.user_id);
+            if (authUser && authUser.user) {
+              user.email = authUser.user.email;
+            }
+          } catch (err) {
+            console.warn(`Could not fetch email for user ${user.user_id}`);
+          }
+        }
+      }
+    }
+
+    console.log(`✅ Found ${data?.length || 0} users in database`);
+    res.json({ success: true, users: data || [] });
+  } catch (error) {
+    console.error('Error getting users:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update user limits/premium
+app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updates = req.body;
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { data, error } = await supabase
+      .from('user_limits')
+      .update(updates)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get content library
+app.get('/api/admin/content', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, content: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('content_library')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, content: data || [] });
+  } catch (error) {
+    console.error('Error getting content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Upload content (model/background)
+app.post('/api/admin/content/upload', authenticateAdmin, upload.single('content'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { content_type, tier, category, name, description } = req.body;
+    const fileName = `admin-content-${Date.now()}-${req.file.originalname}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('admin-content')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    // Save to database
+    const { data: contentData, error: dbError } = await supabase
+      .from('content_library')
+      .insert([{
+        content_type,
+        tier,
+        category,
+        name,
+        description,
+        image_url: urlData.publicUrl,
+        storage_path: fileName
+      }])
+      .select();
+
+    if (dbError) throw dbError;
+
+    res.json({ success: true, content: contentData[0] });
+  } catch (error) {
+    console.error('Error uploading content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete content
+app.delete('/api/admin/content/:contentId', authenticateAdmin, async (req, res) => {
+  try {
+    const { contentId } = req.params;
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    // Get content info first
+    const { data: content, error: fetchError } = await supabase
+      .from('content_library')
+      .select('storage_path')
+      .eq('id', contentId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete from storage
+    if (content.storage_path) {
+      await supabase.storage
+        .from('admin-content')
+        .remove([content.storage_path]);
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('content_library')
+      .delete()
+      .eq('id', contentId);
+
+    if (deleteError) throw deleteError;
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get activity logs
+app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+
+    if (!supabase) {
+      return res.json({ success: true, logs: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('admin_activity_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    res.json({ success: true, logs: data || [] });
+  } catch (error) {
+    console.error('Error getting logs:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ================== END OF ADMIN PANEL API ==================
+
+// Admin panel page routes - MUST come after API routes
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
+});
+
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+});
+
+app.get('/admin/users', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-users.html'));
+});
+
+app.get('/admin/content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
+});
+
+app.get('/admin/analytics', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-analytics.html'));
+});
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
 const modelPrompts = [
@@ -229,21 +620,21 @@ const fallbackModels = [
   { id: 'woman-1', name: 'مدل ۱', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop' },
   { id: 'woman-2', name: 'مدل ۲', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop' },
   { id: 'woman-3', name: 'مدل ۳', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=600&fit=crop' },
-  { id: 'woman-4', name: 'مدل ۴', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop' },
+  { id: 'woman-4', name: 'مدل ۴', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1524504388940-8e864400a348?w=400&h=600&fit=crop' },
   { id: 'woman-5', name: 'مدل ۵', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop' },
 
   // مردان
   { id: 'man-1', name: 'مدل ۱', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop' },
   { id: 'man-2', name: 'مدل ۲', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop' },
   { id: 'man-3', name: 'مدل ۳', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=600&fit=crop' },
-  { id: 'man-4', name: 'مدل ۴', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=600&fit=crop' },
+  { id: 'man-4', name: 'مدل ۴', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1519085360753-5a69c17a67c6?w=400&h=600&fit=crop' },
   { id: 'man-5', name: 'مدل ۵', category: 'man', categoryName: 'مرد', description: 'مرد 35 ساله', image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=600&fit=crop' },
 
   // دختران
   { id: 'girl-1', name: 'مدل ۱', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=600&fit=crop' },
   { id: 'girl-2', name: 'مدل ۲', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=600&fit=crop' },
   { id: 'girl-3', name: 'مدل ۳', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=600&fit=crop' },
-  { id: 'girl-4', name: 'مدل ۴', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=400&h=600&fit=crop' },
+  { id: 'girl-4', name: 'مدل ۴', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1554080353-a576cf80bda?w=400&h=600&fit=crop' },
   { id: 'girl-5', name: 'مدل ۵', category: 'girl', categoryName: 'دختر', description: 'دختر 13-15 ساله', image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=600&fit=crop' },
 
   // پسران
@@ -410,7 +801,7 @@ const postProcessingPresets = [
   { id: 'natural', name: '🌿 طبیعی', description: 'Natural processing, true colors, minimal editing, authentic look' },
   { id: 'editorial', name: '📰 ادیتوریال', description: 'Editorial magazine style, high contrast, vibrant colors, punchy saturation, Vogue aesthetic' },
   { id: 'ecommerce', name: '🛍️ فروشگاهی', description: 'E-commerce clean look, neutral accurate colors, even lighting, product-focused' },
-  { id: 'vintage', name: '📼 وینتیج', description: 'Vintage retro film look, faded colors, grain texture, nostalgic 70s-90s aesthetic' },
+  { id: 'vintage', name: '📼وینتیج', description: 'Vintage retro film look, faded colors, grain texture, nostalgic 70s-90s aesthetic' },
   { id: 'cinematic', name: '🎬 سینمایی', description: 'Cinematic color grading, teal and orange, film-like contrast, movie poster quality' },
   { id: 'portra', name: '🎞️ کداک پرترا', description: 'Kodak Portra 400 film emulation, warm skin tones, soft pastels, professional portrait film' },
   { id: 'velvia', name: '🌄 فوجی ولویا', description: 'Fuji Velvia film emulation, hyper-saturated, rich colors, landscape film aesthetic' },
@@ -523,6 +914,24 @@ app.get('/api/camera-angles', (req, res) => {
 // دریافت لیست استایل‌ها
 app.get('/api/styles', (req, res) => {
   res.json(styles);
+
+
+// دریافت تنظیمات Supabase برای frontend
+app.get('/api/supabase-config', (req, res) => {
+  if (!supabase || !process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    return res.status(500).json({ 
+      error: 'Supabase is not configured',
+      configured: false 
+    });
+  }
+  
+  res.json({
+    configured: true,
+    url: process.env.SUPABASE_URL,
+    anonKey: process.env.SUPABASE_ANON_KEY
+  });
+});
+
 });
 
 // دریافت لیست نورپردازی
@@ -860,10 +1269,9 @@ TASK: Place ${garmentDescription} onto the model shown in the ${garments.length 
 
 CORE REQUIREMENTS:
 1. The model should wear ${garmentDescription}
-${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Location/Setting: ${selectedBackground.description}
-${garments.length > 1 ? '4' : '3'}. Keep the model's face and overall appearance from the reference image
-${garments.length > 1 ? '5' : '4'}. Garment Fit: ${selectedFit.description}
-${garments.length > 1 ? '6' : '5'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
+${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Keep the model's face and overall appearance from the reference image
+${garments.length > 1 ? '4' : '3'}. Garment Fit: ${selectedFit.description}
+${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
 
 POSE & COMPOSITION:
 - Pose: ${selectedPose.description}
@@ -1004,6 +1412,10 @@ CRITICAL IMPERATIVES:
     });
 
     // Add prompt
+
+
+
+
     contentParts.push({ text: prompt });
 
     const result = await model.generateContent(contentParts);
@@ -1180,16 +1592,180 @@ app.post('/api/generate-models', async (req, res) => {
   }
 });
 
+// تولید توضیحات محصول برای سایت
+app.post('/api/generate-product-description', async (req, res) => {
+  try {
+    const { imageUrl, imageId, productInfo } = req.body;
+
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'URL تصویر الزامی است' });
+    }
+
+    console.log('📄 Generating product description for image:', imageUrl);
+    if (productInfo) {
+      console.log('📦 Product info:', productInfo);
+    }
+
+    // دانلود تصویر و تبدیل به base64
+    const imageBase64 = await imageUrlToBase64(imageUrl);
+
+    // استفاده از Gemini برای تولید توضیحات محصول
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    // ساخت پرامپت با اطلاعات محصول
+    let productDetails = '';
+    if (productInfo) {
+      productDetails = `
+
+🛍️ اطلاعات محصول:
+- نام محصول: ${productInfo.name}
+- رنگ‌های موجود: ${productInfo.colors.join('، ')}
+- سایزهای موجود: ${productInfo.sizes.join('، ')}
+- قیمت اصلی: ${parseInt(productInfo.price).toLocaleString('fa-IR')} تومان
+${productInfo.discount ? `- تخفیف: ${productInfo.discount}% (قیمت نهایی: ${parseInt(productInfo.finalPrice).toLocaleString('fa-IR')} تومان)` : ''}
+${productInfo.category ? `- دسته‌بندی: ${productInfo.category}` : ''}
+${productInfo.fabricType ? `- جنس پارچه: ${productInfo.fabricType}` : ''}
+${productInfo.description ? `- توضیحات اضافی: ${productInfo.description}` : ''}`;
+    }
+
+    const prompt = `شما یک متخصص محتوای محصول و کپی‌رایتر حرفه‌ای فروشگاه‌های آنلاین هستید.
+
+این تصویر محصول را تحلیل کن و یک توضیحات کامل، جامع و حرفه‌ای برای صفحه محصول در سایت فروشگاهی بنویس.
+${productDetails}
+
+الزامات مهم:
+
+📝 ساختار محتوا (به ترتیب):
+
+1️⃣ معرفی جذاب (2-3 جمله):
+   - شروع قوی و جذاب که توجه مشتری را جلب کند
+   - ارزش منحصر به فرد محصول را برجسته کن
+   - احساس و تجربه استفاده از محصول را توصیف کن
+
+2️⃣ ویژگی‌های کلیدی (لیست نقطه‌ای):
+   - کیفیت پارچه و جنس مواد
+   - طراحی و استایل
+   - راحتی و کاربرد
+   - دوام و ماندگاری
+   - ویژگی‌های خاص این محصول
+
+3️⃣ کاربردها و موقعیت‌های استفاده (پاراگراف):
+   - کجاها می‌توان از این محصول استفاده کرد؟
+   - برای چه مناسبت‌هایی ایده‌آل است؟
+   - با چه آیتم‌هایی می‌توان ست کرد؟
+   - چه حسی به پوشنده می‌دهد؟
+
+4️⃣ پیشنهادات استایل (پاراگراف):
+   - نحوه ترکیب با سایر لباس‌ها
+   - استایل‌های مختلف (کژوال، رسمی، اسپرت و...)
+   - اکسسوری‌های پیشنهادی
+   - ایده‌های ست کردن خلاقانه
+
+5️⃣ راهنمای نگهداری و شستشو (لیست نقطه‌ای):
+   - نحوه شستشو (ماشین، دستی، حالت ظریف)
+   - دمای مناسب آب
+   - نکات اتو کشیدن
+   - نحوه خشک کردن
+   - نکات نگهداری برای افزایش عمر محصول
+   - هشدارها (مثل عدم استفاده از سفیدکننده)
+
+6️⃣ اطلاعات فنی (جدول‌وار):
+   - رنگ‌های موجود: [لیست]
+   - سایزها: [لیست]
+   ${productInfo && productInfo.fabricType ? `- جنس: ${productInfo.fabricType}` : '- جنس: [از تصویر استخراج کن]'}
+   - قیمت و تخفیف
+
+7️⃣ تضمین کیفیت (1-2 جمله):
+   - ضمانت کیفیت
+   - امکان بازگشت کالا
+   - اصالت و اورجینال بودن
+
+الزامات نگارشی:
+
+✅ زبان: فارسی رسمی اما صمیمی و دوستانه
+✅ طول: حدود 300-350 کلمه (دقیق!)
+✅ لحن: حرفه‌ای، آموزنده، قابل اعتماد
+✅ فرمت: پاراگراف‌های کوتاه با فاصله خوانا
+✅ استفاده از ایموجی: 8-12 عدد به صورت استراتژیک در بخش‌های مختلف
+✅ جمله‌بندی: واضح، ساده، بدون کلیشه
+
+❌ اجتناب از:
+- ادعاهای غیرواقعی یا اغراق‌آمیز
+- جملات پیچیده و طولانی
+- کلیشه‌های تبلیغاتی مزخرف
+- لیست خسته‌کننده بدون توضیح
+
+🎯 هدف نهایی:
+محتوایی بنویس که:
+- اعتماد مشتری را جلب کند
+- تمام سوالات احتمالی را پاسخ دهد
+- نرخ تبدیل فروش را افزایش دهد
+- SEO-friendly باشد
+- مشتری را مطمئن کند که انتخاب درستی می‌کند
+
+فقط متن توضیحات فارسی رو بنویس، بدون هیچ توضیح یا متن اضافه. آماده برای قرار گرفتن مستقیم در صفحه محصول!`;
+
+    const result = await model.generateContent([
+      { text: prompt },
+      {
+        inlineData: {
+          data: imageBase64,
+          mimeType: 'image/jpeg'
+        }
+      }
+    ]);
+
+    const response = await result.response;
+    const description = response.text();
+
+    console.log('✅ Product description generated successfully');
+
+    // ذخیره توضیحات در دیتابیس (اگر supabase فعال باشد و imageId وجود داشته باشد)
+    if (supabase && imageId) {
+      try {
+        const { error: updateError } = await supabase
+          .from('generated_images')
+          .update({ product_description: description })
+          .eq('id', imageId);
+
+        if (updateError) {
+          console.error('خطا در ذخیره توضیحات در دیتابیس:', updateError);
+        } else {
+          console.log('✅ توضیحات در دیتابیس ذخیره شد');
+        }
+      } catch (dbError) {
+        console.error('خطا در ذخیره توضیحات:', dbError);
+      }
+    }
+
+    res.json({
+      success: true,
+      description: description,
+      imageId: imageId
+    });
+
+  } catch (error) {
+    console.error('❌ خطا در تولید توضیحات محصول:', error);
+    res.status(500).json({
+      error: 'خطا در تولید توضیحات محصول',
+      details: error.message
+    });
+  }
+});
+
 // تولید کپشن اینستاگرام برای تصویر
 app.post('/api/generate-caption', async (req, res) => {
   try {
-    const { imageUrl, imageId } = req.body;
+    const { imageUrl, imageId, productInfo } = req.body;
 
     if (!imageUrl) {
       return res.status(400).json({ error: 'URL تصویر الزامی است' });
     }
 
     console.log('📝 Generating Instagram caption for image:', imageUrl);
+    if (productInfo) {
+      console.log('📦 Product info:', productInfo);
+    }
 
     // دانلود تصویر و تبدیل به base64
     const imageBase64 = await imageUrlToBase64(imageUrl);
@@ -1197,9 +1773,27 @@ app.post('/api/generate-caption', async (req, res) => {
     // استفاده از Gemini برای تولید کپشن
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
+    // ساخت پرامپت با اطلاعات محصول
+    let productDetails = '';
+    if (productInfo) {
+      productDetails = `
+
+🛍️ اطلاعات محصول برای کپشن:
+- نام محصول: ${productInfo.name}
+- رنگ‌های موجود: ${productInfo.colors.join('، ')}
+- سایزهای موجود: ${productInfo.sizes.join('، ')}
+- قیمت اصلی: ${parseInt(productInfo.price).toLocaleString('fa-IR')} تومان
+${productInfo.discount ? `- تخفیف: ${productInfo.discount}% (قیمت نهایی: ${parseInt(productInfo.finalPrice).toLocaleString('fa-IR')} تومان)` : ''}
+${productInfo.category ? `- دسته‌بندی: ${productInfo.category}` : ''}
+${productInfo.description ? `- توضیحات: ${productInfo.description}` : ''}
+
+این اطلاعات رو حتماً در کپشن به صورت جذاب و فروش‌محور بگنجون. قیمت و تخفیف رو برجسته کن!`;
+    }
+
     const prompt = `شما یک متخصص بازاریابی اینستاگرامی هستید که کپشن‌های فوق‌العاده جذاب و فروش‌محور می‌نویسید.
 
 این تصویر مد را تحلیل کن و یک کپشن اینستاگرام فارسی فوق‌العاده جذاب و غیرقابل مقاومت بنویس که مشتری را فوراً به خرید ترغیب کند.
+${productDetails}
 
 الزامات مهم:
 
@@ -1209,10 +1803,13 @@ app.post('/api/generate-caption', async (req, res) => {
 4. داستان: تصویر زنده‌ای از اینکه با این لباس چقدر بهتر به نظر میاد و احساس میکنه
 5. فوریت: موجودی محدود، ترند روز، همه می‌خوانش
 6. منافع: تمرکز روی اعتماد به نفس، تعریف‌هایی که می‌شنوه، تحول ظاهری
-7. دعوت به اقدام: قوی و فوری (محدود، تخفیف ویژه، همین الان سفارش بده، دایرکت کن)
-8. ایموجی: 5-8 تا ایموجی مرتبط به صورت استراتژیک
-9. طول: 80-120 کلمه - کوتاه اما قدرتمند
-10. هشتگ: 10-15 هشتگ فارسی و انگلیسی پرطرفدار
+7. اطلاعات محصول: ${productInfo ? 'قیمت، تخفیف، رنگ‌ها و سایزها رو به صورت جذاب و فوری ذکر کن' : 'اگر اطلاعاتی در تصویر دیدی استفاده کن'}
+8. دعوت به اقدام: قوی و فوری (محدود، تخفیف ویژه، همین الان سفارش بده، دایرکت کن)
+9. ایموجی: 5-8 تا ایموجی مرتبط به صورت استراتژیک
+10. طول: ${productInfo ? '120-150 کلمه' : '80-120 کلمه'} - کوتاه اما قدرتمند
+11. هشتگ: 10-15 هشتگ فارسی و انگلیسی پرطرفدار
+
+${productInfo && productInfo.discount ? '⚡ تخفیف رو خیلی برجسته کن! این فرصت محدوده!' : ''}
 
 لحن: هیجان‌انگیز، پرانرژی، ترغیب‌کننده، ایجاد FOMO، مستقیم با مشتری صحبت کن
 
@@ -1272,396 +1869,11 @@ app.post('/api/generate-caption', async (req, res) => {
   }
 });
 
-// ============================================
-// ADMIN DASHBOARD ROUTES
-// ============================================
-
-// Admin authentication middleware
-const adminAuth = (req, res, next) => {
-  const adminEmail = req.headers['admin-email'];
-  const adminPassword = req.headers['admin-password'];
-
-  // Check admin credentials from environment variables
-  if (adminEmail === process.env.ADMIN_EMAIL && adminPassword === process.env.ADMIN_PASSWORD) {
-    next();
-  } else {
-    res.status(401).json({ error: 'Unauthorized: Invalid admin credentials' });
-  }
-};
-
-// Admin login route
-app.post('/api/admin/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Check credentials
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-      res.json({
-        success: true,
-        admin: {
-          email: email,
-          role: 'super_admin'
-        }
-      });
-    } else {
-      res.status(401).json({
-        success: false,
-        error: 'Invalid credentials'
-      });
-    }
-  } catch (error) {
-    console.error('Error in admin login:', error);
-    res.status(500).json({ error: 'Login failed' });
-  }
-});
-
-// Get admin dashboard statistics
-app.get('/api/admin/stats', adminAuth, async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    // Total users
-    const { count: totalUsers, error: usersError } = await supabase
-      .from('user_limits')
-      .select('*', { count: 'exact', head: true });
-
-    // Total images generated
-    const { count: totalImages, error: imagesError } = await supabase
-      .from('generated_images')
-      .select('*', { count: 'exact', head: true });
-
-    // Premium users
-    const { count: premiumUsers, error: premiumError } = await supabase
-      .from('user_limits')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_premium', true);
-
-    // Today's images
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const { count: todayImages, error: todayError } = await supabase
-      .from('generated_images')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', today.toISOString());
-
-    // Content library stats
-    const { count: totalModels, error: modelsError } = await supabase
-      .from('content_library')
-      .select('*', { count: 'exact', head: true })
-      .eq('content_type', 'model');
-
-    const { count: totalBackgrounds, error: backgroundsError } = await supabase
-      .from('content_library')
-      .select('*', { count: 'exact', head: true })
-      .eq('content_type', 'background');
-
-    res.json({
-      success: true,
-      stats: {
-        totalUsers: totalUsers || 0,
-        premiumUsers: premiumUsers || 0,
-        freeUsers: (totalUsers || 0) - (premiumUsers || 0),
-        totalImages: totalImages || 0,
-        todayImages: todayImages || 0,
-        totalModels: totalModels || 0,
-        totalBackgrounds: totalBackgrounds || 0
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching admin stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
-  }
-});
-
-// Get all users with limits
-app.get('/api/admin/users', adminAuth, async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    const { data, error } = await supabase
-      .from('user_limits')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    // Get email from auth.users for each user_id
-    const usersWithEmails = await Promise.all(
-      data.map(async (user) => {
-        const { data: authData } = await supabase.auth.admin.getUserById(user.user_id);
-        return {
-          ...user,
-          email: authData?.user?.email || 'Unknown'
-        };
-      })
-    );
-
-    res.json({
-      success: true,
-      users: usersWithEmails
-    });
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
-});
-
-// Update user premium status and limits
-app.put('/api/admin/users/:userId', adminAuth, async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    const { userId } = req.params;
-    const { is_premium, images_limit, captions_limit, descriptions_limit, notes } = req.body;
-
-    const updateData = {};
-    if (is_premium !== undefined) updateData.is_premium = is_premium;
-    if (images_limit !== undefined) updateData.images_limit = images_limit;
-    if (captions_limit !== undefined) updateData.captions_limit = captions_limit;
-    if (descriptions_limit !== undefined) updateData.descriptions_limit = descriptions_limit;
-    if (notes !== undefined) updateData.notes = notes;
-    updateData.updated_at = new Date().toISOString();
-
-    const { data, error } = await supabase
-      .from('user_limits')
-      .update(updateData)
-      .eq('user_id', userId)
-      .select();
-
-    if (error) throw error;
-
-    // Log activity
-    await supabase.from('admin_activity_logs').insert({
-      action_type: 'user_update',
-      target_type: 'user',
-      target_id: userId,
-      description: `Updated user limits and premium status`,
-      metadata: updateData
-    });
-
-    res.json({
-      success: true,
-      user: data[0]
-    });
-  } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ error: 'Failed to update user' });
-  }
-});
-
-// Get content library
-app.get('/api/admin/content', adminAuth, async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    const { content_type, tier } = req.query;
-
-    let query = supabase.from('content_library').select('*');
-
-    if (content_type) query = query.eq('content_type', content_type);
-    if (tier) query = query.eq('tier', tier);
-
-    query = query.order('created_at', { ascending: false });
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    res.json({
-      success: true,
-      content: data
-    });
-  } catch (error) {
-    console.error('Error fetching content:', error);
-    res.status(500).json({ error: 'Failed to fetch content' });
-  }
-});
-
-// Upload content (model or background)
-app.post('/api/admin/content/upload', adminAuth, upload.single('content'), async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    const { content_type, tier, category, name, description } = req.body;
-
-    // Upload to Supabase Storage
-    const fileName = `${content_type}-${tier}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
-    const { data: storageData, error: storageError } = await supabase.storage
-      .from('admin-content')
-      .upload(fileName, req.file.buffer, {
-        contentType: req.file.mimetype,
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (storageError) throw storageError;
-
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage
-      .from('admin-content')
-      .getPublicUrl(fileName);
-
-    // Insert into content_library
-    const { data, error } = await supabase
-      .from('content_library')
-      .insert({
-        content_type,
-        tier,
-        category,
-        name,
-        description,
-        image_url: publicUrlData.publicUrl,
-        storage_path: fileName,
-        is_active: true,
-        metadata: {
-          file_size: req.file.size,
-          mime_type: req.file.mimetype
-        }
-      })
-      .select();
-
-    if (error) throw error;
-
-    // Log activity
-    await supabase.from('admin_activity_logs').insert({
-      action_type: 'content_upload',
-      target_type: 'content',
-      target_id: data[0].id.toString(),
-      description: `Uploaded ${content_type}: ${name} (${tier})`,
-      metadata: { content_type, tier, category }
-    });
-
-    res.json({
-      success: true,
-      content: data[0]
-    });
-  } catch (error) {
-    console.error('Error uploading content:', error);
-    res.status(500).json({ error: 'Failed to upload content', details: error.message });
-  }
-});
-
-// Delete content
-app.delete('/api/admin/content/:contentId', adminAuth, async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    const { contentId } = req.params;
-
-    // Get content details first
-    const { data: content, error: fetchError } = await supabase
-      .from('content_library')
-      .select('*')
-      .eq('id', contentId)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    // Delete from storage
-    if (content.storage_path) {
-      await supabase.storage
-        .from('admin-content')
-        .remove([content.storage_path]);
-    }
-
-    // Delete from database
-    const { error: deleteError } = await supabase
-      .from('content_library')
-      .delete()
-      .eq('id', contentId);
-
-    if (deleteError) throw deleteError;
-
-    // Log activity
-    await supabase.from('admin_activity_logs').insert({
-      action_type: 'content_delete',
-      target_type: 'content',
-      target_id: contentId,
-      description: `Deleted ${content.content_type}: ${content.name}`,
-      metadata: { content }
-    });
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error deleting content:', error);
-    res.status(500).json({ error: 'Failed to delete content' });
-  }
-});
-
-// Get activity logs
-app.get('/api/admin/logs', adminAuth, async (req, res) => {
-  try {
-    if (!supabase) {
-      return res.status(503).json({ error: 'Database not configured' });
-    }
-
-    const { limit = 50 } = req.query;
-
-    const { data, error } = await supabase
-      .from('admin_activity_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(parseInt(limit));
-
-    if (error) throw error;
-
-    res.json({
-      success: true,
-      logs: data
-    });
-  } catch (error) {
-    console.error('Error fetching logs:', error);
-    res.status(500).json({ error: 'Failed to fetch logs' });
-  }
-});
-
-// Admin page routes
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
-});
-
-app.get('/admin/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
-});
-
-app.get('/admin/users', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin-users.html'));
-});
-
-app.get('/admin/content', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
-});
-
-app.get('/admin/analytics', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin-analytics.html'));
-});
-
-// ============================================
-// START SERVER
-// ============================================
-
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);
   console.log(`🔐 Supabase: ${supabase ? 'Connected' : 'Not configured'}`);
   console.log(`🤖 Gemini AI: ${process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key' ? 'Connected' : 'Not configured'}`);
-  console.log(`👨‍💼 Admin Dashboard: http://0.0.0.0:${PORT}/admin`);
 
   // بارگذاری مدل‌های ذخیره شده یا تولید مدل‌های جدید
   const modelsLoaded = loadSavedModels();
