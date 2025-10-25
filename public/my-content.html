@@ -703,20 +703,44 @@ Example for background: Modern office interior, large windows, natural lighting,
 
                 const data = await response.json();
 
+                console.log('✅ Generate response:', data);
+                console.log('📷 Image URL:', data.imageUrl);
+
                 if (data.success && data.imageUrl) {
                     generatedImageData = {
                         imageUrl: data.imageUrl,
                         prompt: prompt
                     };
 
-                    document.getElementById('generatedImage').src = data.imageUrl;
+                    // Show preview section first
                     document.getElementById('aiPreview').style.display = 'block';
+
+                    // Set image source and force reload
+                    const imgElement = document.getElementById('generatedImage');
+
+                    // Show loading state
+                    imgElement.style.opacity = '0.5';
+                    imgElement.alt = 'Loading image...';
+
+                    imgElement.onerror = function() {
+                        console.error('❌ Failed to load image:', data.imageUrl);
+                        imgElement.style.opacity = '1';
+                        imgElement.alt = 'Failed to load image';
+                        showAlert('Image generated but failed to load. URL: ' + data.imageUrl, 'warning');
+                    };
+                    imgElement.onload = function() {
+                        console.log('✅ Image loaded successfully!');
+                        imgElement.style.opacity = '1';
+                        imgElement.alt = 'Generated image';
+                    };
+                    imgElement.src = data.imageUrl + '?t=' + Date.now(); // Add timestamp to prevent caching
                     document.getElementById('saveContentType').value = contentType;
                     document.getElementById('saveName').value = prompt.substring(0, 50); // Auto-fill name
                     updateSaveCategoryOptions();
 
-                    showAlert('Image generated successfully!', 'success');
+                    showAlert('Image generated successfully! Check preview below.', 'success');
                 } else {
+                    console.error('❌ Generation failed:', data);
                     showAlert(data.error || 'Failed to generate image', 'error');
                 }
             } catch (error) {

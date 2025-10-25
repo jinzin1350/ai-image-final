@@ -1984,61 +1984,155 @@ app.post('/api/generate-image-only', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    console.log(`🎨 Searching image for ${contentType} with prompt: ${prompt}`);
+    console.log(`🎨 Generating ${contentType} with Gemini AI using prompt: ${prompt}`);
 
-    // Extract keywords from prompt for search
-    const keywords = prompt.split(' ').filter(word => word.length > 3).join(' ');
-    const searchQuery = contentType === 'model' ? `${keywords} person model portrait` : `${keywords} background`;
+    // Map aspect ratio to dimensions
+    const aspectRatioMap = {
+      '1:1': { width: 1024, height: 1024, description: '1:1 Square' },
+      '3:4': { width: 768, height: 1024, description: '3:4 Portrait' },
+      '4:3': { width: 1024, height: 768, description: '4:3 Landscape' },
+      '16:9': { width: 1024, height: 576, description: '16:9 Wide' }
+    };
 
-    // Use Unsplash to find a relevant image (free, no API key needed for basic usage)
-    const unsplashUrl = `https://source.unsplash.com/800x1000/?${encodeURIComponent(searchQuery)}`;
+    const selectedAspectRatio = aspectRatioMap[aspectRatio] || aspectRatioMap['3:4'];
 
-    console.log(`🔍 Searching Unsplash with query: ${searchQuery}`);
+    // Build enhanced prompt based on content type
+    let enhancedPrompt = '';
 
-    // For better quality, use the Unsplash API if available
-    try {
-      // Try to fetch random image from Unsplash API
-      const unsplashApiUrl = `https://api.unsplash.com/photos/random?query=${encodeURIComponent(searchQuery)}&orientation=${aspectRatio === '16:9' || aspectRatio === '4:3' ? 'landscape' : 'portrait'}`;
+    if (contentType === 'model') {
+      enhancedPrompt = `Generate a high-quality, professional fashion model photograph based on this description: ${prompt}
 
-      const unsplashResponse = await axios.get(unsplashApiUrl, {
-        headers: {
-          'Authorization': 'Client-ID YOUR_UNSPLASH_ACCESS_KEY' // Optional: add your Unsplash API key
-        },
-        timeout: 5000
-      }).catch(() => null);
+CRITICAL REQUIREMENTS:
+- Create a photorealistic portrait of a fashion model
+- Professional studio or fashion photography quality
+- Natural lighting with proper skin tones
+- Sharp focus on the subject
+- Model should be well-posed and professionally styled
+- Magazine-quality composition
+- No text, watermarks, or artificial elements
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
 
-      if (unsplashResponse && unsplashResponse.data && unsplashResponse.data.urls) {
-        const imageUrl = unsplashResponse.data.urls.regular;
-        console.log(`✅ Found image from Unsplash API: ${imageUrl}`);
+QUALITY PARAMETERS:
+- Professional color grading
+- Proper depth of field
+- Natural skin texture and rendering
+- Proper lighting setup with dimensional depth
+- Clean, uncluttered composition
+- Suitable for fashion e-commerce and editorial use
 
-        return res.json({
-          success: true,
-          imageUrl: imageUrl,
-          prompt: prompt,
-          source: 'unsplash-api'
-        });
-      }
-    } catch (apiError) {
-      console.log('ℹ️ Unsplash API not available, using direct URL method');
+The final image should look like a professional fashion photography shoot.`;
+    } else {
+      enhancedPrompt = `Generate a high-quality background scene based on this description: ${prompt}
+
+CRITICAL REQUIREMENTS:
+- Create a photorealistic environment/background
+- Professional photography quality
+- Proper lighting and atmosphere
+- Sharp details and clarity
+- Suitable for fashion photography backdrop
+- Magazine-quality composition
+- No people in the image
+- No text, watermarks, or artificial elements
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+
+QUALITY PARAMETERS:
+- Professional color grading
+- Proper depth of field
+- Natural environmental lighting
+- Atmospheric perspective
+- Clean, well-composed scene
+- Suitable for fashion e-commerce and editorial backgrounds
+
+The final image should look like a professional photography backdrop.`;
     }
 
-    // Fallback: Use direct Unsplash URL (works without API key)
-    const directImageUrl = `https://source.unsplash.com/800x1000/?${encodeURIComponent(searchQuery)}&sig=${Date.now()}`;
+    console.log('📝 Enhanced Prompt:', enhancedPrompt);
 
-    console.log(`✅ Using Unsplash direct URL: ${directImageUrl}`);
+    // Use Gemini 2.5 Flash Image for generation
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash-image",
+      generationConfig: {
+        responseModalities: ["Image"] // Enable image generation
+      }
+    });
+
+    // Generate content with text-only prompt
+    const result = await model.generateContent([{ text: enhancedPrompt }]);
+
+    const response = await result.response;
+
+    console.log('📦 Response structure:', JSON.stringify({
+      candidates: response.candidates?.length,
+      hasParts: !!response.candidates?.[0]?.content?.parts
+    }));
+
+    // Extract generated image from response
+    let generatedImageBase64 = null;
+    let generatedText = '';
+
+    if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+      console.error('❌ Invalid response structure:', JSON.stringify(response, null, 2));
+      throw new Error('Invalid response from Gemini API');
+    }
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        // This is the generated image
+        generatedImageBase64 = part.inlineData.data;
+        console.log('✅ Image generated successfully!');
+      } else if (part.text) {
+        generatedText += part.text;
+      }
+    }
+
+    if (!generatedImageBase64) {
+      console.error('❌ No image in response. Parts:', JSON.stringify(response.candidates[0].content.parts, null, 2));
+      throw new Error('No image was generated by Gemini. Response only contains text.');
+    }
+
+    // Convert base64 to buffer
+    const imageBuffer = Buffer.from(generatedImageBase64, 'base64');
+    const fileName = `ai-generated-${contentType}-${Date.now()}.png`;
+
+    // Upload generated image to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('admin-content')
+      .upload(fileName, imageBuffer, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Error uploading generated image:', uploadError);
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    const generatedImageUrl = urlData.publicUrl;
+
+    console.log('✅ AI image generated and uploaded successfully!');
 
     res.json({
       success: true,
-      imageUrl: directImageUrl,
+      imageUrl: generatedImageUrl,
       prompt: prompt,
-      source: 'unsplash-direct',
-      note: 'Using stock images from Unsplash. For custom AI-generated images, integrate Imagen, DALL-E, or Stable Diffusion.'
+      contentType: contentType,
+      aspectRatio: aspectRatio,
+      source: 'gemini-2.5-flash',
+      description: generatedText,
+      message: 'Image successfully generated with AI!'
     });
 
   } catch (error) {
-    console.error('❌ Error generating image:', error);
+    console.error('❌ Error generating AI image:', error);
     res.status(500).json({
-      error: 'Failed to generate image',
+      error: 'Failed to generate AI image',
       details: error.message
     });
   }
