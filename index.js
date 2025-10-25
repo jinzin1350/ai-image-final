@@ -210,18 +210,26 @@ app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
 app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
   try {
     if (!supabase) {
+      console.warn('⚠️ Supabase not configured - returning empty user list');
       return res.json({ success: true, users: [] });
     }
+
+    console.log('📋 Fetching all users from Supabase auth...');
 
     // Fetch ALL users from auth.users using admin API
     const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
 
     if (authError) {
-      console.error('Error fetching auth users:', authError);
-      throw authError;
+      console.error('❌ Error fetching auth users:', authError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch users from authentication system',
+        details: authError.message
+      });
     }
 
     const allUsers = authData?.users || [];
+    console.log(`✅ Found ${allUsers.length} auth users`);
 
     // Fetch all user_limits data
     const { data: limitsData, error: limitsError } = await supabase
@@ -234,6 +242,9 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       limitsData.forEach(limit => {
         userLimitsMap[limit.user_id] = limit;
       });
+      console.log(`✅ Found ${limitsData.length} user limit records`);
+    } else if (limitsError) {
+      console.warn('⚠️ Could not fetch user_limits (table might not exist):', limitsError.message);
     }
 
     // Combine auth users with their limits (or default values)
@@ -252,11 +263,15 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       };
     });
 
-    console.log(`✅ Found ${usersWithLimits.length} users in database`);
+    console.log(`✅ Returning ${usersWithLimits.length} users to admin panel`);
     res.json({ success: true, users: usersWithLimits });
   } catch (error) {
-    console.error('Error getting users:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('❌ Error in /api/admin/users:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load users',
+      details: error.message
+    });
   }
 });
 
