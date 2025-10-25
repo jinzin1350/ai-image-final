@@ -336,6 +336,92 @@
             </form>
         </div>
 
+        <!-- AI Image Generator Section -->
+        <div class="upload-section">
+            <h2>🤖 Generate with AI (تولید با هوش مصنوعی)</h2>
+            <p style="color: #666; margin-bottom: 20px;">Generate models or backgrounds using AI and add them to your library</p>
+
+            <div style="display: grid; gap: 20px;">
+                <div class="form-group">
+                    <label>Prompt (توضیحات) *</label>
+                    <textarea id="aiPrompt" rows="4" placeholder="Describe the model or background you want to generate...
+Example for model: A professional female model, business casual attire, 25-30 years old, standing pose, neutral expression
+Example for background: Modern office interior, large windows, natural lighting, minimalist design" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-family: 'Poppins', sans-serif;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Content Type *</label>
+                        <select id="aiContentType" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;">
+                            <option value="model">Model (مدل)</option>
+                            <option value="background">Background (پس‌زمینه)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Aspect Ratio</label>
+                        <select id="aiAspectRatio" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;">
+                            <option value="1:1">Square (1:1)</option>
+                            <option value="3:4" selected>Portrait (3:4)</option>
+                            <option value="4:3">Landscape (4:3)</option>
+                            <option value="16:9">Wide (16:9)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="generateAIImage()" class="btn btn-primary" id="generateBtn">
+                    ✨ Generate Image
+                </button>
+
+                <!-- Generated Image Preview -->
+                <div id="aiPreview" style="display: none; margin-top: 20px;">
+                    <div style="background: #f8f9ff; padding: 20px; border-radius: 15px; border: 2px solid #667eea;">
+                        <h3 style="margin-bottom: 15px; color: #667eea;">Generated Image Preview</h3>
+                        <img id="generatedImage" src="" alt="Generated" style="width: 100%; max-width: 500px; border-radius: 10px; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div class="form-group">
+                                <label>Save as Type *</label>
+                                <select id="saveContentType" onchange="updateSaveCategoryOptions()" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;">
+                                    <option value="model">Model (مدل)</option>
+                                    <option value="background">Background (پس‌زمینه)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Category (دسته‌بندی) *</label>
+                                <select id="saveCategory" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;">
+                                    <!-- Will be populated by JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" id="saveName" placeholder="Give your content a name" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Visibility *</label>
+                            <select id="saveVisibility" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;">
+                                <option value="private">Private (Only You)</option>
+                                <option value="public">Public (Everyone)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button onclick="saveGeneratedContent()" class="btn btn-primary" id="saveBtn">
+                                💾 Save to My Content
+                            </button>
+                            <button onclick="discardGenerated()" class="btn" style="background: #e0e0e0; color: #333;">
+                                ❌ Discard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="upload-section">
             <h2>My Uploaded Content</h2>
             <div id="contentList" class="content-grid">
@@ -574,6 +660,142 @@
                 submitBtn.textContent = 'Upload Content';
             }
         });
+
+        // AI Image Generation Functions
+        let generatedImageData = null;
+
+        function updateSaveCategoryOptions() {
+            const contentType = document.getElementById('saveContentType').value;
+            const categorySelect = document.getElementById('saveCategory');
+            const categories = contentType === 'model' ? modelCategories : backgroundCategories;
+
+            categorySelect.innerHTML = categories.map(cat =>
+                `<option value="${cat.value}">${cat.label}</option>`
+            ).join('');
+        }
+
+        async function generateAIImage() {
+            const prompt = document.getElementById('aiPrompt').value.trim();
+            if (!prompt) {
+                showAlert('Please enter a prompt', 'error');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+
+            try {
+                const aspectRatio = document.getElementById('aiAspectRatio').value;
+                const contentType = document.getElementById('aiContentType').value;
+
+                const response = await fetch('/api/generate-image-only', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        aspectRatio: aspectRatio,
+                        contentType: contentType
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.imageUrl) {
+                    generatedImageData = {
+                        imageUrl: data.imageUrl,
+                        prompt: prompt
+                    };
+
+                    document.getElementById('generatedImage').src = data.imageUrl;
+                    document.getElementById('aiPreview').style.display = 'block';
+                    document.getElementById('saveContentType').value = contentType;
+                    document.getElementById('saveName').value = prompt.substring(0, 50); // Auto-fill name
+                    updateSaveCategoryOptions();
+
+                    showAlert('Image generated successfully!', 'success');
+                } else {
+                    showAlert(data.error || 'Failed to generate image', 'error');
+                }
+            } catch (error) {
+                console.error('Generation error:', error);
+                showAlert('Failed to generate image: ' + error.message, 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Generate Image';
+            }
+        }
+
+        async function saveGeneratedContent() {
+            if (!generatedImageData) {
+                showAlert('No generated image to save', 'error');
+                return;
+            }
+
+            const name = document.getElementById('saveName').value.trim();
+            if (!name) {
+                showAlert('Please enter a name', 'error');
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                const token = await getAuthToken();
+                if (!token) {
+                    showAlert('Please sign in first', 'error');
+                    return;
+                }
+
+                // Download the image as blob
+                const imageResponse = await fetch(generatedImageData.imageUrl);
+                const imageBlob = await imageResponse.blob();
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('content', imageBlob, 'generated-image.jpg');
+                formData.append('content_type', document.getElementById('saveContentType').value);
+                formData.append('visibility', document.getElementById('saveVisibility').value);
+                formData.append('category', document.getElementById('saveCategory').value);
+                formData.append('name', name);
+                formData.append('description', `AI Generated: ${generatedImageData.prompt}`);
+
+                const response = await fetch('/api/user/content/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Content saved successfully!', 'success');
+                    discardGenerated();
+                    loadUserContent();
+                } else {
+                    showAlert(data.error || 'Failed to save content', 'error');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showAlert('Failed to save content: ' + error.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Save to My Content';
+            }
+        }
+
+        function discardGenerated() {
+            generatedImageData = null;
+            document.getElementById('aiPreview').style.display = 'none';
+            document.getElementById('aiPrompt').value = '';
+            document.getElementById('generatedImage').src = '';
+        }
 
         // Load content on page load
         loadUserContent();

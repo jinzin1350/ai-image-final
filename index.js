@@ -1975,6 +1975,70 @@ ${productDetails}
   }
 });
 
+// Generate AI image only (for custom content creation)
+app.post('/api/generate-image-only', async (req, res) => {
+  try {
+    const { prompt, aspectRatio, contentType } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'Gemini API not configured' });
+    }
+
+    console.log(`🎨 Generating ${contentType} image with prompt: ${prompt}`);
+
+    // Enhance prompt based on content type
+    let enhancedPrompt = prompt;
+    if (contentType === 'model') {
+      enhancedPrompt = `Professional high-quality photo of: ${prompt}. Studio lighting, clean background, photorealistic, sharp focus, professional photography.`;
+    } else if (contentType === 'background') {
+      enhancedPrompt = `High-quality professional photograph of: ${prompt}. Clean, well-lit, high resolution, suitable as a background, no people.`;
+    }
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const result = await model.generateContent([{
+      inlineData: {
+        mimeType: 'text/plain',
+        data: Buffer.from(enhancedPrompt).toString('base64')
+      }
+    }]);
+
+    // Note: Gemini 1.5 Flash can generate images via Imagen
+    // But we'll use a simplified approach here - just return the prompt
+    // In production, you'd integrate with Imagen or another image generation API
+
+    // For now, we'll use a placeholder or you can integrate with:
+    // - Google Imagen
+    // - DALL-E
+    // - Stable Diffusion
+    // - Midjourney API
+
+    // Temporary: Return error asking for proper API
+    return res.status(501).json({
+      error: 'Image generation API not yet integrated. Please integrate Imagen, DALL-E, or Stable Diffusion API.',
+      enhancedPrompt: enhancedPrompt
+    });
+
+    // Example response when integrated:
+    // res.json({
+    //   success: true,
+    //   imageUrl: generatedImageUrl,
+    //   prompt: prompt
+    // });
+
+  } catch (error) {
+    console.error('❌ Error generating image:', error);
+    res.status(500).json({
+      error: 'Failed to generate image',
+      details: error.message
+    });
+  }
+});
+
 // تولید کپشن اینستاگرام برای تصویر
 app.post('/api/generate-caption', async (req, res) => {
   try {
