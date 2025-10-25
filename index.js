@@ -1322,6 +1322,7 @@ app.get('/api/models', async (req, res) => {
             .order('created_at', { ascending: false });
 
           if (customModels && customModels.length > 0) {
+            console.log(`✅ Found ${customModels.length} custom models for user ${user.id}`);
             // Transform database models to match frontend format
             const transformedModels = customModels.map(model => ({
               id: `custom-${model.id}`,
@@ -1333,7 +1334,10 @@ app.get('/api/models', async (req, res) => {
               isCustom: true
             }));
 
+            console.log('📋 Custom model categories:', transformedModels.map(m => m.category).join(', '));
             allModels = [...transformedModels, ...allModels];
+          } else {
+            console.log(`ℹ️ No custom models found for user ${user.id}`);
           }
         }
       } catch (authError) {
