@@ -288,9 +288,9 @@
             <form id="uploadForm">
                 <div class="form-group">
                     <label>Content Type *</label>
-                    <select id="contentType" required>
-                        <option value="model">Model</option>
-                        <option value="background">Background</option>
+                    <select id="contentType" required onchange="updateCategoryOptions()">
+                        <option value="model">Model (مدل)</option>
+                        <option value="background">Background (پس‌زمینه)</option>
                     </select>
                 </div>
 
@@ -303,8 +303,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" id="category" placeholder="e.g., woman, man, indoor, outdoor">
+                    <label>Category (دسته‌بندی) *</label>
+                    <select id="category" required>
+                        <!-- Will be populated by JavaScript based on content type -->
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -357,6 +359,49 @@
         const supabaseClient = SUPABASE_URL && SUPABASE_ANON_KEY
             ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
             : null;
+
+        // Category options based on content type
+        const modelCategories = [
+            { value: 'woman', label: 'زن (Woman)' },
+            { value: 'man', label: 'مرد (Man)' },
+            { value: 'child', label: 'کودک (Child)' },
+            { value: 'boy', label: 'پسر (Boy)' },
+            { value: 'girl', label: 'دختر (Girl)' },
+            { value: 'couple', label: 'زوج (Couple)' },
+            { value: 'group', label: 'گروه (Group)' },
+            { value: 'elderly', label: 'سالمند (Elderly)' },
+            { value: 'teen', label: 'نوجوان (Teen)' },
+            { value: 'plus-size', label: 'سایز بزرگ (Plus Size)' }
+        ];
+
+        const backgroundCategories = [
+            { value: 'indoor', label: 'داخلی (Indoor)' },
+            { value: 'outdoor', label: 'خارجی (Outdoor)' },
+            { value: 'urban', label: 'شهری (Urban)' },
+            { value: 'nature', label: 'طبیعت (Nature)' },
+            { value: 'studio', label: 'استودیو (Studio)' },
+            { value: 'street', label: 'خیابان (Street)' },
+            { value: 'cafe', label: 'کافه (Cafe)' },
+            { value: 'office', label: 'اداری (Office)' },
+            { value: 'home', label: 'خانه (Home)' },
+            { value: 'beach', label: 'ساحل (Beach)' },
+            { value: 'park', label: 'پارک (Park)' },
+            { value: 'abstract', label: 'انتزاعی (Abstract)' }
+        ];
+
+        // Function to update category dropdown based on content type
+        function updateCategoryOptions() {
+            const contentType = document.getElementById('contentType').value;
+            const categorySelect = document.getElementById('category');
+            const categories = contentType === 'model' ? modelCategories : backgroundCategories;
+
+            categorySelect.innerHTML = categories.map(cat =>
+                `<option value="${cat.value}">${cat.label}</option>`
+            ).join('');
+        }
+
+        // Initialize categories on page load
+        updateCategoryOptions();
 
         // File input handling
         document.getElementById('contentFile').addEventListener('change', function(e) {
@@ -434,6 +479,7 @@
                             <div class="content-card-meta">
                                 <span class="badge badge-${item.visibility}">${item.visibility}</span>
                                 ${item.content_type}
+                                ${item.category ? ` • ${item.category}` : ''}
                             </div>
                             <button class="btn-delete" onclick="deleteContent(${item.id})">
                                 🗑️ Delete
