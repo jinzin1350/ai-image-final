@@ -664,22 +664,22 @@
             }
 
             try {
-                // Download image as blob
-                const imageResponse = await fetch(generatedImageData.imageUrl);
-                const imageBlob = await imageResponse.blob();
-
-                const formData = new FormData();
-                formData.append('content', imageBlob, 'generated-image.png');
-                formData.append('content_type', document.getElementById('saveContentType').value);
-                formData.append('visibility', document.getElementById('saveVisibility').value);
-                formData.append('category', document.getElementById('saveCategory').value);
-                formData.append('name', document.getElementById('saveName').value || 'AI Generated');
-                formData.append('description', `AI Generated: ${generatedImageData.prompt}`);
-                formData.append('user_id', selectedUserId);
-
-                const response = await fetchWithAuth('/api/admin/user-content/upload', {
+                // Send metadata to backend - let backend handle the image URL
+                const response = await fetchWithAuth('/api/admin/save-generated-to-user', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        imageUrl: generatedImageData.imageUrl,
+                        user_id: selectedUserId,
+                        content_type: document.getElementById('saveContentType').value,
+                        visibility: document.getElementById('saveVisibility').value,
+                        category: document.getElementById('saveCategory').value,
+                        name: document.getElementById('saveName').value || 'AI Generated',
+                        description: `AI Generated: ${generatedImageData.prompt}`,
+                        prompt: generatedImageData.prompt
+                    })
                 });
 
                 const data = await response.json();
@@ -693,7 +693,7 @@
                 }
             } catch (error) {
                 console.error('Save error:', error);
-                showAlert('Failed to save generated content', 'error');
+                showAlert('Failed to save generated content: ' + error.message, 'error');
             }
         }
 

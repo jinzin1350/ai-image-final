@@ -759,6 +759,47 @@ app.delete('/api/admin/user-content/:contentId', authenticateAdmin, async (req, 
   }
 });
 
+// Save generated image to user content (admin only)
+app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res) => {
+  try {
+    const { imageUrl, user_id, content_type, visibility, category, name, description } = req.body;
+
+    if (!user_id || !imageUrl) {
+      return res.status(400).json({ success: false, error: 'User ID and image URL are required' });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    // Simply save the existing imageUrl to database with user ownership
+    // No need to re-upload - image is already in admin-content bucket
+    const { data: contentData, error: dbError } = await supabase
+      .from('content_library')
+      .insert([{
+        content_type,
+        tier: 'premium',
+        visibility: visibility || 'private',
+        category,
+        name,
+        description,
+        image_url: imageUrl,
+        storage_path: imageUrl.split('/').pop(), // Extract filename from URL
+        owner_user_id: user_id,
+        is_active: true
+      }])
+      .select();
+
+    if (dbError) throw dbError;
+
+    console.log(`✅ Admin saved generated image to user ${user_id}: ${name}`);
+    res.json({ success: true, content: contentData[0] });
+  } catch (error) {
+    console.error('Error saving generated content to user:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get activity logs
 app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
   try {
