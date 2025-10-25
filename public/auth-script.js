@@ -176,16 +176,24 @@ async function checkAuth() {
         console.log('Supabase not initialized yet');
         return;
     }
-    
+
     const session = localStorage.getItem('supabase_session');
-    if (session) {
+    const token = localStorage.getItem('supabase_token');
+
+    console.log('🔍 Auth page check:', {
+        hasSession: !!session,
+        hasToken: !!token
+    });
+
+    if (session && token) {
         try {
             const { data, error } = await supabaseClient.auth.getSession();
             if (data.session) {
-                window.location.href = '/app';
+                console.log('✅ User already logged in, redirecting to app');
+                window.location.replace('/app');
             }
         } catch (error) {
-            console.log('Session expired');
+            console.log('❌ Session expired or invalid');
             localStorage.removeItem('supabase_session');
             localStorage.removeItem('supabase_token');
         }

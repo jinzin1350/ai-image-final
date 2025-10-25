@@ -1,9 +1,20 @@
 // Check authentication on page load
 (function checkAuth() {
     const token = localStorage.getItem('supabase_token');
-    if (!token) {
-        console.log('⚠️ No auth token found - redirecting to login');
-        window.location.href = '/auth';
+    const session = localStorage.getItem('supabase_session');
+
+    console.log('🔍 Auth check:', {
+        hasToken: !!token,
+        hasSession: !!session,
+        currentPath: window.location.pathname
+    });
+
+    if (!token || !session) {
+        console.log('⚠️ No auth credentials found - redirecting to login');
+        // Clear any partial data
+        localStorage.removeItem('supabase_token');
+        localStorage.removeItem('supabase_session');
+        window.location.replace('/auth');
         return;
     }
     console.log('✅ User is authenticated');
