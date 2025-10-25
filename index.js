@@ -441,6 +441,183 @@ app.delete('/api/admin/content/:contentId', authenticateAdmin, async (req, res) 
   }
 });
 
+// ========================================
+// USER CONTENT ENDPOINTS (for premium users)
+// ========================================
+
+// Get user's own content (models & backgrounds)
+app.get('/api/user/content', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ success: false, error: 'Invalid token' });
+    }
+
+    // Get user's own content + public content
+    const { data, error } = await supabase
+      .from('content_library')
+      .select('*')
+      .or(`visibility.eq.public,owner_user_id.eq.${user.id}`)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, content: data || [] });
+  } catch (error) {
+    console.error('Error fetching user content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Upload user content (premium users only)
+app.post('/api/user/content/upload', upload.single('content'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ success: false, error: 'Invalid token' });
+    }
+
+    // Check if user is premium
+    const { data: userLimits } = await supabase
+      .from('user_limits')
+      .select('is_premium')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!userLimits || !userLimits.is_premium) {
+      return res.status(403).json({
+        success: false,
+        error: 'Premium subscription required to upload custom content'
+      });
+    }
+
+    const { content_type, visibility, category, name, description } = req.body;
+    const fileName = `user-${user.id}-${Date.now()}-${req.file.originalname}`;
+
+    console.log(`📤 Uploading user content: ${fileName} for user ${user.email}`);
+
+    // Upload to Supabase Storage (admin-content bucket)
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('admin-content')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    // Save to database with user ownership
+    const { data: contentData, error: dbError } = await supabase
+      .from('content_library')
+      .insert([{
+        content_type,
+        tier: 'premium', // User-uploaded content is always premium
+        visibility: visibility || 'private', // Default to private
+        category,
+        name,
+        description,
+        image_url: urlData.publicUrl,
+        storage_path: fileName,
+        owner_user_id: user.id
+      }])
+      .select();
+
+    if (dbError) throw dbError;
+
+    console.log(`✅ User content uploaded successfully: ${contentData[0].id}`);
+    res.json({ success: true, content: contentData[0] });
+  } catch (error) {
+    console.error('Error uploading user content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete user's own content
+app.delete('/api/user/content/:contentId', async (req, res) => {
+  try {
+    const { contentId } = req.params;
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ success: false, error: 'Invalid token' });
+    }
+
+    // Get content info first and verify ownership
+    const { data: content, error: fetchError } = await supabase
+      .from('content_library')
+      .select('storage_path, owner_user_id')
+      .eq('id', contentId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    if (content.owner_user_id !== user.id) {
+      return res.status(403).json({ success: false, error: 'Not authorized to delete this content' });
+    }
+
+    // Delete from storage
+    if (content.storage_path) {
+      await supabase.storage
+        .from('admin-content')
+        .remove([content.storage_path]);
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('content_library')
+      .delete()
+      .eq('id', contentId)
+      .eq('owner_user_id', user.id); // Double-check ownership
+
+    if (deleteError) throw deleteError;
+
+    console.log(`🗑️ User content deleted: ${contentId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting user content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get activity logs
 app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
   try {
