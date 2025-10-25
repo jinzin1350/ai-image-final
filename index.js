@@ -1300,13 +1300,101 @@ app.post('/api/auth/signout', authenticateUser, async (req, res) => {
 });
 
 // دریافت لیست مدل‌ها
-app.get('/api/models', (req, res) => {
-  res.json(models);
+app.get('/api/models', async (req, res) => {
+  try {
+    let allModels = [...models]; // Start with hardcoded models
+
+    // If user is authenticated and Supabase is configured, add their custom models
+    const authHeader = req.headers.authorization;
+    if (authHeader && supabase) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user } } = await supabase.auth.getUser(token);
+
+        if (user) {
+          // Fetch user's custom models (private + public models from content_library)
+          const { data: customModels } = await supabase
+            .from('content_library')
+            .select('*')
+            .eq('content_type', 'model')
+            .eq('is_active', true)
+            .or(`visibility.eq.public,owner_user_id.eq.${user.id}`)
+            .order('created_at', { ascending: false });
+
+          if (customModels && customModels.length > 0) {
+            // Transform database models to match frontend format
+            const transformedModels = customModels.map(model => ({
+              id: `custom-${model.id}`,
+              name: model.name,
+              category: model.category,
+              categoryName: model.category,
+              description: model.description || model.name,
+              image: model.image_url,
+              isCustom: true
+            }));
+
+            allModels = [...transformedModels, ...allModels];
+          }
+        }
+      } catch (authError) {
+        console.log('Auth check failed, returning default models only');
+      }
+    }
+
+    res.json(allModels);
+  } catch (error) {
+    console.error('Error fetching models:', error);
+    res.json(models); // Fallback to default models
+  }
 });
 
 // دریافت لیست پس‌زمینه‌ها
-app.get('/api/backgrounds', (req, res) => {
-  res.json(backgrounds);
+app.get('/api/backgrounds', async (req, res) => {
+  try {
+    let allBackgrounds = [...backgrounds]; // Start with hardcoded backgrounds
+
+    // If user is authenticated and Supabase is configured, add their custom backgrounds
+    const authHeader = req.headers.authorization;
+    if (authHeader && supabase) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user } } = await supabase.auth.getUser(token);
+
+        if (user) {
+          // Fetch user's custom backgrounds
+          const { data: customBackgrounds } = await supabase
+            .from('content_library')
+            .select('*')
+            .eq('content_type', 'background')
+            .eq('is_active', true)
+            .or(`visibility.eq.public,owner_user_id.eq.${user.id}`)
+            .order('created_at', { ascending: false });
+
+          if (customBackgrounds && customBackgrounds.length > 0) {
+            // Transform database backgrounds to match frontend format
+            const transformedBackgrounds = customBackgrounds.map(bg => ({
+              id: `custom-${bg.id}`,
+              name: bg.name,
+              category: bg.category,
+              categoryName: bg.category,
+              description: bg.description || bg.name,
+              image: bg.image_url,
+              isCustom: true
+            }));
+
+            allBackgrounds = [...transformedBackgrounds, ...allBackgrounds];
+          }
+        }
+      } catch (authError) {
+        console.log('Auth check failed, returning default backgrounds only');
+      }
+    }
+
+    res.json(allBackgrounds);
+  } catch (error) {
+    console.error('Error fetching backgrounds:', error);
+    res.json(backgrounds); // Fallback to default backgrounds
+  }
 });
 
 // دریافت لیست حالت‌های بدن

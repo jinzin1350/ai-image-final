@@ -62,7 +62,14 @@ const motionSelect = document.getElementById('motionSelect');
 // بارگذاری مدل‌ها
 async function loadModels() {
     try {
-        const response = await fetch('/api/models');
+        // Get auth token from localStorage if user is logged in
+        const token = localStorage.getItem('supabase_token');
+        const headers = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch('/api/models', { headers });
         allModels = await response.json();
 
         // نمایش مدل‌های دسته‌بندی فعلی
@@ -102,7 +109,14 @@ categorySelect.addEventListener('change', (e) => {
 // بارگذاری پس‌زمینه‌ها
 async function loadBackgrounds() {
     try {
-        const response = await fetch('/api/backgrounds');
+        // Get auth token from localStorage if user is logged in
+        const token = localStorage.getItem('supabase_token');
+        const headers = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch('/api/backgrounds', { headers });
         const backgrounds = await response.json();
 
         backgroundsGrid.innerHTML = backgrounds.map(bg => `
