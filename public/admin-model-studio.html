@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Model Generation Studio | Admin</title>
+    <title>استودیو تولید مدل | مدیریت</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/admin-style.css">
     <style>
@@ -122,12 +122,12 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <a href="/admin/dashboard" class="nav-item"><span>Dashboard</span></a>
-            <a href="/admin/users" class="nav-item"><span>Users</span></a>
-            <a href="/admin/content" class="nav-item"><span>Content</span></a>
-            <a href="/admin/user-content" class="nav-item"><span>User Content</span></a>
-            <a href="/admin/model-studio" class="nav-item active"><span>Model Studio</span></a>
-            <a href="/admin/analytics" class="nav-item"><span>Analytics</span></a>
+            <a href="/admin/dashboard" class="nav-item"><span>داشبورد</span></a>
+            <a href="/admin/users" class="nav-item"><span>کاربران</span></a>
+            <a href="/admin/content" class="nav-item"><span>محتوا</span></a>
+            <a href="/admin/user-content" class="nav-item"><span>محتوای کاربران</span></a>
+            <a href="/admin/model-studio" class="nav-item active"><span>استودیو مدل</span></a>
+            <a href="/admin/analytics" class="nav-item"><span>آمار</span></a>
         </nav>
         <div class="sidebar-footer">
             <button class="btn-logout" onclick="handleLogout()"><span>Logout</span></button>
@@ -137,17 +137,17 @@
     <main class="main-content">
         <header class="page-header">
             <div>
-                <h1>🎨 Professional Model Generation Studio</h1>
-                <p>Create custom fashion models with detailed appearance controls</p>
+                <h1>🎨 استودیو حرفه‌ای تولید مدل</h1>
+                <p>ساخت مدل‌های سفارشی با کنترل‌های دقیق ظاهری</p>
             </div>
         </header>
 
         <div class="studio-container">
             <!-- User Selection -->
             <div class="content-section">
-                <h2>Select User</h2>
+                <h2>انتخاب کاربر</h2>
                 <select id="selectedUser" onchange="handleUserSelect()" class="form-control" style="font-size: 15px; padding: 12px;">
-                    <option value="">-- Select a user to create model for --</option>
+                    <option value="">-- کاربر را برای ساخت مدل انتخاب کنید --</option>
                 </select>
             </div>
 
@@ -157,36 +157,36 @@
 
                     <!-- Basic Info -->
                     <details open class="studio-section" style="background: #f0f9ff;">
-                        <summary style="color: #0369a1;">📋 Basic Information</summary>
+                        <summary style="color: #0369a1;">📋 اطلاعات پایه</summary>
                         <div class="param-grid">
                             <div class="form-group">
-                                <label>Gender</label>
+                                <label>جنسیت</label>
                                 <select id="modelGender">
-                                    <option value="female">Female</option>
-                                    <option value="male">Male</option>
-                                    <option value="non-binary">Non-Binary</option>
+                                    <option value="female">زن</option>
+                                    <option value="male">مرد</option>
+                                    <option value="non-binary">غیر دوجنسیتی</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Age Range</label>
+                                <label>محدوده سنی</label>
                                 <select id="modelAge">
-                                    <option value="child">Child (5-12)</option>
-                                    <option value="teen">Teen (13-17)</option>
-                                    <option value="young-adult" selected>Young Adult (18-25)</option>
-                                    <option value="adult">Adult (26-40)</option>
-                                    <option value="middle-aged">Middle Aged (41-60)</option>
-                                    <option value="elderly">Elderly (60+)</option>
+                                    <option value="child">کودک (5-12)</option>
+                                    <option value="teen">نوجوان (13-17)</option>
+                                    <option value="young-adult" selected>جوان (18-25)</option>
+                                    <option value="adult">بزرگسال (26-40)</option>
+                                    <option value="middle-aged">میانسال (41-60)</option>
+                                    <option value="elderly">سالمند (60+)</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Ethnicity</label>
+                                <label>قومیت</label>
                                 <select id="modelEthnicity">
-                                    <option value="caucasian">Caucasian</option>
-                                    <option value="african">African</option>
-                                    <option value="asian">Asian</option>
-                                    <option value="hispanic">Hispanic</option>
-                                    <option value="middle-eastern">Middle Eastern</option>
-                                    <option value="mixed">Mixed</option>
+                                    <option value="caucasian">قفقازی</option>
+                                    <option value="african">آفریقایی</option>
+                                    <option value="asian">آسیایی</option>
+                                    <option value="hispanic">هیسپانیک</option>
+                                    <option value="middle-eastern">خاورمیانه‌ای</option>
+                                    <option value="mixed">ترکیبی</option>
                                 </select>
                             </div>
                         </div>
@@ -194,7 +194,7 @@
 
                     <!-- Face Features -->
                     <details open class="studio-section" style="background: #fff5f5;">
-                        <summary style="color: #e53e3e;">😊 Facial Features</summary>
+                        <summary style="color: #e53e3e;">😊 ویژگی‌های صورت</summary>
                         <div class="param-grid">
                             <div class="form-group">
                                 <label>Face Shape</label>
@@ -288,7 +288,7 @@
 
                     <!-- Hair Style -->
                     <details open class="studio-section" style="background: #fffbeb;">
-                        <summary style="color: #d97706;">💇 Hair & Style</summary>
+                        <summary style="color: #d97706;">💇 مو و استایل</summary>
                         <div class="param-grid">
                             <div class="form-group">
                                 <label>Hair Color</label>
@@ -353,7 +353,7 @@
 
                     <!-- Skin & Body -->
                     <details open class="studio-section" style="background: #f0fdf4;">
-                        <summary style="color: #16a34a;">🎨 Skin & Body Type</summary>
+                        <summary style="color: #16a34a;">🎨 پوست و نوع بدن</summary>
                         <div class="param-grid">
                             <div class="form-group">
                                 <label>Skin Tone</label>
@@ -402,7 +402,7 @@
 
                     <!-- Expression & Pose -->
                     <details open class="studio-section" style="background: #fef2f2;">
-                        <summary style="color: #dc2626;">😃 Expression & Pose</summary>
+                        <summary style="color: #dc2626;">😃 حالت و ژست</summary>
                         <div class="param-grid">
                             <div class="form-group">
                                 <label>Expression</label>
@@ -445,7 +445,7 @@
 
                     <!-- Photography Settings -->
                     <details open class="studio-section" style="background: #ede9fe;">
-                        <summary style="color: #7c3aed;">📸 Photography & Lighting</summary>
+                        <summary style="color: #7c3aed;">📸 عکاسی و نورپردازی</summary>
                         <div class="param-grid">
                             <div class="form-group">
                                 <label>Camera Angle</label>
@@ -512,13 +512,13 @@
 
                     <!-- Additional Details -->
                     <div class="form-group" style="margin-top: 25px;">
-                        <label>Additional Details (Optional)</label>
-                        <textarea id="additionalDetails" rows="3" placeholder="Specific details like accessories, makeup style, brand aesthetic, special features..." style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: 'Inter', sans-serif;"></textarea>
+                        <label>جزئیات اضافی (اختیاری)</label>
+                        <textarea id="additionalDetails" rows="3" placeholder="جزئیات خاص مثل اکسسوری، سبک آرایش، زیبایی شناسی برند، ویژگی‌های خاص..." style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: 'Inter', sans-serif;"></textarea>
                     </div>
 
                     <!-- Generate Button -->
                     <button onclick="generateModel()" class="btn-generate" id="generateBtn">
-                        ✨ Generate Professional Model
+                        ✨ تولید مدل حرفه‌ای
                     </button>
 
                 </div>
@@ -527,12 +527,12 @@
             <!-- Preview Section -->
             <div id="previewSection" style="display: none; margin-top: 30px;">
                 <div class="preview-container">
-                    <h3 style="margin-bottom: 20px; color: #667eea; font-size: 20px;">Generated Model Preview</h3>
+                    <h3 style="margin-bottom: 20px; color: #667eea; font-size: 20px;">پیش‌نمایش مدل تولید شده</h3>
                     <img id="generatedImage" src="" alt="Generated Model" class="preview-image">
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div class="form-group">
-                            <label>Category (دسته‌بندی) *</label>
+                            <label>دسته‌بندی *</label>
                             <select id="saveCategory">
                                 <option value="woman">👩 زن (Woman)</option>
                                 <option value="man">👨 مرد (Man)</option>
@@ -548,26 +548,26 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Name *</label>
-                            <input type="text" id="saveName" placeholder="Model name">
+                            <label>نام *</label>
+                            <input type="text" id="saveName" placeholder="نام مدل">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Visibility *</label>
+                        <label>نمایش *</label>
                         <select id="saveVisibility">
-                            <option value="private">Private (Only This User)</option>
-                            <option value="public">Public (All Users Can See)</option>
+                            <option value="private">خصوصی (فقط این کاربر)</option>
+                            <option value="public">عمومی (همه کاربران)</option>
                         </select>
                         <small style="color: #6b7280; display: block; margin-top: 4px;">
-                            ⚠️ Private = Only selected user sees it | Public = Everyone sees it
+                            ⚠️ خصوصی = فقط کاربر انتخاب شده می‌بیند | عمومی = همه می‌بینند
                         </small>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
-                        <button onclick="saveModel()" class="btn-primary">💾 Save to User Content</button>
+                        <button onclick="saveModel()" class="btn-primary">💾 ذخیره در محتوای کاربر</button>
                         <button onclick="discardModel()" style="background: #6c757d; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
-                            ❌ Discard
+                            ❌ حذف
                         </button>
                     </div>
                 </div>
@@ -591,14 +591,14 @@
                 if (data.success) {
                     allUsers = data.users;
                     const select = document.getElementById('selectedUser');
-                    select.innerHTML = '<option value="">-- Select a user to create model for --</option>' +
+                    select.innerHTML = '<option value="">-- کاربر را برای ساخت مدل انتخاب کنید --</option>' +
                         allUsers.map(user =>
-                            `<option value="${user.user_id}">${user.email}${user.is_premium ? ' ⭐ Premium' : ''}</option>`
+                            `<option value="${user.user_id}">${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}</option>`
                         ).join('');
                 }
             } catch (error) {
                 console.error('Error loading users:', error);
-                showNotification('Failed to load users', 'error');
+                showNotification('خطا در بارگذاری کاربران', 'error');
             }
         }
 
@@ -611,13 +611,13 @@
 
         async function generateModel() {
             if (!selectedUserId) {
-                showNotification('Please select a user first', 'error');
+                showNotification('لطفاً ابتدا یک کاربر انتخاب کنید', 'error');
                 return;
             }
 
             const generateBtn = document.getElementById('generateBtn');
             generateBtn.disabled = true;
-            generateBtn.textContent = '⏳ Generating...';
+            generateBtn.textContent = '⏳ در حال تولید...';
 
             try {
                 // Build comprehensive prompt from all form fields
@@ -646,16 +646,16 @@
                     document.getElementById('previewSection').style.display = 'block';
                     document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
 
-                    showNotification('Model generated successfully!', 'success');
+                    showNotification('مدل با موفقیت تولید شد!', 'success');
                 } else {
                     throw new Error(data.error || 'Generation failed');
                 }
             } catch (error) {
                 console.error('Generation error:', error);
-                showNotification('Failed to generate model: ' + error.message, 'error');
+                showNotification('خطا در تولید مدل: ' + error.message, 'error');
             } finally {
                 generateBtn.disabled = false;
-                generateBtn.textContent = '✨ Generate Professional Model';
+                generateBtn.textContent = '✨ تولید مدل حرفه‌ای';
             }
         }
 
@@ -756,14 +756,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showNotification('Model saved to user content!', 'success');
+                    showNotification('مدل در محتوای کاربر ذخیره شد!', 'success');
                     discardModel();
                 } else {
                     throw new Error(data.error || 'Save failed');
                 }
             } catch (error) {
                 console.error('Save error:', error);
-                showNotification('Failed to save model: ' + error.message, 'error');
+                showNotification('خطا در ذخیره مدل: ' + error.message, 'error');
             }
         }
 
