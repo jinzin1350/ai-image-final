@@ -618,6 +618,145 @@ app.delete('/api/user/content/:contentId', async (req, res) => {
   }
 });
 
+// ========================================
+// Admin User Content Management Endpoints
+// ========================================
+
+// Get user's content (for admin)
+app.get('/api/admin/user-content/:userId', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!supabase) {
+      return res.json({ success: true, content: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('content_library')
+      .select('*')
+      .eq('owner_user_id', userId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    console.log(`📚 Loaded ${data?.length || 0} content items for user ${userId}`);
+    res.json({ success: true, content: data || [] });
+  } catch (error) {
+    console.error('Error fetching user content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Upload content for a user (admin only)
+app.post('/api/admin/user-content/upload', authenticateAdmin, upload.single('content'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { content_type, visibility, category, name, description, user_id } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ success: false, error: 'User ID is required' });
+    }
+
+    // Upload to Supabase Storage
+    const fileName = `user-${user_id}-${Date.now()}-${req.file.originalname}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('admin-content')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    // Save to database with user ownership
+    const { data: contentData, error: dbError } = await supabase
+      .from('content_library')
+      .insert([{
+        content_type,
+        tier: 'premium',
+        visibility: visibility || 'private',
+        category,
+        name,
+        description,
+        image_url: urlData.publicUrl,
+        storage_path: fileName,
+        owner_user_id: user_id,
+        is_active: true
+      }])
+      .select();
+
+    if (dbError) throw dbError;
+
+    console.log(`✅ Admin uploaded content for user ${user_id}: ${name}`);
+    res.json({ success: true, content: contentData[0] });
+  } catch (error) {
+    console.error('Error uploading content for user:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete user content (admin only)
+app.delete('/api/admin/user-content/:contentId', authenticateAdmin, async (req, res) => {
+  try {
+    const { contentId } = req.params;
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    // Get content to find storage path
+    const { data: content, error: fetchError } = await supabase
+      .from('content_library')
+      .select('storage_path')
+      .eq('id', contentId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete from storage
+    if (content.storage_path) {
+      const { error: storageError } = await supabase.storage
+        .from('admin-content')
+        .remove([content.storage_path]);
+
+      if (storageError) {
+        console.error('Storage deletion error:', storageError);
+      }
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('content_library')
+      .delete()
+      .eq('id', contentId);
+
+    if (deleteError) throw deleteError;
+
+    console.log(`🗑️ Admin deleted content: ${contentId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get activity logs
 app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
   try {
@@ -663,6 +802,10 @@ app.get('/admin/content', (req, res) => {
 
 app.get('/admin/analytics', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-analytics.html'));
+});
+
+app.get('/admin/user-content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-user-content.html'));
 });
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
