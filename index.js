@@ -12,15 +12,36 @@ const PORT = 5000;
 
 // تنظیمات Supabase
 let supabase = null;
+let supabaseAdmin = null;
+
 try {
   if (process.env.SUPABASE_URL &&
       process.env.SUPABASE_URL !== 'your_supabase_project_url' &&
       process.env.SUPABASE_ANON_KEY &&
       process.env.SUPABASE_ANON_KEY !== 'your_supabase_anon_key') {
+    // Regular client for normal operations
     supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_ANON_KEY
     );
+
+    // Admin client with service role key for admin operations
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY &&
+        process.env.SUPABASE_SERVICE_ROLE_KEY !== 'your_supabase_service_role_key') {
+      supabaseAdmin = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      );
+      console.log('✅ Supabase Admin client initialized');
+    } else {
+      console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY not configured - admin features will be limited');
+    }
   }
 } catch (error) {
   console.error('⚠️  خطا در اتصال به Supabase:', error.message);
@@ -209,15 +230,16 @@ app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
 // Get all users
 app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
   try {
-    if (!supabase) {
-      console.warn('⚠️ Supabase not configured - returning empty user list');
+    if (!supabaseAdmin) {
+      console.warn('⚠️ Supabase Admin client not configured - returning empty user list');
+      console.warn('💡 Please set SUPABASE_SERVICE_ROLE_KEY in your environment variables');
       return res.json({ success: true, users: [] });
     }
 
     console.log('📋 Fetching all users from Supabase auth...');
 
-    // Fetch ALL users from auth.users using admin API
-    const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+    // Fetch ALL users from auth.users using admin API (requires service role key)
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
 
     if (authError) {
       console.error('❌ Error fetching auth users:', authError);
