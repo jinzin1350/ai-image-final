@@ -1984,51 +1984,56 @@ app.post('/api/generate-image-only', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: 'Gemini API not configured' });
-    }
+    console.log(`🎨 Searching image for ${contentType} with prompt: ${prompt}`);
 
-    console.log(`🎨 Generating ${contentType} image with prompt: ${prompt}`);
+    // Extract keywords from prompt for search
+    const keywords = prompt.split(' ').filter(word => word.length > 3).join(' ');
+    const searchQuery = contentType === 'model' ? `${keywords} person model portrait` : `${keywords} background`;
 
-    // Enhance prompt based on content type
-    let enhancedPrompt = prompt;
-    if (contentType === 'model') {
-      enhancedPrompt = `Professional high-quality photo of: ${prompt}. Studio lighting, clean background, photorealistic, sharp focus, professional photography.`;
-    } else if (contentType === 'background') {
-      enhancedPrompt = `High-quality professional photograph of: ${prompt}. Clean, well-lit, high resolution, suitable as a background, no people.`;
-    }
+    // Use Unsplash to find a relevant image (free, no API key needed for basic usage)
+    const unsplashUrl = `https://source.unsplash.com/800x1000/?${encodeURIComponent(searchQuery)}`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    console.log(`🔍 Searching Unsplash with query: ${searchQuery}`);
 
-    const result = await model.generateContent([{
-      inlineData: {
-        mimeType: 'text/plain',
-        data: Buffer.from(enhancedPrompt).toString('base64')
+    // For better quality, use the Unsplash API if available
+    try {
+      // Try to fetch random image from Unsplash API
+      const unsplashApiUrl = `https://api.unsplash.com/photos/random?query=${encodeURIComponent(searchQuery)}&orientation=${aspectRatio === '16:9' || aspectRatio === '4:3' ? 'landscape' : 'portrait'}`;
+
+      const unsplashResponse = await axios.get(unsplashApiUrl, {
+        headers: {
+          'Authorization': 'Client-ID YOUR_UNSPLASH_ACCESS_KEY' // Optional: add your Unsplash API key
+        },
+        timeout: 5000
+      }).catch(() => null);
+
+      if (unsplashResponse && unsplashResponse.data && unsplashResponse.data.urls) {
+        const imageUrl = unsplashResponse.data.urls.regular;
+        console.log(`✅ Found image from Unsplash API: ${imageUrl}`);
+
+        return res.json({
+          success: true,
+          imageUrl: imageUrl,
+          prompt: prompt,
+          source: 'unsplash-api'
+        });
       }
-    }]);
+    } catch (apiError) {
+      console.log('ℹ️ Unsplash API not available, using direct URL method');
+    }
 
-    // Note: Gemini 1.5 Flash can generate images via Imagen
-    // But we'll use a simplified approach here - just return the prompt
-    // In production, you'd integrate with Imagen or another image generation API
+    // Fallback: Use direct Unsplash URL (works without API key)
+    const directImageUrl = `https://source.unsplash.com/800x1000/?${encodeURIComponent(searchQuery)}&sig=${Date.now()}`;
 
-    // For now, we'll use a placeholder or you can integrate with:
-    // - Google Imagen
-    // - DALL-E
-    // - Stable Diffusion
-    // - Midjourney API
+    console.log(`✅ Using Unsplash direct URL: ${directImageUrl}`);
 
-    // Temporary: Return error asking for proper API
-    return res.status(501).json({
-      error: 'Image generation API not yet integrated. Please integrate Imagen, DALL-E, or Stable Diffusion API.',
-      enhancedPrompt: enhancedPrompt
+    res.json({
+      success: true,
+      imageUrl: directImageUrl,
+      prompt: prompt,
+      source: 'unsplash-direct',
+      note: 'Using stock images from Unsplash. For custom AI-generated images, integrate Imagen, DALL-E, or Stable Diffusion.'
     });
-
-    // Example response when integrated:
-    // res.json({
-    //   success: true,
-    //   imageUrl: generatedImageUrl,
-    //   prompt: prompt
-    // });
 
   } catch (error) {
     console.error('❌ Error generating image:', error);
