@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استودیو تولید پس‌زمینه | مدیریت</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px 10px;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            color: #667eea;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            transform: translateX(-5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-right: 250px;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .content-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .content-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* User Selection */
+        .user-selection {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-selection label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .user-selection select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-selection select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Studio Form */
+        .studio-form {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .studio-section {
+            margin-bottom: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .studio-section summary {
+            padding: 18px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            background: #f8f9fa;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .studio-section summary:hover {
+            background: #e9ecef;
+        }
+
+        .studio-section[open] summary {
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #444;
+            font-size: 14px;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Preview Section */
+        .preview-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .preview-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .save-options {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .save-options h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🎨 پنل مدیریت</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>داشبورد</span>
+                </a>
+                <a href="/admin/users" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <span>کاربران</span>
+                </a>
+                <a href="/admin/content" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span>محتوا</span>
+                </a>
+                <a href="/admin/user-content" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <polyline points="17 11 19 13 23 9"/>
+                    </svg>
+                    <span>محتوای کاربران</span>
+                </a>
+                <a href="/admin/model-studio" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>استودیو مدل</span>
+                </a>
+                <a href="/admin/background-studio" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span>استودیو پس‌زمینه</span>
+                </a>
+                <a href="/admin/analytics" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="20" x2="12" y2="10"/>
+                        <line x1="18" y1="20" x2="18" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="16"/>
+                    </svg>
+                    <span>آمار</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="content-header">
+                <h1>🎨 استودیو تولید پس‌زمینه حرفه‌ای</h1>
+                <p>ساخت پس‌زمینه‌های با کیفیت و متنوع برای کاربران</p>
+            </div>
+
+            <!-- User Selection -->
+            <div class="user-selection">
+                <label>👤 انتخاب کاربر</label>
+                <select id="selectedUser" onchange="handleUserSelect()">
+                    <option value="">-- کاربر را برای ساخت پس‌زمینه انتخاب کنید --</option>
+                </select>
+            </div>
+
+            <!-- Studio Form -->
+            <div class="studio-form">
+                <form id="backgroundForm">
+                    <!-- Background Type -->
+                    <details open class="studio-section" style="background: #fff7ed;">
+                        <summary style="color: #ea580c;">🎭 نوع پس‌زمینه</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>دسته‌بندی اصلی</label>
+                                <select id="bgCategory">
+                                    <option value="studio">استودیو</option>
+                                    <option value="outdoor">فضای باز</option>
+                                    <option value="indoor">فضای داخلی</option>
+                                    <option value="abstract">انتزاعی</option>
+                                    <option value="gradient">گرادیانت</option>
+                                    <option value="texture">بافت</option>
+                                    <option value="pattern">الگو</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>سبک کلی</label>
+                                <select id="bgStyle">
+                                    <option value="minimalist">مینیمالیست</option>
+                                    <option value="professional">حرفه‌ای</option>
+                                    <option value="artistic">هنری</option>
+                                    <option value="modern">مدرن</option>
+                                    <option value="vintage">وینتیج</option>
+                                    <option value="luxury">لوکس</option>
+                                    <option value="casual">کژوال</option>
+                                    <option value="dramatic">دراماتیک</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Studio Backgrounds -->
+                    <details open class="studio-section" style="background: #f0fdf4;">
+                        <summary style="color: #16a34a;">🏢 پس‌زمینه‌های استودیو</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>رنگ پایه</label>
+                                <select id="studioColor">
+                                    <option value="white">سفید خالص</option>
+                                    <option value="off-white">سفید شکسته</option>
+                                    <option value="light-gray">خاکستری روشن</option>
+                                    <option value="medium-gray">خاکستری متوسط</option>
+                                    <option value="dark-gray">خاکستری تیره</option>
+                                    <option value="black">سیاه</option>
+                                    <option value="beige">بژ</option>
+                                    <option value="cream">کرم</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع سطح</label>
+                                <select id="surfaceType">
+                                    <option value="seamless">یکپارچه</option>
+                                    <option value="cyclorama">سیکلورما (منحنی)</option>
+                                    <option value="flat-wall">دیوار صاف</option>
+                                    <option value="textured-wall">دیوار بافت‌دار</option>
+                                    <option value="paper-backdrop">پس‌زمینه کاغذی</option>
+                                    <option value="canvas">بوم</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>جلوه‌های اضافی</label>
+                                <select id="studioEffects">
+                                    <option value="none">بدون جلوه</option>
+                                    <option value="subtle-texture">بافت ملایم</option>
+                                    <option value="vignette">وینیت (تاریک کردن اطراف)</option>
+                                    <option value="subtle-gradient">گرادیانت ملایم</option>
+                                    <option value="light-leak">نشت نور</option>
+                                    <option value="shadows">سایه‌های طبیعی</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Outdoor Backgrounds -->
+                    <details class="studio-section" style="background: #eff6ff;">
+                        <summary style="color: #2563eb;">🌳 پس‌زمینه‌های فضای باز</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>نوع محیط</label>
+                                <select id="outdoorEnvironment">
+                                    <option value="urban-street">خیابان شهری</option>
+                                    <option value="park">پارک</option>
+                                    <option value="garden">باغ</option>
+                                    <option value="beach">ساحل</option>
+                                    <option value="forest">جنگل</option>
+                                    <option value="mountain">کوهستان</option>
+                                    <option value="desert">بیابان</option>
+                                    <option value="field">مزرعه/دشت</option>
+                                    <option value="rooftop">پشت‌بام</option>
+                                    <option value="alley">کوچه</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>زمان روز</label>
+                                <select id="timeOfDay">
+                                    <option value="golden-hour-morning">طلوع (Golden Hour)</option>
+                                    <option value="morning">صبح</option>
+                                    <option value="midday">ظهر</option>
+                                    <option value="afternoon">بعدازظهر</option>
+                                    <option value="golden-hour-evening">غروب (Golden Hour)</option>
+                                    <option value="dusk">گرگ و میش</option>
+                                    <option value="night">شب</option>
+                                    <option value="blue-hour">ساعت آبی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>وضعیت آب و هوا</label>
+                                <select id="weather">
+                                    <option value="clear-sunny">صاف و آفتابی</option>
+                                    <option value="partly-cloudy">نیمه ابری</option>
+                                    <option value="overcast">ابری</option>
+                                    <option value="foggy">مه‌آلود</option>
+                                    <option value="rainy">بارانی</option>
+                                    <option value="snowy">برفی</option>
+                                    <option value="dramatic-sky">آسمان دراماتیک</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>عمق میدان</label>
+                                <select id="outdoorDepthOfField">
+                                    <option value="shallow">کم (Bokeh)</option>
+                                    <option value="medium">متوسط</option>
+                                    <option value="deep">زیاد (همه‌چیز واضح)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Indoor Backgrounds -->
+                    <details class="studio-section" style="background: #fef3c7;">
+                        <summary style="color: #d97706;">🏠 پس‌زمینه‌های فضای داخلی</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>نوع مکان</label>
+                                <select id="indoorLocation">
+                                    <option value="loft">لافت/اتاق باز</option>
+                                    <option value="living-room">اتاق نشیمن</option>
+                                    <option value="bedroom">اتاق خواب</option>
+                                    <option value="cafe">کافه</option>
+                                    <option value="restaurant">رستوران</option>
+                                    <option value="office">دفتر کار</option>
+                                    <option value="gallery">گالری</option>
+                                    <option value="warehouse">انبار/فضای صنعتی</option>
+                                    <option value="lobby">لابی هتل</option>
+                                    <option value="library">کتابخانه</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>سبک دکوراسیون</label>
+                                <select id="decorStyle">
+                                    <option value="modern">مدرن</option>
+                                    <option value="minimalist">مینیمالیست</option>
+                                    <option value="industrial">صنعتی</option>
+                                    <option value="vintage">وینتیج</option>
+                                    <option value="bohemian">بوهمیان</option>
+                                    <option value="scandinavian">اسکاندیناوی</option>
+                                    <option value="luxury">لوکس</option>
+                                    <option value="rustic">روستایی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع نور</label>
+                                <select id="indoorLighting">
+                                    <option value="window-natural">نور پنجره (طبیعی)</option>
+                                    <option value="chandelier">لوستر</option>
+                                    <option value="pendant-lights">چراغ آویز</option>
+                                    <option value="wall-sconces">چراغ دیواری</option>
+                                    <option value="floor-lamps">آباژور ایستاده</option>
+                                    <option value="mixed">ترکیبی</option>
+                                    <option value="neon">نئون</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>میزان تاری پس‌زمینه</label>
+                                <select id="indoorBlur">
+                                    <option value="sharp">واضح</option>
+                                    <option value="slightly-blurred">کمی تار</option>
+                                    <option value="medium-blur">تار متوسط</option>
+                                    <option value="heavy-blur">تار زیاد (Bokeh)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Abstract & Artistic Backgrounds -->
+                    <details class="studio-section" style="background: #fce7f3;">
+                        <summary style="color: #db2777;">🎨 پس‌زمینه‌های انتزاعی و هنری</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>نوع طرح</label>
+                                <select id="abstractType">
+                                    <option value="gradient">گرادیانت</option>
+                                    <option value="geometric">اشکال هندسی</option>
+                                    <option value="organic-shapes">اشکال ارگانیک</option>
+                                    <option value="bokeh">بوکه (دایره‌های نور)</option>
+                                    <option value="watercolor">آبرنگ</option>
+                                    <option value="smoke">دود</option>
+                                    <option value="liquid">مایع</option>
+                                    <option value="particles">ذرات</option>
+                                    <option value="light-rays">پرتوهای نور</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>طیف رنگی</label>
+                                <select id="colorScheme">
+                                    <option value="monochrome">تک‌رنگ</option>
+                                    <option value="warm">گرم (قرمز، نارنجی، زرد)</option>
+                                    <option value="cool">سرد (آبی، سبز، بنفش)</option>
+                                    <option value="pastel">پاستل</option>
+                                    <option value="vibrant">پرانرژی</option>
+                                    <option value="earth-tones">خاکی</option>
+                                    <option value="neon">نئون</option>
+                                    <option value="complementary">مکمل</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>پیچیدگی</label>
+                                <select id="complexity">
+                                    <option value="simple">ساده</option>
+                                    <option value="moderate">متوسط</option>
+                                    <option value="complex">پیچیده</option>
+                                    <option value="intricate">بسیار پیچیده</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>جلوه‌های ویژه</label>
+                                <select id="specialEffects">
+                                    <option value="none">بدون جلوه</option>
+                                    <option value="glow">درخشش</option>
+                                    <option value="sparkles">جرقه‌ها</option>
+                                    <option value="shimmer">برق</option>
+                                    <option value="motion-blur">تاری حرکتی</option>
+                                    <option value="chromatic-aberration">انحراف رنگی</option>
+                                    <option value="lens-flare">فلر لنز</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Technical Settings -->
+                    <details open class="studio-section" style="background: #ede9fe;">
+                        <summary style="color: #7c3aed;">⚙️ تنظیمات فنی</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>نسبت تصویر</label>
+                                <select id="aspectRatio">
+                                    <option value="1:1">مربع (1:1)</option>
+                                    <option value="4:3">استاندارد (4:3)</option>
+                                    <option value="3:4" selected>پرتره (3:4)</option>
+                                    <option value="16:9">عریض (16:9)</option>
+                                    <option value="9:16">استوری (9:16)</option>
+                                    <option value="21:9">سینمایی (21:9)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>کیفیت</label>
+                                <select id="quality">
+                                    <option value="standard">استاندارد</option>
+                                    <option value="high" selected>بالا</option>
+                                    <option value="ultra">فوق‌العاده</option>
+                                    <option value="professional">حرفه‌ای</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>میزان نویز</label>
+                                <select id="noiseLevel">
+                                    <option value="none">بدون نویز</option>
+                                    <option value="minimal">حداقل</option>
+                                    <option value="low">کم</option>
+                                    <option value="medium">متوسط</option>
+                                    <option value="film-grain">دانه‌بندی فیلم</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>کنتراست</label>
+                                <select id="contrast">
+                                    <option value="low">کم</option>
+                                    <option value="normal" selected>عادی</option>
+                                    <option value="high">زیاد</option>
+                                    <option value="dramatic">دراماتیک</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Additional Details -->
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label>توضیحات اضافی (اختیاری)</label>
+                        <input type="text" id="additionalDetails" placeholder="مثال: با رنگ‌های آبی و طلایی، حس شاد و پرانرژی">
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-primary" id="generateBtn" onclick="generateBackground()">
+                            <span>✨ تولید پس‌زمینه</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" id="previewSection">
+                <h2>🎨 پیش‌نمایش پس‌زمینه تولید شده</h2>
+                <img id="generatedImage" class="preview-image" alt="Generated Background">
+
+                <div class="save-options">
+                    <h3>💾 ذخیره در پروفایل کاربر</h3>
+                    <div class="param-grid">
+                        <div class="form-group">
+                            <label>نام پس‌زمینه</label>
+                            <input type="text" id="saveName" placeholder="مثال: پس‌زمینه استودیو سفید">
+                        </div>
+                        <div class="form-group">
+                            <label>دسته‌بندی</label>
+                            <select id="saveCategory">
+                                <option value="woman">زن</option>
+                                <option value="man">مرد</option>
+                                <option value="girl">دختر</option>
+                                <option value="boy">پسر</option>
+                                <option value="child">کودک</option>
+                                <option value="couple">زوج</option>
+                                <option value="group">گروه</option>
+                                <option value="elderly">سالمند</option>
+                                <option value="teen">نوجوان</option>
+                                <option value="plus-size">سایز بزرگ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>قابلیت نمایش</label>
+                            <select id="saveVisibility">
+                                <option value="private">خصوصی</option>
+                                <option value="public">عمومی</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="action-buttons" style="margin-top: 20px;">
+                        <button type="button" class="btn btn-primary" onclick="saveBackground()">
+                            💾 ذخیره در پروفایل کاربر
+                        </button>
+                        <button type="button" class="btn" style="background: #6b7280; color: white;" onclick="discardBackground()">
+                            ❌ انصراف
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let selectedUserId = null;
+        let generatedImageData = null;
+
+        // Load users on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadUsers();
+        });
+
+        // Helper function to make authenticated requests
+        async function fetchWithAuth(url, options = {}) {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/admin/login.html';
+                return;
+            }
+
+            const headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+
+            const response = await fetch(url, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('adminToken');
+                window.location.href = '/admin/login.html';
+                return;
+            }
+
+            return response;
+        }
+
+        // Load all users
+        async function loadUsers() {
+            try {
+                const response = await fetchWithAuth('/api/admin/users');
+                const data = await response.json();
+
+                const select = document.getElementById('selectedUser');
+                select.innerHTML = '<option value="">-- کاربر را برای ساخت پس‌زمینه انتخاب کنید --</option>';
+
+                data.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.full_name || user.username} (${user.email})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('خطا در بارگذاری کاربران', 'error');
+            }
+        }
+
+        // Handle user selection
+        function handleUserSelect() {
+            const select = document.getElementById('selectedUser');
+            selectedUserId = select.value;
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = !selectedUserId;
+        }
+
+        // Build background prompt from form
+        function buildBackgroundPrompt() {
+            const category = document.getElementById('bgCategory').value;
+            const style = document.getElementById('bgStyle').value;
+            const quality = document.getElementById('quality').value;
+            const aspectRatio = document.getElementById('aspectRatio').value;
+            const contrast = document.getElementById('contrast').value;
+            const noiseLevel = document.getElementById('noiseLevel').value;
+            const additionalDetails = document.getElementById('additionalDetails').value;
+
+            let prompt = `Professional ${quality} quality background for fashion photography. `;
+            prompt += `Style: ${style}. `;
+
+            // Add category-specific details
+            if (category === 'studio') {
+                const color = document.getElementById('studioColor').value;
+                const surface = document.getElementById('surfaceType').value;
+                const effects = document.getElementById('studioEffects').value;
+                prompt += `Studio background: ${color} ${surface} surface. `;
+                if (effects !== 'none') prompt += `Effects: ${effects}. `;
+            } else if (category === 'outdoor') {
+                const environment = document.getElementById('outdoorEnvironment').value;
+                const timeOfDay = document.getElementById('timeOfDay').value;
+                const weather = document.getElementById('weather').value;
+                const dof = document.getElementById('outdoorDepthOfField').value;
+                prompt += `Outdoor environment: ${environment}, ${timeOfDay}, ${weather} weather. `;
+                prompt += `Depth of field: ${dof}. `;
+            } else if (category === 'indoor') {
+                const location = document.getElementById('indoorLocation').value;
+                const decor = document.getElementById('decorStyle').value;
+                const lighting = document.getElementById('indoorLighting').value;
+                const blur = document.getElementById('indoorBlur').value;
+                prompt += `Indoor location: ${location}, ${decor} decor style, ${lighting} lighting. `;
+                prompt += `Background blur: ${blur}. `;
+            } else if (category === 'abstract' || category === 'gradient' || category === 'texture' || category === 'pattern') {
+                const abstractType = document.getElementById('abstractType').value;
+                const colorScheme = document.getElementById('colorScheme').value;
+                const complexity = document.getElementById('complexity').value;
+                const specialEffects = document.getElementById('specialEffects').value;
+                prompt += `Abstract background: ${abstractType} with ${colorScheme} color scheme. `;
+                prompt += `Complexity: ${complexity}. `;
+                if (specialEffects !== 'none') prompt += `Special effects: ${specialEffects}. `;
+            }
+
+            // Technical details
+            prompt += `Contrast: ${contrast}. `;
+            if (noiseLevel !== 'none') prompt += `Noise/grain: ${noiseLevel}. `;
+
+            if (additionalDetails) {
+                prompt += `Additional details: ${additionalDetails}. `;
+            }
+
+            prompt += `Ultra high resolution, professional photography, perfect for fashion background.`;
+
+            return prompt;
+        }
+
+        // Generate background
+        async function generateBackground() {
+            if (!selectedUserId) {
+                showNotification('لطفاً ابتدا یک کاربر انتخاب کنید', 'error');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<div class="loading"></div> <span>در حال تولید...</span>';
+
+            try {
+                const prompt = buildBackgroundPrompt();
+                const aspectRatio = document.getElementById('aspectRatio').value;
+
+                const response = await fetchWithAuth('/api/generate-image-only', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        contentType: 'background',
+                        aspectRatio: aspectRatio
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    generatedImageData = {
+                        imageUrl: data.imageUrl,
+                        prompt: prompt
+                    };
+
+                    document.getElementById('generatedImage').src = data.imageUrl;
+                    document.getElementById('previewSection').style.display = 'block';
+                    document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+                    showNotification('پس‌زمینه با موفقیت تولید شد!', 'success');
+                } else {
+                    showNotification(data.error || 'خطا در تولید پس‌زمینه', 'error');
+                }
+            } catch (error) {
+                console.error('Error generating background:', error);
+                showNotification('خطا در تولید پس‌زمینه', 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<span>✨ تولید پس‌زمینه</span>';
+            }
+        }
+
+        // Save background to user profile
+        async function saveBackground() {
+            if (!generatedImageData || !selectedUserId) {
+                showNotification('خطا: اطلاعات ناقص است', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/save-generated-to-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageUrl: generatedImageData.imageUrl,
+                        user_id: selectedUserId,
+                        content_type: 'background',
+                        visibility: document.getElementById('saveVisibility').value,
+                        category: document.getElementById('saveCategory').value,
+                        name: document.getElementById('saveName').value || 'AI Generated Background',
+                        description: `AI Generated Background: ${generatedImageData.prompt}`,
+                        prompt: generatedImageData.prompt
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('پس‌زمینه در پروفایل کاربر ذخیره شد!', 'success');
+                    setTimeout(() => {
+                        discardBackground();
+                    }, 1500);
+                } else {
+                    showNotification(data.error || 'خطا در ذخیره‌سازی', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving background:', error);
+                showNotification('خطا در ذخیره‌سازی', 'error');
+            }
+        }
+
+        // Discard generated background
+        function discardBackground() {
+            generatedImageData = null;
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('generatedImage').src = '';
+            document.getElementById('saveName').value = '';
+            showNotification('تصویر حذف شد', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
