@@ -1324,7 +1324,8 @@ app.get('/api/models', async (req, res) => {
     if (authHeader && supabase) {
       try {
         const token = authHeader.replace('Bearer ', '');
-        const { data: { user } } = await supabase.auth.getUser(token);
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (error) throw error;
 
         if (user) {
           // Fetch user's custom models (private + public models from content_library)
@@ -1377,7 +1378,8 @@ app.get('/api/backgrounds', async (req, res) => {
     if (authHeader && supabase) {
       try {
         const token = authHeader.replace('Bearer ', '');
-        const { data: { user } } = await supabase.auth.getUser(token);
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (error) throw error;
 
         if (user) {
           // Fetch user's custom backgrounds
