@@ -1260,6 +1260,13 @@ const authenticateUser = async (req, res, next) => {
     return next();
   }
 
+  // If Supabase is not configured, allow access without authentication
+  if (!supabase) {
+    console.warn('⚠️ Supabase not configured - allowing unauthenticated access');
+    req.user = null;
+    return next();
+  }
+
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error) throw error;
