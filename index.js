@@ -1813,26 +1813,35 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('✨ Style:', selectedStyle.name);
     console.log('💡 Lighting:', selectedLighting.name);
 
-    // دانلود عکس‌های لباس (چند تایی) و مدل و تبدیل به base64
+    // دانلود عکس‌های لباس (چند تایی) و مدل و پس‌زمینه و تبدیل به base64
     const garmentBase64Array = await Promise.all(
       garments.map(path => imageUrlToBase64(path))
     );
     const modelBase64 = await imageUrlToBase64(selectedModel.image);
+    const backgroundBase64 = await imageUrlToBase64(selectedBackground.image);
 
     // ساخت پرامپت برای Virtual Try-On با پارامترهای جدید
     const garmentDescription = garments.length === 1
       ? 'the garment/clothing from the first image'
       : `ALL ${garments.length} garments/clothing items from the first ${garments.length} images (combine them on the model - e.g., if there's pants, shirt, and jacket, the model should wear all of them together)`;
 
+    const imageRefText = garments.length === 1 ? 'second image (model), third image (background/location)' : `image ${garments.length + 1} (model), image ${garments.length + 2} (background/location)`;
+
     const prompt = `You are a world-class professional fashion photographer and expert image editor with mastery in color science, fabric rendering, and photographic composition. Create an ultra-realistic, high-quality virtual try-on image.
 
-TASK: Place ${garmentDescription} onto the model shown in the ${garments.length === 1 ? 'second' : 'last'} image.
+TASK:
+1. Place ${garmentDescription} onto the model shown in the ${imageRefText}
+2. IMPORTANT: Place this model wearing the garment(s) in the BACKGROUND/LOCATION shown in the final image
+3. The model should be photographed in the environment/setting from the background image
 
 CORE REQUIREMENTS:
 1. The model should wear ${garmentDescription}
 ${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Keep the model's face and overall appearance from the reference image
 ${garments.length > 1 ? '4' : '3'}. Garment Fit: ${selectedFit.description}
-${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping${garments.length > 1 ? '\n7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
+${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping
+${garments.length > 1 ? '6' : '5'}. CRITICAL: Place the model in the LOCATION/ENVIRONMENT from the background image - match lighting, perspective, and atmosphere
+${garments.length > 1 ? '7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
+${garments.length > 1 ? '8' : '6'}. Background: Use the location from the final image - ${selectedBackground.description}
 
 POSE & COMPOSITION:
 - Pose: ${selectedPose.description}
@@ -1968,6 +1977,15 @@ CRITICAL IMPERATIVES:
     contentParts.push({
       inlineData: {
         data: modelBase64,
+        mimeType: 'image/jpeg'
+      }
+    });
+
+    // Add background/location image
+    contentParts.push({ text: "BACKGROUND/LOCATION IMAGE:" });
+    contentParts.push({
+      inlineData: {
+        data: backgroundBase64,
         mimeType: 'image/jpeg'
       }
     });
