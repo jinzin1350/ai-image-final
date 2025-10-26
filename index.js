@@ -1729,8 +1729,54 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
     }
 
-    const selectedModel = models.find(m => m.id === modelId);
-    const selectedBackground = backgrounds.find(b => b.id === backgroundId);
+    // Find model (check hardcoded first, then custom from database)
+    let selectedModel = models.find(m => m.id === modelId);
+
+    // If not found in hardcoded models and ID starts with 'custom-', fetch from database
+    if (!selectedModel && modelId.startsWith('custom-') && supabase) {
+      const customId = modelId.replace('custom-', '');
+      const { data: customModel } = await supabase
+        .from('content_library')
+        .select('*')
+        .eq('id', customId)
+        .eq('content_type', 'model')
+        .single();
+
+      if (customModel) {
+        selectedModel = {
+          id: `custom-${customModel.id}`,
+          name: customModel.name,
+          category: customModel.category,
+          description: customModel.description || customModel.name,
+          image: customModel.image_url
+        };
+      }
+    }
+
+    // Find background (check hardcoded first, then custom from database)
+    let selectedBackground = backgrounds.find(b => b.id === backgroundId);
+
+    // If not found in hardcoded backgrounds and ID starts with 'custom-', fetch from database
+    if (!selectedBackground && backgroundId.startsWith('custom-') && supabase) {
+      const customId = backgroundId.replace('custom-', '');
+      const { data: customBackground } = await supabase
+        .from('content_library')
+        .select('*')
+        .eq('id', customId)
+        .eq('content_type', 'background')
+        .single();
+
+      if (customBackground) {
+        selectedBackground = {
+          id: `custom-${customBackground.id}`,
+          name: customBackground.name,
+          category: customBackground.category,
+          description: customBackground.description || customBackground.name,
+          image: customBackground.image_url
+        };
+      }
+    }
+
     const selectedPose = poses.find(p => p.id === poseId) || poses[0];
     const selectedCameraAngle = cameraAngles.find(c => c.id === cameraAngleId) || cameraAngles[0];
     const selectedStyle = styles.find(s => s.id === styleId) || styles[0];
