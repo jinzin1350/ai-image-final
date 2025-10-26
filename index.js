@@ -1827,137 +1827,40 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     const imageRefText = garments.length === 1 ? 'second image (model), third image (background/location)' : `image ${garments.length + 1} (model), image ${garments.length + 2} (background/location)`;
 
-    const prompt = `You are a professional fashion photographer. Create a photorealistic virtual try-on image showing the model wearing the garment.
+    const prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
-IMAGES PROVIDED:
-- Garment(s): ${garments.length === 1 ? 'First image' : `First ${garments.length} images`} - the clothing to be worn
-- Model: ${garments.length === 1 ? 'Second' : `Image ${garments.length + 1}`} - the person who will wear the garment
-- Background reference: ${garments.length === 1 ? 'Third' : `Image ${garments.length + 2}`} - for lighting and atmosphere reference only
+IMAGES:
+- Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment to wear
+- Image ${garments.length + 1}: Model
+- Image ${garments.length + 2}: Background/location
 
-YOUR TASK - Virtual Try-On:
-Simply show the model from image ${garments.length === 1 ? '2' : garments.length + 1} wearing ${garmentDescription}, keeping everything else natural and realistic.
+TASK:
+Show this exact model wearing ${garmentDescription}. Make it look like a real photograph.
 
-CORE REQUIREMENTS:
-1. The model wears ${garmentDescription} - fit the clothing naturally onto the model's body
-${garments.length > 1 ? '2. Layer multiple garments realistically (pants, shirt, jacket all worn together)\n' : ''}${garments.length > 1 ? '3' : '2'}. KEEP the model's exact face, body type, and pose from the reference
-${garments.length > 1 ? '4' : '3'}. Garment fit: ${selectedFit.description}
-${garments.length > 1 ? '5' : '4'}. Natural fabric draping, wrinkles, and realistic clothing physics
-${garments.length > 1 ? '6' : '5'}. Use lighting inspiration from the background image - ${selectedBackground.description}
-${garments.length > 1 ? '7' : '6'}. The model should have similar lighting mood/style as shown in the background reference (warm/cool tones, soft/hard light, etc.)
+KEY REQUIREMENTS:
+1. Keep model's face, body, and pose EXACTLY the same - only change the clothes
+2. Garment should fit naturally with realistic wrinkles and fabric draping
+3. Match lighting and mood from the background image
+4. ${selectedPose.description}
+5. ${selectedCameraAngle.description}
+6. ${selectedStyle.description}
+7. ${selectedLighting.description}
 
-POSE & COMPOSITION:
-- Pose: ${selectedPose.description}
-- Camera Angle: ${selectedCameraAngle.description}
-- Framing: Full body or three-quarter shot, well-composed, rule of thirds
-- ${selectedMotion.description}
+QUALITY:
+- Photorealistic, like a professional fashion photograph
+- Natural skin texture (no plastic smoothing)
+- Accurate garment colors and patterns
+- Realistic fabric physics and shadows
+- Clean, sharp focus on the model
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height}
 
-STYLE & MOOD:
-- Overall Style: ${selectedStyle.description}
-- The image should convey this mood and aesthetic
-- Make it look professional and magazine-quality
+DO NOT:
+- Change the model's face or body
+- Make unrealistic distortions
+- Add text, watermarks, or logos
+- Create artificial or fake-looking composites
 
-===== PHASE 1: CRITICAL QUALITY PARAMETERS =====
-
-COLOR TEMPERATURE & WHITE BALANCE:
-- Color Temperature: ${selectedColorTemp.description}
-- Ensure proper white balance for natural skin tones
-- Color harmony between garment, model, and environment
-- No unnatural color casts unless intentional for mood
-
-DEPTH OF FIELD:
-- ${selectedDoF.description}
-- Create proper bokeh if shallow DoF is selected
-- Ensure subject is in sharp focus while background matches DoF setting
-- Natural lens characteristics and optical quality
-
-FABRIC TEXTURE & MATERIAL RENDERING:
-- ${selectedFabric.description}
-- Render fabric with proper surface characteristics and texture detail
-- Show natural fabric behavior: how it wrinkles, folds, reflects light
-- Micro-details: stitching, weave pattern, fabric grain visible
-- Material-specific properties (cotton matte vs silk sheen)
-- Proper subsurface scattering for translucent fabrics
-
-SHADOW QUALITY & DIRECTION:
-- ${selectedShadow.description}
-- Shadow color should be slightly cooler than highlights
-- Shadows should follow light source direction logically
-- Proper shadow density and transition zones
-- Ambient occlusion in folds and creases
-
-===== PHASE 2: PROFESSIONAL TOUCH =====
-
-LIGHTING SETUP:
-- Main Lighting: ${selectedLighting.description}
-- Lighting Ratio: ${selectedLightingRatio.description}
-- Create dimensional depth with proper key, fill, and rim lighting
-- Catchlights in eyes for lifelike appearance
-- Ensure lighting enhances garment texture and form
-
-BACKGROUND & ENVIRONMENT INTEGRATION:
-- Background Location: ${selectedBackground.name} - ${selectedBackground.description}
-- The model MUST be naturally integrated into this specific environment
-- Match the lighting direction, color temperature, and intensity from the background location
-- Ensure proper perspective - the model should appear to be IN the location, not pasted on top
-- Background Blur: ${selectedBgBlur.description}
-- Natural subject-background separation with proper depth relationships
-- Proper bokeh characteristics if blur is applied
-- The model's shadows and lighting must match the background environment
-- CRITICAL: The result should look like the model was actually photographed in this location, not composited
-
-IMAGE OUTPUT SPECS:
-- Aspect Ratio: ${selectedAspectRatio.description}
-- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
-- Sharp focus on subject, proper edge sharpness
-- No digital artifacts or compression issues
-
-===== PHASE 3: ADVANCED FEATURES =====
-
-POST-PROCESSING & COLOR GRADING:
-- ${selectedPostProcessing.description}
-- Professional color science and grading
-- Proper contrast curves and tonal distribution
-- Skin tone rendering with natural warmth
-- Color harmony and palette cohesion
-
-ENVIRONMENTAL INTERACTION:
-- ${selectedEnvReflection.description}
-- Ambient light from surroundings affecting subject
-- Proper color temperature shift based on environment
-- Reflective materials show environment (silk, leather, synthetics)
-- Natural light bounce and fill from surroundings
-
-ATMOSPHERE & WEATHER:
-- ${selectedWeather.description}
-- Atmospheric perspective and depth cues
-- Proper haze, mist, or clarity based on conditions
-- Weather-appropriate lighting characteristics
-
-SKIN RENDERING:
-- Natural skin texture with pores and detail
-- Proper subsurface scattering for skin translucency
-- Skin tone matched to lighting conditions
-- NO over-smoothing or "plastic" appearance
-- Realistic skin-to-fabric transitions
-
-FINAL TECHNICAL SPECIFICATIONS:
-- Photorealistic rendering, indistinguishable from real photography
-- Professional color accuracy for e-commerce use
-- Suitable for editorial, advertising, and product photography
-- Film-like quality with proper grain structure if applicable
-- No text, watermarks, logos, or artificial elements
-- Natural lens characteristics (slight vignette if shallow DoF)
-
-CRITICAL IMPERATIVES FOR NATURAL RESULTS:
-- PRESERVE the model's facial features, body type, and overall appearance completely
-- ONLY change the clothing - everything else stays the same
-- Seamless garment integration that looks like the model is actually wearing these clothes
-- Natural fabric behavior with realistic wrinkles, shadows, and draping
-- The garment colors and textures must be preserved accurately
-- Lighting should be consistent and natural
-- NO unrealistic distortions, morphing, or artificial-looking effects
-- The result must look like a real photograph of this person wearing these clothes
-- MOST IMPORTANT: Focus on making the clothing look naturally worn by this specific model - don't try to change too many things at once`;
+Make it simple and natural - like this person is actually wearing these clothes in a real photo.`;
 
 
 
