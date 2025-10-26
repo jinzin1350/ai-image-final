@@ -1892,11 +1892,16 @@ LIGHTING SETUP:
 - Catchlights in eyes for lifelike appearance
 - Ensure lighting enhances garment texture and form
 
-BACKGROUND TREATMENT:
+BACKGROUND & ENVIRONMENT INTEGRATION:
+- Background Location: ${selectedBackground.name} - ${selectedBackground.description}
+- The model MUST be naturally integrated into this specific environment
+- Match the lighting direction, color temperature, and intensity from the background location
+- Ensure proper perspective - the model should appear to be IN the location, not pasted on top
 - Background Blur: ${selectedBgBlur.description}
-- Natural subject-background separation
+- Natural subject-background separation with proper depth relationships
 - Proper bokeh characteristics if blur is applied
-- Background should complement not distract from subject
+- The model's shadows and lighting must match the background environment
+- CRITICAL: The result should look like the model was actually photographed in this location, not composited
 
 IMAGE OUTPUT SPECS:
 - Aspect Ratio: ${selectedAspectRatio.description}
@@ -1945,8 +1950,13 @@ CRITICAL IMPERATIVES:
 - Do NOT change the model's facial features or body type
 - Preserve authentic garment colors with accurate material rendering
 - Seamless clothing integration with realistic physics
+- The model MUST look naturally placed in the background environment - NOT like a cutout pasted onto it
+- Lighting, shadows, and color temperature MUST match between model and background perfectly
+- Proper scale and perspective - the model should appear to actually exist in the space
 - All parameters must work together harmoniously
-- The final image should look like a $10,000 professional photoshoot from a top fashion photographer`;
+- The final image should look like a $10,000 professional photoshoot from a top fashion photographer
+- MOST IMPORTANT: Create a SINGLE COHESIVE IMAGE where the model naturally belongs in the environment, with consistent lighting throughout`;
+
 
     console.log('📝 Prompt:', prompt);
 
