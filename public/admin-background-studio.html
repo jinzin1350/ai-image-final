@@ -932,11 +932,12 @@
 
                     showNotification('پس‌زمینه با موفقیت تولید شد!', 'success');
                 } else {
-                    showNotification(data.error || 'خطا در تولید پس‌زمینه', 'error');
+                    const errorMessage = data.message || data.error || 'خطا در تولید پس‌زمینه';
+                    showNotification(errorMessage, 'error');
                 }
             } catch (error) {
                 console.error('Error generating background:', error);
-                showNotification('خطا در تولید پس‌زمینه', 'error');
+                showNotification('خطا در تولید پس‌زمینه: ' + error.message, 'error');
             } finally {
                 generateBtn.disabled = false;
                 generateBtn.innerHTML = '<span>✨ تولید پس‌زمینه</span>';

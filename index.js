@@ -2268,6 +2268,24 @@ app.post('/api/generate-image-only', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
+    // Check if Gemini AI is configured
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key') {
+      return res.status(503).json({
+        success: false,
+        error: 'Gemini AI is not configured',
+        message: 'Please set GEMINI_API_KEY in your environment variables to use AI image generation'
+      });
+    }
+
+    // Check if Supabase is configured (needed for image storage)
+    if (!supabase) {
+      return res.status(503).json({
+        success: false,
+        error: 'Supabase is not configured',
+        message: 'Please set Supabase credentials in your environment variables'
+      });
+    }
+
     console.log(`🎨 Generating ${contentType} with Gemini AI using prompt: ${prompt}`);
 
     // Map aspect ratio to dimensions
