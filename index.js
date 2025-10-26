@@ -1827,21 +1827,23 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     const imageRefText = garments.length === 1 ? 'second image (model), third image (background/location)' : `image ${garments.length + 1} (model), image ${garments.length + 2} (background/location)`;
 
-    const prompt = `You are a world-class professional fashion photographer and expert image editor with mastery in color science, fabric rendering, and photographic composition. Create an ultra-realistic, high-quality virtual try-on image.
+    const prompt = `You are a professional fashion photographer. Create a photorealistic virtual try-on image showing the model wearing the garment.
 
-TASK:
-1. Place ${garmentDescription} onto the model shown in the ${imageRefText}
-2. IMPORTANT: Place this model wearing the garment(s) in the BACKGROUND/LOCATION shown in the final image
-3. The model should be photographed in the environment/setting from the background image
+IMAGES PROVIDED:
+- Garment(s): ${garments.length === 1 ? 'First image' : `First ${garments.length} images`} - the clothing to be worn
+- Model: ${garments.length === 1 ? 'Second' : `Image ${garments.length + 1}`} - the person who will wear the garment
+- Background reference: ${garments.length === 1 ? 'Third' : `Image ${garments.length + 2}`} - for lighting and atmosphere reference only
+
+YOUR TASK - Virtual Try-On:
+Simply show the model from image ${garments.length === 1 ? '2' : garments.length + 1} wearing ${garmentDescription}, keeping everything else natural and realistic.
 
 CORE REQUIREMENTS:
-1. The model should wear ${garmentDescription}
-${garments.length > 1 ? '2. IMPORTANT: Combine and layer all garments naturally (e.g., pants + shirt + jacket all worn together by the model)\n' : ''}${garments.length > 1 ? '3' : '2'}. Keep the model's face and overall appearance from the reference image
-${garments.length > 1 ? '4' : '3'}. Garment Fit: ${selectedFit.description}
-${garments.length > 1 ? '5' : '4'}. The clothing must fit naturally on the model's body with realistic wrinkles and fabric draping
-${garments.length > 1 ? '6' : '5'}. CRITICAL: Place the model in the LOCATION/ENVIRONMENT from the background image - match lighting, perspective, and atmosphere
-${garments.length > 1 ? '7. Each garment should be clearly visible and properly layered (bottom layers like pants and shirts should be visible under jackets/coats)' : ''}
-${garments.length > 1 ? '8' : '6'}. Background: Use the location from the final image - ${selectedBackground.description}
+1. The model wears ${garmentDescription} - fit the clothing naturally onto the model's body
+${garments.length > 1 ? '2. Layer multiple garments realistically (pants, shirt, jacket all worn together)\n' : ''}${garments.length > 1 ? '3' : '2'}. KEEP the model's exact face, body type, and pose from the reference
+${garments.length > 1 ? '4' : '3'}. Garment fit: ${selectedFit.description}
+${garments.length > 1 ? '5' : '4'}. Natural fabric draping, wrinkles, and realistic clothing physics
+${garments.length > 1 ? '6' : '5'}. Use lighting inspiration from the background image - ${selectedBackground.description}
+${garments.length > 1 ? '7' : '6'}. The model should have similar lighting mood/style as shown in the background reference (warm/cool tones, soft/hard light, etc.)
 
 POSE & COMPOSITION:
 - Pose: ${selectedPose.description}
@@ -1946,16 +1948,17 @@ FINAL TECHNICAL SPECIFICATIONS:
 - No text, watermarks, logos, or artificial elements
 - Natural lens characteristics (slight vignette if shallow DoF)
 
-CRITICAL IMPERATIVES:
-- Do NOT change the model's facial features or body type
-- Preserve authentic garment colors with accurate material rendering
-- Seamless clothing integration with realistic physics
-- The model MUST look naturally placed in the background environment - NOT like a cutout pasted onto it
-- Lighting, shadows, and color temperature MUST match between model and background perfectly
-- Proper scale and perspective - the model should appear to actually exist in the space
-- All parameters must work together harmoniously
-- The final image should look like a $10,000 professional photoshoot from a top fashion photographer
-- MOST IMPORTANT: Create a SINGLE COHESIVE IMAGE where the model naturally belongs in the environment, with consistent lighting throughout`;
+CRITICAL IMPERATIVES FOR NATURAL RESULTS:
+- PRESERVE the model's facial features, body type, and overall appearance completely
+- ONLY change the clothing - everything else stays the same
+- Seamless garment integration that looks like the model is actually wearing these clothes
+- Natural fabric behavior with realistic wrinkles, shadows, and draping
+- The garment colors and textures must be preserved accurately
+- Lighting should be consistent and natural
+- NO unrealistic distortions, morphing, or artificial-looking effects
+- The result must look like a real photograph of this person wearing these clothes
+- MOST IMPORTANT: Focus on making the clothing look naturally worn by this specific model - don't try to change too many things at once`;
+
 
 
     console.log('📝 Prompt:', prompt);
