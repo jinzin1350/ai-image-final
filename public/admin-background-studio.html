@@ -781,21 +781,24 @@
 
         // Helper function to make authenticated requests
         async function fetchWithAuth(url, options = {}) {
-            const token = localStorage.getItem('adminToken');
-            if (!token) {
+            const adminEmail = sessionStorage.getItem('adminEmail');
+            const adminPassword = sessionStorage.getItem('adminPassword');
+
+            if (!adminEmail || !adminPassword) {
                 window.location.href = '/admin/login.html';
                 return;
             }
 
             const headers = {
                 ...options.headers,
-                'Authorization': `Bearer ${token}`
+                'admin-email': adminEmail,
+                'admin-password': adminPassword
             };
 
             const response = await fetch(url, { ...options, headers });
 
             if (response.status === 401) {
-                localStorage.removeItem('adminToken');
+                sessionStorage.clear();
                 window.location.href = '/admin/login.html';
                 return;
             }
