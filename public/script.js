@@ -601,6 +601,7 @@ generateBtn.addEventListener('click', async () => {
                 garmentPaths: uploadedGarmentPaths,
                 modelId: selectedModelId,
                 backgroundId: selectedBackgroundId,
+                customLocation: document.getElementById('customLocation')?.value || '', // Custom location override
                 poseId: selectedPoseId,
                 cameraAngleId: selectedCameraAngleId,
                 styleId: selectedStyleId,

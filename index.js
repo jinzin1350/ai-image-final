@@ -1066,35 +1066,50 @@ let models = [...fallbackModels];
 
 // لیست پس‌زمینه‌ها - 20 موقعیت واقعی و متنوع
 const backgrounds = [
-  // استودیو و داخلی (Indoor)
-  { id: 'studio-white', name: 'استودیو سفید', description: 'Professional white studio background, clean minimalist photography studio', image: 'https://images.unsplash.com/photo-1606146485010-7e2e2f72027e?w=800&h=600&fit=crop' },
-  { id: 'studio-gray', name: 'استودیو خاکستری', description: 'Modern gray studio background with professional lighting', image: 'https://images.unsplash.com/photo-1554844453-7ea2a562a6c8?w=800&h=600&fit=crop' },
-  { id: 'luxury-hotel', name: 'هتل لوکس', description: 'Luxury hotel lobby with elegant interior design', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop' },
-  { id: 'modern-office', name: 'دفتر مدرن', description: 'Modern minimalist office with glass walls', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop' },
-  { id: 'art-gallery', name: 'گالری هنری', description: 'Contemporary art gallery with white walls', image: 'https://images.unsplash.com/photo-1567281880862-4c3d9c1c4e88?w=800&h=600&fit=crop' },
+  // استودیو (Studio) - High Variation
+  { id: 'studio-white-highkey', name: 'استودیو سفید - نور بالا', description: 'Bright white seamless studio backdrop with high-key lighting, minimal shadows, clean professional fashion photography style, pure white cyclorama wall', image: 'https://images.unsplash.com/photo-1606146485010-7e2e2f72027e?w=800&h=600&fit=crop' },
+  { id: 'studio-gray-neutral', name: 'استودیو خاکستری خنثی', description: 'Neutral gray studio background with balanced soft lighting, medium gray backdrop, professional product photography style with subtle shadows', image: 'https://images.unsplash.com/photo-1554844453-7ea2a562a6c8?w=800&h=600&fit=crop' },
+  { id: 'studio-dark-dramatic', name: 'استودیو تیره دراماتیک', description: 'Dark moody studio with dramatic low-key lighting, deep charcoal background, strong side lighting creating contrast and depth, editorial fashion style', image: 'https://images.unsplash.com/photo-1554844453-7ea2a562a6c8?w=800&h=600&fit=crop' },
+  { id: 'studio-cream-warm', name: 'استودیو کرم گرم', description: 'Warm cream-colored studio with soft diffused lighting, beige textured backdrop, cozy warm tones, lifestyle photography aesthetic', image: 'https://images.unsplash.com/photo-1606146485010-7e2e2f72027e?w=800&h=600&fit=crop' },
 
-  // کافه و رستوران (Cafe & Restaurant)
-  { id: 'cafe-modern', name: 'کافه مدرن', description: 'Trendy modern cafe with large windows and natural light', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop' },
-  { id: 'cafe-vintage', name: 'کافه وینتیج', description: 'Vintage style cafe with warm lighting and cozy atmosphere', image: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=800&h=600&fit=crop' },
-  { id: 'restaurant-elegant', name: 'رستوران شیک', description: 'Elegant fine dining restaurant interior', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop' },
+  // کافه (Cafe) - Varied Atmospheres
+  { id: 'cafe-modern-bright', name: 'کافه مدرن روشن', description: 'Bright modern cafe with floor-to-ceiling windows, natural daylight streaming in, clean white interior, minimalist Scandinavian design, fresh and airy atmosphere', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop' },
+  { id: 'cafe-vintage-cozy', name: 'کافه وینتیج دنج', description: 'Cozy vintage cafe with warm Edison bulbs, exposed brick walls, wooden furniture, amber lighting, nostalgic atmosphere with soft shadows', image: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=800&h=600&fit=crop' },
+  { id: 'cafe-industrial-urban', name: 'کافه صنعتی شهری', description: 'Industrial loft cafe with metal fixtures, concrete walls, pendant lights, cool tones, urban trendy aesthetic with natural light from skylights', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop' },
+  { id: 'cafe-parisian-elegant', name: 'کافه پاریسی شیک', description: 'Elegant Parisian-style cafe with marble tables, velvet seating, gold accents, soft romantic lighting, sophisticated European charm', image: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=800&h=600&fit=crop' },
 
-  // فضای باز شهری (Urban Outdoor)
-  { id: 'street-urban', name: 'خیابان شهری', description: 'Modern city street with contemporary architecture', image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop' },
-  { id: 'rooftop-city', name: 'پشت‌بام شهری', description: 'Rooftop terrace with city skyline view', image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&h=600&fit=crop' },
-  { id: 'downtown-night', name: 'مرکز شهر شب', description: 'Downtown city at night with bright lights', image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&h=600&fit=crop' },
-  { id: 'alley-brick', name: 'کوچه آجری', description: 'Charming brick alley with urban character', image: 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&h=600&fit=crop' },
+  // شهری (Urban) - Different Times and Moods
+  { id: 'street-modern-day', name: 'خیابان مدرن روز', description: 'Contemporary city street in bright daylight, clean modern architecture, glass buildings, crisp shadows, dynamic urban energy, clear blue sky', image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop' },
+  { id: 'street-graffiti-colorful', name: 'خیابان گرافیتی رنگی', description: 'Vibrant street art alley with colorful graffiti murals, urban edge, artistic vibe, natural daylight, street culture aesthetic', image: 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&h=600&fit=crop' },
+  { id: 'downtown-golden-hour', name: 'مرکز شهر طلایی', description: 'Downtown cityscape during golden hour, warm sunset light reflecting off glass buildings, long soft shadows, magical hour glow', image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&h=600&fit=crop' },
+  { id: 'downtown-night-neon', name: 'مرکز شهر شب نئونی', description: 'Downtown at night with vibrant neon lights, colorful store signs, bokeh city lights in background, cinematic night photography', image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&h=600&fit=crop' },
+  { id: 'rooftop-skyline', name: 'پشت‌بام با منظره', description: 'Rooftop terrace with stunning city skyline view, afternoon light, modern urban backdrop, professional architectural setting', image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&h=600&fit=crop' },
 
-  // طبیعت (Nature)
-  { id: 'beach-sunset', name: 'ساحل غروب', description: 'Beautiful beach at sunset with golden light', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop' },
-  { id: 'park-green', name: 'پارک سبز', description: 'Lush green park with trees and natural lighting', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop' },
-  { id: 'garden-flower', name: 'باغ گل', description: 'Colorful flower garden with blooming plants', image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800&h=600&fit=crop' },
-  { id: 'forest-path', name: 'جنگل', description: 'Forest path with natural greenery and soft light', image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&h=600&fit=crop' },
+  // طبیعت (Nature) - Different Seasons and Times
+  { id: 'beach-golden-sunset', name: 'ساحل غروب طلایی', description: 'Sandy beach at golden hour sunset, warm orange and pink sky, soft natural light, romantic coastal atmosphere, gentle ocean backdrop', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop' },
+  { id: 'park-spring-bright', name: 'پارک بهاری روشن', description: 'Lush green park in spring, bright daylight filtering through trees, fresh vibrant greenery, natural outdoor lighting, energetic atmosphere', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop' },
+  { id: 'forest-morning-mist', name: 'جنگل مه صبح', description: 'Misty forest path in early morning, soft diffused light through fog, ethereal dreamy atmosphere, cool tones, mysterious natural setting', image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&h=600&fit=crop' },
+  { id: 'garden-summer-bloom', name: 'باغ گل تابستانی', description: 'Colorful flower garden in full summer bloom, bright natural sunlight, vibrant colors, cheerful outdoor setting, botanical backdrop', image: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=800&h=600&fit=crop' },
 
-  // معماری و ساختمان (Architecture)
-  { id: 'building-modern', name: 'ساختمان مدرن', description: 'Modern architectural building with geometric design', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop' },
-  { id: 'stairs-marble', name: 'پله‌های مرمر', description: 'Elegant marble staircase in modern building', image: 'https://images.unsplash.com/photo-1505798577917-a65157d3320a?w=800&h=600&fit=crop' },
-  { id: 'plaza-public', name: 'میدان عمومی', description: 'Open public plaza with contemporary design', image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&h=600&fit=crop' },
-  { id: 'bridge-urban', name: 'پل شهری', description: 'Modern urban bridge with architectural interest', image: 'https://images.unsplash.com/photo-1470114716159-e389f8712fda?w=800&h=600&fit=crop' }
+  // معماری (Architecture) - Varied Styles
+  { id: 'building-modern-glass', name: 'ساختمان شیشه‌ای مدرن', description: 'Sleek modern glass building with geometric patterns, reflective surfaces, contemporary architecture, clean lines, professional business aesthetic', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop' },
+  { id: 'stairs-marble-luxury', name: 'پله‌های مرمر لوکس', description: 'Elegant marble staircase in luxury building, sophisticated lighting, high-end architectural detail, refined elegant atmosphere', image: 'https://images.unsplash.com/photo-1505798577917-a65157d3320a?w=800&h=600&fit=crop' },
+  { id: 'concrete-minimal', name: 'بتن مینیمال', description: 'Minimalist concrete architecture, raw industrial aesthetic, clean geometric shapes, modern brutalist style, neutral gray tones', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop' },
+  { id: 'bridge-modern-steel', name: 'پل فلزی مدرن', description: 'Contemporary steel bridge with architectural interest, urban engineering, strong lines and structure, dynamic modern backdrop', image: 'https://images.unsplash.com/photo-1470114716159-e389f8712fda?w=800&h=600&fit=crop' },
+
+  // داخلی لوکس (Luxury Interior)
+  { id: 'hotel-lobby-elegant', name: 'لابی هتل اِلِگانت', description: 'Luxurious hotel lobby with crystal chandeliers, polished marble floors, elegant furniture, warm ambient lighting, five-star sophistication', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop' },
+  { id: 'office-modern-bright', name: 'دفتر مدرن روشن', description: 'Modern bright office space with glass walls, natural daylight, clean white interior, professional business environment, corporate aesthetic', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop' },
+  { id: 'gallery-art-white', name: 'گالری هنری سفید', description: 'Contemporary white art gallery with pristine walls, track lighting, minimalist exhibition space, clean professional art presentation', image: 'https://images.unsplash.com/photo-1567281880862-4c3d9c1c4e88?w=800&h=600&fit=crop' },
+  { id: 'loft-industrial-brick', name: 'لافت صنعتی آجری', description: 'Industrial loft with exposed brick walls, high ceilings, large windows, natural light, urban trendy living space aesthetic', image: 'https://images.unsplash.com/photo-1567281880862-4c3d9c1c4e88?w=800&h=600&fit=crop' },
+
+  // رستوران (Restaurant)
+  { id: 'restaurant-fine-dining', name: 'رستوران شیک', description: 'Elegant fine dining restaurant with mood lighting, sophisticated table settings, romantic ambiance, warm intimate atmosphere', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop' },
+  { id: 'restaurant-modern-casual', name: 'رستوران مدرن کژوال', description: 'Modern casual dining space with bright lighting, contemporary design, relaxed atmosphere, friendly welcoming environment', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop' },
+
+  // فضای باز دیگر (Other Outdoor)
+  { id: 'plaza-urban-day', name: 'میدان شهری روز', description: 'Open urban plaza in bright daylight, modern public space, contemporary architecture, clean geometric design, dynamic city environment', image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&h=600&fit=crop' },
+  { id: 'alley-charming-brick', name: 'کوچه آجری جذاب', description: 'Charming narrow brick alley with character, vintage urban feel, natural daylight, authentic street photography aesthetic', image: 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=800&h=600&fit=crop' }
 ];
 
 // لیست حالت‌های بدن (Poses)
@@ -1701,6 +1716,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       garmentPaths,     // New: array of garment paths
       modelId,
       backgroundId,
+      customLocation,   // NEW: Custom location description (overrides backgroundId)
       poseId = 'standing-front',
       cameraAngleId = 'eye-level',
       styleId = 'professional',
@@ -1827,6 +1843,13 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     const imageRefText = garments.length === 1 ? 'second image (model), third image (background/location)' : `image ${garments.length + 1} (model), image ${garments.length + 2} (background/location)`;
 
+    // Use custom location if provided, otherwise use selected background
+    const locationDescription = customLocation && customLocation.trim() !== ''
+      ? customLocation.trim()
+      : `${selectedBackground.name} - ${selectedBackground.description}`;
+
+    console.log('📍 Using location description:', locationDescription);
+
     const prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
 IMAGES PROVIDED:
@@ -1837,7 +1860,7 @@ TASK:
 Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.
 
 SCENE & ENVIRONMENT:
-- Location/Background: ${selectedBackground.name} - ${selectedBackground.description}
+- Location/Background: ${locationDescription}
 - Lighting: ${selectedLighting.description}
 - Style: ${selectedStyle.description}
 - Mood: Professional fashion photography
@@ -1848,7 +1871,7 @@ KEY REQUIREMENTS:
 3. ${selectedPose.description}
 4. ${selectedCameraAngle.description}
 5. Professional ${selectedLighting.description}
-6. Background: ${selectedBackground.description}
+6. Background: ${locationDescription}
 
 QUALITY STANDARDS:
 - Photorealistic, like a professional fashion photograph
