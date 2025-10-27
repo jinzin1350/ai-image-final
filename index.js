@@ -1859,28 +1859,31 @@ IMAGES PROVIDED:
 TASK:
 Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.
 
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Fabric Type: ${selectedFabric.description}
+- Lighting: ${selectedLighting.description}
+- Background Blur: ${selectedBgBlur.description}
+- Depth of Field: ${selectedDoF.description}
+- Color Temperature: ${selectedColorTemp.description}
+- Shadow Quality: ${selectedShadow.description}
+- Garment Fit: ${selectedFit.description}
+
 SCENE & ENVIRONMENT:
 - Location/Background: ${locationDescription}
-- Lighting: ${selectedLighting.description}
 - Style: ${selectedStyle.description}
+- Pose: ${selectedPose.description}
+- Camera Angle: ${selectedCameraAngle.description}
 - Mood: Professional fashion photography
 
 KEY REQUIREMENTS:
 1. Keep model's face, body, and pose EXACTLY the same - only change the clothes
 2. Garment should fit naturally with realistic wrinkles and fabric draping
-3. ${selectedPose.description}
-4. ${selectedCameraAngle.description}
-5. Professional ${selectedLighting.description}
-6. Background: ${locationDescription}
-
-QUALITY STANDARDS:
-- Photorealistic, like a professional fashion photograph
-- Natural skin texture (no plastic smoothing or artificial effects)
-- Accurate garment colors and patterns from the garment image
-- Realistic fabric physics, wrinkles, and natural shadows
-- Clean, sharp focus on the model and clothing
-- Professional composition and framing
-- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height}
+3. Natural skin texture (no plastic smoothing or artificial effects)
+4. Accurate garment colors and patterns from the garment image
+5. Realistic fabric physics, wrinkles, and natural shadows
+6. Clean, sharp focus on the model and clothing
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
