@@ -9,13 +9,7 @@
 <body>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header"><div class="logo"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/></svg><span>Admin Panel</span></div></div>
-        <nav class="sidebar-nav">
-            <a href="/admin/dashboard" class="nav-item"><span>Dashboard</span></a>
-            <a href="/admin/users" class="nav-item"><span>Users</span></a>
-            <a href="/admin/content" class="nav-item active"><span>Content Library</span></a>
-            <a href="/admin/user-content" class="nav-item"><span>User Content</span></a>
-            <a href="/admin/analytics" class="nav-item"><span>Analytics</span></a>
-        </nav>
+        <div class="sidebar-nav-container" data-active-page="content"></div>
         <div class="sidebar-footer"><button class="btn-logout" onclick="handleLogout()"><span>Logout</span></button></div>
     </aside>
 
@@ -61,6 +55,7 @@
         </div>
     </main>
 
+    <script src="/admin-menu.js"></script>
     <script src="/admin-common.js"></script>
     <script>
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
