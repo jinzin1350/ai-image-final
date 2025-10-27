@@ -5,6 +5,7 @@ const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const axios = require('axios');
+const sharp = require('sharp');
 require('dotenv').config();
 
 const app = express();
@@ -1591,6 +1592,44 @@ async function imageUrlToBase64(url) {
   }
 }
 
+// Image enhancement function using Sharp
+async function enhanceImage(imageBuffer) {
+  try {
+    console.log('🎨 Enhancing image quality with Sharp...');
+
+    const enhancedBuffer = await sharp(imageBuffer)
+      // Improve sharpness and clarity
+      .sharpen({
+        sigma: 1.5,      // Sharpening strength
+        m1: 1.0,         // Sharpening threshold
+        m2: 0.2          // Sharpening edge detection
+      })
+      // Enhance colors and contrast
+      .modulate({
+        brightness: 1.05,  // Slight brightness boost
+        saturation: 1.1    // Enhance color saturation
+      })
+      // Improve contrast
+      .linear(1.1, -(128 * 0.1)) // Increase contrast slightly
+      // Normalize the image
+      .normalize()
+      // Convert to PNG with high quality
+      .png({
+        quality: 100,
+        compressionLevel: 6,
+        adaptiveFiltering: true
+      })
+      .toBuffer();
+
+    console.log('✅ Image enhancement completed');
+    return enhancedBuffer;
+  } catch (error) {
+    console.error('⚠️ Image enhancement failed, using original:', error.message);
+    // If enhancement fails, return original buffer
+    return imageBuffer;
+  }
+}
+
 // تابع تولید تصاویر مدل‌ها با Gemini AI
 async function generateModelImages() {
   console.log('🎨 شروع تولید تصاویر مدل‌ها با Gemini AI...');
@@ -1974,12 +2013,16 @@ Make it simple and natural - like this person is actually wearing these clothes 
 
     // تبدیل base64 به buffer
     const imageBuffer = Buffer.from(generatedImageBase64, 'base64');
+
+    // Enhance image quality with Sharp
+    const enhancedImageBuffer = await enhanceImage(imageBuffer);
+
     const fileName = `generated-${Date.now()}.png`;
 
     // آپلود تصویر تولید شده به Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('garments')
-      .upload(fileName, imageBuffer, {
+      .upload(fileName, enhancedImageBuffer, {
         contentType: 'image/png',
         upsert: false
       });
