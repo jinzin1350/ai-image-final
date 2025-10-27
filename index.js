@@ -1813,12 +1813,12 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('✨ Style:', selectedStyle.name);
     console.log('💡 Lighting:', selectedLighting.name);
 
-    // دانلود عکس‌های لباس (چند تایی) و مدل و پس‌زمینه و تبدیل به base64
+    // دانلود عکس‌های لباس (چند تایی) و مدل و تبدیل به base64
+    // Background is now TEXT ONLY - not sent as image to AI
     const garmentBase64Array = await Promise.all(
       garments.map(path => imageUrlToBase64(path))
     );
     const modelBase64 = await imageUrlToBase64(selectedModel.image);
-    const backgroundBase64 = await imageUrlToBase64(selectedBackground.image);
 
     // ساخت پرامپت برای Virtual Try-On با پارامترهای جدید
     const garmentDescription = garments.length === 1
@@ -1829,38 +1829,44 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     const prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
-IMAGES:
-- Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment to wear
-- Image ${garments.length + 1}: Model
-- Image ${garments.length + 2}: Background/location
+IMAGES PROVIDED:
+- Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment/clothing to wear
+- Image ${garments.length + 1}: Model (person)
 
 TASK:
-Show this exact model wearing ${garmentDescription}. Make it look like a real photograph.
+Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.
+
+SCENE & ENVIRONMENT:
+- Location/Background: ${selectedBackground.name} - ${selectedBackground.description}
+- Lighting: ${selectedLighting.description}
+- Style: ${selectedStyle.description}
+- Mood: Professional fashion photography
 
 KEY REQUIREMENTS:
 1. Keep model's face, body, and pose EXACTLY the same - only change the clothes
 2. Garment should fit naturally with realistic wrinkles and fabric draping
-3. Match lighting and mood from the background image
-4. ${selectedPose.description}
-5. ${selectedCameraAngle.description}
-6. ${selectedStyle.description}
-7. ${selectedLighting.description}
+3. ${selectedPose.description}
+4. ${selectedCameraAngle.description}
+5. Professional ${selectedLighting.description}
+6. Background: ${selectedBackground.description}
 
-QUALITY:
+QUALITY STANDARDS:
 - Photorealistic, like a professional fashion photograph
-- Natural skin texture (no plastic smoothing)
-- Accurate garment colors and patterns
-- Realistic fabric physics and shadows
-- Clean, sharp focus on the model
+- Natural skin texture (no plastic smoothing or artificial effects)
+- Accurate garment colors and patterns from the garment image
+- Realistic fabric physics, wrinkles, and natural shadows
+- Clean, sharp focus on the model and clothing
+- Professional composition and framing
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height}
 
 DO NOT:
-- Change the model's face or body
-- Make unrealistic distortions
+- Change the model's face, body type, or overall appearance
+- Make unrealistic distortions or morphing
 - Add text, watermarks, or logos
-- Create artificial or fake-looking composites
+- Create obvious fake composites or artificial effects
+- Over-smooth skin or create plastic-looking results
 
-Make it simple and natural - like this person is actually wearing these clothes in a real photo.`;
+Make it simple and natural - like this person is actually wearing these clothes in a real professional photo shoot.`;
 
 
 
@@ -1874,7 +1880,7 @@ Make it simple and natural - like this person is actually wearing these clothes 
       }
     });
 
-    // Build content array with all garments + model
+    // Build content array with garments + model ONLY (no background image)
     const contentParts = [];
 
     // Add all garment images
@@ -1897,16 +1903,10 @@ Make it simple and natural - like this person is actually wearing these clothes 
       }
     });
 
-    // Add background/location image
-    contentParts.push({ text: "BACKGROUND/LOCATION IMAGE:" });
-    contentParts.push({
-      inlineData: {
-        data: backgroundBase64,
-        mimeType: 'image/jpeg'
-      }
-    });
+    // Background is now TEXT ONLY in the prompt - no image sent
+    // This simplifies the AI's task: just garment + model
 
-    // Add prompt
+    // Add prompt with text-based background description
 
 
 
