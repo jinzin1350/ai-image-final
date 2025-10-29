@@ -1717,6 +1717,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
+      hijabType,        // NEW: نوع حجاب
       poseId = 'standing-front',
       cameraAngleId = 'eye-level',
       styleId = 'professional',
@@ -1850,6 +1851,21 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     console.log('📍 Using location description:', locationDescription);
 
+    // تعریف نوع حجاب
+    const hijabDescriptions = {
+      'full-rosari': 'Complete hijab with headscarf (rosari) covering the entire head and neck',
+      'full-shal': 'Complete hijab with shawl (shal) covering the entire head and neck',
+      'half-rosari': 'Half hijab with headscarf (rosari) covering part of the head',
+      'half-shal': 'Half hijab with shawl (shal) covering part of the head',
+      'no-hijab': 'No hijab - hair visible'
+    };
+
+    const hijabDescription = hijabType && hijabDescriptions[hijabType]
+      ? hijabDescriptions[hijabType]
+      : null;
+
+    console.log('🧕 Hijab type:', hijabType, hijabDescription);
+
     const prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
 IMAGES PROVIDED:
@@ -1868,7 +1884,7 @@ TECHNICAL SPECS:
 - Depth of Field: ${selectedDoF.description}
 - Color Temperature: ${selectedColorTemp.description}
 - Shadow Quality: ${selectedShadow.description}
-- Garment Fit: ${selectedFit.description}
+- Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
 
 SCENE & ENVIRONMENT:
 - Location/Background: ${locationDescription}
@@ -1883,7 +1899,7 @@ KEY REQUIREMENTS:
 3. Natural skin texture (no plastic smoothing or artificial effects)
 4. Accurate garment colors and patterns from the garment image
 5. Realistic fabric physics, wrinkles, and natural shadows
-6. Clean, sharp focus on the model and clothing
+6. Clean, sharp focus on the model and clothing${hijabDescription ? `\n7. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
 DO NOT:
 - Change the model's face, body type, or overall appearance

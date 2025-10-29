@@ -31,6 +31,7 @@ function handleLogout() {
 let uploadedGarmentPaths = []; // Changed to array for multiple garments
 let selectedModelId = null;
 let selectedBackgroundId = null;
+let selectedHijabType = null; // نوع حجاب انتخاب شده
 let allModels = [];
 let currentCategory = 'woman';
 let selectedPoseId = 'standing-front';
@@ -74,6 +75,9 @@ const shadowSelect = document.getElementById('shadowSelect');
 const aspectRatioSelect = document.getElementById('aspectRatioSelect');
 const bgBlurSelect = document.getElementById('bgBlurSelect');
 const fitSelect = document.getElementById('fitSelect');
+
+// Hijab section elements
+const hijabSection = document.getElementById('hijabSection');
 
 // بارگذاری مدل‌ها
 async function loadModels() {
@@ -366,6 +370,30 @@ function selectModel(modelId) {
     document.querySelectorAll('.model-card').forEach(card => {
         card.classList.toggle('selected', card.dataset.id === modelId);
     });
+
+    // نمایش بخش انتخاب حجاب فقط برای دسته‌های مناسب
+    const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+    if (shouldShowHijab) {
+        hijabSection.style.display = 'block';
+        // ریست کردن انتخاب قبلی حجاب
+        selectedHijabType = null;
+        document.querySelectorAll('.hijab-option-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+    } else {
+        hijabSection.style.display = 'none';
+        selectedHijabType = null;
+    }
+
+    checkGenerateButton();
+}
+
+// انتخاب نوع حجاب
+function selectHijabType(hijabType) {
+    selectedHijabType = hijabType;
+    document.querySelectorAll('.hijab-option-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.hijabType === hijabType);
+    });
     checkGenerateButton();
 }
 
@@ -380,7 +408,15 @@ function selectBackground(backgroundId) {
 
 // بررسی فعال بودن دکمه تولید
 function checkGenerateButton() {
-    generateBtn.disabled = !(uploadedGarmentPaths.length > 0 && selectedModelId && selectedBackgroundId);
+    const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+    const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
+
+    generateBtn.disabled = !(
+        uploadedGarmentPaths.length > 0 &&
+        selectedModelId &&
+        selectedBackgroundId &&
+        hijabCondition
+    );
 }
 
 // رویدادهای آپلود فایل
@@ -502,6 +538,7 @@ generateBtn.addEventListener('click', async () => {
                 modelId: selectedModelId,
                 backgroundId: selectedBackgroundId,
                 customLocation: document.getElementById('customLocation')?.value || '', // Custom location override
+                hijabType: selectedHijabType, // نوع حجاب انتخاب شده
                 poseId: selectedPoseId,
                 cameraAngleId: selectedCameraAngleId,
                 styleId: selectedStyleId,
@@ -607,3 +644,11 @@ loadShadowQualities();
 loadAspectRatios();
 loadBackgroundBlurs();
 loadGarmentFits();
+
+// افزودن event listener برای انتخاب حجاب
+document.querySelectorAll('.hijab-option-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const hijabType = card.dataset.hijabType;
+        selectHijabType(hijabType);
+    });
+});
