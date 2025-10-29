@@ -1853,11 +1853,11 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // تعریف نوع حجاب
     const hijabDescriptions = {
-      'full-rosari': 'Complete hijab with headscarf (rosari) covering the entire head and neck',
-      'full-shal': 'Complete hijab with shawl (shal) covering the entire head and neck',
-      'half-rosari': 'Half hijab with headscarf (rosari) covering part of the head',
-      'half-shal': 'Half hijab with shawl (shal) covering part of the head',
-      'no-hijab': 'No hijab - hair visible'
+      'full-rosari': 'Full traditional hijab: headscarf (rosari) tightly wrapped, completely covering all hair and neck, modest conservative Islamic style, no hair visible',
+      'full-shal': 'Full traditional hijab: shawl (shal) tightly wrapped, completely covering all hair and neck, modest conservative Islamic style, no hair visible',
+      'half-rosari': 'Loose relaxed hijab: headscarf (rosari) worn loosely and casually, still covering the head but in a modern relaxed style, may show a small amount of hair at the front edges, draped more freely',
+      'half-shal': 'Loose relaxed hijab: shawl (shal) worn loosely and casually, still covering the head but in a modern relaxed style, may show a small amount of hair at the front edges, draped more freely',
+      'no-hijab': 'No hijab - hair completely visible and uncovered'
     };
 
     const hijabDescription = hijabType && hijabDescriptions[hijabType]
