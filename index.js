@@ -1853,10 +1853,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // تعریف نوع حجاب
     const hijabDescriptions = {
-      'full-rosari': 'Full traditional hijab: headscarf (rosari) tightly wrapped, completely covering all hair and neck, modest conservative Islamic style, no hair visible',
-      'full-shal': 'Full traditional hijab: shawl (shal) tightly wrapped, completely covering all hair and neck, modest conservative Islamic style, no hair visible',
-      'half-rosari': 'Loose relaxed hijab: headscarf (rosari) worn loosely and casually, still covering the head but in a modern relaxed style, may show a small amount of hair at the front edges, draped more freely',
-      'half-shal': 'Loose relaxed hijab: shawl (shal) worn loosely and casually, still covering the head but in a modern relaxed style, may show a small amount of hair at the front edges, draped more freely',
+      'full-rosari': 'Full traditional hijab with ROSARI (square headscarf): small square scarf tightly wrapped and tied under chin or behind head, fitted and structured, completely covering all hair and neck, modest conservative Islamic style, no hair visible',
+      'full-shal': 'Full traditional hijab with SHAL (rectangular shawl/scarf): large rectangular shawl tightly wrapped, completely covering all hair and neck, modest conservative Islamic style, no hair visible, more fabric than rosari',
+      'half-rosari': 'Loose modern hijab with ROSARI (square headscarf): small square scarf worn loosely and casually, tied loosely under chin or behind head, still covering the head but in a modern relaxed style, may show a small amount of hair at the front edges, fitted but casual',
+      'half-shal': 'Loose modern hijab with SHAL (rectangular shawl/scarf): large rectangular shawl draped loosely and casually over head and shoulders, flowing and relaxed modern style, still covering the head but worn casually, may show a small amount of hair at the front edges, draped freely with more fabric flow',
       'no-hijab': 'No hijab - hair completely visible and uncovered'
     };
 
