@@ -873,11 +873,17 @@
             let photoType = isAccessory ? 'accessory product' : (isUnderwear ? 'underwear product' : 'fashion');
             let prompt = `Professional ${quality} ${photoType} photograph of a ${age.replace('-', ' ')} ${ethnicity} ${gender} model. `;
 
-            prompt += `Face: ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
+            // For underwear models: HEADLESS/CROPPED (no face shown) for e-commerce focus
+            if (!isUnderwear) {
+                prompt += `Face: ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
 
-            prompt += `Hair: ${hairLength} ${hairTexture} ${hairColor} hair styled in ${hairstyle}. `;
-            if (gender === 'male' && facialHair !== 'none') {
-                prompt += `${facialHair} facial hair. `;
+                prompt += `Hair: ${hairLength} ${hairTexture} ${hairColor} hair styled in ${hairstyle}. `;
+                if (gender === 'male' && facialHair !== 'none') {
+                    prompt += `${facialHair} facial hair. `;
+                }
+            } else {
+                // Headless model for underwear photography
+                prompt += `HEADLESS MODEL - face and head NOT SHOWN, cropped at neck level. E-commerce product photography style focusing only on body and garment. `;
             }
 
             prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
