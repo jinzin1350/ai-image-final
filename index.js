@@ -1715,8 +1715,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       mode = 'complete-outfit',  // NEW: 'complete-outfit', 'accessories-only', 'underwear'
       garmentPath,      // For backward compatibility (single garment)
       garmentPaths,     // New: array of garment paths
-      userPhotoPath,    // NEW: For accessories-only mode
-      accessories = [], // NEW: Array of accessory IDs
+      accessoryPath,    // NEW: For accessories-only mode (product photo)
+      accessoryType,    // NEW: Type of accessory (handbag, watch, etc.)
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
@@ -1756,8 +1756,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
       }
     } else if (mode === 'accessories-only') {
-      if (!userPhotoPath || !accessories.length) {
-        return res.status(400).json({ error: 'لطفاً عکس خود و حداقل یک اکسسوری را انتخاب کنید' });
+      if (!accessoryPath || !accessoryType || !modelId || !backgroundId) {
+        return res.status(400).json({ error: 'لطفاً تصویر اکسسوری، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
       }
     } else if (mode === 'underwear') {
       if (!modelId || !backgroundId || !braStyle || !pantyStyle || !underwearColor) {
@@ -1873,9 +1873,14 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'accessories-only') {
-      // For accessories mode, we only need the user's photo
-      // It will be loaded in the contentParts section
-      locationDescription = ''; // Not used in accessories mode
+      // For accessories mode, load accessory product image and model
+      garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
+      modelBase64 = await imageUrlToBase64(selectedModel.image);
+
+      garmentDescription = `the ${accessoryType} accessory from the first image`;
+      locationDescription = customLocation && customLocation.trim() !== ''
+        ? customLocation.trim()
+        : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'underwear') {
       // Load model image only
@@ -1901,54 +1906,20 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('🧕 Hijab type:', hijabType, hijabDescription);
 
     // ========================================
-    // NEW: Accessory Descriptions
-    // ========================================
-    const accessoryDescriptions = {
-      // Glasses
-      'sunglasses-aviator': 'aviator-style sunglasses with metal frame',
-      'sunglasses-cateye': 'cat-eye sunglasses with retro style',
-      'sunglasses-round': 'round sunglasses with vintage look',
-      'glasses-reading': 'reading glasses with modern frame',
-      // Jewelry
-      'necklace-pendant': 'elegant pendant necklace',
-      'necklace-chain': 'gold chain necklace',
-      'earrings-drop': 'drop earrings',
-      'earrings-stud': 'stud earrings',
-      'bracelet': 'fashionable bracelet',
-      'rings': 'elegant rings',
-      // Bags
-      'bag-handbag': 'handbag held in hand or on arm',
-      'bag-crossbody': 'crossbody bag worn across shoulder',
-      'bag-clutch': 'clutch bag held in hand',
-      'bag-backpack': 'backpack worn on back',
-      // Hats & Scarves
-      'hat-fedora': 'fedora hat',
-      'hat-baseball': 'baseball cap',
-      'hat-beanie': 'knit beanie hat',
-      'scarf-neck': 'neck scarf draped elegantly',
-      // Watches & Belts
-      'watch-classic': 'classic wristwatch',
-      'watch-sport': 'sport watch',
-      'belt-leather': 'leather belt'
-    };
-
-    const accessoryList = accessories.map(acc => accessoryDescriptions[acc] || acc).join(', ');
-
-    // ========================================
     // NEW: Mode-Specific Prompt Generation
     // ========================================
     let prompt = '';
 
     if (mode === 'complete-outfit') {
-      // COMPLETE OUTFIT MODE: Garment + Hijab + Optional Accessories
-      prompt = `Create a photorealistic fashion photo showing the model wearing the garment${accessories.length > 0 ? ' and accessories' : ''}.
+      // COMPLETE OUTFIT MODE: Garment + Hijab
+      prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
 IMAGES PROVIDED:
 - Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment/clothing to wear
 - Image ${garments.length + 1}: Model (person)
 
 TASK:
-Show this exact model wearing ${garmentDescription}${accessories.length > 0 ? ` with the following accessories: ${accessoryList}` : ''}. Make it look like a real professional photograph.
+Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -1959,7 +1930,7 @@ TECHNICAL SPECS:
 - Depth of Field: ${selectedDoF.description}
 - Color Temperature: ${selectedColorTemp.description}
 - Shadow Quality: ${selectedShadow.description}
-- Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}${accessories.length > 0 ? `\n- Accessories: ${accessoryList}` : ''}
+- Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
 
 SCENE & ENVIRONMENT:
 - Location/Background: ${locationDescription}
@@ -1974,7 +1945,7 @@ KEY REQUIREMENTS:
 3. Natural skin texture (no plastic smoothing or artificial effects)
 4. Accurate garment colors and patterns from the garment image
 5. Realistic fabric physics, wrinkles, and natural shadows
-6. Clean, sharp focus on the model and clothing${hijabDescription ? `\n7. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}${accessories.length > 0 ? `\n8. Add accessories naturally and realistically: ${accessoryList}` : ''}
+6. Clean, sharp focus on the model and clothing${hijabDescription ? `\n7. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
@@ -1983,43 +1954,79 @@ DO NOT:
 - Create obvious fake composites or artificial effects
 - Over-smooth skin or create plastic-looking results
 
-Make it simple and natural - like this person is actually wearing these clothes${accessories.length > 0 ? ' and accessories' : ''} in a real professional photo shoot.`;
+Make it simple and natural - like this person is actually wearing these clothes in a real professional photo shoot.`;
 
     } else if (mode === 'accessories-only') {
-      // ACCESSORIES ONLY MODE: Add accessories to user's photo
-      prompt = `Add the following accessories to this person's existing outfit while keeping everything else unchanged: ${accessoryList}.
+      // ACCESSORIES MODE: Product Photography for Accessory
+      const accessoryTypeDescriptions = {
+        'handbag': 'handbag (carried in hand or on arm)',
+        'backpack': 'backpack (worn on back)',
+        'crossbody-bag': 'crossbody bag (worn across shoulder)',
+        'clutch': 'clutch bag (held in hand)',
+        'sunglasses': 'sunglasses (worn on face)',
+        'eyeglasses': 'eyeglasses (worn on face)',
+        'watch': 'wristwatch (worn on wrist)',
+        'necklace': 'necklace (worn around neck)',
+        'earrings': 'earrings (worn on ears)',
+        'bracelet': 'bracelet (worn on wrist)',
+        'ring': 'ring (worn on finger)',
+        'scarf': 'neck scarf (draped around neck)',
+        'hat': 'hat (worn on head)',
+        'belt': 'belt (worn around waist)',
+        'shoes': 'shoes (worn on feet)'
+      };
 
-IMAGE PROVIDED:
-- User's photo showing their current outfit
+      const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
+
+      prompt = `Create a professional product photography image showing the model wearing/holding/using this ${accessoryType}.
+
+IMAGES PROVIDED:
+- Image 1: ${accessoryType.toUpperCase()} product photo
+- Image 2: Model (person)
 
 TASK:
-Add these accessories to the photo: ${accessoryList}. The person's clothing, pose, background, and everything else must remain EXACTLY the same. Only add the specified accessories.
+Show this exact model wearing, holding, or using ${garmentDescription}. Create a professional product photography shot that showcases the ${accessoryType} naturally on the model.
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
-- Lighting: Natural, matching the original photo
-- Style: Realistic product integration
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Lighting: ${selectedLighting.description}
+- Background Blur: ${selectedBgBlur.description}
+- Depth of Field: ${selectedDoF.description}
+- Color Temperature: ${selectedColorTemp.description}
+- Shadow Quality: ${selectedShadow.description}
 
-ACCESSORIES TO ADD:
-${accessoryList}
+SCENE & ENVIRONMENT:
+- Location/Background: ${locationDescription}
+- Style: ${selectedStyle.description}
+- Pose: ${selectedPose.description}
+- Camera Angle: ${selectedCameraAngle.description}
+- Mood: Professional product photography for e-commerce/Instagram
+
+ACCESSORY POSITIONING:
+- Type: ${accessoryDesc}
+- Position the ${accessoryType} naturally and appropriately on/with the model
+- The ${accessoryType} should be the STAR of the photo - clearly visible and well-displayed
+- Model should showcase the ${accessoryType} in a natural, appealing way
 
 KEY REQUIREMENTS:
-1. Keep EVERYTHING in the original photo unchanged (clothing, pose, background, lighting, person's appearance)
-2. ONLY add the specified accessories
-3. Accessories should look natural and realistic
-4. Match the lighting and style of the original photo
-5. Accessories should be positioned appropriately (glasses on face, bags in hand or on shoulder, jewelry on body, etc.)
-6. Maintain the original photo's quality and aesthetic
-7. No modifications to existing outfit or environment
+1. Keep model's face and body EXACTLY the same from the reference image
+2. Position the ${accessoryType} correctly based on its type (${accessoryDesc})
+3. The ${accessoryType} should look natural and realistic on/with the model
+4. Accurate colors and details from the ${accessoryType} product image
+5. Professional product photography aesthetic - clean, appealing, e-commerce ready
+6. Focus on showcasing the ${accessoryType} product beautifully
+7. Natural skin texture (no plastic smoothing)
+8. Clean, sharp focus on both model and ${accessoryType}
 
 DO NOT:
-- Change the person's clothing, pose, or facial expression
-- Modify the background or lighting
-- Add any elements other than the specified accessories
-- Make the accessories look artificial or pasted on
+- Change the model's face, body type, or overall appearance
+- Make unrealistic distortions or artificial effects
 - Add text, watermarks, or logos
+- Make the ${accessoryType} look pasted on or fake
+- Over-smooth skin or create plastic-looking results
 
-Focus on seamlessly integrating the accessories into the existing photo as if they were always there.`;
+Create a beautiful product photography shot that would work perfectly for an e-commerce website or Instagram post - professional, clean, and showcasing the ${accessoryType} naturally on the model.`;
 
     } else if (mode === 'underwear') {
       // UNDERWEAR MODE: Generate lingerie visualization
@@ -2122,12 +2129,19 @@ Create a clean, professional visualization similar to high-end lingerie retail c
       });
 
     } else if (mode === 'accessories-only') {
-      // Accessories only: Load user photo only
-      const userPhotoBase64 = await imageUrlToBase64(userPhotoPath);
-      contentParts.push({ text: "USER PHOTO:" });
+      // Accessories mode: Load accessory product image + model image
+      contentParts.push({ text: `ACCESSORY PRODUCT IMAGE:` });
       contentParts.push({
         inlineData: {
-          data: userPhotoBase64,
+          data: garmentBase64Array[0],
+          mimeType: 'image/jpeg'
+        }
+      });
+
+      contentParts.push({ text: "MODEL IMAGE:" });
+      contentParts.push({
+        inlineData: {
+          data: modelBase64,
           mimeType: 'image/jpeg'
         }
       });

@@ -15,7 +15,9 @@
       "Bash(git restore:*)",
       "Bash(git pull:*)",
       "Bash(git checkout:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git revert:*)",
+      "Bash(git cherry-pick:*)"
     ],
     "deny": [],
     "ask": []

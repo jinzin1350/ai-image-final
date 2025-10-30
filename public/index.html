@@ -32,9 +32,9 @@
                         <div class="mode-description">لباس + حجاب + اکسسوری (اختیاری)</div>
                     </div>
                     <div class="mode-card" data-mode="accessories-only">
-                        <div class="mode-icon">👓</div>
-                        <div class="mode-title">افزودن اکسسوری</div>
-                        <div class="mode-description">اکسسوری را به عکس خودتان اضافه کنید</div>
+                        <div class="mode-icon">👜</div>
+                        <div class="mode-title">عکاسی اکسسوری</div>
+                        <div class="mode-description">تولید عکس حرفه‌ای محصولات اکسسوری</div>
                     </div>
                     <div class="mode-card" data-mode="underwear">
                         <div class="mode-icon">👙</div>
@@ -115,123 +115,54 @@
                 </div>
             </section>
 
-            <!-- بخش انتخاب اکسسوری -->
-            <section class="selection-section accessories-section" id="accessoriesSection" style="display: none;">
-                <h2>۲.۲. انتخاب اکسسوری (اختیاری)</h2>
-                <p class="section-description">اکسسوری‌های مورد نظر خود را انتخاب کنید</p>
-
-                <div class="accessory-category">
-                    <h3>👓 عینک</h3>
-                    <div class="accessory-options">
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="sunglasses-aviator">
-                            <span>عینک آفتابی خلبانی</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="sunglasses-cateye">
-                            <span>عینک کت‌آی</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="sunglasses-round">
-                            <span>عینک گرد</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="glasses-reading">
-                            <span>عینک طبی</span>
-                        </label>
+            <!-- بخش آپلود اکسسوری -->
+            <section class="upload-section" id="accessoryUploadSection" style="display: none;">
+                <h2>۱. آپلود تصویر اکسسوری (محصول)</h2>
+                <div class="upload-area" id="accessoryUploadArea">
+                    <input type="file" id="accessoryInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="accessoryUploadPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصویر اکسسوری</h3>
+                        <p>عکس محصول اکسسوری (کیف، عینک، ساعت، جواهرات و...) را آپلود کنید</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
                     </div>
+                    <div id="accessoryPreview" class="garment-previews" style="display: none;"></div>
                 </div>
 
-                <div class="accessory-category">
-                    <h3>💍 جواهرات</h3>
-                    <div class="accessory-options">
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="necklace-pendant">
-                            <span>گردنبند آویز</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="necklace-chain">
-                            <span>زنجیر طلا</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="earrings-drop">
-                            <span>گوشواره آویز</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="earrings-stud">
-                            <span>گوشواره میخی</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="bracelet">
-                            <span>دستبند</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="rings">
-                            <span>انگشتر</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="accessory-category">
-                    <h3>👜 کیف</h3>
-                    <div class="accessory-options">
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="bag-handbag">
-                            <span>کیف دستی</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="bag-crossbody">
-                            <span>کیف دوشی</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="bag-clutch">
-                            <span>کلاچ</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="bag-backpack">
-                            <span>کوله پشتی</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="accessory-category">
-                    <h3>🎩 کلاه و شال</h3>
-                    <div class="accessory-options">
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="hat-fedora">
-                            <span>کلاه فدورا</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="hat-baseball">
-                            <span>کلاه کپ</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="hat-beanie">
-                            <span>کلاه بافتنی</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="scarf-neck">
-                            <span>شال گردن</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="accessory-category">
-                    <h3>⌚ ساعت و کمربند</h3>
-                    <div class="accessory-options">
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="watch-classic">
-                            <span>ساعت کلاسیک</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="watch-sport">
-                            <span>ساعت اسپرت</span>
-                        </label>
-                        <label class="accessory-checkbox">
-                            <input type="checkbox" name="accessories" value="belt-leather">
-                            <span>کمربند چرمی</span>
-                        </label>
-                    </div>
+                <!-- نوع اکسسوری -->
+                <div class="param-group" style="margin-top: 20px;">
+                    <label for="accessoryType">🏷️ نوع اکسسوری</label>
+                    <select id="accessoryType" class="param-dropdown">
+                        <option value="">انتخاب کنید...</option>
+                        <option value="handbag">کیف دستی</option>
+                        <option value="backpack">کوله پشتی</option>
+                        <option value="crossbody-bag">کیف دوشی</option>
+                        <option value="clutch">کلاچ</option>
+                        <option value="sunglasses">عینک آفتابی</option>
+                        <option value="eyeglasses">عینک طبی</option>
+                        <option value="watch">ساعت مچی</option>
+                        <option value="necklace">گردنبند</option>
+                        <option value="earrings">گوشواره</option>
+                        <option value="bracelet">دستبند</option>
+                        <option value="ring">انگشتر</option>
+                        <option value="scarf">شال گردن</option>
+                        <option value="hat">کلاه</option>
+                        <option value="belt">کمربند</option>
+                        <option value="shoes">کفش</option>
+                    </select>
+                    <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                        💡 انتخاب نوع اکسسوری به هوش مصنوعی کمک می‌کند تا بهتر آن را روی مدل قرار دهد
+                    </p>
                 </div>
             </section>
 

@@ -41,7 +41,8 @@ let selectedLightingId = 'studio';
 
 // NEW: Mode selection variables
 let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'underwear'
-let selectedAccessories = []; // Array of selected accessory IDs
+let uploadedAccessoryPath = null; // Path to uploaded accessory product image
+let selectedAccessoryType = null; // Type of accessory (handbag, watch, etc.)
 
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
@@ -86,8 +87,15 @@ const hijabSection = document.getElementById('hijabSection');
 // NEW: Mode selection elements
 const modeCards = document.querySelectorAll('.mode-card');
 const garmentUploadSection = document.getElementById('garmentUploadSection');
-const accessoriesSection = document.getElementById('accessoriesSection');
+const accessoryUploadSection = document.getElementById('accessoryUploadSection');
 const underwearSection = document.getElementById('underwearSection');
+
+// NEW: Accessory upload elements
+const accessoryInput = document.getElementById('accessoryInput');
+const accessoryUploadArea = document.getElementById('accessoryUploadArea');
+const accessoryUploadPlaceholder = document.getElementById('accessoryUploadPlaceholder');
+const accessoryPreview = document.getElementById('accessoryPreview');
+const accessoryTypeSelect = document.getElementById('accessoryType');
 
 // بارگذاری مدل‌ها
 async function loadModels() {
@@ -374,6 +382,71 @@ async function loadGarmentFits() {
     }
 }
 
+// ========================================
+// NEW: Accessory Upload Handlers
+// ========================================
+
+// Accessory upload area click
+if (accessoryUploadArea) {
+    accessoryUploadArea.addEventListener('click', () => accessoryInput.click());
+}
+
+// Accessory file input change
+if (accessoryInput) {
+    accessoryInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            await uploadAccessoryFile(file);
+        }
+    });
+}
+
+// Upload accessory product image
+async function uploadAccessoryFile(file) {
+    const formData = new FormData();
+    formData.append('garment', file); // Use same endpoint as garment
+
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            uploadedAccessoryPath = data.filePath;
+
+            // Show preview
+            accessoryPreview.innerHTML = `
+                <div class="garment-preview-item">
+                    <img src="${data.filePath}" alt="اکسسوری">
+                    <div class="garment-preview-label">محصول اکسسوری</div>
+                </div>
+            `;
+            accessoryUploadPlaceholder.style.display = 'none';
+            accessoryPreview.style.display = 'grid';
+
+            checkGenerateButton();
+        } else {
+            console.error('Upload failed:', data);
+            const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
+            alert(`Error: ${errorMsg}`);
+        }
+    } catch (error) {
+        console.error('خطا در آپلود فایل:', error);
+        alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر انتخاب کنید.');
+    }
+}
+
+// Accessory type selection
+if (accessoryTypeSelect) {
+    accessoryTypeSelect.addEventListener('change', (e) => {
+        selectedAccessoryType = e.target.value;
+        checkGenerateButton();
+    });
+}
+
 // انتخاب مدل
 function selectModel(modelId) {
     selectedModelId = modelId;
@@ -412,48 +485,37 @@ function switchMode(mode) {
 
     // Show/hide sections based on mode
     if (mode === 'complete-outfit') {
-        // Complete outfit mode: show garment upload, model selection, hijab, accessories (optional)
+        // Complete outfit mode: show garment upload, model selection, hijab
         garmentUploadSection.style.display = 'block';
-        accessoriesSection.style.display = 'block'; // Make accessories optional in complete outfit
+        accessoryUploadSection.style.display = 'none';
         underwearSection.style.display = 'none';
 
-        // Update upload section title
+        // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
 
     } else if (mode === 'accessories-only') {
-        // Accessories only mode: upload user's photo, select accessories
-        garmentUploadSection.style.display = 'block';
-        accessoriesSection.style.display = 'block';
+        // Accessories mode: upload accessory product photo, select model and background
+        garmentUploadSection.style.display = 'none';
+        accessoryUploadSection.style.display = 'block';
         underwearSection.style.display = 'none';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
-
-        // Update upload section title to indicate user photo upload
-        document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود عکس خود';
-        document.querySelector('#uploadPlaceholder h3').textContent = 'آپلود عکس شما';
-        document.querySelector('#uploadPlaceholder p').textContent = 'عکس خود را آپلود کنید تا اکسسوری‌ها به آن اضافه شود';
 
     } else if (mode === 'underwear') {
         // Underwear mode: no garment upload (AI generates), model selection, underwear options
         garmentUploadSection.style.display = 'none';
-        accessoriesSection.style.display = 'none';
+        accessoryUploadSection.style.display = 'none';
         underwearSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section in underwear mode
     }
 
     // Reset selections when switching modes
-    selectedAccessories = [];
+    uploadedAccessoryPath = null;
+    selectedAccessoryType = null;
     if (mode !== 'complete-outfit') {
         selectedHijabType = null;
     }
 
     checkGenerateButton();
-}
-
-// Handle accessory checkbox changes
-function updateAccessories() {
-    const checkboxes = document.querySelectorAll('input[name="accessories"]:checked');
-    selectedAccessories = Array.from(checkboxes).map(cb => cb.value);
-    console.log('Selected accessories:', selectedAccessories);
 }
 
 // انتخاب نوع حجاب
@@ -489,9 +551,11 @@ function checkGenerateButton() {
                   hijabCondition;
 
     } else if (currentMode === 'accessories-only') {
-        // Accessories mode: need user photo (garment upload), at least one accessory selected
-        isValid = uploadedGarmentPaths.length > 0 &&
-                  selectedAccessories.length > 0;
+        // Accessories mode: need accessory product photo, accessory type, model, and background
+        isValid = uploadedAccessoryPath !== null &&
+                  selectedAccessoryType !== null &&
+                  selectedModelId &&
+                  selectedBackgroundId;
 
     } else if (currentMode === 'underwear') {
         // Underwear mode: need model and underwear selections
@@ -640,13 +704,14 @@ generateBtn.addEventListener('click', async () => {
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
             requestBody.hijabType = selectedHijabType;
-            requestBody.accessories = selectedAccessories; // Optional accessories
 
         } else if (currentMode === 'accessories-only') {
-            // Accessories only mode - user photo with accessories
-            requestBody.userPhotoPath = uploadedGarmentPaths[0]; // User's photo
-            requestBody.accessories = selectedAccessories;
-            // No model/background needed for this mode
+            // Accessories mode - accessory product photography
+            requestBody.accessoryPath = uploadedAccessoryPath;
+            requestBody.accessoryType = selectedAccessoryType;
+            requestBody.modelId = selectedModelId;
+            requestBody.backgroundId = selectedBackgroundId;
+            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
 
         } else if (currentMode === 'underwear') {
             // Underwear mode
@@ -767,14 +832,6 @@ modeCards.forEach(card => {
     card.addEventListener('click', () => {
         const mode = card.dataset.mode;
         switchMode(mode);
-    });
-});
-
-// Accessory checkbox change handlers
-document.querySelectorAll('input[name="accessories"]').forEach(checkbox => {
-    checkbox.addEventListener('change', () => {
-        updateAccessories();
-        checkGenerateButton();
     });
 });
 
