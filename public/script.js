@@ -40,11 +40,9 @@ let selectedStyleId = 'professional';
 let selectedLightingId = 'studio';
 
 // NEW: Mode selection variables
-let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'underwear'
+let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only'
 let uploadedAccessoryPath = null; // Path to uploaded accessory product image
 let selectedAccessoryType = null; // Type of accessory (handbag, watch, etc.)
-let uploadedUnderwearPath = null; // Path to uploaded underwear product image
-let selectedUnderwearType = null; // Type of underwear (bra, panty, etc.)
 
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
@@ -90,7 +88,6 @@ const hijabSection = document.getElementById('hijabSection');
 const modeCards = document.querySelectorAll('.mode-card');
 const garmentUploadSection = document.getElementById('garmentUploadSection');
 const accessoryUploadSection = document.getElementById('accessoryUploadSection');
-const underwearSection = document.getElementById('underwearSection');
 
 // NEW: Accessory upload elements
 const accessoryInput = document.getElementById('accessoryInput');
@@ -449,88 +446,6 @@ if (accessoryTypeSelect) {
     });
 }
 
-// ========================================
-// NEW: Underwear Upload Handlers
-// ========================================
-
-// Get underwear upload elements
-const underwearInput = document.getElementById('underwearUpload');
-const underwearUploadArea = document.getElementById('underwearUploadArea');
-const underwearUploadPlaceholder = document.getElementById('underwearUploadPlaceholder');
-const underwearPreview = document.getElementById('underwearUploadPreview');
-const underwearPreviewImage = document.getElementById('underwearPreviewImage');
-const underwearTypeSelect = document.getElementById('underwearType');
-const removeUnderwearBtn = document.getElementById('removeUnderwear');
-
-// Underwear upload area click
-if (underwearUploadArea) {
-    underwearUploadArea.addEventListener('click', () => {
-        if (underwearInput) underwearInput.click();
-    });
-}
-
-// Underwear file input change
-if (underwearInput) {
-    underwearInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            await uploadUnderwearFile(file);
-        }
-    });
-}
-
-// Upload underwear product file
-async function uploadUnderwearFile(file) {
-    try {
-        const formData = new FormData();
-        formData.append('garment', file);
-
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            uploadedUnderwearPath = data.filePath;
-
-            // Show preview
-            underwearPreviewImage.src = data.filePath;
-            underwearUploadPlaceholder.style.display = 'none';
-            underwearPreview.style.display = 'block';
-
-            checkGenerateButton();
-        } else {
-            console.error('Upload failed:', data);
-            const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
-            alert(`Error: ${errorMsg}`);
-        }
-    } catch (error) {
-        console.error('خطا در آپلود فایل:', error);
-        alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر انتخاب کنید.');
-    }
-}
-
-// Remove underwear button
-if (removeUnderwearBtn) {
-    removeUnderwearBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        uploadedUnderwearPath = null;
-        underwearInput.value = '';
-        underwearUploadPlaceholder.style.display = 'block';
-        underwearPreview.style.display = 'none';
-        checkGenerateButton();
-    });
-}
-
-// Underwear type selection
-if (underwearTypeSelect) {
-    underwearTypeSelect.addEventListener('change', (e) => {
-        selectedUnderwearType = e.target.value;
-        checkGenerateButton();
-    });
-}
 
 // انتخاب مدل
 function selectModel(modelId) {
@@ -573,7 +488,6 @@ function switchMode(mode) {
         // Complete outfit mode: show garment upload, model selection, hijab
         garmentUploadSection.style.display = 'block';
         accessoryUploadSection.style.display = 'none';
-        underwearSection.style.display = 'none';
 
         // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
@@ -582,22 +496,12 @@ function switchMode(mode) {
         // Accessories mode: upload accessory product photo, select model and background
         garmentUploadSection.style.display = 'none';
         accessoryUploadSection.style.display = 'block';
-        underwearSection.style.display = 'none';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
-
-    } else if (mode === 'underwear') {
-        // Underwear mode: no garment upload (AI generates), model selection, underwear options
-        garmentUploadSection.style.display = 'none';
-        accessoryUploadSection.style.display = 'none';
-        underwearSection.style.display = 'block';
-        hijabSection.style.display = 'none'; // Hide hijab section in underwear mode
     }
 
     // Reset selections when switching modes
     uploadedAccessoryPath = null;
     selectedAccessoryType = null;
-    uploadedUnderwearPath = null;
-    selectedUnderwearType = null;
     if (mode !== 'complete-outfit') {
         selectedHijabType = null;
     }
@@ -641,13 +545,6 @@ function checkGenerateButton() {
         // Accessories mode: need accessory product photo, accessory type, model, and background
         isValid = uploadedAccessoryPath !== null &&
                   selectedAccessoryType !== null &&
-                  selectedModelId &&
-                  selectedBackgroundId;
-
-    } else if (currentMode === 'underwear') {
-        // Underwear mode: need underwear product photo, underwear type, model, and background
-        isValid = uploadedUnderwearPath !== null &&
-                  selectedUnderwearType !== null &&
                   selectedModelId &&
                   selectedBackgroundId;
     }
@@ -796,14 +693,6 @@ generateBtn.addEventListener('click', async () => {
             requestBody.modelId = selectedModelId;
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
-
-        } else if (currentMode === 'underwear') {
-            // Underwear mode - underwear product photography
-            requestBody.underwearPath = uploadedUnderwearPath;
-            requestBody.underwearType = selectedUnderwearType;
-            requestBody.modelId = selectedModelId;
-            requestBody.backgroundId = selectedBackgroundId;
-            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
         }
 
         console.log('🚀 Sending request:', requestBody);
@@ -918,14 +807,6 @@ modeCards.forEach(card => {
         const mode = card.dataset.mode;
         switchMode(mode);
     });
-});
-
-// Underwear dropdown change handlers
-['braStyle', 'pantyStyle', 'underwearColor', 'underwearMaterial'].forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-        element.addEventListener('change', checkGenerateButton);
-    }
 });
 
 // افزودن event listener برای انتخاب حجاب
