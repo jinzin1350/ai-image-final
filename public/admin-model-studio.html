@@ -583,6 +583,25 @@
 
                         <div id="underwearSettingsSection" style="display: none;">
                             <div class="form-group">
+                                <label>نوع لباس زیر 👙</label>
+                                <select id="underwearTypeForModel">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="bra">سوتین (مدل با شورت می‌پوشد)</option>
+                                    <option value="panty">شورت (مدل با تاپ می‌پوشد)</option>
+                                    <option value="lingerie-set">ست لباس زیر (مدل فقط با لباس زیر)</option>
+                                    <option value="sports-bra">سوتین ورزشی (مدل با شورت ورزشی)</option>
+                                    <option value="boxers">باکسر (مدل با تاپ می‌پوشد)</option>
+                                    <option value="briefs">زیرشورت (مدل با تاپ می‌پوشد)</option>
+                                    <option value="bodysuit">بادی‌سوت (مدل کامل)</option>
+                                    <option value="shapewear">لباس فرم‌دهنده (مدل کامل)</option>
+                                    <option value="sleepwear">لباس خواب (مدل کامل)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 هوش مصنوعی به صورت خودکار لباس مکمل را اضافه می‌کند تا Gemini قبول کند
+                                </small>
+                            </div>
+
+                            <div class="form-group">
                                 <label>فریمینگ دوربین 📷</label>
                                 <select id="underwearCameraFraming">
                                     <option value="upper-body">نیم‌تنه بالایی</option>
@@ -845,6 +864,7 @@
 
             // Underwear photography specific
             const isUnderwear = document.getElementById('isUnderwearModel').value === 'yes';
+            const underwearTypeForModel = document.getElementById('underwearTypeForModel').value;
             const underwearFraming = document.getElementById('underwearCameraFraming').value;
             const underwearPose = document.getElementById('underwearPose').value;
             const underwearPhotoStyle = document.getElementById('underwearPhotoStyle').value;
@@ -862,6 +882,26 @@
 
             prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
             prompt += `Body: ${bodyType} ${height} build. `;
+
+            // SMART CLOTHING: Add complementary clothing for underwear models to bypass Gemini filter
+            if (isUnderwear && underwearTypeForModel) {
+                const complementaryClothing = {
+                    'bra': 'wearing simple black athletic shorts on lower body',
+                    'panty': 'wearing simple white sports top on upper body',
+                    'lingerie-set': 'wearing minimal athletic wear set',
+                    'sports-bra': 'wearing black athletic shorts',
+                    'boxers': 'wearing simple white tank top',
+                    'briefs': 'wearing simple white tank top',
+                    'bodysuit': 'wearing form-fitting athletic bodysuit',
+                    'shapewear': 'wearing compression athletic wear',
+                    'sleepwear': 'wearing comfortable sleepwear'
+                };
+                const clothing = complementaryClothing[underwearTypeForModel];
+                if (clothing) {
+                    prompt += `Clothing: ${clothing}. `;
+                    prompt += `IMPORTANT: Model prepared for ${underwearTypeForModel} product photography - complementary garments allow product placement. `;
+                }
+            }
 
             // Accessory-specific clothing and framing
             if (isAccessory && accessoryClothing) {
