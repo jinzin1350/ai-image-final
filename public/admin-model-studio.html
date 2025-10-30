@@ -602,6 +602,37 @@
                             </div>
 
                             <div class="form-group">
+                                <label>لباس اول مدل (برای بالاتنه) 👕</label>
+                                <select id="underwearTopClothing">
+                                    <option value="">هیچ (بالاتنه خالی)</option>
+                                    <option value="white-tank">تاپ سفید ساده</option>
+                                    <option value="black-tank">تاپ مشکی ساده</option>
+                                    <option value="gray-tank">تاپ خاکستری ساده</option>
+                                    <option value="white-sports-bra">سوتین ورزشی سفید</option>
+                                    <option value="black-sports-bra">سوتین ورزشی مشکی</option>
+                                    <option value="nude-tank">تاپ بژ (رنگ پوست)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 برای عکاسی سوتین: هیچ | برای عکاسی شورت: تاپ
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>لباس دوم مدل (برای پایین‌تنه) 🩳</label>
+                                <select id="underwearBottomClothing">
+                                    <option value="">هیچ (پایین‌تنه خالی)</option>
+                                    <option value="black-shorts">شورت ورزشی مشکی</option>
+                                    <option value="white-shorts">شورت ورزشی سفید</option>
+                                    <option value="gray-shorts">شورت ورزشی خاکستری</option>
+                                    <option value="black-athletic-shorts">شورت ورزشی کوتاه مشکی</option>
+                                    <option value="nude-shorts">شورت بژ (رنگ پوست)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 برای عکاسی شورت: هیچ | برای عکاسی سوتین: شورت
+                                </small>
+                            </div>
+
+                            <div class="form-group">
                                 <label>فریمینگ دوربین 📷</label>
                                 <select id="underwearCameraFraming">
                                     <option value="upper-body">نیم‌تنه بالایی</option>
@@ -865,6 +896,8 @@
             // Underwear photography specific
             const isUnderwear = document.getElementById('isUnderwearModel').value === 'yes';
             const underwearTypeForModel = document.getElementById('underwearTypeForModel').value;
+            const underwearTopClothing = document.getElementById('underwearTopClothing').value;
+            const underwearBottomClothing = document.getElementById('underwearBottomClothing').value;
             const underwearFraming = document.getElementById('underwearCameraFraming').value;
             const underwearPose = document.getElementById('underwearPose').value;
             const underwearPhotoStyle = document.getElementById('underwearPhotoStyle').value;
@@ -889,23 +922,40 @@
             prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
             prompt += `Body: ${bodyType} ${height} build. `;
 
-            // SMART CLOTHING: Add complementary clothing for underwear models to bypass Gemini filter
-            if (isUnderwear && underwearTypeForModel) {
-                const complementaryClothing = {
-                    'bra': 'wearing simple black athletic shorts on lower body',
-                    'panty': 'wearing simple white sports top on upper body',
-                    'lingerie-set': 'wearing minimal athletic wear set',
-                    'sports-bra': 'wearing black athletic shorts',
-                    'boxers': 'wearing simple white tank top',
-                    'briefs': 'wearing simple white tank top',
-                    'bodysuit': 'wearing form-fitting athletic bodysuit',
-                    'shapewear': 'wearing compression athletic wear',
-                    'sleepwear': 'wearing comfortable sleepwear'
+            // CUSTOM CLOTHING: User-selected clothing for underwear models
+            if (isUnderwear) {
+                const topClothingDescriptions = {
+                    'white-tank': 'wearing simple plain white tank top on upper body',
+                    'black-tank': 'wearing simple plain black tank top on upper body',
+                    'gray-tank': 'wearing simple plain gray tank top on upper body',
+                    'white-sports-bra': 'wearing white sports bra on upper body',
+                    'black-sports-bra': 'wearing black sports bra on upper body',
+                    'nude-tank': 'wearing nude/beige tank top on upper body'
                 };
-                const clothing = complementaryClothing[underwearTypeForModel];
-                if (clothing) {
-                    prompt += `Clothing: ${clothing}. `;
-                    prompt += `IMPORTANT: Model prepared for ${underwearTypeForModel} product photography - complementary garments allow product placement. `;
+
+                const bottomClothingDescriptions = {
+                    'black-shorts': 'wearing black athletic shorts on lower body',
+                    'white-shorts': 'wearing white athletic shorts on lower body',
+                    'gray-shorts': 'wearing gray athletic shorts on lower body',
+                    'black-athletic-shorts': 'wearing short black athletic shorts on lower body',
+                    'nude-shorts': 'wearing nude/beige shorts on lower body'
+                };
+
+                let clothingParts = [];
+
+                if (underwearTopClothing && topClothingDescriptions[underwearTopClothing]) {
+                    clothingParts.push(topClothingDescriptions[underwearTopClothing]);
+                }
+
+                if (underwearBottomClothing && bottomClothingDescriptions[underwearBottomClothing]) {
+                    clothingParts.push(bottomClothingDescriptions[underwearBottomClothing]);
+                }
+
+                if (clothingParts.length > 0) {
+                    prompt += `Clothing: ${clothingParts.join(', ')}. `;
+                    prompt += `IMPORTANT: Model prepared for underwear product photography - selected garments allow product placement. `;
+                } else {
+                    prompt += `IMPORTANT: Minimal coverage model for underwear product photography. `;
                 }
             }
 
