@@ -86,6 +86,7 @@
                         <option value="teen">🧑 نوجوان (Teen)</option>
                         <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
                         <option value="accessory">💍 اکسسوری (Accessory)</option>
+                        <option value="underwear">👙 لباس زیر (Underwear)</option>
                     </select>
                 </div>
                 <div class="models-grid" id="modelsGrid">
@@ -169,58 +170,47 @@
 
             <!-- بخش انتخاب لباس زیر -->
             <section class="selection-section underwear-section" id="underwearSection" style="display: none;">
-                <h2>۲. انتخاب لباس زیر</h2>
+                <h2>۲. آپلود تصویر لباس زیر (محصول)</h2>
 
-                <div class="param-group">
-                    <label for="braStyle">👙 مدل سوتین</label>
-                    <select id="braStyle" class="param-dropdown">
-                        <option value="">انتخاب کنید...</option>
-                        <option value="push-up">پوش‌آپ</option>
-                        <option value="balconette">بالکونت</option>
-                        <option value="sports">ورزشی</option>
-                        <option value="bralette">برالت</option>
-                        <option value="strapless">بدون بند</option>
-                        <option value="full-coverage">پوشش کامل</option>
-                    </select>
+                <div class="upload-area" id="underwearUploadArea">
+                    <input type="file" id="underwearUpload" accept="image/*" style="display: none;">
+                    <div class="upload-placeholder" id="underwearUploadPlaceholder">
+                        <span style="font-size: 48px;">👙</span>
+                        <p>تصویر محصول لباس زیر را آپلود کنید</p>
+                        <p style="font-size: 14px; color: #666; margin-top: 8px;">
+                            برای عکاسی محصول حرفه‌ای از این لباس زیر
+                        </p>
+                        <button type="button" class="upload-btn" onclick="document.getElementById('underwearUpload').click()">
+                            انتخاب فایل
+                        </button>
+                    </div>
+                    <div class="upload-preview" id="underwearUploadPreview" style="display: none;">
+                        <img id="underwearPreviewImage" src="" alt="Preview">
+                        <button type="button" class="remove-btn" id="removeUnderwear">✕ حذف</button>
+                    </div>
                 </div>
 
-                <div class="param-group">
-                    <label for="pantyStyle">🩲 مدل شورت</label>
-                    <select id="pantyStyle" class="param-dropdown">
+                <div class="param-group" style="margin-top: 20px;">
+                    <label for="underwearType">
+                        <span style="font-size: 20px;">👙</span>
+                        <span style="font-weight: bold;">نوع لباس زیر</span>
+                    </label>
+                    <select id="underwearType" class="param-dropdown">
                         <option value="">انتخاب کنید...</option>
-                        <option value="bikini">بیکینی</option>
-                        <option value="hipster">هیپستر</option>
-                        <option value="boy-short">باکسری</option>
-                        <option value="thong">تنگ</option>
-                        <option value="high-waist">کمر بلند</option>
-                        <option value="classic">کلاسیک</option>
+                        <option value="bra">سوتین</option>
+                        <option value="panty">شورت زنانه</option>
+                        <option value="lingerie-set">ست لباس زیر</option>
+                        <option value="sports-bra">سوتین ورزشی</option>
+                        <option value="boxers">باکسر مردانه</option>
+                        <option value="briefs">زیرشورت مردانه</option>
+                        <option value="bodysuit">بادی‌سوت</option>
+                        <option value="corset">کرست</option>
+                        <option value="shapewear">لباس فرم‌دهنده</option>
+                        <option value="sleepwear">لباس خواب</option>
                     </select>
-                </div>
-
-                <div class="param-group">
-                    <label for="underwearColor">🎨 رنگ</label>
-                    <select id="underwearColor" class="param-dropdown">
-                        <option value="">انتخاب کنید...</option>
-                        <option value="black">مشکی</option>
-                        <option value="white">سفید</option>
-                        <option value="nude">بژ</option>
-                        <option value="red">قرمز</option>
-                        <option value="pink">صورتی</option>
-                        <option value="blue">آبی</option>
-                        <option value="purple">بنفش</option>
-                    </select>
-                </div>
-
-                <div class="param-group">
-                    <label for="underwearMaterial">🧵 جنس پارچه</label>
-                    <select id="underwearMaterial" class="param-dropdown">
-                        <option value="">انتخاب کنید...</option>
-                        <option value="lace">توری</option>
-                        <option value="cotton">نخی</option>
-                        <option value="satin">ساتن</option>
-                        <option value="microfiber">میکروفایبر</option>
-                        <option value="silk">ابریشم</option>
-                    </select>
+                    <p style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.6;">
+                        💡 انتخاب نوع لباس زیر به هوش مصنوعی کمک می‌کند تا عکاسی حرفه‌ای مناسب تولید کند
+                    </p>
                 </div>
             </section>
 

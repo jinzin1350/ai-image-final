@@ -1717,15 +1717,12 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       garmentPaths,     // New: array of garment paths
       accessoryPath,    // NEW: For accessories-only mode (product photo)
       accessoryType,    // NEW: Type of accessory (handbag, watch, etc.)
+      underwearPath,    // NEW: For underwear mode (product photo)
+      underwearType,    // NEW: Type of underwear (bra, panty, etc.)
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
       hijabType,        // NEW: نوع حجاب
-      // NEW: Underwear parameters
-      braStyle,
-      pantyStyle,
-      underwearColor,
-      underwearMaterial,
       poseId = 'standing-front',
       cameraAngleId = 'eye-level',
       styleId = 'professional',
@@ -1760,8 +1757,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً تصویر اکسسوری، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
       }
     } else if (mode === 'underwear') {
-      if (!modelId || !backgroundId || !braStyle || !pantyStyle || !underwearColor) {
-        return res.status(400).json({ error: 'لطفاً تمام فیلدهای لباس زیر را پر کنید' });
+      if (!underwearPath || !underwearType || !modelId || !backgroundId) {
+        return res.status(400).json({ error: 'لطفاً تصویر لباس زیر، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
       }
     }
 
@@ -1883,8 +1880,11 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'underwear') {
-      // Load model image only
+      // For underwear mode, load underwear product image and model
+      garmentBase64Array = [await imageUrlToBase64(underwearPath)];
       modelBase64 = await imageUrlToBase64(selectedModel.image);
+
+      garmentDescription = `the ${underwearType} from the first image`;
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
@@ -2029,29 +2029,34 @@ DO NOT:
 Create a beautiful product photography shot that would work perfectly for an e-commerce website or Instagram post - professional, clean, and showcasing the ${accessoryType} naturally on the model.`;
 
     } else if (mode === 'underwear') {
-      // UNDERWEAR MODE: Generate lingerie visualization
-      const materialDesc = underwearMaterial || 'comfortable fabric';
-      const materialDescriptions = {
-        'lace': 'delicate lace material',
-        'cotton': 'soft cotton material',
-        'satin': 'smooth satin material',
-        'microfiber': 'comfortable microfiber material',
-        'silk': 'luxurious silk material'
+      // UNDERWEAR MODE: Product Photography for Underwear/Lingerie
+      const underwearTypeDescriptions = {
+        'bra': 'bra (worn on chest)',
+        'panty': 'panties (worn on lower body)',
+        'lingerie-set': 'lingerie set (bra and panties together)',
+        'sports-bra': 'sports bra (athletic wear)',
+        'boxers': 'boxers (worn on lower body)',
+        'briefs': 'briefs (worn on lower body)',
+        'bodysuit': 'bodysuit (full body undergarment)',
+        'corset': 'corset (worn on torso)',
+        'shapewear': 'shapewear (form-fitting undergarment)',
+        'sleepwear': 'sleepwear/nightwear'
       };
-      const materialDetail = materialDescriptions[materialDesc] || materialDesc;
 
-      prompt = `Create a tasteful, professional lingerie photograph showing ${braStyle} bra and ${pantyStyle} underwear in ${underwearColor} color.
+      const underwearDesc = underwearTypeDescriptions[underwearType] || underwearType;
 
-IMAGE PROVIDED:
-- Image 1: Model (person)
+      prompt = `Create a professional, tasteful product photography image showing the model wearing this ${underwearType}.
+
+IMAGES PROVIDED:
+- Image 1: ${underwearType.toUpperCase()} product photo
+- Image 2: Model (person)
 
 TASK:
-Show this exact model wearing ${braStyle} style bra and ${pantyStyle} style underwear in ${underwearColor} color, made of ${materialDetail}. Style as clean, professional product photography similar to retail catalogs.
+Show this exact model wearing ${garmentDescription}. Create a clean, professional product photography shot that showcases the ${underwearType} naturally and tastefully on the model - similar to high-end retail catalogs.
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
 - Aspect Ratio: ${selectedAspectRatio.description}
-- Fabric Type: ${materialDetail}
 - Lighting: ${selectedLighting.description}
 - Background Blur: ${selectedBgBlur.description}
 - Depth of Field: ${selectedDoF.description}
@@ -2060,36 +2065,39 @@ TECHNICAL SPECS:
 
 SCENE & ENVIRONMENT:
 - Location/Background: ${locationDescription}
-- Style: Clean, professional retail catalog photography
+- Style: ${selectedStyle.description}
 - Pose: ${selectedPose.description}
 - Camera Angle: ${selectedCameraAngle.description}
-- Mood: Professional, tasteful, respectful
+- Mood: Professional, tasteful, respectful product photography
 
-LINGERIE DETAILS:
-- Bra Style: ${braStyle}
-- Underwear Style: ${pantyStyle}
-- Color: ${underwearColor}
-- Material: ${materialDetail}
+UNDERWEAR POSITIONING:
+- Type: ${underwearDesc}
+- Position the ${underwearType} correctly and naturally on the model
+- The ${underwearType} should be the focus - clearly visible, well-displayed, professional
+- Model should showcase the ${underwearType} in a tasteful, appropriate way
 
 KEY REQUIREMENTS:
 1. Keep model's face and body EXACTLY the same from the reference image
-2. Professional, tasteful framing focused on fit and style visualization
-3. Natural skin texture (no artificial smoothing)
-4. Accurate color: ${underwearColor}
-5. Realistic fabric appearance for ${materialDetail}
-6. Clean, sharp focus on the lingerie
-7. Maintain respectful, professional aesthetic like retail product photography
-8. Show how the lingerie fits naturally
+2. CRITICAL PRIVACY & MODESTY: Professional, tasteful framing like retail catalogs - appropriate poses, respectful composition
+3. Position the ${underwearType} correctly based on its type (${underwearDesc})
+4. The ${underwearType} should look natural and realistic on the model
+5. Accurate colors and details from the ${underwearType} product image
+6. Professional product photography aesthetic - clean, tasteful, e-commerce ready
+7. Focus on showcasing the ${underwearType} product professionally and respectfully
+8. Natural skin texture (no plastic smoothing)
+9. Clean, sharp focus on both model and ${underwearType}
+10. IMPORTANT: Maintain appropriate, professional aesthetic - avoid anything overtly sexual or inappropriate
 
 DO NOT:
-- Make it overtly sexual or inappropriate
-- Change the model's face or body type
-- Add unrealistic effects or distortions
+- Change the model's face, body type, or overall appearance
+- Make unrealistic distortions or artificial effects
 - Add text, watermarks, or logos
-- Create artificial or fake-looking results
-- Over-smooth skin or create plastic effects
+- Make the ${underwearType} look pasted on or fake
+- Over-smooth skin or create plastic-looking results
+- Create overtly sexual, inappropriate, or unprofessional imagery
+- Use suggestive poses or compositions
 
-Create a clean, professional visualization similar to high-end lingerie retail catalogs - tasteful, respectful, and focused on the product.`;
+Create a beautiful, TASTEFUL product photography shot that would work perfectly for a professional e-commerce website or retail catalog - clean, respectful, professional, and showcasing the ${underwearType} naturally on the model.`;
     }
 
     console.log('🎯 Mode:', mode);
@@ -2147,7 +2155,15 @@ Create a clean, professional visualization similar to high-end lingerie retail c
       });
 
     } else if (mode === 'underwear') {
-      // Underwear: Load model image only (no garment image needed)
+      // Underwear mode: Load underwear product image + model image
+      contentParts.push({ text: `UNDERWEAR PRODUCT IMAGE:` });
+      contentParts.push({
+        inlineData: {
+          data: garmentBase64Array[0],
+          mimeType: 'image/jpeg'
+        }
+      });
+
       contentParts.push({ text: "MODEL IMAGE:" });
       contentParts.push({
         inlineData: {
