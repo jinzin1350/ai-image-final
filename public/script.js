@@ -39,6 +39,10 @@ let selectedCameraAngleId = 'eye-level';
 let selectedStyleId = 'professional';
 let selectedLightingId = 'studio';
 
+// NEW: Mode selection variables
+let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'underwear'
+let selectedAccessories = []; // Array of selected accessory IDs
+
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
 let selectedDofId = 'medium';
@@ -78,6 +82,12 @@ const fitSelect = document.getElementById('fitSelect');
 
 // Hijab section elements
 const hijabSection = document.getElementById('hijabSection');
+
+// NEW: Mode selection elements
+const modeCards = document.querySelectorAll('.mode-card');
+const garmentUploadSection = document.getElementById('garmentUploadSection');
+const accessoriesSection = document.getElementById('accessoriesSection');
+const underwearSection = document.getElementById('underwearSection');
 
 // بارگذاری مدل‌ها
 async function loadModels() {
@@ -388,6 +398,64 @@ function selectModel(modelId) {
     checkGenerateButton();
 }
 
+// ========================================
+// NEW: Mode Switching Functions
+// ========================================
+
+function switchMode(mode) {
+    currentMode = mode;
+
+    // Update active mode card
+    modeCards.forEach(card => {
+        card.classList.toggle('active', card.dataset.mode === mode);
+    });
+
+    // Show/hide sections based on mode
+    if (mode === 'complete-outfit') {
+        // Complete outfit mode: show garment upload, model selection, hijab, accessories (optional)
+        garmentUploadSection.style.display = 'block';
+        accessoriesSection.style.display = 'block'; // Make accessories optional in complete outfit
+        underwearSection.style.display = 'none';
+
+        // Update upload section title
+        document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
+
+    } else if (mode === 'accessories-only') {
+        // Accessories only mode: upload user's photo, select accessories
+        garmentUploadSection.style.display = 'block';
+        accessoriesSection.style.display = 'block';
+        underwearSection.style.display = 'none';
+        hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
+
+        // Update upload section title to indicate user photo upload
+        document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود عکس خود';
+        document.querySelector('#uploadPlaceholder h3').textContent = 'آپلود عکس شما';
+        document.querySelector('#uploadPlaceholder p').textContent = 'عکس خود را آپلود کنید تا اکسسوری‌ها به آن اضافه شود';
+
+    } else if (mode === 'underwear') {
+        // Underwear mode: no garment upload (AI generates), model selection, underwear options
+        garmentUploadSection.style.display = 'none';
+        accessoriesSection.style.display = 'none';
+        underwearSection.style.display = 'block';
+        hijabSection.style.display = 'none'; // Hide hijab section in underwear mode
+    }
+
+    // Reset selections when switching modes
+    selectedAccessories = [];
+    if (mode !== 'complete-outfit') {
+        selectedHijabType = null;
+    }
+
+    checkGenerateButton();
+}
+
+// Handle accessory checkbox changes
+function updateAccessories() {
+    const checkboxes = document.querySelectorAll('input[name="accessories"]:checked');
+    selectedAccessories = Array.from(checkboxes).map(cb => cb.value);
+    console.log('Selected accessories:', selectedAccessories);
+}
+
 // انتخاب نوع حجاب
 function selectHijabType(hijabType) {
     selectedHijabType = hijabType;
@@ -408,15 +476,35 @@ function selectBackground(backgroundId) {
 
 // بررسی فعال بودن دکمه تولید
 function checkGenerateButton() {
-    const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
-    const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
+    let isValid = false;
 
-    generateBtn.disabled = !(
-        uploadedGarmentPaths.length > 0 &&
-        selectedModelId &&
-        selectedBackgroundId &&
-        hijabCondition
-    );
+    if (currentMode === 'complete-outfit') {
+        // Complete outfit: need garment, model, background, and hijab (if applicable)
+        const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+        const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
+
+        isValid = uploadedGarmentPaths.length > 0 &&
+                  selectedModelId &&
+                  selectedBackgroundId &&
+                  hijabCondition;
+
+    } else if (currentMode === 'accessories-only') {
+        // Accessories mode: need user photo (garment upload), at least one accessory selected
+        isValid = uploadedGarmentPaths.length > 0 &&
+                  selectedAccessories.length > 0;
+
+    } else if (currentMode === 'underwear') {
+        // Underwear mode: need model and underwear selections
+        const braStyle = document.getElementById('braStyle')?.value;
+        const pantyStyle = document.getElementById('pantyStyle')?.value;
+        const underwearColor = document.getElementById('underwearColor')?.value;
+
+        isValid = selectedModelId &&
+                  selectedBackgroundId &&
+                  braStyle && pantyStyle && underwearColor;
+    }
+
+    generateBtn.disabled = !isValid;
 }
 
 // رویدادهای آپلود فایل
@@ -528,30 +616,55 @@ generateBtn.addEventListener('click', async () => {
     resultSection.style.display = 'none';
 
     try {
+        // Build request body based on current mode
+        let requestBody = {
+            mode: currentMode, // NEW: Send current mode to API
+            poseId: selectedPoseId,
+            cameraAngleId: selectedCameraAngleId,
+            styleId: selectedStyleId,
+            lightingId: selectedLightingId,
+            // Professional Quality Parameters
+            colorTemperatureId: selectedColorTempId,
+            depthOfFieldId: selectedDofId,
+            fabricTypeId: selectedFabricId,
+            shadowQualityId: selectedShadowId,
+            aspectRatioId: selectedAspectRatioId,
+            backgroundBlurId: selectedBgBlurId,
+            garmentFitId: selectedFitId
+        };
+
+        if (currentMode === 'complete-outfit') {
+            // Complete outfit mode
+            requestBody.garmentPaths = uploadedGarmentPaths;
+            requestBody.modelId = selectedModelId;
+            requestBody.backgroundId = selectedBackgroundId;
+            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+            requestBody.hijabType = selectedHijabType;
+            requestBody.accessories = selectedAccessories; // Optional accessories
+
+        } else if (currentMode === 'accessories-only') {
+            // Accessories only mode - user photo with accessories
+            requestBody.userPhotoPath = uploadedGarmentPaths[0]; // User's photo
+            requestBody.accessories = selectedAccessories;
+            // No model/background needed for this mode
+
+        } else if (currentMode === 'underwear') {
+            // Underwear mode
+            requestBody.modelId = selectedModelId;
+            requestBody.backgroundId = selectedBackgroundId;
+            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+            requestBody.braStyle = document.getElementById('braStyle').value;
+            requestBody.pantyStyle = document.getElementById('pantyStyle').value;
+            requestBody.underwearColor = document.getElementById('underwearColor').value;
+            requestBody.underwearMaterial = document.getElementById('underwearMaterial').value;
+        }
+
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                garmentPaths: uploadedGarmentPaths,
-                modelId: selectedModelId,
-                backgroundId: selectedBackgroundId,
-                customLocation: document.getElementById('customLocation')?.value || '', // Custom location override
-                hijabType: selectedHijabType, // نوع حجاب انتخاب شده
-                poseId: selectedPoseId,
-                cameraAngleId: selectedCameraAngleId,
-                styleId: selectedStyleId,
-                lightingId: selectedLightingId,
-                // Professional Quality Parameters
-                colorTemperatureId: selectedColorTempId,
-                depthOfFieldId: selectedDofId,
-                fabricTypeId: selectedFabricId,
-                shadowQualityId: selectedShadowId,
-                aspectRatioId: selectedAspectRatioId,
-                backgroundBlurId: selectedBgBlurId,
-                garmentFitId: selectedFitId
-            })
+            body: JSON.stringify(requestBody)
         });
 
         const data = await response.json();
@@ -644,6 +757,34 @@ loadShadowQualities();
 loadAspectRatios();
 loadBackgroundBlurs();
 loadGarmentFits();
+
+// ========================================
+// NEW: Event Listeners for Mode Switching
+// ========================================
+
+// Mode card click handlers
+modeCards.forEach(card => {
+    card.addEventListener('click', () => {
+        const mode = card.dataset.mode;
+        switchMode(mode);
+    });
+});
+
+// Accessory checkbox change handlers
+document.querySelectorAll('input[name="accessories"]').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+        updateAccessories();
+        checkGenerateButton();
+    });
+});
+
+// Underwear dropdown change handlers
+['braStyle', 'pantyStyle', 'underwearColor', 'underwearMaterial'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener('change', checkGenerateButton);
+    }
+});
 
 // افزودن event listener برای انتخاب حجاب
 document.querySelectorAll('.hijab-option-card').forEach(card => {

@@ -750,3 +750,181 @@ button,
         height: 120px;
     }
 }
+
+/* ========================================
+   Mode Selection Cards
+   ======================================== */
+
+.mode-selection {
+    margin-bottom: var(--space-xl);
+}
+
+.mode-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.mode-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.mode-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-blue);
+}
+
+.mode-card.active {
+    border-color: var(--accent-blue);
+    background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+    box-shadow: var(--shadow-md);
+}
+
+.mode-card.active::before {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--accent-blue);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.mode-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-sm);
+}
+
+.mode-title {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.mode-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* ========================================
+   Accessories Section
+   ======================================== */
+
+.accessories-section,
+.underwear-section {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.accessory-category {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.accessory-category:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.accessory-category h3 {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.accessory-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-sm);
+}
+
+.accessory-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background: var(--primary-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+}
+
+.accessory-checkbox:hover {
+    background: #e8f4ff;
+    border-color: var(--accent-blue);
+}
+
+.accessory-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent-blue);
+}
+
+.accessory-checkbox input[type="checkbox"]:checked + span {
+    font-weight: var(--font-weight-medium);
+    color: var(--accent-blue);
+}
+
+.accessory-checkbox span {
+    flex: 1;
+}
+
+/* ========================================
+   Underwear Section
+   ======================================== */
+
+.underwear-section .param-group {
+    margin-bottom: var(--space-md);
+}
+
+.underwear-section .param-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ========================================
+   Responsive Adjustments for New Sections
+   ======================================== */
+
+@media (max-width: 768px) {
+    .mode-selector {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+
+    .accessory-options {
+        grid-template-columns: 1fr;
+    }
+
+    .mode-icon {
+        font-size: 2.5rem;
+    }
+}

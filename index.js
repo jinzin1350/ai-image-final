@@ -1712,12 +1712,20 @@ function loadSavedModels() {
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const {
+      mode = 'complete-outfit',  // NEW: 'complete-outfit', 'accessories-only', 'underwear'
       garmentPath,      // For backward compatibility (single garment)
       garmentPaths,     // New: array of garment paths
+      userPhotoPath,    // NEW: For accessories-only mode
+      accessories = [], // NEW: Array of accessory IDs
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
       hijabType,        // NEW: نوع حجاب
+      // NEW: Underwear parameters
+      braStyle,
+      pantyStyle,
+      underwearColor,
+      underwearMaterial,
       poseId = 'standing-front',
       cameraAngleId = 'eye-level',
       styleId = 'professional',
@@ -1742,8 +1750,19 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     // Support both single garment (old) and multiple garments (new)
     const garments = garmentPaths || (garmentPath ? [garmentPath] : []);
 
-    if (!garments.length || !modelId || !backgroundId) {
-      return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
+    // Validation based on mode
+    if (mode === 'complete-outfit') {
+      if (!garments.length || !modelId || !backgroundId) {
+        return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
+      }
+    } else if (mode === 'accessories-only') {
+      if (!userPhotoPath || !accessories.length) {
+        return res.status(400).json({ error: 'لطفاً عکس خود و حداقل یک اکسسوری را انتخاب کنید' });
+      }
+    } else if (mode === 'underwear') {
+      if (!modelId || !backgroundId || !braStyle || !pantyStyle || !underwearColor) {
+        return res.status(400).json({ error: 'لطفاً تمام فیلدهای لباس زیر را پر کنید' });
+      }
     }
 
     // Find model (check hardcoded first, then custom from database)
@@ -1830,24 +1849,41 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('✨ Style:', selectedStyle.name);
     console.log('💡 Lighting:', selectedLighting.name);
 
-    // دانلود عکس‌های لباس (چند تایی) و مدل و تبدیل به base64
-    // Background is now TEXT ONLY - not sent as image to AI
-    const garmentBase64Array = await Promise.all(
-      garments.map(path => imageUrlToBase64(path))
-    );
-    const modelBase64 = await imageUrlToBase64(selectedModel.image);
+    // ========================================
+    // NEW: Mode-Specific Image Loading Preparation
+    // ========================================
+    let garmentBase64Array = [];
+    let modelBase64 = null;
+    let garmentDescription = '';
+    let locationDescription = '';
 
-    // ساخت پرامپت برای Virtual Try-On با پارامترهای جدید
-    const garmentDescription = garments.length === 1
-      ? 'the garment/clothing from the first image'
-      : `ALL ${garments.length} garments/clothing items from the first ${garments.length} images (combine them on the model - e.g., if there's pants, shirt, and jacket, the model should wear all of them together)`;
+    if (mode === 'complete-outfit') {
+      // Load garment images and model
+      garmentBase64Array = await Promise.all(
+        garments.map(path => imageUrlToBase64(path))
+      );
+      modelBase64 = await imageUrlToBase64(selectedModel.image);
 
-    const imageRefText = garments.length === 1 ? 'second image (model), third image (background/location)' : `image ${garments.length + 1} (model), image ${garments.length + 2} (background/location)`;
+      garmentDescription = garments.length === 1
+        ? 'the garment/clothing from the first image'
+        : `ALL ${garments.length} garments/clothing items from the first ${garments.length} images (combine them on the model - e.g., if there's pants, shirt, and jacket, the model should wear all of them together)`;
 
-    // Use custom location if provided, otherwise use selected background
-    const locationDescription = customLocation && customLocation.trim() !== ''
-      ? customLocation.trim()
-      : `${selectedBackground.name} - ${selectedBackground.description}`;
+      locationDescription = customLocation && customLocation.trim() !== ''
+        ? customLocation.trim()
+        : `${selectedBackground.name} - ${selectedBackground.description}`;
+
+    } else if (mode === 'accessories-only') {
+      // For accessories mode, we only need the user's photo
+      // It will be loaded in the contentParts section
+      locationDescription = ''; // Not used in accessories mode
+
+    } else if (mode === 'underwear') {
+      // Load model image only
+      modelBase64 = await imageUrlToBase64(selectedModel.image);
+      locationDescription = customLocation && customLocation.trim() !== ''
+        ? customLocation.trim()
+        : `${selectedBackground.name} - ${selectedBackground.description}`;
+    }
 
     console.log('📍 Using location description:', locationDescription);
 
@@ -1864,14 +1900,55 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     console.log('🧕 Hijab type:', hijabType, hijabDescription);
 
-    const prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
+    // ========================================
+    // NEW: Accessory Descriptions
+    // ========================================
+    const accessoryDescriptions = {
+      // Glasses
+      'sunglasses-aviator': 'aviator-style sunglasses with metal frame',
+      'sunglasses-cateye': 'cat-eye sunglasses with retro style',
+      'sunglasses-round': 'round sunglasses with vintage look',
+      'glasses-reading': 'reading glasses with modern frame',
+      // Jewelry
+      'necklace-pendant': 'elegant pendant necklace',
+      'necklace-chain': 'gold chain necklace',
+      'earrings-drop': 'drop earrings',
+      'earrings-stud': 'stud earrings',
+      'bracelet': 'fashionable bracelet',
+      'rings': 'elegant rings',
+      // Bags
+      'bag-handbag': 'handbag held in hand or on arm',
+      'bag-crossbody': 'crossbody bag worn across shoulder',
+      'bag-clutch': 'clutch bag held in hand',
+      'bag-backpack': 'backpack worn on back',
+      // Hats & Scarves
+      'hat-fedora': 'fedora hat',
+      'hat-baseball': 'baseball cap',
+      'hat-beanie': 'knit beanie hat',
+      'scarf-neck': 'neck scarf draped elegantly',
+      // Watches & Belts
+      'watch-classic': 'classic wristwatch',
+      'watch-sport': 'sport watch',
+      'belt-leather': 'leather belt'
+    };
+
+    const accessoryList = accessories.map(acc => accessoryDescriptions[acc] || acc).join(', ');
+
+    // ========================================
+    // NEW: Mode-Specific Prompt Generation
+    // ========================================
+    let prompt = '';
+
+    if (mode === 'complete-outfit') {
+      // COMPLETE OUTFIT MODE: Garment + Hijab + Optional Accessories
+      prompt = `Create a photorealistic fashion photo showing the model wearing the garment${accessories.length > 0 ? ' and accessories' : ''}.
 
 IMAGES PROVIDED:
 - Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment/clothing to wear
 - Image ${garments.length + 1}: Model (person)
 
 TASK:
-Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.
+Show this exact model wearing ${garmentDescription}${accessories.length > 0 ? ` with the following accessories: ${accessoryList}` : ''}. Make it look like a real professional photograph.
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -1882,7 +1959,7 @@ TECHNICAL SPECS:
 - Depth of Field: ${selectedDoF.description}
 - Color Temperature: ${selectedColorTemp.description}
 - Shadow Quality: ${selectedShadow.description}
-- Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
+- Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}${accessories.length > 0 ? `\n- Accessories: ${accessoryList}` : ''}
 
 SCENE & ENVIRONMENT:
 - Location/Background: ${locationDescription}
@@ -1897,7 +1974,7 @@ KEY REQUIREMENTS:
 3. Natural skin texture (no plastic smoothing or artificial effects)
 4. Accurate garment colors and patterns from the garment image
 5. Realistic fabric physics, wrinkles, and natural shadows
-6. Clean, sharp focus on the model and clothing${hijabDescription ? `\n7. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
+6. Clean, sharp focus on the model and clothing${hijabDescription ? `\n7. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}${accessories.length > 0 ? `\n8. Add accessories naturally and realistically: ${accessoryList}` : ''}
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
@@ -1906,10 +1983,109 @@ DO NOT:
 - Create obvious fake composites or artificial effects
 - Over-smooth skin or create plastic-looking results
 
-Make it simple and natural - like this person is actually wearing these clothes in a real professional photo shoot.`;
+Make it simple and natural - like this person is actually wearing these clothes${accessories.length > 0 ? ' and accessories' : ''} in a real professional photo shoot.`;
 
+    } else if (mode === 'accessories-only') {
+      // ACCESSORIES ONLY MODE: Add accessories to user's photo
+      prompt = `Add the following accessories to this person's existing outfit while keeping everything else unchanged: ${accessoryList}.
 
+IMAGE PROVIDED:
+- User's photo showing their current outfit
 
+TASK:
+Add these accessories to the photo: ${accessoryList}. The person's clothing, pose, background, and everything else must remain EXACTLY the same. Only add the specified accessories.
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Lighting: Natural, matching the original photo
+- Style: Realistic product integration
+
+ACCESSORIES TO ADD:
+${accessoryList}
+
+KEY REQUIREMENTS:
+1. Keep EVERYTHING in the original photo unchanged (clothing, pose, background, lighting, person's appearance)
+2. ONLY add the specified accessories
+3. Accessories should look natural and realistic
+4. Match the lighting and style of the original photo
+5. Accessories should be positioned appropriately (glasses on face, bags in hand or on shoulder, jewelry on body, etc.)
+6. Maintain the original photo's quality and aesthetic
+7. No modifications to existing outfit or environment
+
+DO NOT:
+- Change the person's clothing, pose, or facial expression
+- Modify the background or lighting
+- Add any elements other than the specified accessories
+- Make the accessories look artificial or pasted on
+- Add text, watermarks, or logos
+
+Focus on seamlessly integrating the accessories into the existing photo as if they were always there.`;
+
+    } else if (mode === 'underwear') {
+      // UNDERWEAR MODE: Generate lingerie visualization
+      const materialDesc = underwearMaterial || 'comfortable fabric';
+      const materialDescriptions = {
+        'lace': 'delicate lace material',
+        'cotton': 'soft cotton material',
+        'satin': 'smooth satin material',
+        'microfiber': 'comfortable microfiber material',
+        'silk': 'luxurious silk material'
+      };
+      const materialDetail = materialDescriptions[materialDesc] || materialDesc;
+
+      prompt = `Create a tasteful, professional lingerie photograph showing ${braStyle} bra and ${pantyStyle} underwear in ${underwearColor} color.
+
+IMAGE PROVIDED:
+- Image 1: Model (person)
+
+TASK:
+Show this exact model wearing ${braStyle} style bra and ${pantyStyle} style underwear in ${underwearColor} color, made of ${materialDetail}. Style as clean, professional product photography similar to retail catalogs.
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Fabric Type: ${materialDetail}
+- Lighting: ${selectedLighting.description}
+- Background Blur: ${selectedBgBlur.description}
+- Depth of Field: ${selectedDoF.description}
+- Color Temperature: ${selectedColorTemp.description}
+- Shadow Quality: ${selectedShadow.description}
+
+SCENE & ENVIRONMENT:
+- Location/Background: ${locationDescription}
+- Style: Clean, professional retail catalog photography
+- Pose: ${selectedPose.description}
+- Camera Angle: ${selectedCameraAngle.description}
+- Mood: Professional, tasteful, respectful
+
+LINGERIE DETAILS:
+- Bra Style: ${braStyle}
+- Underwear Style: ${pantyStyle}
+- Color: ${underwearColor}
+- Material: ${materialDetail}
+
+KEY REQUIREMENTS:
+1. Keep model's face and body EXACTLY the same from the reference image
+2. Professional, tasteful framing focused on fit and style visualization
+3. Natural skin texture (no artificial smoothing)
+4. Accurate color: ${underwearColor}
+5. Realistic fabric appearance for ${materialDetail}
+6. Clean, sharp focus on the lingerie
+7. Maintain respectful, professional aesthetic like retail product photography
+8. Show how the lingerie fits naturally
+
+DO NOT:
+- Make it overtly sexual or inappropriate
+- Change the model's face or body type
+- Add unrealistic effects or distortions
+- Add text, watermarks, or logos
+- Create artificial or fake-looking results
+- Over-smooth skin or create plastic effects
+
+Create a clean, professional visualization similar to high-end lingerie retail catalogs - tasteful, respectful, and focused on the product.`;
+    }
+
+    console.log('🎯 Mode:', mode);
     console.log('📝 Prompt:', prompt);
 
     // استفاده از Gemini 2.5 Flash Image برای تولید تصویر
@@ -1920,37 +2096,54 @@ Make it simple and natural - like this person is actually wearing these clothes 
       }
     });
 
-    // Build content array with garments + model ONLY (no background image)
+    // ========================================
+    // NEW: Mode-Specific Image Loading
+    // ========================================
     const contentParts = [];
 
-    // Add all garment images
-    garmentBase64Array.forEach((garmentBase64, index) => {
-      contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1}:` });
+    if (mode === 'complete-outfit') {
+      // Complete outfit: Load garment images + model image
+      garmentBase64Array.forEach((garmentBase64, index) => {
+        contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1}:` });
+        contentParts.push({
+          inlineData: {
+            data: garmentBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      });
+
+      contentParts.push({ text: "MODEL IMAGE:" });
       contentParts.push({
         inlineData: {
-          data: garmentBase64,
+          data: modelBase64,
           mimeType: 'image/jpeg'
         }
       });
-    });
 
-    // Add model image
-    contentParts.push({ text: "MODEL IMAGE:" });
-    contentParts.push({
-      inlineData: {
-        data: modelBase64,
-        mimeType: 'image/jpeg'
-      }
-    });
+    } else if (mode === 'accessories-only') {
+      // Accessories only: Load user photo only
+      const userPhotoBase64 = await imageUrlToBase64(userPhotoPath);
+      contentParts.push({ text: "USER PHOTO:" });
+      contentParts.push({
+        inlineData: {
+          data: userPhotoBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
 
-    // Background is now TEXT ONLY in the prompt - no image sent
-    // This simplifies the AI's task: just garment + model
+    } else if (mode === 'underwear') {
+      // Underwear: Load model image only (no garment image needed)
+      contentParts.push({ text: "MODEL IMAGE:" });
+      contentParts.push({
+        inlineData: {
+          data: modelBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
+    }
 
-    // Add prompt with text-based background description
-
-
-
-
+    // Add the prompt
     contentParts.push({ text: prompt });
 
     const result = await model.generateContent(contentParts);

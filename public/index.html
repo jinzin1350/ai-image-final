@@ -21,8 +21,31 @@
         </header>
 
         <div class="main-content">
+            <!-- بخش انتخاب حالت -->
+            <section class="selection-section mode-selection">
+                <h2>🎯 انتخاب نوع خدمت</h2>
+                <p class="subtitle">لطفاً نوع خدمت مورد نظر خود را انتخاب کنید</p>
+                <div class="mode-selector">
+                    <div class="mode-card active" data-mode="complete-outfit">
+                        <div class="mode-icon">👗</div>
+                        <div class="mode-title">استایل کامل</div>
+                        <div class="mode-description">لباس + حجاب + اکسسوری (اختیاری)</div>
+                    </div>
+                    <div class="mode-card" data-mode="accessories-only">
+                        <div class="mode-icon">👓</div>
+                        <div class="mode-title">افزودن اکسسوری</div>
+                        <div class="mode-description">اکسسوری را به عکس خودتان اضافه کنید</div>
+                    </div>
+                    <div class="mode-card" data-mode="underwear">
+                        <div class="mode-icon">👙</div>
+                        <div class="mode-title">لباس زیر</div>
+                        <div class="mode-description">امتحان مدل‌های لباس زیر</div>
+                    </div>
+                </div>
+            </section>
+
             <!-- بخش آپلود لباس -->
-            <section class="upload-section">
+            <section class="upload-section" id="garmentUploadSection">
                 <h2>۱. آپلود تصویر لباس</h2>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="garmentInput" accept="image/*" multiple hidden>
@@ -89,6 +112,183 @@
                         <div class="hijab-title">بی حجاب</div>
                         <div class="hijab-description">بدون پوشش سر - موها کاملاً باز</div>
                     </div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب اکسسوری -->
+            <section class="selection-section accessories-section" id="accessoriesSection" style="display: none;">
+                <h2>۲.۲. انتخاب اکسسوری (اختیاری)</h2>
+                <p class="section-description">اکسسوری‌های مورد نظر خود را انتخاب کنید</p>
+
+                <div class="accessory-category">
+                    <h3>👓 عینک</h3>
+                    <div class="accessory-options">
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="sunglasses-aviator">
+                            <span>عینک آفتابی خلبانی</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="sunglasses-cateye">
+                            <span>عینک کت‌آی</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="sunglasses-round">
+                            <span>عینک گرد</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="glasses-reading">
+                            <span>عینک طبی</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="accessory-category">
+                    <h3>💍 جواهرات</h3>
+                    <div class="accessory-options">
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="necklace-pendant">
+                            <span>گردنبند آویز</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="necklace-chain">
+                            <span>زنجیر طلا</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="earrings-drop">
+                            <span>گوشواره آویز</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="earrings-stud">
+                            <span>گوشواره میخی</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="bracelet">
+                            <span>دستبند</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="rings">
+                            <span>انگشتر</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="accessory-category">
+                    <h3>👜 کیف</h3>
+                    <div class="accessory-options">
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="bag-handbag">
+                            <span>کیف دستی</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="bag-crossbody">
+                            <span>کیف دوشی</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="bag-clutch">
+                            <span>کلاچ</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="bag-backpack">
+                            <span>کوله پشتی</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="accessory-category">
+                    <h3>🎩 کلاه و شال</h3>
+                    <div class="accessory-options">
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="hat-fedora">
+                            <span>کلاه فدورا</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="hat-baseball">
+                            <span>کلاه کپ</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="hat-beanie">
+                            <span>کلاه بافتنی</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="scarf-neck">
+                            <span>شال گردن</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="accessory-category">
+                    <h3>⌚ ساعت و کمربند</h3>
+                    <div class="accessory-options">
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="watch-classic">
+                            <span>ساعت کلاسیک</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="watch-sport">
+                            <span>ساعت اسپرت</span>
+                        </label>
+                        <label class="accessory-checkbox">
+                            <input type="checkbox" name="accessories" value="belt-leather">
+                            <span>کمربند چرمی</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب لباس زیر -->
+            <section class="selection-section underwear-section" id="underwearSection" style="display: none;">
+                <h2>۲. انتخاب لباس زیر</h2>
+
+                <div class="param-group">
+                    <label for="braStyle">👙 مدل سوتین</label>
+                    <select id="braStyle" class="param-dropdown">
+                        <option value="">انتخاب کنید...</option>
+                        <option value="push-up">پوش‌آپ</option>
+                        <option value="balconette">بالکونت</option>
+                        <option value="sports">ورزشی</option>
+                        <option value="bralette">برالت</option>
+                        <option value="strapless">بدون بند</option>
+                        <option value="full-coverage">پوشش کامل</option>
+                    </select>
+                </div>
+
+                <div class="param-group">
+                    <label for="pantyStyle">🩲 مدل شورت</label>
+                    <select id="pantyStyle" class="param-dropdown">
+                        <option value="">انتخاب کنید...</option>
+                        <option value="bikini">بیکینی</option>
+                        <option value="hipster">هیپستر</option>
+                        <option value="boy-short">باکسری</option>
+                        <option value="thong">تنگ</option>
+                        <option value="high-waist">کمر بلند</option>
+                        <option value="classic">کلاسیک</option>
+                    </select>
+                </div>
+
+                <div class="param-group">
+                    <label for="underwearColor">🎨 رنگ</label>
+                    <select id="underwearColor" class="param-dropdown">
+                        <option value="">انتخاب کنید...</option>
+                        <option value="black">مشکی</option>
+                        <option value="white">سفید</option>
+                        <option value="nude">بژ</option>
+                        <option value="red">قرمز</option>
+                        <option value="pink">صورتی</option>
+                        <option value="blue">آبی</option>
+                        <option value="purple">بنفش</option>
+                    </select>
+                </div>
+
+                <div class="param-group">
+                    <label for="underwearMaterial">🧵 جنس پارچه</label>
+                    <select id="underwearMaterial" class="param-dropdown">
+                        <option value="">انتخاب کنید...</option>
+                        <option value="lace">توری</option>
+                        <option value="cotton">نخی</option>
+                        <option value="satin">ساتن</option>
+                        <option value="microfiber">میکروفایبر</option>
+                        <option value="silk">ابریشم</option>
+                    </select>
                 </div>
             </section>
 
