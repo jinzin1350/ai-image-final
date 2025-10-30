@@ -503,6 +503,68 @@
                         </div>
                     </details>
 
+                    <!-- Accessory Photography Section -->
+                    <details class="studio-section" style="background: #fef3c7;">
+                        <summary style="color: #d97706;">💍 عکاسی اکسسوری (برای مدل‌های اکسسوری)</summary>
+                        <p style="color: #92400e; margin-bottom: 15px; font-size: 14px;">
+                            ⚠️ این بخش فقط برای مدل‌هایی است که می‌خواهید برای عکاسی محصولات اکسسوری استفاده کنید.
+                            <br>مدل باید لباس‌های ساده و بی‌حاشیه بپوشد تا توجه روی اکسسوری باشد، نه لباس.
+                        </p>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>آیا این مدل برای عکاسی اکسسوری است؟</label>
+                            <select id="isAccessoryModel">
+                                <option value="no">❌ خیر - مدل معمولی</option>
+                                <option value="yes">✅ بله - مدل اکسسوری</option>
+                            </select>
+                        </div>
+
+                        <div id="accessoryClothingSection" style="display: none;">
+                            <div class="form-group">
+                                <label>سبک لباس برای مدل 🎨</label>
+                                <select id="accessoryClothingStyle">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="simple-white-tshirt">تی‌شرت سفید ساده</option>
+                                    <option value="black-turtleneck">یقه اسکی مشکی</option>
+                                    <option value="beige-blazer">کت بژ کلاسیک</option>
+                                    <option value="gray-sweater">ژاکت خاکستری ساده</option>
+                                    <option value="minimal-dress">لباس مینیمال و ساده</option>
+                                    <option value="plain-white-shirt">پیراهن سفید ساده</option>
+                                    <option value="navy-cardigan">کاردیگان سرمه‌ای</option>
+                                    <option value="cream-blouse">بلوز کرم رنگ</option>
+                                    <option value="black-v-neck">تی‌شرت یقه V مشکی</option>
+                                    <option value="neutral-tank-top">تاپ بدون آستین خنثی</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 لباس‌های ساده و تک‌رنگ بهترین انتخاب برای نمایش اکسسوری هستند
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>فریمینگ دوربین 📷</label>
+                                <select id="accessoryCameraFraming">
+                                    <option value="upper-body">نیم‌تنه بالایی (برای جواهرات، عینک، کلاه)</option>
+                                    <option value="three-quarter">سه‌چهارم بدن (برای کیف، کمربند)</option>
+                                    <option value="hands-focus">تمرکز روی دست‌ها (برای ساعت، انگشتر، دستبند)</option>
+                                    <option value="face-neck-focus">تمرکز روی صورت و گردن (برای گوشواره، گردنبند)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    📸 نحوه فریم شدن مدل بسته به نوع اکسسوری
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>حالت بدن برای اکسسوری 🤸</label>
+                                <select id="accessoryPose">
+                                    <option value="natural-standing">ایستاده طبیعی</option>
+                                    <option value="hands-visible">دست‌ها قابل رویت (برای ساعت، انگشتر)</option>
+                                    <option value="casual-confident">اعتماد به نفس و راحت</option>
+                                    <option value="minimal-movement">حرکت کم، تمرکز روی اکسسوری</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
                     <!-- Additional Details -->
                     <div class="form-group" style="margin-top: 25px;">
                         <label>جزئیات اضافی (اختیاری)</label>
@@ -537,6 +599,7 @@
                                 <option value="elderly">👴 سالمند (Elderly)</option>
                                 <option value="teen">🧑 نوجوان (Teen)</option>
                                 <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                                <option value="accessory">💍 اکسسوری (Accessory)</option>
                             </select>
                         </div>
 
@@ -602,6 +665,16 @@
                 console.log('Selected user:', selectedUserId);
             }
         }
+
+        // Toggle accessory clothing section
+        document.getElementById('isAccessoryModel').addEventListener('change', function() {
+            const accessoryClothingSection = document.getElementById('accessoryClothingSection');
+            if (this.value === 'yes') {
+                accessoryClothingSection.style.display = 'block';
+            } else {
+                accessoryClothingSection.style.display = 'none';
+            }
+        });
 
         async function generateModel() {
             if (!selectedUserId) {
@@ -698,8 +771,14 @@
             // Additional
             const additional = document.getElementById('additionalDetails').value;
 
+            // Accessory photography specific
+            const isAccessory = document.getElementById('isAccessoryModel').value === 'yes';
+            const accessoryClothing = document.getElementById('accessoryClothingStyle').value;
+            const accessoryFraming = document.getElementById('accessoryCameraFraming').value;
+            const accessoryPose = document.getElementById('accessoryPose').value;
+
             // Build comprehensive prompt
-            let prompt = `Professional ${quality} fashion photograph of a ${age.replace('-', ' ')} ${ethnicity} ${gender} model. `;
+            let prompt = `Professional ${quality} ${isAccessory ? 'accessory product' : 'fashion'} photograph of a ${age.replace('-', ' ')} ${ethnicity} ${gender} model. `;
 
             prompt += `Face: ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
 
@@ -711,12 +790,51 @@
             prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
             prompt += `Body: ${bodyType} ${height} build. `;
 
+            // Accessory-specific clothing and framing
+            if (isAccessory && accessoryClothing) {
+                const clothingDescriptions = {
+                    'simple-white-tshirt': 'wearing simple plain white t-shirt',
+                    'black-turtleneck': 'wearing black turtleneck sweater',
+                    'beige-blazer': 'wearing beige classic blazer',
+                    'gray-sweater': 'wearing gray plain sweater',
+                    'minimal-dress': 'wearing minimal simple dress',
+                    'plain-white-shirt': 'wearing plain white button-up shirt',
+                    'navy-cardigan': 'wearing navy blue cardigan',
+                    'cream-blouse': 'wearing cream-colored blouse',
+                    'black-v-neck': 'wearing black V-neck t-shirt',
+                    'neutral-tank-top': 'wearing neutral-colored tank top'
+                };
+                prompt += `Clothing: ${clothingDescriptions[accessoryClothing] || accessoryClothing}. `;
+                prompt += `IMPORTANT: Simple, solid-color, minimal clothing to NOT distract from accessories. `;
+            }
+
+            // Accessory-specific pose and framing
+            if (isAccessory && accessoryPose) {
+                prompt += `Pose: ${accessoryPose.replace('-', ' ')} pose. `;
+            } else {
+                prompt += `Pose: ${pose.replace('-', ' ')} pose, head ${headAngle.replace('-', ' ')}. `;
+            }
+
             prompt += `Expression: ${expression.replace('-', ' ')} expression. `;
-            prompt += `Pose: ${pose.replace('-', ' ')} pose, head ${headAngle.replace('-', ' ')}. `;
 
-            prompt += `Photography: ${shotType.replace('-', ' ')} shot from ${cameraAngle.replace('-', ' ')} angle, ${lighting} lighting, ${bgStyle.replace('-', ' ')} background. `;
+            // Accessory-specific camera framing
+            if (isAccessory && accessoryFraming) {
+                const framingDescriptions = {
+                    'upper-body': 'upper body shot focusing on face, neck, and shoulders area - perfect for jewelry, glasses, hats',
+                    'three-quarter': 'three-quarter body shot showing torso and upper legs - ideal for bags, belts',
+                    'hands-focus': 'shot with clear focus on hands and wrists - perfect for watches, rings, bracelets',
+                    'face-neck-focus': 'close-up focusing on face and neck area - ideal for earrings, necklaces'
+                };
+                prompt += `Camera Framing: ${framingDescriptions[accessoryFraming] || accessoryFraming}. `;
+            } else {
+                prompt += `Photography: ${shotType.replace('-', ' ')} shot from ${cameraAngle.replace('-', ' ')} angle, ${lighting} lighting, ${bgStyle.replace('-', ' ')} background. `;
+            }
 
-            prompt += `Professional fashion photography, high-end editorial quality, sharp focus, perfect lighting, detailed features, photorealistic, 8K resolution. `;
+            if (isAccessory) {
+                prompt += `ACCESSORY PRODUCT PHOTOGRAPHY: Model is styled specifically for showcasing accessories. Clean background, professional lighting, model pose and framing optimized to display accessories clearly. The model complements the accessory, not competes with it. `;
+            }
+
+            prompt += `Professional ${isAccessory ? 'product' : 'fashion'} photography, high-end editorial quality, sharp focus, perfect lighting, detailed features, photorealistic, 8K resolution. `;
 
             if (additional) {
                 prompt += additional + ' ';
