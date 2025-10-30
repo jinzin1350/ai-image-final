@@ -724,6 +724,8 @@ generateBtn.addEventListener('click', async () => {
             requestBody.underwearMaterial = document.getElementById('underwearMaterial').value;
         }
 
+        console.log('🚀 Sending request:', requestBody);
+
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: {
@@ -733,6 +735,7 @@ generateBtn.addEventListener('click', async () => {
         });
 
         const data = await response.json();
+        console.log('📥 Response:', data);
 
         if (data.success) {
             // ذخیره در localStorage برای گالری

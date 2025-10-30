@@ -1766,10 +1766,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     // Find model (check hardcoded first, then custom from database)
-    let selectedModel = models.find(m => m.id === modelId);
+    let selectedModel = modelId ? models.find(m => m.id === modelId) : null;
 
     // If not found in hardcoded models and ID starts with 'custom-', fetch from database
-    if (!selectedModel && modelId.startsWith('custom-') && supabase) {
+    if (!selectedModel && modelId && modelId.startsWith('custom-') && supabase) {
       const customId = modelId.replace('custom-', '');
       const { data: customModel } = await supabase
         .from('content_library')
@@ -1790,10 +1790,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     // Find background (check hardcoded first, then custom from database)
-    let selectedBackground = backgrounds.find(b => b.id === backgroundId);
+    let selectedBackground = backgroundId ? backgrounds.find(b => b.id === backgroundId) : null;
 
     // If not found in hardcoded backgrounds and ID starts with 'custom-', fetch from database
-    if (!selectedBackground && backgroundId.startsWith('custom-') && supabase) {
+    if (!selectedBackground && backgroundId && backgroundId.startsWith('custom-') && supabase) {
       const customId = backgroundId.replace('custom-', '');
       const { data: customBackground } = await supabase
         .from('content_library')
