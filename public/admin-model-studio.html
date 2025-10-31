@@ -508,15 +508,35 @@
                         <summary style="color: #d97706;">💍 عکاسی اکسسوری (برای مدل‌های اکسسوری)</summary>
                         <p style="color: #92400e; margin-bottom: 15px; font-size: 14px;">
                             ⚠️ این بخش فقط برای مدل‌هایی است که می‌خواهید برای عکاسی محصولات اکسسوری استفاده کنید.
-                            <br>مدل باید لباس‌های ساده و بی‌حاشیه بپوشد تا توجه روی اکسسوری باشد، نه لباس.
+                            <br>می‌توانید بین مدل تمام بدن یا عکس نزدیک اعضای بدن (دست، گردن، صورت) انتخاب کنید.
                         </p>
 
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label>آیا این مدل برای عکاسی اکسسوری است؟</label>
                             <select id="isAccessoryModel">
                                 <option value="no">❌ خیر - مدل معمولی</option>
-                                <option value="yes">✅ بله - مدل اکسسوری</option>
+                                <option value="full-body">👤 بله - مدل تمام بدن برای اکسسوری</option>
+                                <option value="body-part">✋ بله - مدل نزدیک (دست، گردن، صورت)</option>
                             </select>
+                        </div>
+
+                        <!-- Body Part Type Selection (NEW) -->
+                        <div id="bodyPartTypeSection" style="display: none; margin-bottom: 20px;">
+                            <div class="form-group">
+                                <label>🎯 نوع مدل نزدیک (Body Part)</label>
+                                <select id="bodyPartType">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="hand-palm">✋ دست - کف دست (برای انگشتر، دستبند)</option>
+                                    <option value="hand-side">🤚 دست - نمای جانبی (برای انگشتر، دستبند)</option>
+                                    <option value="wrist">⌚ مچ دست (برای ساعت، دستبند)</option>
+                                    <option value="neck-chest">👔 گردن و سینه (برای گردنبند)</option>
+                                    <option value="ear-profile">👂 پروفایل گوش (برای گوشواره)</option>
+                                    <option value="face-portrait">👤 پرتره صورت (برای عینک)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 برای عکاسی حرفه‌ای اکسسوری، مدل‌های نزدیک بهتر از تمام بدن هستند
+                                </small>
+                            </div>
                         </div>
 
                         <div id="accessoryClothingSection" style="display: none;">
@@ -775,10 +795,17 @@
         // Toggle accessory clothing section
         document.getElementById('isAccessoryModel').addEventListener('change', function() {
             const accessoryClothingSection = document.getElementById('accessoryClothingSection');
-            if (this.value === 'yes') {
+            const bodyPartTypeSection = document.getElementById('bodyPartTypeSection');
+
+            if (this.value === 'full-body') {
                 accessoryClothingSection.style.display = 'block';
+                bodyPartTypeSection.style.display = 'none';
+            } else if (this.value === 'body-part') {
+                accessoryClothingSection.style.display = 'none';
+                bodyPartTypeSection.style.display = 'block';
             } else {
                 accessoryClothingSection.style.display = 'none';
+                bodyPartTypeSection.style.display = 'none';
             }
         });
 
@@ -842,6 +869,24 @@
             }
         }
 
+        function buildBodyPartPrompt(bodyPartType, gender, age, ethnicity, skinTone, skinTexture, quality) {
+            const bodyPartPrompts = {
+                'hand-palm': `Professional ${quality} close-up product photography of ${gender} hand, palm facing forward. ${skinTone} ${skinTexture} skin. Hand is elegantly positioned, fingers slightly spread, relaxed natural pose. Clean studio background, soft professional lighting, perfect for displaying rings and bracelets. Extreme close-up, sharp focus on hand details, photorealistic, 8K resolution. Product photography style for jewelry catalog.`,
+
+                'hand-side': `Professional ${quality} close-up product photography of ${gender} hand from side angle. ${skinTone} ${skinTexture} skin. Hand in elegant relaxed pose, side profile view showing wrist and fingers clearly. Clean studio background, professional lighting, ideal for rings, bracelets, and watches. Extreme close-up, sharp focus, photorealistic, 8K resolution. Product photography for jewelry.`,
+
+                'wrist': `Professional ${quality} close-up product photography focusing on ${gender} wrist and forearm. ${skinTone} ${skinTexture} skin. Wrist positioned elegantly at slight angle, forearm visible, hand relaxed. Clean studio background, professional lighting, perfect for displaying watches and bracelets. Close-up shot, sharp focus on wrist area, photorealistic, 8K resolution. Product photography for watch catalog.`,
+
+                'neck-chest': `Professional ${quality} close-up product photography of ${gender} neck and upper chest area. ${skinTone} ${skinTexture} skin. Elegant neckline, shoulders visible, clean minimal styling. Head cropped at chin level (face not shown), focus on neck and collarbone area. Clean studio background, professional lighting, ideal for necklaces and pendants. Close-up shot, sharp focus, photorealistic, 8K resolution. Product photography for jewelry.`,
+
+                'ear-profile': `Professional ${quality} close-up product photography of ${gender} side profile showing ear clearly. ${skinTone} ${skinTexture} skin. Clean ear with elegant profile, hair pulled back away from ear. Face partially visible in profile (focus on ear), neck and shoulder visible. Clean studio background, professional lighting, perfect for earrings. Close-up shot, sharp focus on ear, photorealistic, 8K resolution. Product photography for earring catalog.`,
+
+                'face-portrait': `Professional ${quality} portrait close-up product photography of ${ethnicity} ${gender} face. ${skinTone} ${skinTexture} skin. Clean elegant facial features, neutral confident expression, straight head angle looking at camera. Hair styled neatly. Clean studio background, professional lighting, ideal for sunglasses and eyeglasses. Portrait headshot, sharp focus on face, photorealistic, 8K resolution. Product photography for eyewear catalog.`
+            };
+
+            return bodyPartPrompts[bodyPartType] || `Professional product photography close-up of ${gender} ${bodyPartType}`;
+        }
+
         function buildModelPrompt() {
             // Basic info
             const gender = document.getElementById('modelGender').value;
@@ -888,7 +933,10 @@
             const additional = document.getElementById('additionalDetails').value;
 
             // Accessory photography specific
-            const isAccessory = document.getElementById('isAccessoryModel').value === 'yes';
+            const isAccessoryValue = document.getElementById('isAccessoryModel').value;
+            const isAccessory = isAccessoryValue === 'full-body' || isAccessoryValue === 'body-part';
+            const isBodyPart = isAccessoryValue === 'body-part';
+            const bodyPartType = document.getElementById('bodyPartType').value;
             const accessoryClothing = document.getElementById('accessoryClothingStyle').value;
             const accessoryFraming = document.getElementById('accessoryCameraFraming').value;
             const accessoryPose = document.getElementById('accessoryPose').value;
@@ -904,6 +952,12 @@
 
             // Build comprehensive prompt
             let photoType = isAccessory ? 'accessory product' : (isUnderwear ? 'underwear product' : 'fashion');
+
+            // SPECIAL HANDLING: Body-part models for accessory photography
+            if (isBodyPart && bodyPartType) {
+                return buildBodyPartPrompt(bodyPartType, gender, age, ethnicity, skinTone, skinTexture, quality);
+            }
+
             let prompt = `Professional ${quality} ${photoType} photograph of a ${age.replace('-', ' ')} ${ethnicity} ${gender} model. `;
 
             // For underwear models: HEADLESS/CROPPED (no face shown) for e-commerce focus
