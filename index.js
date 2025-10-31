@@ -1972,11 +1972,12 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'accessories-only') {
-      // For accessories mode, load accessory product image and model
+      // For accessories mode, load ONLY accessory product image (not model image)
+      // AI will generate the scene naturally from text prompt
       garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
-      modelBase64 = await imageUrlToBase64(selectedModel.image);
+      modelBase64 = null; // NEW: Don't send model image - let AI generate naturally
 
-      garmentDescription = `the ${accessoryType} accessory from the first image`;
+      garmentDescription = `the ${accessoryType} accessory from the image`;
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
@@ -2109,14 +2110,13 @@ Make it simple and natural - like this person is actually wearing these clothes 
 
         const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
 
-        prompt = `Create a professional product photography image showing the model wearing/holding/using this ${accessoryType}.
+        prompt = `Create a professional product photography image of this ${accessoryType} being worn/displayed naturally.
 
-IMAGES PROVIDED:
-- Image 1: ${accessoryType.toUpperCase()} product photo
-- Image 2: Model (person)
+IMAGE PROVIDED:
+- ${accessoryType.toUpperCase()} product photo
 
 TASK:
-Show this exact model wearing, holding, or using ${garmentDescription}. Create a professional product photography shot that showcases the ${accessoryType} naturally on the model.
+Generate a complete professional product photography scene showing this exact ${accessoryType} from the image being worn/displayed naturally in an e-commerce style photo.
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -2130,34 +2130,33 @@ TECHNICAL SPECS:
 SCENE & ENVIRONMENT:
 - Location/Background: ${locationDescription}
 - Style: ${selectedStyle.description}
-- Pose: ${selectedPose.description}
 - Camera Angle: ${selectedCameraAngle.description}
 - Mood: Professional product photography for e-commerce/Instagram
 
-ACCESSORY POSITIONING:
-- Type: ${accessoryDesc}
-- Position the ${accessoryType} naturally and appropriately on/with the model
-- The ${accessoryType} should be the STAR of the photo - clearly visible and well-displayed
-- Model should showcase the ${accessoryType} in a natural, appealing way
+SCENE GENERATION:
+- Generate a natural scene appropriate for ${accessoryDesc}
+- If it's jewelry (ring, bracelet, necklace, earrings): show elegant hand/neck/ear naturally displaying it
+- If it's eyewear (sunglasses, glasses): show someone wearing it naturally
+- If it's a bag/accessory: show it being held/worn in a natural, appealing way
+- The ${accessoryType} should be the STAR - clearly visible and beautifully displayed
+- Create a complete, natural, photorealistic scene
 
 KEY REQUIREMENTS:
-1. Keep model's face and body EXACTLY the same from the reference image
-2. Position the ${accessoryType} correctly based on its type (${accessoryDesc})
-3. The ${accessoryType} should look natural and realistic on/with the model
-4. Accurate colors and details from the ${accessoryType} product image
-5. Professional product photography aesthetic - clean, appealing, e-commerce ready
-6. Focus on showcasing the ${accessoryType} product beautifully
-7. Natural skin texture (no plastic smoothing)
-8. Clean, sharp focus on both model and ${accessoryType}
+1. Use the EXACT ${accessoryType} from the provided image - keep all details, colors, and design accurate
+2. Generate a natural, realistic scene (not a composite or paste-on effect)
+3. Professional e-commerce product photography quality
+4. Clean, sharp focus on the ${accessoryType}
+5. Natural skin texture and realistic lighting
+6. Appropriate body-part/model positioning for the accessory type
 
 DO NOT:
-- Change the model's face, body type, or overall appearance
-- Make unrealistic distortions or artificial effects
+- Make unrealistic or artificial composites
 - Add text, watermarks, or logos
 - Make the ${accessoryType} look pasted on or fake
+- Change the ${accessoryType}'s design, color, or details from the reference image
 - Over-smooth skin or create plastic-looking results
 
-Create a beautiful product photography shot that would work perfectly for an e-commerce website or Instagram post - professional, clean, and showcasing the ${accessoryType} naturally on the model.`;
+Generate a beautiful, natural product photography shot that looks like a real professional photo shoot - perfect for e-commerce or Instagram.`;
       }
 
     } else if (mode === 'underwear') {
@@ -2266,7 +2265,8 @@ Create a professional fashion product photography shot suitable for retail e-com
       });
 
     } else if (mode === 'accessories-only') {
-      // Accessories mode: Load accessory product image + model image
+      // NEW: Accessories mode - ONLY send accessory image, NO model image
+      // AI generates the scene naturally from text prompt
       contentParts.push({ text: `ACCESSORY PRODUCT IMAGE:` });
       contentParts.push({
         inlineData: {
@@ -2275,13 +2275,9 @@ Create a professional fashion product photography shot suitable for retail e-com
         }
       });
 
-      contentParts.push({ text: "MODEL IMAGE:" });
-      contentParts.push({
-        inlineData: {
-          data: modelBase64,
-          mimeType: 'image/jpeg'
-        }
-      });
+      // NOTE: We intentionally DO NOT send model image
+      // The custom prompt describes the scene/hand/body-part
+      // AI generates everything naturally
 
     } else if (mode === 'underwear') {
       // Underwear mode: Load underwear product image + model image
