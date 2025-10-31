@@ -759,6 +759,108 @@ app.delete('/api/admin/user-content/:contentId', authenticateAdmin, async (req, 
   }
 });
 
+// ========================================
+// Model Prompts Management (Admin Only)
+// ========================================
+
+// Get all prompts for a specific model
+app.get('/api/admin/model-prompts/:modelId', authenticateAdmin, async (req, res) => {
+  try {
+    const { modelId } = req.params;
+
+    const { data: prompts, error } = await supabaseAdmin
+      .from('model_prompts')
+      .select('*')
+      .eq('model_id', modelId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, prompts: prompts || [] });
+  } catch (error) {
+    console.error('Error fetching model prompts:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Add a new prompt for a model
+app.post('/api/admin/model-prompts', authenticateAdmin, async (req, res) => {
+  try {
+    const { model_id, prompt_text, prompt_type = 'accessory' } = req.body;
+
+    if (!model_id || !prompt_text) {
+      return res.status(400).json({ success: false, error: 'Model ID and prompt text are required' });
+    }
+
+    const { data: prompt, error } = await supabaseAdmin
+      .from('model_prompts')
+      .insert([{
+        model_id,
+        prompt_text,
+        prompt_type,
+        is_active: true
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Added prompt for model ${model_id}`);
+    res.json({ success: true, prompt });
+  } catch (error) {
+    console.error('Error adding model prompt:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update a prompt
+app.put('/api/admin/model-prompts/:promptId', authenticateAdmin, async (req, res) => {
+  try {
+    const { promptId } = req.params;
+    const { prompt_text, is_active } = req.body;
+
+    const updateData = {};
+    if (prompt_text !== undefined) updateData.prompt_text = prompt_text;
+    if (is_active !== undefined) updateData.is_active = is_active;
+    updateData.updated_at = new Date().toISOString();
+
+    const { data: prompt, error } = await supabaseAdmin
+      .from('model_prompts')
+      .update(updateData)
+      .eq('id', promptId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Updated prompt ${promptId}`);
+    res.json({ success: true, prompt });
+  } catch (error) {
+    console.error('Error updating prompt:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete a prompt
+app.delete('/api/admin/model-prompts/:promptId', authenticateAdmin, async (req, res) => {
+  try {
+    const { promptId } = req.params;
+
+    const { error } = await supabaseAdmin
+      .from('model_prompts')
+      .delete()
+      .eq('id', promptId);
+
+    if (error) throw error;
+
+    console.log(`🗑️ Deleted prompt ${promptId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting prompt:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Save generated image to user content (admin only)
 app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res) => {
   try {
@@ -1879,6 +1981,28 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
+      // NEW: Check if this model has custom prompts
+      let customPrompt = null;
+      if (selectedModel.id.startsWith('custom-') && supabase) {
+        const modelDbId = selectedModel.id.replace('custom-', '');
+        const { data: prompts } = await supabase
+          .from('model_prompts')
+          .select('prompt_text')
+          .eq('model_id', modelDbId)
+          .eq('is_active', true)
+          .eq('prompt_type', 'accessory');
+
+        if (prompts && prompts.length > 0) {
+          // Randomly select one prompt
+          const randomIndex = Math.floor(Math.random() * prompts.length);
+          customPrompt = prompts[randomIndex].prompt_text;
+          console.log(`🎲 Using random custom prompt (${randomIndex + 1}/${prompts.length}) for model ${modelDbId}`);
+        }
+      }
+
+      // Store custom prompt for later use
+      selectedModel.customPrompt = customPrompt;
+
     } else if (mode === 'underwear') {
       // For underwear mode, load underwear product image and model
       garmentBase64Array = [await imageUrlToBase64(underwearPath)];
@@ -1958,27 +2082,34 @@ Make it simple and natural - like this person is actually wearing these clothes 
 
     } else if (mode === 'accessories-only') {
       // ACCESSORIES MODE: Product Photography for Accessory
-      const accessoryTypeDescriptions = {
-        'handbag': 'handbag (carried in hand or on arm)',
-        'backpack': 'backpack (worn on back)',
-        'crossbody-bag': 'crossbody bag (worn across shoulder)',
-        'clutch': 'clutch bag (held in hand)',
-        'sunglasses': 'sunglasses (worn on face)',
-        'eyeglasses': 'eyeglasses (worn on face)',
-        'watch': 'wristwatch (worn on wrist)',
-        'necklace': 'necklace (worn around neck)',
-        'earrings': 'earrings (worn on ears)',
-        'bracelet': 'bracelet (worn on wrist)',
-        'ring': 'ring (worn on finger)',
-        'scarf': 'neck scarf (draped around neck)',
-        'hat': 'hat (worn on head)',
-        'belt': 'belt (worn around waist)',
-        'shoes': 'shoes (worn on feet)'
-      };
 
-      const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
+      // NEW: Use custom prompt if available
+      if (selectedModel.customPrompt) {
+        prompt = selectedModel.customPrompt;
+        console.log('✅ Using custom prompt for accessory model');
+      } else {
+        // Fallback to default prompt
+        const accessoryTypeDescriptions = {
+          'handbag': 'handbag (carried in hand or on arm)',
+          'backpack': 'backpack (worn on back)',
+          'crossbody-bag': 'crossbody bag (worn across shoulder)',
+          'clutch': 'clutch bag (held in hand)',
+          'sunglasses': 'sunglasses (worn on face)',
+          'eyeglasses': 'eyeglasses (worn on face)',
+          'watch': 'wristwatch (worn on wrist)',
+          'necklace': 'necklace (worn around neck)',
+          'earrings': 'earrings (worn on ears)',
+          'bracelet': 'bracelet (worn on wrist)',
+          'ring': 'ring (worn on finger)',
+          'scarf': 'neck scarf (draped around neck)',
+          'hat': 'hat (worn on head)',
+          'belt': 'belt (worn around waist)',
+          'shoes': 'shoes (worn on feet)'
+        };
 
-      prompt = `Create a professional product photography image showing the model wearing/holding/using this ${accessoryType}.
+        const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
+
+        prompt = `Create a professional product photography image showing the model wearing/holding/using this ${accessoryType}.
 
 IMAGES PROVIDED:
 - Image 1: ${accessoryType.toUpperCase()} product photo
@@ -2027,6 +2158,7 @@ DO NOT:
 - Over-smooth skin or create plastic-looking results
 
 Create a beautiful product photography shot that would work perfectly for an e-commerce website or Instagram post - professional, clean, and showcasing the ${accessoryType} naturally on the model.`;
+      }
 
     } else if (mode === 'underwear') {
       // INTIMATE APPAREL MODE: Product Photography (using neutral terminology to avoid content filters)
