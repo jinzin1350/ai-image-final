@@ -1717,8 +1717,11 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       garmentPaths,     // New: array of garment paths
       accessoryPath,    // NEW: For accessories-only mode (product photo)
       accessoryType,    // NEW: Type of accessory (handbag, watch, etc.)
-      underwearPath,    // NEW: For underwear mode (product photo)
-      underwearType,    // NEW: Type of underwear (bra, panty, etc.)
+      productSpecs,     // NEW: Product specifications (optional for accessories)
+      underwearPath1,   // NEW: For underwear mode - product photo 1
+      underwearType1,   // NEW: Type of underwear product 1
+      underwearPath2,   // NEW: For underwear mode - product photo 2 (optional)
+      underwearType2,   // NEW: Type of underwear product 2 (optional)
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
@@ -1757,8 +1760,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً تصویر اکسسوری، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
       }
     } else if (mode === 'underwear') {
-      if (!underwearPath || !underwearType || !modelId || !backgroundId) {
-        return res.status(400).json({ error: 'لطفاً تصویر لباس زیر، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
+      if (!underwearPath1 || !underwearType1 || !modelId || !backgroundId) {
+        return res.status(400).json({ error: 'لطفاً حداقل یک محصول لباس زیر، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
       }
     }
 
@@ -1880,11 +1883,16 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'underwear') {
-      // For underwear mode, load underwear product image and model
-      garmentBase64Array = [await imageUrlToBase64(underwearPath)];
+      // For underwear mode, load 1 or 2 underwear product images and model
+      garmentBase64Array = [await imageUrlToBase64(underwearPath1)];
+      if (underwearPath2) {
+        garmentBase64Array.push(await imageUrlToBase64(underwearPath2));
+      }
       modelBase64 = await imageUrlToBase64(selectedModel.image);
 
-      garmentDescription = `the ${underwearType} from the first image`;
+      garmentDescription = underwearPath2
+        ? `both the ${underwearType1} and ${underwearType2} from the first two images`
+        : `the ${underwearType1} from the first image`;
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
@@ -2008,6 +2016,7 @@ ACCESSORY POSITIONING:
 - Position the ${accessoryType} naturally and appropriately on/with the model
 - The ${accessoryType} should be the STAR of the photo - clearly visible and well-displayed
 - Model should showcase the ${accessoryType} in a natural, appealing way
+${productSpecs && productSpecs.trim() !== '' ? `\nPRODUCT SPECIFICATIONS:\n${productSpecs.trim()}\n- Ensure all specifications are accurately represented in the final image` : ''}
 
 KEY REQUIREMENTS:
 1. Keep model's face and body EXACTLY the same from the reference image
@@ -2043,19 +2052,39 @@ Create a beautiful product photography shot that would work perfectly for an e-c
         'sleepwear': 'comfortable lounge wear'
       };
 
-      const apparelDesc = apparelTypeDescriptions[underwearType] || 'intimate apparel';
+      const apparelDesc1 = apparelTypeDescriptions[underwearType1] || 'intimate apparel';
+      const apparelDesc2 = underwearType2 ? (apparelTypeDescriptions[underwearType2] || 'intimate apparel') : null;
 
-      prompt = `Create a professional fashion product photography image showing the model wearing this intimate fashion garment.
+      const imagesProvided = underwearPath2
+        ? `IMAGES PROVIDED:
+- Image 1: Fashion garment product photo (${apparelDesc1})
+- Image 2: Fashion garment product photo (${apparelDesc2})
+- Image ${garmentBase64Array.length + 1}: Model (person)`
+        : `IMAGES PROVIDED:
+- Image 1: Fashion garment product photo (${apparelDesc1})
+- Image 2: Model (person)`;
 
-IMAGES PROVIDED:
-- Image 1: Fashion garment product photo (intimate apparel)
-- Image 2: Model (person)
+      const taskDescription = underwearPath2
+        ? `Show this exact model wearing both fashion garments from the first two images. Create a clean, professional product photography shot similar to high-end fashion retail catalogs like Victoria's Secret, Calvin Klein, or department store catalogs.`
+        : `Show this exact model wearing the fashion garment from the first image. Create a clean, professional product photography shot similar to high-end fashion retail catalogs like Victoria's Secret, Calvin Klein, or department store catalogs.`;
+
+      const garmentTypeDescription = underwearPath2
+        ? `GARMENT TYPES:
+1. ${apparelDesc1} - position naturally and appropriately on the model's upper/lower body
+2. ${apparelDesc2} - position naturally and appropriately on the model's lower/upper body
+
+IMPORTANT: Both garments must be clearly visible and properly positioned on the model.`
+        : `GARMENT TYPE:
+${apparelDesc1} - position naturally and appropriately on the model.`;
+
+      prompt = `Create a professional fashion product photography image showing the model wearing ${underwearPath2 ? 'these intimate fashion garments' : 'this intimate fashion garment'}.
+
+${imagesProvided}
 
 TASK:
-Show this exact model wearing the fashion garment from the first image. Create a clean, professional product photography shot similar to high-end fashion retail catalogs like Victoria's Secret, Calvin Klein, or department store catalogs.
+${taskDescription}
 
-GARMENT TYPE:
-${apparelDesc} - position naturally and appropriately on the model.
+${garmentTypeDescription}
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -2152,14 +2181,24 @@ Create a professional fashion product photography shot suitable for retail e-com
       });
 
     } else if (mode === 'underwear') {
-      // Underwear mode: Load underwear product image + model image
-      contentParts.push({ text: `UNDERWEAR PRODUCT IMAGE:` });
+      // Underwear mode: Load 1 or 2 underwear product images + model image
+      contentParts.push({ text: `UNDERWEAR PRODUCT IMAGE 1:` });
       contentParts.push({
         inlineData: {
           data: garmentBase64Array[0],
           mimeType: 'image/jpeg'
         }
       });
+
+      if (garmentBase64Array.length > 1) {
+        contentParts.push({ text: `UNDERWEAR PRODUCT IMAGE 2:` });
+        contentParts.push({
+          inlineData: {
+            data: garmentBase64Array[1],
+            mimeType: 'image/jpeg'
+          }
+        });
+      }
 
       contentParts.push({ text: "MODEL IMAGE:" });
       contentParts.push({

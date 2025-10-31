@@ -690,6 +690,7 @@ generateBtn.addEventListener('click', async () => {
             // Accessories mode - accessory product photography
             requestBody.accessoryPath = uploadedAccessoryPath;
             requestBody.accessoryType = selectedAccessoryType;
+            requestBody.productSpecs = document.getElementById('productSpecs')?.value || ''; // NEW: Product specifications
             requestBody.modelId = selectedModelId;
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
