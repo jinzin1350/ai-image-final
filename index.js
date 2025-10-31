@@ -2070,13 +2070,26 @@ KEY REQUIREMENTS:
 3. Natural skin texture (no plastic smoothing or artificial effects)
 4. Accurate garment colors and patterns from the garment image
 5. Realistic fabric physics, wrinkles, and natural shadows
-6. Clean, sharp focus on the model and clothing${hijabDescription ? `\n7. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
+6. Clean, sharp focus on the model and clothing
+7. CRITICAL DETAIL ATTENTION:
+   - Preserve ALL fabric details: stitching, seams, texture, and weave patterns
+   - Show exact button positions, button holes, and button design
+   - Accurately render zippers with proper metal/plastic texture and zipper teeth
+   - Maintain pocket shapes, pocket stitching, and pocket flaps exactly as shown
+   - Display fabric texture realistically (smooth, rough, ribbed, woven, knit, etc.)
+   - Show material quality indicators (sheen for silk, matte for cotton, etc.)
+   - Render collar details, cuff details, and hem stitching precisely
+   - Maintain any decorative elements (embroidery, prints, patches, logos)
+   - Show fabric weight through natural draping and wrinkle patterns${hijabDescription ? `\n8. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
 - Make unrealistic distortions or morphing
 - Add text, watermarks, or logos
 - Create obvious fake composites or artificial effects
+- Simplify or omit garment details like buttons, zippers, stitching
+- Smooth out fabric texture or make it look artificial
+- Ignore small but important details like seams, hems, or decorative elements
 - Over-smooth skin or create plastic-looking results
 
 Make it simple and natural - like this person is actually wearing these clothes in a real professional photo shoot.`;
@@ -2148,13 +2161,26 @@ KEY REQUIREMENTS:
 4. Clean, sharp focus on the ${accessoryType}
 5. Natural skin texture and realistic lighting
 6. Appropriate body-part/model positioning for the accessory type
+7. CRITICAL DETAIL ATTENTION FOR ACCESSORIES:
+   - Preserve ALL material details: leather grain, metal finish, fabric weave
+   - Show exact stitching patterns, seam lines, and thread color
+   - Accurately render hardware: buckles, zippers, clasps, chains with proper metallic texture
+   - Maintain brand logos, embossing, or embroidery exactly as shown
+   - Display material quality: leather sheen, fabric texture, metal polish
+   - Show wear patterns, edge finishing, and piping details
+   - Render precise color matching and any color blocking/patterns
+   - Maintain exact proportions and shape of the accessory
+   - Show surface details: perforations, quilting, studs, or decorative elements
 
 DO NOT:
 - Make unrealistic or artificial composites
-- Add text, watermarks, or logos
+- Add text, watermarks, or logos (unless they exist on the original product)
 - Make the ${accessoryType} look pasted on or fake
 - Change the ${accessoryType}'s design, color, or details from the reference image
 - Over-smooth skin or create plastic-looking results
+- Simplify or omit fine details like stitching, hardware, or brand elements
+- Alter material texture or finish quality
+- Ignore small decorative elements or design details
 
 Generate a beautiful, natural product photography shot that looks like a real professional photo shoot - perfect for e-commerce or Instagram.`;
       }
@@ -2217,6 +2243,15 @@ KEY REQUIREMENTS:
 7. Natural skin texture (no plastic smoothing)
 8. Clean, sharp focus on both model and garment
 9. Fashion editorial quality similar to department store catalogs
+10. CRITICAL DETAIL ATTENTION:
+   - Preserve ALL fabric details: lace patterns, mesh texture, elastic bands
+   - Show exact stitching, seam lines, and decorative trim
+   - Accurately render elastic waistbands, straps, and adjustable elements
+   - Maintain any decorative elements: bows, ribbons, appliques, embroidery
+   - Display fabric texture realistically: satin sheen, lace transparency, cotton matte
+   - Show material layering and how different fabrics interact
+   - Render precise color matching and any color combinations
+   - Maintain exact garment construction details and cut
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
@@ -2224,6 +2259,9 @@ DO NOT:
 - Add text, watermarks, or logos
 - Make the garment look pasted on or fake
 - Over-smooth skin or create plastic-looking results
+- Simplify or omit fine details like lace patterns, trim, or decorative elements
+- Alter fabric texture or material sheen
+- Ignore construction details like seams, elastic bands, or straps
 
 Create a professional fashion product photography shot suitable for retail e-commerce - elegant, clean, and showcasing the garment naturally on the model in the style of major fashion retailers.`;
     }
