@@ -2123,13 +2123,31 @@ Make it simple and natural - like this person is actually wearing these clothes 
 
         const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
 
+        // تعریف توصیف دقیق مدل بر اساس category
+        const modelCategoryDescriptions = {
+          'woman': 'adult woman (30-40 years old)',
+          'man': 'adult man (30-40 years old)',
+          'girl': 'teenage girl (age 12-15 years old)',
+          'boy': 'teenage boy (age 12-15 years old)',
+          'teen': 'teenager (age 15-18 years old)',
+          'child': 'child (age 6-11 years old)'
+        };
+
+        const modelDescription = modelCategoryDescriptions[selectedModel.category] || 'person';
+
         prompt = `Create a professional product photography image of this ${accessoryType} being worn/displayed naturally.
 
 IMAGE PROVIDED:
 - ${accessoryType.toUpperCase()} product photo
 
 TASK:
-Generate a complete professional product photography scene showing this exact ${accessoryType} from the image being worn/displayed naturally in an e-commerce style photo.
+Generate a complete professional product photography scene showing this exact ${accessoryType} from the image being worn/displayed naturally by a ${modelDescription} in an e-commerce style photo.
+
+IMPORTANT MODEL REQUIREMENTS:
+- The person in the photo MUST be a ${modelDescription}
+- Face and body proportions should match this age/category exactly
+- Natural, age-appropriate appearance and styling
+- Professional fashion model pose suitable for this age group
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -2153,6 +2171,7 @@ SCENE GENERATION:
 - If it's a bag/accessory: show it being held/worn in a natural, appealing way
 - The ${accessoryType} should be the STAR - clearly visible and beautifully displayed
 - Create a complete, natural, photorealistic scene
+- The model MUST be a ${modelDescription} - NOT an adult if child/teen category
 
 KEY REQUIREMENTS:
 1. Use the EXACT ${accessoryType} from the provided image - keep all details, colors, and design accurate
@@ -2161,7 +2180,8 @@ KEY REQUIREMENTS:
 4. Clean, sharp focus on the ${accessoryType}
 5. Natural skin texture and realistic lighting
 6. Appropriate body-part/model positioning for the accessory type
-7. CRITICAL DETAIL ATTENTION FOR ACCESSORIES:
+7. CRITICAL: Model must be ${modelDescription} with age-appropriate features and proportions
+8. CRITICAL DETAIL ATTENTION FOR ACCESSORIES:
    - Preserve ALL material details: leather grain, metal finish, fabric weave
    - Show exact stitching patterns, seam lines, and thread color
    - Accurately render hardware: buckles, zippers, clasps, chains with proper metallic texture
@@ -2181,6 +2201,7 @@ DO NOT:
 - Simplify or omit fine details like stitching, hardware, or brand elements
 - Alter material texture or finish quality
 - Ignore small decorative elements or design details
+- CRITICAL: Do NOT generate an adult model if the selected category is child/teen/girl/boy - the age MUST match the category
 
 Generate a beautiful, natural product photography shot that looks like a real professional photo shoot - perfect for e-commerce or Instagram.`;
       }
