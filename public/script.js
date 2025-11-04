@@ -48,6 +48,10 @@ let selectedAccessoryType = null; // Type of accessory (handbag, watch, etc.)
 let uploadedColorVariants = []; // Array of uploaded color variant paths
 let selectedDisplayScenario = null; // 'on-arm', 'hanging-rack', 'folded-stack', 'laid-out'
 
+// NEW: Flat Lay mode variables
+let uploadedFlatLayProducts = []; // Array of uploaded product paths for flat lay
+let selectedArrangement = null; // 'grid', 'scattered', 'circular', 'diagonal'
+
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
 let selectedDofId = 'medium';
@@ -93,6 +97,7 @@ const modeCards = document.querySelectorAll('.mode-card');
 const garmentUploadSection = document.getElementById('garmentUploadSection');
 const accessoryUploadSection = document.getElementById('accessoryUploadSection');
 const colorCollectionUploadSection = document.getElementById('colorCollectionUploadSection');
+const flatLayUploadSection = document.getElementById('flatLayUploadSection');
 
 // NEW: Accessory upload elements
 const accessoryInput = document.getElementById('accessoryInput');
@@ -107,6 +112,13 @@ const colorCollectionUploadArea = document.getElementById('colorCollectionUpload
 const colorCollectionPlaceholder = document.getElementById('colorCollectionPlaceholder');
 const colorCollectionPreviews = document.getElementById('colorCollectionPreviews');
 const displayScenarioSection = document.getElementById('displayScenarioSection');
+
+// NEW: Flat Lay upload elements
+const flatLayInput = document.getElementById('flatLayInput');
+const flatLayUploadArea = document.getElementById('flatLayUploadArea');
+const flatLayPlaceholder = document.getElementById('flatLayPlaceholder');
+const flatLayPreviews = document.getElementById('flatLayPreviews');
+const flatLayArrangementSection = document.getElementById('flatLayArrangementSection');
 
 // بارگذاری مدل‌ها
 async function loadModels() {
@@ -576,6 +588,98 @@ function selectDisplayScenario(scenario) {
 }
 
 // ========================================
+// NEW: Flat Lay Upload Functions
+// ========================================
+
+// Setup flat lay upload
+if (flatLayUploadArea && flatLayInput) {
+    flatLayUploadArea.addEventListener('click', () => {
+        flatLayInput.click();
+    });
+
+    flatLayInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            await uploadFlatLayFiles(files);
+        }
+    });
+}
+
+// Upload multiple flat lay product images
+async function uploadFlatLayFiles(files) {
+    // Limit to 6 files
+    if (files.length > 6) {
+        alert('حداکثر ۶ محصول می‌توانید آپلود کنید');
+        files = files.slice(0, 6);
+    }
+
+    uploadedFlatLayProducts = [];
+
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('garment', file);
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                uploadedFlatLayProducts.push(data.filePath);
+            }
+        } catch (error) {
+            console.error('خطا در آپلود تصویر:', error);
+        }
+    }
+
+    // Show previews
+    flatLayPreviews.style.display = 'grid';
+    flatLayPlaceholder.style.display = 'none';
+
+    flatLayPreviews.innerHTML = uploadedFlatLayProducts.map((path, index) => `
+        <div class="garment-preview-item">
+            <img src="${path}" alt="محصول ${index + 1}">
+            <button class="remove-garment-btn" onclick="removeFlatLayProduct(${index})">&times;</button>
+            <div class="garment-preview-label">محصول ${index + 1}</div>
+        </div>
+    `).join('');
+
+    checkGenerateButton();
+}
+
+// Remove a flat lay product
+function removeFlatLayProduct(index) {
+    uploadedFlatLayProducts.splice(index, 1);
+
+    if (uploadedFlatLayProducts.length === 0) {
+        flatLayPreviews.style.display = 'none';
+        flatLayPlaceholder.style.display = 'flex';
+    } else {
+        flatLayPreviews.innerHTML = uploadedFlatLayProducts.map((path, idx) => `
+            <div class="garment-preview-item">
+                <img src="${path}" alt="محصول ${idx + 1}">
+                <button class="remove-garment-btn" onclick="removeFlatLayProduct(${idx})">&times;</button>
+                <div class="garment-preview-label">محصول ${idx + 1}</div>
+            </div>
+        `).join('');
+    }
+
+    checkGenerateButton();
+}
+
+// Select flat lay arrangement
+function selectArrangement(arrangement) {
+    selectedArrangement = arrangement;
+    document.querySelectorAll('[data-arrangement]').forEach(card => {
+        card.classList.toggle('selected', card.dataset.arrangement === arrangement);
+    });
+    checkGenerateButton();
+}
+
+// ========================================
 // NEW: Mode Switching Functions
 // ========================================
 
@@ -612,6 +716,18 @@ function switchMode(mode) {
         accessoryUploadSection.style.display = 'none';
         colorCollectionUploadSection.style.display = 'block';
         displayScenarioSection.style.display = 'block';
+        flatLayUploadSection.style.display = 'none';
+        flatLayArrangementSection.style.display = 'none';
+        hijabSection.style.display = 'none'; // Hide hijab section
+
+    } else if (mode === 'flat-lay') {
+        // Flat Lay mode: upload products and select arrangement
+        garmentUploadSection.style.display = 'none';
+        accessoryUploadSection.style.display = 'none';
+        colorCollectionUploadSection.style.display = 'none';
+        displayScenarioSection.style.display = 'none';
+        flatLayUploadSection.style.display = 'block';
+        flatLayArrangementSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
     }
 
@@ -620,6 +736,8 @@ function switchMode(mode) {
     selectedAccessoryType = null;
     uploadedColorVariants = [];
     selectedDisplayScenario = null;
+    uploadedFlatLayProducts = [];
+    selectedArrangement = null;
     if (mode !== 'complete-outfit') {
         selectedHijabType = null;
     }
@@ -670,6 +788,12 @@ function checkGenerateButton() {
         // Color Collection mode: need at least 1 color variant, display scenario, and background
         isValid = uploadedColorVariants.length >= 1 &&
                   selectedDisplayScenario !== null &&
+                  selectedBackgroundId;
+
+    } else if (currentMode === 'flat-lay') {
+        // Flat Lay mode: need at least 1 product, arrangement, and background
+        isValid = uploadedFlatLayProducts.length >= 1 &&
+                  selectedArrangement !== null &&
                   selectedBackgroundId;
     }
 
@@ -824,6 +948,13 @@ generateBtn.addEventListener('click', async () => {
             requestBody.displayScenario = selectedDisplayScenario;
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+
+        } else if (currentMode === 'flat-lay') {
+            // Flat Lay mode - overhead product photography
+            requestBody.flatLayProducts = uploadedFlatLayProducts;
+            requestBody.arrangement = selectedArrangement;
+            requestBody.backgroundId = selectedBackgroundId;
+            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
         }
 
         console.log('🚀 Sending request:', requestBody);
@@ -953,5 +1084,13 @@ document.querySelectorAll('.scenario-card').forEach(card => {
     card.addEventListener('click', () => {
         const scenario = card.dataset.scenario;
         selectDisplayScenario(scenario);
+    });
+});
+
+// Event listener for flat lay arrangement selection
+document.querySelectorAll('[data-arrangement]').forEach(card => {
+    card.addEventListener('click', () => {
+        const arrangement = card.dataset.arrangement;
+        selectArrangement(arrangement);
     });
 });

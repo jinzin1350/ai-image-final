@@ -1823,6 +1823,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       underwearType,    // NEW: Type of underwear (bra, panty, etc.)
       colorVariants,    // NEW: For color-collection mode (array of color variant paths)
       displayScenario,  // NEW: Display scenario (on-arm, hanging-rack, folded-stack, laid-out)
+      flatLayProducts,  // NEW: For flat-lay mode (array of product paths)
+      arrangement,      // NEW: Flat lay arrangement (grid, scattered, circular, diagonal)
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
@@ -1867,6 +1869,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     } else if (mode === 'color-collection') {
       if (!colorVariants || !colorVariants.length || !displayScenario || !backgroundId) {
         return res.status(400).json({ error: 'لطفاً حداقل یک رنگ، نوع نمایش و پس‌زمینه را انتخاب کنید' });
+      }
+    } else if (mode === 'flat-lay') {
+      if (!flatLayProducts || !flatLayProducts.length || !arrangement || !backgroundId) {
+        return res.status(400).json({ error: 'لطفاً حداقل یک محصول، نوع چیدمان و پس‌زمینه را انتخاب کنید' });
       }
     }
 
@@ -2028,6 +2034,18 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       modelBase64 = null; // No model needed for color collection display
 
       garmentDescription = `${colorVariants.length} color variants of the same garment`;
+      locationDescription = customLocation && customLocation.trim() !== ''
+        ? customLocation.trim()
+        : `${selectedBackground.name} - ${selectedBackground.description}`;
+
+    } else if (mode === 'flat-lay') {
+      // For flat lay mode, load ALL product images (no model needed)
+      garmentBase64Array = await Promise.all(
+        flatLayProducts.map(path => imageUrlToBase64(path))
+      );
+      modelBase64 = null; // No model needed for flat lay photography
+
+      garmentDescription = `${flatLayProducts.length} product(s) for flat lay arrangement`;
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
@@ -2387,6 +2405,97 @@ DO NOT:
 - Create unrealistic composites
 
 Generate a professional e-commerce product photo perfect for showcasing the complete color collection - like in online stores or catalogs.`;
+
+    } else if (mode === 'flat-lay') {
+      // FLAT LAY MODE: Overhead product photography
+
+      const arrangementDescriptions = {
+        'grid': {
+          name: 'in a neat grid layout',
+          details: 'Products arranged in a perfect grid pattern (rows and columns), evenly spaced with consistent gaps between items. Clean, organized retail catalog style.',
+          positioning: 'Arrange products in symmetrical rows and columns with equal spacing between each item'
+        },
+        'scattered': {
+          name: 'in an artistic scattered arrangement',
+          details: 'Products artistically scattered across the surface in a seemingly random but visually balanced composition. Natural, lifestyle magazine editorial style.',
+          positioning: 'Place products at various angles and positions, creating visual interest while maintaining balance'
+        },
+        'circular': {
+          name: 'in a circular arrangement',
+          details: 'Products arranged in a circle or radiating from a central point. Creates a focal point in the center with items evenly distributed around it.',
+          positioning: 'Position products in a circular pattern, either forming a ring or radiating outward from center'
+        },
+        'diagonal': {
+          name: 'in a diagonal arrangement',
+          details: 'Products aligned along diagonal lines across the frame. Creates dynamic energy and visual flow. Modern, contemporary catalog style.',
+          positioning: 'Arrange products along diagonal lines from corner to corner, creating dynamic composition'
+        }
+      };
+
+      const currentArrangement = arrangementDescriptions[arrangement] || arrangementDescriptions['grid'];
+
+      prompt = `Create a professional flat lay product photography image with products ${currentArrangement.name}.
+
+IMAGES PROVIDED:
+${flatLayProducts.map((_, index) => `- Image ${index + 1}: Product ${index + 1}`).join('\n')}
+
+TOTAL: ${flatLayProducts.length} product(s)
+
+TASK:
+Generate a professional overhead flat lay photograph showing ${flatLayProducts.length > 1 ? 'ALL ' + flatLayProducts.length + ' products' : 'the product'} ${currentArrangement.name}.
+${currentArrangement.details}
+
+ARRANGEMENT TYPE: ${arrangement.toUpperCase()}
+${currentArrangement.positioning}
+
+CAMERA PERSPECTIVE:
+- Perfectly overhead/bird's eye view (90-degree angle from above)
+- Camera parallel to the flat surface
+- Products laid flat on the surface below
+- Professional top-down product photography
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Lighting: ${selectedLighting.description} - even lighting across entire surface
+- Background Blur: Minimal (flat lay style focuses on sharp details throughout)
+- Depth of Field: ${selectedDoF.description}
+- Color Temperature: ${selectedColorTemp.description}
+- Shadow Quality: ${selectedShadow.description} - soft shadows under products
+
+SCENE & ENVIRONMENT:
+- Surface/Background: ${locationDescription}
+- Style: ${selectedStyle.description} - clean flat lay aesthetic
+- Mood: Professional e-commerce/editorial flat lay photography
+
+KEY REQUIREMENTS:
+1. Perfect overhead angle - directly from above looking down
+2. ${currentArrangement.positioning}
+3. All products must lay completely flat on the surface (no standing/propped items)
+4. ${flatLayProducts.length > 1 ? 'Each product must be clearly visible and well-spaced' : 'Product should be prominently displayed'}
+5. Even, consistent lighting across entire frame with no hot spots
+6. Sharp focus on all products throughout the image
+7. Clean, professional composition suitable for e-commerce
+8. CRITICAL DETAIL ATTENTION:
+   - Preserve ALL product details: textures, materials, colors, patterns
+   - Show exact product features: buttons, zippers, logos, stitching
+   - Maintain accurate colors and fabric textures
+   - Render realistic shadows beneath each product
+   - Display any text, labels, or branding clearly
+   - Natural material appearance (leather grain, fabric weave, metal shine)
+   - Show product construction details and edges crisply
+
+DO NOT:
+- Tilt the camera angle (must be perfectly overhead)
+- Make products stand up or lean (everything must be flat)
+- Create unrealistic shadows or lighting
+- Over-smooth or lose product details
+- Add text, watermarks, or graphics
+- Make products look fake or digitally pasted
+- Create cluttered or chaotic compositions
+- Use dramatic angles or perspectives
+
+Generate a professional flat lay photograph perfect for e-commerce product listings, social media, or catalog use - clean, organized, and beautifully composed.`;
     }
 
     console.log('🎯 Mode:', mode);
@@ -2471,6 +2580,20 @@ Generate a professional e-commerce product photo perfect for showcasing the comp
       });
 
       // NOTE: No model image needed - AI generates the display scenario naturally
+
+    } else if (mode === 'flat-lay') {
+      // Flat Lay mode: Load ALL product images
+      garmentBase64Array.forEach((productBase64, index) => {
+        contentParts.push({ text: `PRODUCT ${index + 1} IMAGE:` });
+        contentParts.push({
+          inlineData: {
+            data: productBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      });
+
+      // NOTE: No model needed - AI generates overhead flat lay composition naturally
     }
 
     // Add the prompt

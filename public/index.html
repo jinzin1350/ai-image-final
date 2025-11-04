@@ -41,6 +41,11 @@
                         <div class="mode-title">نمایش کالکشن رنگی</div>
                         <div class="mode-description">نمایش چند رنگ از یک محصول در کنار هم</div>
                     </div>
+                    <div class="mode-card" data-mode="flat-lay">
+                        <div class="mode-icon">📸</div>
+                        <div class="mode-title">عکاسی Flat Lay</div>
+                        <div class="mode-description">عکاسی از بالا - چیدمان محصولات روی سطح</div>
+                    </div>
                 </div>
             </section>
 
@@ -218,6 +223,61 @@
                         <div class="scenario-icon">📐</div>
                         <div class="scenario-name">کنار هم روی سطح</div>
                         <div class="scenario-desc">پهن شده کنار هم</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش آپلود Flat Lay -->
+            <section class="upload-section" id="flatLayUploadSection" style="display: none;">
+                <h2>۱. آپلود تصاویر محصولات</h2>
+                <p style="margin-bottom: 20px; color: #666;">تصاویر محصولاتی که می‌خواهید در Flat Lay چیده شوند را آپلود کنید (۱ تا ۶ محصول)</p>
+                <div class="upload-area" id="flatLayUploadArea">
+                    <input type="file" id="flatLayInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="flatLayPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصاویر محصولات</h3>
+                        <p>عکس‌های محصولاتی که می‌خواهید در Flat Lay چیده شوند</p>
+                        <p class="multi-hint">📸 می‌توانید چند محصول را با هم چیدمان کنید</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="flatLayPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب چیدمان Flat Lay -->
+            <section class="selection-section" id="flatLayArrangementSection" style="display: none;">
+                <h2>۲. انتخاب نوع چیدمان</h2>
+                <p class="section-description">نحوه چیدمان محصولات را انتخاب کنید</p>
+                <div class="scenario-grid">
+                    <div class="scenario-card" data-arrangement="grid">
+                        <div class="scenario-icon">⊞</div>
+                        <div class="scenario-name">چیدمان شبکه‌ای</div>
+                        <div class="scenario-desc">منظم و مرتب</div>
+                    </div>
+                    <div class="scenario-card" data-arrangement="scattered">
+                        <div class="scenario-icon">✨</div>
+                        <div class="scenario-name">چیدمان آزاد</div>
+                        <div class="scenario-desc">طبیعی و پراکنده</div>
+                    </div>
+                    <div class="scenario-card" data-arrangement="circular">
+                        <div class="scenario-icon">⭕</div>
+                        <div class="scenario-name">چیدمان دایره‌ای</div>
+                        <div class="scenario-desc">به شکل دایره</div>
+                    </div>
+                    <div class="scenario-card" data-arrangement="diagonal">
+                        <div class="scenario-icon">⟋</div>
+                        <div class="scenario-name">چیدمان مورب</div>
+                        <div class="scenario-desc">قطری و پویا</div>
                     </div>
                 </div>
             </section>
