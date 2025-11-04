@@ -2183,7 +2183,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('🎯 Mode:', mode);
     console.log('📸 Garment URLs:', garments);
     if (selectedModel) console.log('👤 Model:', selectedModel.name);
-    console.log('📍 Location:', selectedBackground.name);
+    if (selectedBackground) console.log('📍 Location:', selectedBackground.name);
+    if (mode === 'scene-recreation') console.log('🎬 Reference Photo:', referencePhotoPath);
     console.log('🎭 Pose:', selectedPose.name);
     console.log('📷 Camera:', selectedCameraAngle.name);
     console.log('✨ Style:', selectedStyle.name);
