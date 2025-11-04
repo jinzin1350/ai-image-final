@@ -410,18 +410,53 @@
                                     <option value="fierce">قاطع</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>ژست</label>
-                                <select id="modelPose">
-                                    <option value="standing-front" selected>ایستاده رو به جلو</option>
-                                    <option value="standing-side">ایستاده نیمرخ</option>
-                                    <option value="walking">در حال راه رفتن</option>
-                                    <option value="sitting">نشسته</option>
-                                    <option value="leaning">تکیه داده</option>
-                                    <option value="hands-on-hips">دست به کمر</option>
-                                    <option value="crossed-arms">دست به سینه</option>
-                                    <option value="dynamic">ژست پویا</option>
-                                </select>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>ژست‌ها (می‌توانید چندتا انتخاب کنید)</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; max-height: 200px; overflow-y: auto; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="standing-front" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">ایستاده رو به جلو</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="standing-side" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">ایستاده نیمرخ</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="walking" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">در حال راه رفتن</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="sitting" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">نشسته</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="leaning" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">تکیه داده</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="hands-on-hips" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">دست به کمر</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="crossed-arms" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">دست به سینه</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="dynamic" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">ژست پویا</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="one-leg-bent" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">یک پا خم</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="looking-back" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">نگاه به عقب</span>
+                                    </label>
+                                </div>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 می‌توانید چندین ژست را ترکیب کنید. مثلاً "ایستاده رو به جلو" + "دست به کمر"
+                                </small>
                             </div>
                             <div class="form-group">
                                 <label>زاویه سر</label>
@@ -459,6 +494,18 @@
                                     <option value="headshot">سر و شانه</option>
                                     <option value="close-up">نمای نزدیک چهره</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>🎯 نوع فریمینگ عکس مدل (برای سوال از کاربر)</label>
+                                <select id="modelFramingType">
+                                    <option value="full-length" selected>📏 تمام قد (Full Length)</option>
+                                    <option value="upper-half">⬆️ نیم‌تنه بالا (Upper Half)</option>
+                                    <option value="lower-half">⬇️ نیم‌تنه پایین (Lower Half)</option>
+                                    <option value="neck-up">🗣️ گردن به بالا (Neck Up)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 این گزینه مشخص می‌کند مدل به چه شکلی باید باشد: تمام بدن / فقط بالاتنه / فقط پایین تنه / فقط سر و گردن
+                                </small>
                             </div>
                             <div class="form-group">
                                 <label>نورپردازی</label>
@@ -919,12 +966,13 @@
 
             // Expression & Pose
             const expression = document.getElementById('expression').value;
-            const pose = document.getElementById('modelPose').value;
+            const selectedPoses = Array.from(document.querySelectorAll('.pose-checkbox:checked')).map(cb => cb.value);
             const headAngle = document.getElementById('headAngle').value;
 
             // Photography
             const cameraAngle = document.getElementById('cameraAngle').value;
             const shotType = document.getElementById('shotType').value;
+            const modelFramingType = document.getElementById('modelFramingType').value;
             const lighting = document.getElementById('lighting').value;
             const bgStyle = document.getElementById('bgStyle').value;
             const quality = document.getElementById('imageQuality').value;
@@ -1037,10 +1085,27 @@
             } else if (isUnderwear && underwearPose) {
                 prompt += `Pose: ${underwearPose.replace('-', ' ')} pose. `;
             } else {
-                prompt += `Pose: ${pose.replace('-', ' ')} pose, head ${headAngle.replace('-', ' ')}. `;
+                // Multiple poses can be combined
+                if (selectedPoses && selectedPoses.length > 0) {
+                    const poseDescriptions = selectedPoses.map(p => p.replace('-', ' ')).join(', ');
+                    prompt += `Pose: ${poseDescriptions}, head ${headAngle.replace('-', ' ')}. `;
+                } else {
+                    prompt += `Pose: standing naturally, head ${headAngle.replace('-', ' ')}. `;
+                }
             }
 
             prompt += `Expression: ${expression.replace('-', ' ')} expression. `;
+
+            // Model Framing Type - What the user will see when they ask for model
+            const framingDescriptions = {
+                'full-length': 'FULL-LENGTH MODEL - complete full body from head to toe, entire person visible',
+                'upper-half': 'UPPER-HALF MODEL - from head down to waist/hips area, lower body NOT shown',
+                'lower-half': 'LOWER-HALF MODEL - from waist/hips down to feet, head and upper body NOT shown, focus on legs and lower body',
+                'neck-up': 'NECK-UP MODEL - from neck upwards only showing head and face, body NOT visible below neck'
+            };
+            if (modelFramingType && framingDescriptions[modelFramingType]) {
+                prompt += `Model Type: ${framingDescriptions[modelFramingType]}. `;
+            }
 
             // Camera framing (accessory, underwear, or regular)
             if (isAccessory && accessoryFraming) {
