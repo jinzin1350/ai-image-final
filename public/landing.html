@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="landing-style.css">
+    <link rel="stylesheet" href="lang-switcher.css">
+    <script src="lang-switcher.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -30,12 +32,19 @@
                     <span>استودیو Fusion</span>
                 </div>
                 <div class="nav-links">
-                    <a href="#features">امکانات</a>
-                    <a href="#showcase">نمونه‌کارها</a>
-                    <a href="#how-it-works">نحوه کار</a>
-                    <a href="#pricing">قیمت‌گذاری</a>
+                    <a href="#features" data-lang-fa="امکانات" data-lang-en="Features">امکانات</a>
+                    <a href="#showcase" data-lang-fa="نمونه‌کارها" data-lang-en="Showcase">نمونه‌کارها</a>
+                    <a href="#how-it-works" data-lang-fa="نحوه کار" data-lang-en="How it Works">نحوه کار</a>
+                    <a href="#pricing" data-lang-fa="قیمت‌گذاری" data-lang-en="Pricing">قیمت‌گذاری</a>
                 </div>
-                <a href="/app" class="btn-primary">شروع رایگان</a>
+                <div class="lang-switcher" onclick="toggleLanguage()">
+                    <span class="lang-label">
+                        <span class="lang-flag">🇮🇷</span>
+                        <span class="lang-text" data-lang-fa="فارسی" data-lang-en="English">فارسی</span>
+                    </span>
+                    <div class="lang-toggle" id="langToggle"></div>
+                </div>
+                <a href="/app" class="btn-primary" data-lang-fa="شروع رایگان" data-lang-en="Start Free">شروع رایگان</a>
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <span></span>
                     <span></span>
