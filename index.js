@@ -2804,39 +2804,45 @@ DO NOT:
 Generate a professional flat lay photograph perfect for e-commerce product listings, social media, or catalog use - clean, organized, and beautifully composed.`;
 
     } else if (mode === 'scene-recreation') {
-      // SCENE RECREATION MODE: Recreate a photo with model wearing garment in same scene
-      prompt = `Create a photorealistic fashion photo by combining THREE elements: the MODEL's appearance (Image 1), the GARMENT (Image 2), and the SCENE from the reference photo (Image 3).
+      // SCENE RECREATION MODE: Create inspired photo using reference as style guide
+      prompt = `Create a photorealistic fashion photo showing the MODEL wearing the GARMENT, INSPIRED BY the style, lighting, and mood of the reference photo.
 
 IMAGES PROVIDED (IN ORDER):
-- Image 1: ⭐ MODEL - Use this person's EXACT face and body
-- Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: GARMENT - Clothing to put on the MODEL
-- Image ${garments.length + 2}: REFERENCE PHOTO - Copy the ENTIRE scene (location, lighting, composition, atmosphere)
+- Image 1: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)
+- Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: GARMENT - Clothing for the MODEL to wear
+- Image ${garments.length + 2}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)
 
-⚠️ TWO CRITICAL REQUIREMENTS (BOTH ARE EQUALLY IMPORTANT):
+⚠️ CRITICAL APPROACH:
 
-**REQUIREMENT 1: Use the MODEL from Image 1**
-- The PERSON must be the MODEL from Image 1 - use their face, facial features, body, skin tone, hair
-- DO NOT use the face or body from any person in the reference photo
-- If reference has a person: copy their POSE/POSITION but use the MODEL's appearance from Image 1
+**PRIMARY GOAL: Photograph the MODEL from Image 1**
+- The person in the final photo MUST be the MODEL from Image 1
+- Use their EXACT face, facial features, body type, skin tone, and hair
+- This is the most important requirement - the MODEL must be recognizable as the person from Image 1
 
-**REQUIREMENT 2: Recreate the SCENE from Image ${garments.length + 2}**
-- Copy the EXACT location, environment, and background from the reference photo
-- Match the lighting direction, quality, intensity, and color temperature EXACTLY
-- Replicate the composition, framing, camera angle, and perspective
-- Preserve the atmospheric mood, time of day, weather conditions
-- Keep the same color palette and visual style as the reference
+**SECONDARY GOAL: Create a SIMILAR style inspired by the reference**
+- Study the reference photo (Image ${garments.length + 2}) for inspiration
+- Copy the general TYPE of location (e.g., if it's outdoors in nature, shoot outdoors in nature)
+- Match the STYLE of lighting (e.g., if it's golden hour, use golden hour lighting)
+- Recreate the MOOD and atmosphere (e.g., if it's romantic, create romantic mood)
+- Use a SIMILAR pose if there's a person in the reference
+- Match the general composition style and camera angle
 
-STEP-BY-STEP TASK:
-1. Study Image ${garments.length + 2} (reference) carefully - note the location, lighting setup, camera angle, atmosphere
-2. Take the MODEL from Image 1 - remember their face and body
-3. Place that MODEL in the SAME location/scene from the reference photo
-4. Position them with the same pose (if reference has a person) or naturally in the scene
-5. Apply the SAME lighting from the reference photo onto the MODEL
-6. Dress the MODEL in the GARMENT from Image 2
-7. Match the camera angle and composition from the reference photo
-8. Ensure the mood and atmosphere match the reference photo
+**What to copy from reference:**
+✅ Type of location (outdoor/indoor, urban/nature, studio/casual)
+✅ Lighting style (natural/artificial, soft/dramatic, time of day)
+✅ Mood and atmosphere (energetic, calm, romantic, professional)
+✅ General pose and body positioning
+✅ Camera angle type (eye-level, low angle, etc.)
+✅ Color palette and overall vibe
 
-Think of it as: "Teleport the person from Image 1 into the scene from Image ${garments.length + 2}, then photograph them wearing the garment from Image 2"
+**What NOT to copy from reference:**
+❌ The exact specific location (create a similar type of place, not the identical spot)
+❌ The person's face or identity from the reference
+❌ Every tiny detail of the background
+❌ The exact clothing from the reference
+
+TASK DESCRIPTION:
+Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.
 
 AI SCENE ANALYSIS:
 The reference photo has been analyzed by AI with these findings:
@@ -2848,36 +2854,31 @@ TECHNICAL SPECS:
 - Fabric Type: ${selectedFabric.description}
 - Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
 
-KEY REQUIREMENTS - BALANCED APPROACH:
-1. **Match the Reference Scene (MUST DO THIS)**:
-   - Recreate the EXACT location from Image ${garments.length + 2} - same place, same environment
-   - Copy the EXACT lighting setup - direction, quality, intensity, color temperature from reference
-   - Match the time of day, weather conditions, and atmospheric mood from reference
-   - Use the SAME camera angle, composition, and framing as the reference photo
-   - Preserve the color palette and overall visual style from the reference
-   - The background, setting, and atmosphere must be IDENTICAL to the reference photo
+KEY REQUIREMENTS:
+1. **The MODEL is the Star (MOST IMPORTANT)**:
+   - The person in the final photo MUST be the MODEL from Image 1
+   - Use their EXACT face - every facial feature must match Image 1
+   - Use their EXACT body type, skin tone, and hair from Image 1
+   - The MODEL must be clearly recognizable as the person from Image 1
+   - DO NOT use or blend the face/body from the reference photo
 
-2. **Use the CORRECT PERSON (MUST DO THIS TOO)**:
-   ⚠️ The person in the final image MUST be the MODEL from Image 1 (the FIRST image)
-   - Use the MODEL'S EXACT face - facial features, eyes, nose, mouth, skin tone, hair
-   - Use the MODEL'S EXACT body type, height, and build
-   - DO NOT use the face or body of any person from the reference photo (Image ${garments.length + 2})
-   - The reference photo people are ONLY for pose reference, NOT appearance
-   - If reference has a person: Copy their POSE only, but the face/body must be from Image 1
-   - If reference has NO people: Place the model from Image 1 naturally in the scene
-   - Think: "What if the person from Image 1 was photographed in the scene from Image ${garments.length + 2}?"
+2. **Create a SIMILAR Scene (Inspired, Not Identical)**:
+   - If reference shows outdoor park → shoot MODEL in a similar outdoor park setting
+   - If reference shows indoor studio → shoot MODEL in a similar studio setting
+   - If reference has golden sunset light → use golden sunset-style lighting on MODEL
+   - If reference has dramatic shadows → create dramatic shadows for MODEL
+   - Copy the FEEL and VIBE, not the exact pixels
 
-3. **Model Integration**:
-   - The final photo must show the MODEL from Image 1, NOT any person from the reference photo
-   - Copy pose and positioning from reference person (if present), but use the appearance from Image 1
-   - Keep model's face and body features EXACTLY as shown in Image 1
-   - Model should wear ${garmentDescription}
-   - The person must be recognizable as the MODEL from Image 1, not anyone from the reference photo
+3. **Pose and Composition Guidance**:
+   - If reference has a person in a specific pose → position MODEL in a similar pose
+   - Use a similar camera angle and framing style
+   - Match the general composition approach
+   - But the face MUST be the MODEL from Image 1
 
-4. **Garment Accuracy**:
+4. **Garment Integration**:
+   - Dress the MODEL in ${garmentDescription}
    - Garment should fit naturally with realistic wrinkles and fabric draping
    - Accurate garment colors and patterns from the garment image
-   - Realistic fabric physics, wrinkles, and natural shadows
    - Preserve ALL fabric details: stitching, seams, texture, buttons, zippers, pockets
    - Show material quality indicators (sheen, texture, weight)${hijabDescription ? `\n   - Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
@@ -2901,26 +2902,27 @@ DO NOT:
 - Simplify or omit garment details
 - Over-smooth skin or create plastic-looking results
 
-EXAMPLE TO CLARIFY THE CORRECT APPROACH:
+EXAMPLE TO CLARIFY THE APPROACH:
 IMAGE ORDER YOU RECEIVE:
-- Image 1: MODEL - Shows a brunette woman with tan skin, curly hair
-- Image 2: GARMENT - Shows a blue floral dress
-- Image 3: REFERENCE - Shows a blonde woman in a sunny park at sunset, standing by a tree, wearing a red dress
+- Image 1: MODEL - A brunette woman with tan skin, curly hair
+- Image 2: GARMENT - A blue floral dress
+- Image 3: REFERENCE - A blonde woman in a sunny park at golden hour, standing by a tree, casual relaxed pose
 
 CORRECT OUTPUT:
-✅ The brunette woman from Image 1 (with her face, curly hair, tan skin)
+✅ The brunette woman from Image 1 (her EXACT face, curly hair, tan skin)
 ✅ Wearing the blue floral dress from Image 2
-✅ Standing by the same tree in the same park from Image 3
-✅ With the same sunset lighting from Image 3
-✅ Same camera angle and composition as Image 3
+✅ Photographed in AN outdoor park setting (similar to reference, but doesn't have to be the exact same park)
+✅ With golden hour sunset-style lighting (similar to reference)
+✅ In a casual relaxed pose similar to the reference
+✅ Similar camera angle and vibe
 
 WRONG OUTPUTS:
-❌ The blonde woman from Image 3 wearing the blue dress (wrong person)
-❌ The brunette woman in a different location with different lighting (wrong scene)
-❌ A mix/blend of the two women's faces (wrong - use Image 1 face only)
-❌ The brunette in a generic studio instead of the park (wrong - must use reference scene)
+❌ The blonde woman from the reference wearing the blue dress
+❌ The brunette in indoor studio lighting (reference was outdoor golden hour)
+❌ The brunette in formal stiff pose (reference was casual)
+❌ A completely different style that ignores the reference mood
 
-FINAL CHECK: Does the output show Image-1-person + Image-2-garment + Image-3-scene? All three must be present!`;
+Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the reference photo"
     }
 
     console.log('🎯 Mode:', mode);
