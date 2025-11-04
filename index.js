@@ -905,27 +905,38 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
 // Get all models with user information (for admin model management)
 app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
-    const { data: models, error } = await supabaseAdmin
+    // First, get all models
+    const { data: models, error: modelsError } = await supabaseAdmin
       .from('content_library')
-      .select(`
-        id,
-        name,
-        category,
-        visibility,
-        image_url,
-        created_at,
-        owner_user_id,
-        users!content_library_owner_user_id_fkey (
-          email,
-          is_premium
-        )
-      `)
+      .select('id, name, category, visibility, image_url, created_at, owner_user_id')
       .eq('content_type', 'model')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (modelsError) throw modelsError;
 
-    // Format the response
+    // Get unique user IDs
+    const userIds = [...new Set(models.map(m => m.owner_user_id).filter(Boolean))];
+
+    // Fetch user information
+    const { data: users, error: usersError } = await supabaseAdmin
+      .from('users')
+      .select('user_id, email, is_premium')
+      .in('user_id', userIds);
+
+    if (usersError) {
+      console.error('Error fetching users:', usersError);
+      // Continue without user info if this fails
+    }
+
+    // Create a map of user_id to user info
+    const userMap = {};
+    if (users) {
+      users.forEach(user => {
+        userMap[user.user_id] = user;
+      });
+    }
+
+    // Format the response with user information
     const formattedModels = models.map(model => ({
       id: model.id,
       name: model.name,
@@ -934,8 +945,8 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       image_url: model.image_url,
       created_at: model.created_at,
       user_id: model.owner_user_id,
-      user_email: model.users?.email || 'Unknown',
-      is_premium: model.users?.is_premium || false
+      user_email: userMap[model.owner_user_id]?.email || 'Unknown',
+      is_premium: userMap[model.owner_user_id]?.is_premium || false
     }));
 
     res.json({ success: true, models: formattedModels });
