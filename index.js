@@ -1947,13 +1947,23 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     const selectedWeather = weatherEffects.find(we => we.id === weatherEffectId) || weatherEffects[0]; // clear
     const selectedMotion = motionElements.find(me => me.id === motionElementId) || motionElements[0]; // static
 
-    if (!selectedModel || !selectedBackground) {
-      return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
+    // Validate model and background based on mode
+    if (mode === 'color-collection' || mode === 'flat-lay') {
+      // These modes don't need a model, only background
+      if (!selectedBackground) {
+        return res.status(400).json({ error: 'پس‌زمینه نامعتبر است' });
+      }
+    } else {
+      // Other modes need both model and background
+      if (!selectedModel || !selectedBackground) {
+        return res.status(400).json({ error: 'مدل یا پس‌زمینه نامعتبر است' });
+      }
     }
 
     console.log('🎨 Generating image with Gemini 2.5 Flash...');
+    console.log('🎯 Mode:', mode);
     console.log('📸 Garment URLs:', garments);
-    console.log('👤 Model:', selectedModel.name);
+    if (selectedModel) console.log('👤 Model:', selectedModel.name);
     console.log('📍 Location:', selectedBackground.name);
     console.log('🎭 Pose:', selectedPose.name);
     console.log('📷 Camera:', selectedCameraAngle.name);
@@ -2685,7 +2695,7 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
     res.json({
       success: true,
       imagePath: generatedImageUrl,
-      model: selectedModel.name,
+      model: selectedModel ? selectedModel.name : 'No model (product photography)',
       background: selectedBackground.name,
       description: generatedText,
       prompt: prompt,
