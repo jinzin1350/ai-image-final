@@ -101,6 +101,14 @@ const flatLayUploadSection = document.getElementById('flatLayUploadSection');
 const modelSection = document.getElementById('modelSection');
 const backgroundSection = document.getElementById('backgroundSection');
 
+// Debug: Check if sections exist
+console.log('🔍 Sections found:', {
+    modelSection: !!modelSection,
+    backgroundSection: !!backgroundSection,
+    displayScenarioSection: !!document.getElementById('displayScenarioSection'),
+    flatLayArrangementSection: !!document.getElementById('flatLayArrangementSection')
+});
+
 // NEW: Accessory upload elements
 const accessoryInput = document.getElementById('accessoryInput');
 const accessoryUploadArea = document.getElementById('accessoryUploadArea');
@@ -702,8 +710,8 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
-        modelSection.style.display = 'block';
-        backgroundSection.style.display = 'block';
+        if (modelSection) modelSection.style.display = 'block';
+        if (backgroundSection) backgroundSection.style.display = 'block';
 
         // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
@@ -716,8 +724,8 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
-        modelSection.style.display = 'block';
-        backgroundSection.style.display = 'block';
+        if (modelSection) modelSection.style.display = 'block';
+        if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
 
     } else if (mode === 'color-collection') {
@@ -728,8 +736,8 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'block';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
-        modelSection.style.display = 'none'; // No model needed
-        backgroundSection.style.display = 'block';
+        if (modelSection) modelSection.style.display = 'none'; // No model needed
+        if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
 
     } else if (mode === 'flat-lay') {
@@ -740,8 +748,8 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'block';
         flatLayArrangementSection.style.display = 'block';
-        modelSection.style.display = 'none'; // No model needed
-        backgroundSection.style.display = 'block';
+        if (modelSection) modelSection.style.display = 'none'; // No model needed
+        if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
     }
 
