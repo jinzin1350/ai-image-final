@@ -2373,32 +2373,62 @@ DO NOT:
 Create a professional fashion product photography shot suitable for retail e-commerce - elegant, clean, and showcasing the garment naturally on the model in the style of major fashion retailers.`;
 
     } else if (mode === 'color-collection') {
-      // COLOR COLLECTION MODE: Multiple color variants display
+      // COLOR COLLECTION MODE: Multiple color variants display with 10 variations per scenario
 
-      const scenarioDescriptions = {
-        'on-arm': {
-          name: 'draped over an arm',
-          details: 'All garments beautifully draped over a person\'s forearm, showing fabric drape and texture. Each color clearly visible, stacked elegantly on the arm like a salesperson showing options to a customer.',
-          positioning: 'Stack the garments on the forearm naturally, with each color variant clearly visible'
-        },
-        'hanging-rack': {
-          name: 'hanging on a clothing rack',
-          details: 'All garments hanging on wooden or metal hangers on a clothing rack, side by side. Retail boutique style with professional lighting.',
-          positioning: 'Hang each color variant on individual hangers, arranged side by side on the rack'
-        },
-        'folded-stack': {
-          name: 'neatly folded and stacked',
-          details: 'All garments folded neatly and stacked on top of each other, with each color visible from the stack. Like in a retail store shelf display.',
-          positioning: 'Stack the folded garments neatly, slightly offset so each color is visible'
-        },
-        'laid-out': {
-          name: 'laid out flat on a surface',
-          details: 'All garments laid flat on a surface side by side or slightly overlapping, showing colors clearly. Top-down or slight angle view.',
-          positioning: 'Arrange garments flat on the surface, side by side or with slight overlap to show all colors'
-        }
+      const colorCollectionVariations = {
+        'on-arm': [
+          { name: 'draped over extended forearm', details: 'Garments elegantly draped over extended forearm held horizontally, arm parallel to ground, each color cascading down naturally', positioning: 'Stack garments on horizontal forearm, front colors draping down, each color edge visible' },
+          { name: 'held on bent arm at elbow', details: 'Garments held on forearm with elbow bent at 90°, vertical forearm presentation, colors stacked like retail display', positioning: 'Arrange on vertical forearm with elbow bent, stack colors from wrist toward elbow' },
+          { name: 'casually slung over shoulder and arm', details: 'Garments draped from shoulder flowing down arm, relaxed casual presentation, lifestyle boutique aesthetic', positioning: 'Drape over shoulder cascading down to forearm, colors overlapping naturally shoulder to wrist' },
+          { name: 'fanned out on extended arm', details: 'Colors fanned out in arc formation along the arm, each garment slightly spread to show full color, rainbow-like display', positioning: 'Fan garments in 120° arc along arm, each color separated showing full width' },
+          { name: 'layered on arm with hand visible', details: 'Stacked on arm with hand elegantly positioned, fingers visible, adds human touch and scale to composition', positioning: 'Layer on forearm with graceful hand pose visible, colors stacked wrist toward elbow' },
+          { name: 'held in crook of elbow', details: 'Garments nestled in the crook/bend of elbow, intimate holding position, cozy natural draping', positioning: 'Nestle all colors in elbow crook, allow natural draping from bent position' },
+          { name: 'double-arm presentation', details: 'Colors distributed across both arms held together, expansive two-arm display for larger collections', positioning: 'Spread colors across both forearms held parallel, divide collection between two arms' },
+          { name: 'one-handed gather on forearm', details: 'Hand gently gathering garments on opposite forearm, interactive presentation showing handling', positioning: 'One hand holds colors gathered on opposite forearm, natural gathering gesture' },
+          { name: 'arm raised with cascading drape', details: 'Arm raised upward at 45° angle, garments cascading down dramatically, elegant waterfall effect', positioning: 'Raise arm at 45°, drape garments cascading downward, dramatic flowing arrangement' },
+          { name: 'twisted arm presentation', details: 'Forearm gently twisted to show different angles of draped fabric, dynamic dimensional view of colors', positioning: 'Twist forearm 30° showing side profile, colors drape with dimensional twist' }
+        ],
+        'hanging-rack': [
+          { name: 'on modern black metal rack', details: 'Hanging on sleek black metal clothing rack, contemporary minimalist aesthetic, clean industrial look', positioning: 'Hang colors on black metal rack, evenly spaced, modern minimal presentation' },
+          { name: 'on vintage wooden clothing rail', details: 'Displayed on rustic wooden clothing rail, warm vintage boutique charm, natural wood tones', positioning: 'Arrange on wooden rail, vintage hangers, warm nostalgic retail aesthetic' },
+          { name: 'on white boutique rack', details: 'Hanging on pristine white clothing rack, clean fresh retail environment, bright and airy presentation', positioning: 'Display on white rack with matching white/clear hangers, clean monochrome look' },
+          { name: 'on copper pipe industrial rack', details: 'Displayed on exposed copper pipe clothing rack, trendy industrial-chic aesthetic, warm metallic accents', positioning: 'Hang on copper/brass pipe rack, industrial-chic hangers, warm metal tones' },
+          { name: 'on tiered double-level rack', details: 'Arranged on two-tier clothing rack, colors split between upper and lower levels, boutique merchandising style', positioning: 'Distribute colors across two rack levels, create visual layers and depth' },
+          { name: 'on curved arc clothing rack', details: 'Displayed on curved/arc-shaped rack, colors following the curve, dynamic flowing presentation', positioning: 'Arrange along curved rack following arc, creates sweeping visual flow' },
+          { name: 'on wall-mounted rack bar', details: 'Hanging from wall-mounted clothing bar, floating appearance, modern space-saving display', positioning: 'Mount colors on wall bar, floating presentation, contemporary minimal look' },
+          { name: 'on freestanding garment valet', details: 'Arranged on elegant freestanding valet/butler stand, upscale hotel-like presentation, refined aesthetic', positioning: 'Display on valet stand, refined hotel-style presentation, sophisticated spacing' },
+          { name: 'on ladder-style leaning rack', details: 'Hanging on trendy ladder rack leaning against wall, casual-chic boutique vibe, relaxed aesthetic', positioning: 'Arrange on ladder rungs at various heights, casual layered look' },
+          { name: 'on rolling clothing rack', details: 'Displayed on professional rolling garment rack, behind-the-scenes fashion studio feel, authentic backstage aesthetic', positioning: 'Hang on rolling Z-rack, fashion industry authentic presentation' }
+        ],
+        'folded-stack': [
+          { name: 'neatly stacked with visible edges', details: 'Perfectly folded and stacked with each color edge prominently visible, retail shelf merchandising perfection', positioning: 'Stack with 3cm offset showing full edge of each color, retail-perfect alignment' },
+          { name: 'casually stacked pile', details: 'Loosely folded and stacked in casual pile, lived-in lifestyle aesthetic, approachable natural arrangement', positioning: 'Stack casually with slight irregularity, natural home-like pile presentation' },
+          { name: 'stacked in ascending size order', details: 'Folded and stacked from largest on bottom to smallest on top, pyramid formation, organized visual hierarchy', positioning: 'Stack largest to smallest creating tapered pyramid, visual size progression' },
+          { name: 'side-by-side row of stacks', details: 'Multiple small stacks arranged in row side by side, organized compartmentalized display, boutique merchandising', positioning: 'Create 3-4 small stacks arranged horizontally, neat row presentation' },
+          { name: 'stacked with one unfolded accent', details: 'Neat stack with top garment partially unfolded showing fabric detail, mixed presentation style', positioning: 'Stack colors neatly, top garment partially opened revealing texture and style' },
+          { name: 'leaning stacked tower', details: 'Stack tilted at slight angle leaning against surface, casual dynamic presentation, relaxed aesthetic', positioning: 'Create tall stack leaning at 15° angle, dynamic casual composition' },
+          { name: 'color-blocked stepped stack', details: 'Stacked in stepped formation like stairs, each color at different depth, architectural presentation', positioning: 'Arrange in staircase steps, each color recessed from previous, 3D depth' },
+          { name: 'folded in thirds retail style', details: 'Each garment professionally folded in thirds and stacked, high-end retail store standard, crisp edges', positioning: 'Fold in professional thirds, stack with precision, luxury retail standard' },
+          { name: 'rolled and stacked cylinders', details: 'Garments rolled instead of folded, stacked as cylinders showing spiral edges, unique modern presentation', positioning: 'Roll each color into cylinder, stack showing spiral edges, modern twist' },
+          { name: 'stacked in woven basket', details: 'Folded colors stacked inside woven basket or container, cozy homey presentation, natural organic aesthetic', positioning: 'Arrange folded stack inside natural fiber basket, organic home styling' }
+        ],
+        'laid-out': [
+          { name: 'flat side-by-side in row', details: 'All colors laid completely flat in straight row side by side, clean linear presentation, catalog style', positioning: 'Arrange in horizontal row, each garment flat and touching edges, linear alignment' },
+          { name: 'overlapping fan arrangement', details: 'Colors laid out overlapping in fan formation, each color partially visible, dynamic radial composition', positioning: 'Overlap colors in fan pattern, each showing 60% surface area, radial spread' },
+          { name: 'flat with sleeves extended', details: 'Garments laid with sleeves fully extended outward, showing full silhouette and form, detailed presentation', positioning: 'Lay flat with sleeves spread wide, show complete garment shape and construction' },
+          { name: 'artfully scattered flat layout', details: 'Colors laid flat but at varied angles artistically scattered, editorial magazine aesthetic, dynamic composition', positioning: 'Lay each color at different 15-90° rotation, artistic scattered but controlled' },
+          { name: 'stacked flat with slight offset', details: 'Colors layered flat on top of each other with slight offset, showing edge of each color, dimensional stack', positioning: 'Layer flat with 5cm offset showing color strips, create flat dimensional layers' },
+          { name: 'diagonal line flat arrangement', details: 'Colors arranged flat along diagonal line, creates dynamic directional energy, modern editorial style', positioning: 'Lay colors flat along 45° diagonal from corner to corner, linear diagonal flow' },
+          { name: 'circular flat mandala layout', details: 'Colors arranged flat in circular mandala pattern radiating from center, symmetrical artistic composition', positioning: 'Arrange flat in circle with each color pointing outward from center, radial symmetry' },
+          { name: 'folded-half flat display', details: 'Each garment folded in half and laid flat showing both fold and edges, retail presentation hybrid', positioning: 'Fold each in half, lay flat showing fold line and color edges clearly' },
+          { name: 'flat on chair or draping surface', details: 'Colors laid flat across chair back or draped surface, lifestyle home context, natural environment', positioning: 'Arrange flat across chair or furniture, natural home styling context' },
+          { name: 'gradient progression flat layout', details: 'Colors arranged flat in gradient progression from light to dark or warm to cool, artistic color story', positioning: 'Lay flat in color gradient order, create visual color transition progression' }
+        ]
       };
 
-      const scenario = scenarioDescriptions[displayScenario] || scenarioDescriptions['laid-out'];
+      // Randomly select one of the 10 variations for the chosen scenario
+      const variations = colorCollectionVariations[displayScenario] || colorCollectionVariations['laid-out'];
+      const scenario = variations[Math.floor(Math.random() * variations.length)];
 
       prompt = `Create a professional product photography image showing multiple color variants of the same garment ${scenario.name}.
 
@@ -2457,32 +2487,62 @@ DO NOT:
 Generate a professional e-commerce product photo perfect for showcasing the complete color collection - like in online stores or catalogs.`;
 
     } else if (mode === 'flat-lay') {
-      // FLAT LAY MODE: Overhead product photography
+      // FLAT LAY MODE: Overhead product photography with 10 variations per arrangement
 
-      const arrangementDescriptions = {
-        'grid': {
-          name: 'in a neat grid layout',
-          details: 'Products arranged in a perfect grid pattern (rows and columns), evenly spaced with consistent gaps between items. Clean, organized retail catalog style.',
-          positioning: 'Arrange products in symmetrical rows and columns with equal spacing between each item'
-        },
-        'scattered': {
-          name: 'in an artistic scattered arrangement',
-          details: 'Products artistically scattered across the surface in a seemingly random but visually balanced composition. Natural, lifestyle magazine editorial style.',
-          positioning: 'Place products at various angles and positions, creating visual interest while maintaining balance'
-        },
-        'circular': {
-          name: 'in a circular arrangement',
-          details: 'Products arranged in a circle or radiating from a central point. Creates a focal point in the center with items evenly distributed around it.',
-          positioning: 'Position products in a circular pattern, either forming a ring or radiating outward from center'
-        },
-        'diagonal': {
-          name: 'in a diagonal arrangement',
-          details: 'Products aligned along diagonal lines across the frame. Creates dynamic energy and visual flow. Modern, contemporary catalog style.',
-          positioning: 'Arrange products along diagonal lines from corner to corner, creating dynamic composition'
-        }
+      const flatLayVariations = {
+        'grid': [
+          { name: 'in a tight 2×2 grid', details: 'Compact 2×2 grid arrangement with minimal spacing between products, centered composition, symmetrical and orderly', positioning: 'Arrange in 2 rows and 2 columns with 2cm gaps, perfectly aligned' },
+          { name: 'in a spacious 3×3 grid', details: 'Wide 3×3 grid with generous white space between each item, breathing room for each product, modern minimal aesthetic', positioning: 'Create 3×3 grid with 5cm spacing between items, emphasize negative space' },
+          { name: 'in an asymmetric grid with hero product', details: 'Grid layout with one larger featured product taking center stage, other items arranged around in smaller grid cells', positioning: 'Place main product center at 1.5x size, arrange others in grid around it' },
+          { name: 'in a staggered brick-pattern grid', details: 'Brick-laying pattern where each row is offset from the one above, creating visual rhythm and movement', positioning: 'Offset each row by half a product width, like brick masonry pattern' },
+          { name: 'in a perfect square 4×4 grid', details: 'Dense 4×4 grid pattern filling the frame, catalog-style product showcase, equal prominence to all items', positioning: 'Arrange 16 items (or repeat if fewer) in tight 4×4 grid, minimal gaps' },
+          { name: 'in a vertical column grid', details: 'Products arranged in neat vertical columns with generous horizontal spacing, tall elegant composition', positioning: 'Create 3-4 vertical columns, items stacked vertically with horizontal breathing room' },
+          { name: 'in a horizontal row grid', details: 'Products lined up in horizontal rows across the frame, wide panoramic feeling, editorial magazine style', positioning: 'Arrange in 2-3 horizontal rows spanning full width, vertical spacing between rows' },
+          { name: 'in a centered cross-pattern grid', details: 'Grid arranged in a cross/plus formation with products radiating from center point, balanced symmetry', positioning: 'Position products forming a + shape from center, equal spacing on all arms' },
+          { name: 'in a checkerboard alternating grid', details: 'Checkerboard pattern where products alternate with empty spaces, playful negative space composition', positioning: 'Place products in alternating grid squares like checkerboard, empty spaces create rhythm' },
+          { name: 'in a modular box grid', details: 'Products grouped in separate box modules within the grid, organized compartmentalized look', positioning: 'Divide frame into 4-6 box sections, arrange 1-2 products per box in mini-grids' }
+        ],
+        'scattered': [
+          { name: 'in an organic scattered arrangement', details: 'Naturally scattered as if casually tossed, products at random angles creating effortless cool vibe', positioning: 'Scatter products at varying 15-45° angles, random placement with natural spacing' },
+          { name: 'in a controlled chaos scatter', details: 'Deliberately random arrangement that looks spontaneous but maintains visual balance and harmony', positioning: 'Place products randomly but ensure balanced weight distribution across frame' },
+          { name: 'in a clustered scattered arrangement', details: 'Products gathered in 2-3 small clusters with open space between groups, social grouping aesthetic', positioning: 'Create 2-3 product clusters, leaving breathing room between cluster groups' },
+          { name: 'in a corner-weighted scatter', details: 'Products concentrated in corners with open center space, creates negative space focal point', positioning: 'Scatter most products toward 3-4 corners, keep center area relatively empty' },
+          { name: 'in a flowing scattered arrangement', details: 'Products scattered in a flowing S-curve pattern across the frame, natural movement and rhythm', positioning: 'Arrange products following an invisible S or curved path, fluid composition' },
+          { name: 'in a minimalist scattered layout', details: 'Very few products with lots of negative space, each item isolated and breathing, zen-like simplicity', positioning: 'Place 2-4 products with large empty areas between, emphasize isolation and space' },
+          { name: 'in a layered scattered arrangement', details: 'Some products slightly overlapping others creating depth, dimensional scattered composition', positioning: 'Allow 10-20% overlap between some products, creates depth and layering' },
+          { name: 'in a border-scattered layout', details: 'Products scattered around the perimeter leaving center empty, frame-within-frame composition', positioning: 'Scatter products around outer 30% of frame, central area stays clear' },
+          { name: 'in a diagonal-flow scatter', details: 'Products scattered but flowing from one corner to opposite, diagonal energy and movement', positioning: 'Scatter products primarily along diagonal axis from corner to corner' },
+          { name: 'in a random rotation scatter', details: 'Each product rotated to different extreme angle (45°-90°), dynamic angular energy throughout', positioning: 'Rotate each product differently (30-90°), create strong angular variety and movement' }
+        ],
+        'circular': [
+          { name: 'in a perfect circle ring', details: 'Products arranged in a perfect circular ring with empty center, classic mandala-like composition', positioning: 'Position products in exact circle, equal spacing, center point empty for focal interest' },
+          { name: 'in a spiral arrangement', details: 'Products arranged in a spiral pattern rotating outward from center, creates motion and flow', positioning: 'Arrange products in Fibonacci spiral or similar, starting center rotating outward' },
+          { name: 'in a sunburst radiating pattern', details: 'Products radiating outward from center point like sun rays, dynamic energy emanating from core', positioning: 'Place products pointing outward from center like clock hands, radial symmetry' },
+          { name: 'in concentric circles', details: 'Multiple circular rings nested inside each other, layered circular composition with depth', positioning: 'Create 2-3 concentric circles, inner circle smaller items, outer circle larger products' },
+          { name: 'in a circular cluster with center focus', details: 'Main hero product in center, other items arranged in loose circle around it, clear hierarchy', positioning: 'Featured product dead center, arrange others in circular formation surrounding it' },
+          { name: 'in a semi-circle arc', details: 'Products arranged in a half-circle arc across the frame, creates dynamic curved composition', positioning: 'Arrange products in 180° arc from left to right, rainbow-like curved formation' },
+          { name: 'in an orbital pattern', details: 'Products at different orbital distances from center like planets, varied circular layers', positioning: 'Place products at varying distances from center point, 3-4 different orbital radii' },
+          { name: 'in a circular wreath layout', details: 'Products tightly packed forming a circular wreath shape, festive and abundant feeling', positioning: 'Arrange products close together in circle, slightly overlapping, wreath aesthetic' },
+          { name: 'in a broken circle arrangement', details: 'Circular pattern intentionally incomplete, creating visual tension and modern asymmetry', positioning: 'Form 3/4 circle leaving 1/4 open, creates dynamic incomplete circular flow' },
+          { name: 'in a circular gradient pattern', details: 'Products arranged in circle with size gradation from small to large, creates depth perspective', positioning: 'Arrange in circle with smallest items one end, gradually larger moving around circle' }
+        ],
+        'diagonal': [
+          { name: 'in a single diagonal line', details: 'Products aligned in one clean diagonal line from corner to corner, bold linear composition', positioning: 'Arrange all products along single 45° diagonal from bottom-left to top-right' },
+          { name: 'in parallel diagonal rows', details: 'Multiple parallel diagonal lines creating striped pattern, dynamic rhythm and repetition', positioning: 'Create 2-3 parallel diagonal lines, products aligned along each stripe' },
+          { name: 'in a diagonal cascade', details: 'Products stair-stepping diagonally with slight overlap, creates flowing waterfall effect', positioning: 'Arrange products in diagonal staircase pattern, each item slightly lower and overlapping' },
+          { name: 'in a crossed diagonal X-pattern', details: 'Two diagonal lines crossing in center forming X shape, balanced dynamic symmetry', positioning: 'Form two diagonal lines intersecting at center, creating bold X composition' },
+          { name: 'in a diagonal chevron pattern', details: 'V or inverted V shape along diagonal axis, creates strong directional arrow composition', positioning: 'Arrange products in V or Λ shape along diagonal, pointed chevron formation' },
+          { name: 'in a diagonal zig-zag', details: 'Products alternating back and forth along diagonal path, creates energetic Z-shaped movement', positioning: 'Place products in zig-zag pattern following overall diagonal direction' },
+          { name: 'in a diagonal offset pattern', details: 'Main diagonal line with secondary products offset to side, creates dimensional diagonal composition', positioning: 'Primary products on main diagonal, accent items offset 2-3cm to either side' },
+          { name: 'in a diagonal wedge formation', details: 'Triangular wedge shape with diagonal edge, products densest at one corner spreading outward', positioning: 'Form triangle with one edge on diagonal, products dense at point spreading to base' },
+          { name: 'in a stepped diagonal blocks', details: 'Products grouped in block formations stepping diagonally, architectural stair-step aesthetic', positioning: 'Create 3-4 product blocks arranged in diagonal staircase formation' },
+          { name: 'in a sweeping diagonal curve', details: 'Products following a curved diagonal arc, combines diagonal energy with flowing curves', positioning: 'Arrange products in gentle curved arc that flows diagonally across frame' }
+        ]
       };
 
-      const currentArrangement = arrangementDescriptions[arrangement] || arrangementDescriptions['grid'];
+      // Randomly select one of the 10 variations for the chosen arrangement
+      const variations = flatLayVariations[arrangement] || flatLayVariations['grid'];
+      const currentArrangement = variations[Math.floor(Math.random() * variations.length)];
 
       prompt = `Create a professional flat lay product photography image with products ${currentArrangement.name}.
 
