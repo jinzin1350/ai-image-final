@@ -40,9 +40,13 @@ let selectedStyleId = 'professional';
 let selectedLightingId = 'studio';
 
 // NEW: Mode selection variables
-let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only'
+let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'color-collection'
 let uploadedAccessoryPath = null; // Path to uploaded accessory product image
 let selectedAccessoryType = null; // Type of accessory (handbag, watch, etc.)
+
+// NEW: Color Collection mode variables
+let uploadedColorVariants = []; // Array of uploaded color variant paths
+let selectedDisplayScenario = null; // 'on-arm', 'hanging-rack', 'folded-stack', 'laid-out'
 
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
@@ -88,6 +92,7 @@ const hijabSection = document.getElementById('hijabSection');
 const modeCards = document.querySelectorAll('.mode-card');
 const garmentUploadSection = document.getElementById('garmentUploadSection');
 const accessoryUploadSection = document.getElementById('accessoryUploadSection');
+const colorCollectionUploadSection = document.getElementById('colorCollectionUploadSection');
 
 // NEW: Accessory upload elements
 const accessoryInput = document.getElementById('accessoryInput');
@@ -95,6 +100,13 @@ const accessoryUploadArea = document.getElementById('accessoryUploadArea');
 const accessoryUploadPlaceholder = document.getElementById('accessoryUploadPlaceholder');
 const accessoryPreview = document.getElementById('accessoryPreview');
 const accessoryTypeSelect = document.getElementById('accessoryType');
+
+// NEW: Color Collection upload elements
+const colorCollectionInput = document.getElementById('colorCollectionInput');
+const colorCollectionUploadArea = document.getElementById('colorCollectionUploadArea');
+const colorCollectionPlaceholder = document.getElementById('colorCollectionPlaceholder');
+const colorCollectionPreviews = document.getElementById('colorCollectionPreviews');
+const displayScenarioSection = document.getElementById('displayScenarioSection');
 
 // بارگذاری مدل‌ها
 async function loadModels() {
@@ -472,6 +484,98 @@ function selectModel(modelId) {
 }
 
 // ========================================
+// NEW: Color Collection Upload Functions
+// ========================================
+
+// Setup color collection upload
+if (colorCollectionUploadArea && colorCollectionInput) {
+    colorCollectionUploadArea.addEventListener('click', () => {
+        colorCollectionInput.click();
+    });
+
+    colorCollectionInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            await uploadColorVariantFiles(files);
+        }
+    });
+}
+
+// Upload multiple color variant images
+async function uploadColorVariantFiles(files) {
+    // Limit to 10 files
+    if (files.length > 10) {
+        alert('حداکثر ۱۰ رنگ می‌توانید آپلود کنید');
+        files = files.slice(0, 10);
+    }
+
+    uploadedColorVariants = [];
+
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('garment', file);
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                uploadedColorVariants.push(data.filePath);
+            }
+        } catch (error) {
+            console.error('خطا در آپلود تصویر:', error);
+        }
+    }
+
+    // Show previews
+    colorCollectionPreviews.style.display = 'grid';
+    colorCollectionPlaceholder.style.display = 'none';
+
+    colorCollectionPreviews.innerHTML = uploadedColorVariants.map((path, index) => `
+        <div class="garment-preview-item">
+            <img src="${path}" alt="رنگ ${index + 1}">
+            <button class="remove-garment-btn" onclick="removeColorVariant(${index})">&times;</button>
+            <div class="garment-preview-label">رنگ ${index + 1}</div>
+        </div>
+    `).join('');
+
+    checkGenerateButton();
+}
+
+// Remove a color variant
+function removeColorVariant(index) {
+    uploadedColorVariants.splice(index, 1);
+
+    if (uploadedColorVariants.length === 0) {
+        colorCollectionPreviews.style.display = 'none';
+        colorCollectionPlaceholder.style.display = 'flex';
+    } else {
+        colorCollectionPreviews.innerHTML = uploadedColorVariants.map((path, idx) => `
+            <div class="garment-preview-item">
+                <img src="${path}" alt="رنگ ${idx + 1}">
+                <button class="remove-garment-btn" onclick="removeColorVariant(${idx})">&times;</button>
+                <div class="garment-preview-label">رنگ ${idx + 1}</div>
+            </div>
+        `).join('');
+    }
+
+    checkGenerateButton();
+}
+
+// Select display scenario
+function selectDisplayScenario(scenario) {
+    selectedDisplayScenario = scenario;
+    document.querySelectorAll('.scenario-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.scenario === scenario);
+    });
+    checkGenerateButton();
+}
+
+// ========================================
 // NEW: Mode Switching Functions
 // ========================================
 
@@ -488,6 +592,8 @@ function switchMode(mode) {
         // Complete outfit mode: show garment upload, model selection, hijab
         garmentUploadSection.style.display = 'block';
         accessoryUploadSection.style.display = 'none';
+        colorCollectionUploadSection.style.display = 'none';
+        displayScenarioSection.style.display = 'none';
 
         // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
@@ -496,12 +602,24 @@ function switchMode(mode) {
         // Accessories mode: upload accessory product photo, select model and background
         garmentUploadSection.style.display = 'none';
         accessoryUploadSection.style.display = 'block';
+        colorCollectionUploadSection.style.display = 'none';
+        displayScenarioSection.style.display = 'none';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
+
+    } else if (mode === 'color-collection') {
+        // Color Collection mode: upload multiple color variants and select display scenario
+        garmentUploadSection.style.display = 'none';
+        accessoryUploadSection.style.display = 'none';
+        colorCollectionUploadSection.style.display = 'block';
+        displayScenarioSection.style.display = 'block';
+        hijabSection.style.display = 'none'; // Hide hijab section
     }
 
     // Reset selections when switching modes
     uploadedAccessoryPath = null;
     selectedAccessoryType = null;
+    uploadedColorVariants = [];
+    selectedDisplayScenario = null;
     if (mode !== 'complete-outfit') {
         selectedHijabType = null;
     }
@@ -546,6 +664,12 @@ function checkGenerateButton() {
         isValid = uploadedAccessoryPath !== null &&
                   selectedAccessoryType !== null &&
                   selectedModelId &&
+                  selectedBackgroundId;
+
+    } else if (currentMode === 'color-collection') {
+        // Color Collection mode: need at least 1 color variant, display scenario, and background
+        isValid = uploadedColorVariants.length >= 1 &&
+                  selectedDisplayScenario !== null &&
                   selectedBackgroundId;
     }
 
@@ -693,6 +817,13 @@ generateBtn.addEventListener('click', async () => {
             requestBody.modelId = selectedModelId;
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+
+        } else if (currentMode === 'color-collection') {
+            // Color Collection mode - multiple color variants display
+            requestBody.colorVariants = uploadedColorVariants;
+            requestBody.displayScenario = selectedDisplayScenario;
+            requestBody.backgroundId = selectedBackgroundId;
+            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
         }
 
         console.log('🚀 Sending request:', requestBody);
@@ -814,5 +945,13 @@ document.querySelectorAll('.hijab-option-card').forEach(card => {
     card.addEventListener('click', () => {
         const hijabType = card.dataset.hijabType;
         selectHijabType(hijabType);
+    });
+});
+
+// Event listener for display scenario selection
+document.querySelectorAll('.scenario-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const scenario = card.dataset.scenario;
+        selectDisplayScenario(scenario);
     });
 });
