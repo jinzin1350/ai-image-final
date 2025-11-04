@@ -27,8 +27,27 @@
         return currentLang;
     };
 
+    // Get translation by key path (e.g., "hero.title")
+    function getTranslation(key) {
+        if (!window.translations) return null;
+
+        const keys = key.split('.');
+        let value = window.translations[currentLang];
+
+        for (const k of keys) {
+            if (value && typeof value === 'object') {
+                value = value[k];
+            } else {
+                return null;
+            }
+        }
+
+        return value;
+    }
+
     // Update all elements with translation attributes
     function updateTranslations() {
+        // Handle data-lang-fa/data-lang-en attributes (old system)
         const elements = document.querySelectorAll('[data-lang-fa][data-lang-en]');
         elements.forEach(el => {
             const text = el.getAttribute(`data-lang-${currentLang}`);
@@ -40,6 +59,40 @@
                     el.placeholder = text;
                 } else {
                     el.textContent = text;
+                }
+            }
+        });
+
+        // Handle data-translate-key attributes (new JSON system)
+        const keyElements = document.querySelectorAll('[data-translate-key]');
+        keyElements.forEach(el => {
+            const key = el.getAttribute('data-translate-key');
+            const translation = getTranslation(key);
+
+            if (translation !== null) {
+                // Handle arrays (for lists)
+                if (Array.isArray(translation)) {
+                    // Find all list items within this element
+                    const listItems = el.querySelectorAll('[data-translate-index]');
+                    listItems.forEach(item => {
+                        const index = parseInt(item.getAttribute('data-translate-index'));
+                        if (translation[index]) {
+                            // Find the span with the text
+                            const span = item.querySelector('span');
+                            if (span) {
+                                span.textContent = translation[index];
+                            }
+                        }
+                    });
+                } else {
+                    // Handle regular text
+                    if (el.hasAttribute('data-translate-placeholder')) {
+                        el.placeholder = translation;
+                    } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else {
+                        el.textContent = translation;
+                    }
                 }
             }
         });
