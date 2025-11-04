@@ -775,18 +775,26 @@ function switchMode(mode) {
     // Reload backgrounds with mode-specific list
     loadBackgrounds(mode);
 
-    // Reload models with mode-specific list (for accessories mode)
-    if (mode === 'accessories-only' || mode === 'complete-outfit') {
+    // Reload models and set appropriate category
+    if (mode === 'accessories-only') {
         loadModels(mode);
         // Reset model selection
         selectedModelId = null;
         document.querySelectorAll('.model-card').forEach(card => {
             card.classList.remove('selected');
         });
-        // For accessories mode, set category to 'accessory' to show all hand models
-        if (mode === 'accessories-only') {
-            currentCategory = 'accessory';
-        }
+        // Set category to 'accessory' to show accessory models from database
+        currentCategory = 'accessory';
+        displayModelsByCategory('accessory');
+    } else if (mode === 'complete-outfit') {
+        loadModels(mode);
+        // Reset model selection
+        selectedModelId = null;
+        document.querySelectorAll('.model-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        // Reset to default category
+        currentCategory = 'woman';
     }
 
     // Reset background selection

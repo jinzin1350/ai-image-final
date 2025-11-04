@@ -1478,17 +1478,9 @@ app.post('/api/auth/signout', authenticateUser, async (req, res) => {
 // دریافت لیست مدل‌ها
 app.get('/api/models', async (req, res) => {
   try {
-    const mode = req.query.mode || 'complete-outfit'; // Get mode from query parameter
-
-    // Select appropriate model list based on mode
-    let baseModels;
-    if (mode === 'accessories-only') {
-      baseModels = [...accessoryModels]; // Hand/arm models for accessory photography
-    } else {
-      baseModels = [...models]; // Regular full-body models
-    }
-
-    let allModels = baseModels;
+    // Always start with regular models as base
+    // For accessories mode, we'll rely on database models with category='accessory'
+    let allModels = [...models];
 
     // If user is authenticated and Supabase is configured, add their custom models
     const authHeader = req.headers.authorization;
