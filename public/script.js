@@ -71,9 +71,6 @@ const uploadArea = document.getElementById('uploadArea');
 const uploadPlaceholder = document.getElementById('uploadPlaceholder');
 const garmentPreviews = document.getElementById('garmentPreviews');
 const categorySelect = document.getElementById('categorySelect');
-const ageSlider = document.getElementById('ageSlider');
-const ageValue = document.getElementById('ageValue');
-const ethnicitySelect = document.getElementById('ethnicitySelect');
 const modelsGrid = document.getElementById('modelsGrid');
 const backgroundsGrid = document.getElementById('backgroundsGrid');
 const poseSelect = document.getElementById('poseSelect');
@@ -194,23 +191,6 @@ categorySelect.addEventListener('change', (e) => {
     selectedModelId = null; // پاک کردن انتخاب قبلی
     displayModelsByCategory(currentCategory);
     checkGenerateButton();
-});
-
-// به‌روزرسانی نمایش سن
-ageSlider.addEventListener('input', (e) => {
-    ageValue.textContent = e.target.value;
-});
-
-// ذخیره سن و قومیت انتخاب شده برای ارسال به API
-let selectedAge = 25;
-let selectedEthnicity = 'iranian';
-
-ageSlider.addEventListener('change', (e) => {
-    selectedAge = parseInt(e.target.value);
-});
-
-ethnicitySelect.addEventListener('change', (e) => {
-    selectedEthnicity = e.target.value;
 });
 
 // بارگذاری پس‌زمینه‌ها
@@ -1118,8 +1098,6 @@ generateBtn.addEventListener('click', async () => {
         // Build request body based on current mode
         let requestBody = {
             mode: currentMode, // NEW: Send current mode to API
-            modelAge: selectedAge, // NEW: Send selected age
-            modelEthnicity: selectedEthnicity, // NEW: Send selected ethnicity
             poseId: selectedPoseId,
             cameraAngleId: selectedCameraAngleId,
             styleId: selectedStyleId,
