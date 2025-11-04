@@ -1198,7 +1198,7 @@ const modelPrompts = [
     category: 'girl',
     categoryName: 'دختر',
     description: 'دختر نوجوان 13-15 ساله',
-    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old, friendly smile, youthful appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE GIRL (age 13-15 years old) - NOT an adult woman. A professional fashion portrait of a young teenage girl exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: round face, soft young features, teenage proportions, innocent youthful expression, age-appropriate appearance. She must clearly look like a young teenager, NOT an adult. Friendly smile, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'girl-2',
@@ -1206,7 +1206,7 @@ const modelPrompts = [
     category: 'girl',
     categoryName: 'دختر',
     description: 'دختر نوجوان 13-15 ساله با موهای بلند',
-    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old with long hair, cheerful expression, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE GIRL (age 13-15 years old) - NOT an adult woman. A professional fashion portrait of a young teenage girl exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: round face, soft young features, teenage proportions, innocent youthful expression, age-appropriate appearance. She must clearly look like a young teenager, NOT an adult. Long hair, cheerful expression, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'girl-3',
@@ -1214,7 +1214,7 @@ const modelPrompts = [
     category: 'girl',
     categoryName: 'دختر',
     description: 'دختر نوجوان 13-15 ساله با استایل مدرن',
-    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old, modern style, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE GIRL (age 13-15 years old) - NOT an adult woman. A professional fashion portrait of a young teenage girl exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: round face, soft young features, teenage proportions, innocent youthful expression, age-appropriate appearance. She must clearly look like a young teenager, NOT an adult. Modern style, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'girl-4',
@@ -1222,7 +1222,7 @@ const modelPrompts = [
     category: 'girl',
     categoryName: 'دختر',
     description: 'دختر نوجوان 13-15 ساله با موهای کوتاه',
-    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old with short hair, sporty look, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE GIRL (age 13-15 years old) - NOT an adult woman. A professional fashion portrait of a young teenage girl exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: round face, soft young features, teenage proportions, innocent youthful expression, age-appropriate appearance. She must clearly look like a young teenager, NOT an adult. Short hair, sporty look, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'girl-5',
@@ -1230,7 +1230,7 @@ const modelPrompts = [
     category: 'girl',
     categoryName: 'دختر',
     description: 'دختر نوجوان 13-15 ساله با لبخند',
-    prompt: 'A professional fashion model portrait, teenage girl age 13-15 years old, happy smile, natural beauty, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE GIRL (age 13-15 years old) - NOT an adult woman. A professional fashion portrait of a young teenage girl exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: round face, soft young features, teenage proportions, innocent youthful expression, age-appropriate appearance. She must clearly look like a young teenager, NOT an adult. Happy smile, natural beauty, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
 
   // پسران (13-15 ساله)
@@ -1240,7 +1240,7 @@ const modelPrompts = [
     category: 'boy',
     categoryName: 'پسر',
     description: 'پسر نوجوان 13-15 ساله',
-    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, friendly expression, youthful appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE BOY (age 13-15 years old) - NOT an adult man. A professional fashion portrait of a young teenage boy exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: rounder face, softer young features, teenage body proportions, innocent boyish expression, age-appropriate appearance. He must clearly look like a young teenager, NOT an adult. Friendly expression, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'boy-2',
@@ -1248,7 +1248,7 @@ const modelPrompts = [
     category: 'boy',
     categoryName: 'پسر',
     description: 'پسر نوجوان 13-15 ساله ورزشکار',
-    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, athletic build, sporty appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE BOY (age 13-15 years old) - NOT an adult man. A professional fashion portrait of a young teenage boy exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: rounder face, softer young features, teenage body proportions, innocent boyish expression, age-appropriate appearance. He must clearly look like a young teenager, NOT an adult. Athletic build for a teenager, sporty appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'boy-3',
@@ -1256,7 +1256,7 @@ const modelPrompts = [
     category: 'boy',
     categoryName: 'پسر',
     description: 'پسر نوجوان 13-15 ساله با موهای کوتاه',
-    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old with short hair, casual style, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE BOY (age 13-15 years old) - NOT an adult man. A professional fashion portrait of a young teenage boy exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: rounder face, softer young features, teenage body proportions, innocent boyish expression, age-appropriate appearance. He must clearly look like a young teenager, NOT an adult. Short hair, casual style, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'boy-4',
@@ -1264,7 +1264,7 @@ const modelPrompts = [
     category: 'boy',
     categoryName: 'پسر',
     description: 'پسر نوجوان 13-15 ساله با لبخند',
-    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, happy smile, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE BOY (age 13-15 years old) - NOT an adult man. A professional fashion portrait of a young teenage boy exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: rounder face, softer young features, teenage body proportions, innocent boyish expression, age-appropriate appearance. He must clearly look like a young teenager, NOT an adult. Happy smile, confident pose, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   },
   {
     id: 'boy-5',
@@ -1272,7 +1272,7 @@ const modelPrompts = [
     category: 'boy',
     categoryName: 'پسر',
     description: 'پسر نوجوان 13-15 ساله با استایل مدرن',
-    prompt: 'A professional fashion model portrait, teenage boy age 13-15 years old, modern casual style, friendly appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on'
+    prompt: 'IMPORTANT: Create a TEENAGE BOY (age 13-15 years old) - NOT an adult man. A professional fashion portrait of a young teenage boy exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: rounder face, softer young features, teenage body proportions, innocent boyish expression, age-appropriate appearance. He must clearly look like a young teenager, NOT an adult. Modern casual style, friendly appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   }
 ];
 
