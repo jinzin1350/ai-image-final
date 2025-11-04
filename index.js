@@ -1163,6 +1163,23 @@ const fallbackModels = [
   { id: 'boy-5', name: 'مدل ۵', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop' }
 ];
 
+// Accessory models (hand/arm models for accessory photography)
+const accessoryModels = [
+  // Female hand/arm models
+  { id: 'hand-woman-1', name: 'دست زن ۱', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و بازوی زن برای عکاسی اکسسوری', image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400&h=600&fit=crop' },
+  { id: 'hand-woman-2', name: 'دست زن ۲', category: 'accessory', categoryName: 'اکسسوری', description: 'دست زن با پوست روشن', image: 'https://images.unsplash.com/photo-1583327112925-b3f0e0a36ff5?w=400&h=600&fit=crop' },
+  { id: 'hand-woman-3', name: 'دست زن ۳', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و مچ زن برای ساعت و دستبند', image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop' },
+  { id: 'hand-woman-4', name: 'دست زن ۴', category: 'accessory', categoryName: 'اکسسوری', description: 'دست زن با پوست متوسط', image: 'https://images.unsplash.com/photo-1610992015762-45dca7e4e1f6?w=400&h=600&fit=crop' },
+  { id: 'hand-woman-5', name: 'دست زن ۵', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و بازوی زن لاغر', image: 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=400&h=600&fit=crop' },
+
+  // Male hand/arm models
+  { id: 'hand-man-1', name: 'دست مرد ۱', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و بازوی مرد برای عکاسی اکسسوری', image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=600&fit=crop' },
+  { id: 'hand-man-2', name: 'دست مرد ۲', category: 'accessory', categoryName: 'اکسسوری', description: 'دست مرد برای ساعت مچی', image: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=400&h=600&fit=crop' },
+  { id: 'hand-man-3', name: 'دست مرد ۳', category: 'accessory', categoryName: 'اکسسوری', description: 'مچ و دست مرد', image: 'https://images.unsplash.com/photo-1509941943102-10c232535736?w=400&h=600&fit=crop' },
+  { id: 'hand-man-4', name: 'دست مرد ۴', category: 'accessory', categoryName: 'اکسسوری', description: 'دست مرد با پوست روشن', image: 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=400&h=600&fit=crop' },
+  { id: 'hand-man-5', name: 'دست مرد ۵', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و بازوی مرد قوی', image: 'https://images.unsplash.com/photo-1594576722512-582bcd46fba4?w=400&h=600&fit=crop' }
+];
+
 // لیست مدل‌ها با URL‌های تولید شده (در ابتدا از fallback استفاده می‌شود)
 let models = [...fallbackModels];
 
@@ -1461,7 +1478,17 @@ app.post('/api/auth/signout', authenticateUser, async (req, res) => {
 // دریافت لیست مدل‌ها
 app.get('/api/models', async (req, res) => {
   try {
-    let allModels = [...models]; // Start with hardcoded models
+    const mode = req.query.mode || 'complete-outfit'; // Get mode from query parameter
+
+    // Select appropriate model list based on mode
+    let baseModels;
+    if (mode === 'accessories-only') {
+      baseModels = [...accessoryModels]; // Hand/arm models for accessory photography
+    } else {
+      baseModels = [...models]; // Regular full-body models
+    }
+
+    let allModels = baseModels;
 
     // If user is authenticated and Supabase is configured, add their custom models
     const authHeader = req.headers.authorization;
@@ -1914,7 +1941,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     // Find model (check hardcoded first, then custom from database)
-    let selectedModel = modelId ? models.find(m => m.id === modelId) : null;
+    // Search in both regular models and accessory models
+    let selectedModel = modelId ?
+      (models.find(m => m.id === modelId) || accessoryModels.find(m => m.id === modelId))
+      : null;
 
     // If not found in hardcoded models and ID starts with 'custom-', fetch from database
     if (!selectedModel && modelId && modelId.startsWith('custom-') && supabase) {

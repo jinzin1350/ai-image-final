@@ -131,7 +131,7 @@ const flatLayPreviews = document.getElementById('flatLayPreviews');
 const flatLayArrangementSection = document.getElementById('flatLayArrangementSection');
 
 // بارگذاری مدل‌ها
-async function loadModels() {
+async function loadModels(mode = 'complete-outfit') {
     try {
         // Get auth token from localStorage if user is logged in
         const token = localStorage.getItem('supabase_token');
@@ -140,7 +140,8 @@ async function loadModels() {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch('/api/models', { headers });
+        // Add mode parameter to fetch appropriate models
+        const response = await fetch(`/api/models?mode=${mode}`, { headers });
         allModels = await response.json();
 
         // نمایش مدل‌های دسته‌بندی فعلی
@@ -713,12 +714,15 @@ function switchMode(mode) {
         flatLayArrangementSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
+        // Show category selector for complete outfit
+        const categorySelector = document.querySelector('.category-selector');
+        if (categorySelector) categorySelector.style.display = 'block';
 
         // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
 
     } else if (mode === 'accessories-only') {
-        // Accessories mode: upload accessory product photo, select model and background
+        // Accessories mode: upload accessory product photo, select hand/arm model
         garmentUploadSection.style.display = 'none';
         accessoryUploadSection.style.display = 'block';
         colorCollectionUploadSection.style.display = 'none';
@@ -728,6 +732,9 @@ function switchMode(mode) {
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
+        // Hide category selector - only show hand models
+        const categorySelector = document.querySelector('.category-selector');
+        if (categorySelector) categorySelector.style.display = 'none';
 
     } else if (mode === 'color-collection') {
         // Color Collection mode: upload multiple color variants and select display scenario
@@ -767,6 +774,20 @@ function switchMode(mode) {
 
     // Reload backgrounds with mode-specific list
     loadBackgrounds(mode);
+
+    // Reload models with mode-specific list (for accessories mode)
+    if (mode === 'accessories-only' || mode === 'complete-outfit') {
+        loadModels(mode);
+        // Reset model selection
+        selectedModelId = null;
+        document.querySelectorAll('.model-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        // For accessories mode, set category to 'accessory' to show all hand models
+        if (mode === 'accessories-only') {
+            currentCategory = 'accessory';
+        }
+    }
 
     // Reset background selection
     selectedBackgroundId = null;
