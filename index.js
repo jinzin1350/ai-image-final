@@ -1027,6 +1027,25 @@ app.delete('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => 
   }
 });
 
+// Make all models public (bulk update)
+app.post('/api/admin/models/make-all-public', authenticateAdmin, async (req, res) => {
+  try {
+    const { data: models, error } = await supabaseAdmin
+      .from('content_library')
+      .update({ visibility: 'public' })
+      .eq('content_type', 'model')
+      .select();
+
+    if (error) throw error;
+
+    console.log(`🌍 Made ${models?.length || 0} models public`);
+    res.json({ success: true, count: models?.length || 0, models });
+  } catch (error) {
+    console.error('Error making models public:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get activity logs
 app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
   try {

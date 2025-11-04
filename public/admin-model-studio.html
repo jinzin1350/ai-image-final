@@ -872,9 +872,14 @@
             <div class="studio-card-inner">
                 <h2 style="margin-bottom: 20px; color: #eef2ff; display: flex; justify-content: space-between; align-items: center;">
                     <span>📋 مدیریت مدل‌های ساخته شده</span>
-                    <button onclick="loadAllModels()" style="background: #eef2ff; color: #4f46e5; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
-                        🔄 به‌روزرسانی
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="makeAllModelsPublic()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                            🌍 همه را عمومی کن
+                        </button>
+                        <button onclick="loadAllModels()" style="background: #eef2ff; color: #4f46e5; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                            🔄 به‌روزرسانی
+                        </button>
+                    </div>
                 </h2>
                 <p style="color: #c7d2fe; margin-bottom: 20px; font-size: 15px;">
                     لیست تمام مدل‌هایی که در سیستم ساخته شده‌اند. می‌توانید ویرایش، حذف، یا تغییر دسترسی دهید.
@@ -1671,6 +1676,31 @@
             } catch (error) {
                 console.error('Error deleting model:', error);
                 showNotification('خطا در حذف مدل: ' + error.message, 'error');
+            }
+        }
+
+        async function makeAllModelsPublic() {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید همه مدل‌ها را عمومی کنید؟\nاین عمل همه مدل‌های خصوصی را برای همه کاربران قابل مشاهده می‌کند.')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models/make-all-public', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`✅ ${data.count} مدل با موفقیت عمومی شدند!`, 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Update failed');
+                }
+            } catch (error) {
+                console.error('Error making models public:', error);
+                showNotification('خطا در تغییر دسترسی مدل‌ها: ' + error.message, 'error');
             }
         }
 
