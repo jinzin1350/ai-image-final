@@ -2805,15 +2805,20 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
 
     } else if (mode === 'scene-recreation') {
       // SCENE RECREATION MODE: Recreate a photo with model wearing garment in same scene
-      prompt = `Create a photorealistic fashion photo that RECREATES the scene, lighting, composition, and atmosphere from the reference photo, but with the specified model wearing the specified garment.
+      prompt = `Create a photorealistic fashion photo that RECREATES the scene, lighting, composition, and atmosphere from the reference photo, but with a DIFFERENT PERSON (the specified model) wearing the specified garment.
 
 IMAGES PROVIDED:
-- Image 1: REFERENCE PHOTO - the scene/environment/lighting/composition to recreate
+- Image 1: REFERENCE PHOTO - ONLY use this for the scene/environment/lighting/composition - DO NOT use the people in this photo
 - Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: Garment/clothing to wear
-- Image ${garments.length + 2}: Model (person)
+- Image ${garments.length + 2}: MODEL - USE THIS PERSON'S FACE AND BODY, not the person from the reference photo
+
+⚠️ CRITICAL: The reference photo is ONLY for the environment, lighting, and composition. You MUST use the MODEL from Image ${garments.length + 2} for the person's face, body, and appearance.
 
 TASK:
-Recreate the EXACT scene from the reference photo, but replace any people in the reference with the specified model wearing ${garmentDescription}.
+1. Copy the scene, environment, background, lighting, and composition from the REFERENCE PHOTO (Image 1)
+2. Place the MODEL (from Image ${garments.length + 2}) in that scene - use their EXACT face and body
+3. Make the MODEL wear ${garmentDescription}
+4. If there's a person in the reference photo, copy their POSE and POSITION, but use the MODEL'S face and body, NOT the reference person's face/body
 
 AI SCENE ANALYSIS:
 The reference photo has been analyzed by AI with these findings:
@@ -2833,16 +2838,21 @@ KEY REQUIREMENTS - SCENE RECREATION:
    - Replicate the composition, framing, and camera angle
    - Preserve the color palette and overall visual style
 
-2. **People Handling**:
+2. **Use the CORRECT PERSON - EXTREMELY IMPORTANT**:
+   ⚠️ The person in the final image MUST be the MODEL from Image ${garments.length + 2}
+   - Use the MODEL'S EXACT face - facial features, eyes, nose, mouth, skin tone
+   - Use the MODEL'S EXACT body type, height, and build
+   - DO NOT use the face or body of any person from the reference photo
+   - If reference has a person: Copy their POSE only, but the face/body must be the MODEL
    - If reference has NO people: Place the model naturally in the scene
-   - If reference has ONE person: Replace that person with the model
-   - If reference has MULTIPLE people: Replace the main/central person with the model, keep others OR recreate the group dynamic with the model in a similar pose/position
+   - Think: "What if THIS specific model was photographed in THAT specific scene?"
 
 3. **Model Integration**:
-   - Use the provided model image for the person's appearance
-   - Match the pose and body language from reference photo (if person present)
-   - Keep model's face and body features EXACTLY as shown in model image
+   - The final photo must show the MODEL from Image ${garments.length + 2}, NOT any person from the reference
+   - Copy pose and positioning from reference person (if present), but use MODEL's appearance
+   - Keep model's face and body features EXACTLY as shown in the model image
    - Model should wear ${garmentDescription}
+   - The person must be recognizable as the MODEL, not the reference person
 
 4. **Garment Accuracy**:
    - Garment should fit naturally with realistic wrinkles and fabric draping
@@ -2859,6 +2869,9 @@ KEY REQUIREMENTS - SCENE RECREATION:
    - Make it look like a real photo taken in that actual location
 
 DO NOT:
+- ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo
+- ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference
+- ❌ The person must be the MODEL from Image ${garments.length + 2}, not the reference person
 - Change the scene, location, or environment from the reference
 - Alter the lighting mood or atmosphere
 - Change the camera angle or composition significantly
@@ -2868,7 +2881,14 @@ DO NOT:
 - Simplify or omit garment details
 - Over-smooth skin or create plastic-looking results
 
-The goal is to create a NEW photo that looks like it was taken in the SAME place, at the SAME time, with the SAME camera and lighting - but featuring the specified model wearing the specified garment.`;
+EXAMPLE TO CLARIFY:
+- Reference photo (Image 1): Shows a blonde woman in a park wearing a red dress
+- Model (Image ${garments.length + 2}): Shows a brunette woman with different face
+- Garment (Image 2): Shows a blue dress
+- CORRECT OUTPUT: The brunette woman from the MODEL image, wearing the blue dress, photographed in the same park with same lighting
+- WRONG OUTPUT: The blonde woman from reference wearing the blue dress
+
+The goal: Place the MODEL (Image ${garments.length + 2}) in the SCENE (Image 1) wearing the GARMENT (Image 2). The person's face and body must match the MODEL, not the reference.`;
     }
 
     console.log('🎯 Mode:', mode);
