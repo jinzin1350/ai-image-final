@@ -204,6 +204,43 @@
                             💡 دسته‌بندی کمک می‌کند تا مدل در بخش مناسب ذخیره شود
                         </small>
                     </div>
+
+                    <!-- انتخاب سن دقیق مدل -->
+                    <div style="margin-top: 20px; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 2px solid #10b981;">
+                        <label for="modelAgeSlider" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #047857;">
+                            🎂 سن مدل: <span id="modelAgeValue" style="color: #10b981; font-size: 18px;">25</span> ساله
+                        </label>
+                        <input type="range" id="modelAgeSlider" min="3" max="80" value="25"
+                               style="width: 100%; height: 8px; border-radius: 5px; background: #d1fae5; outline: none; cursor: pointer; accent-color: #10b981;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #065f46; margin-top: 5px;">
+                            <span>3 سال</span>
+                            <span>80 سال</span>
+                        </div>
+                        <small style="color: #065f46; display: block; margin-top: 8px;">
+                            💡 سن دقیق به AI کمک می‌کند ویژگی‌های صورت و بدن متناسب با سن را بسازد
+                        </small>
+                    </div>
+
+                    <!-- انتخاب قومیت مدل -->
+                    <div style="margin-top: 20px; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 2px solid #10b981;">
+                        <label for="modelEthnicitySelect" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #047857;">
+                            🌍 قومیت / Ethnicity
+                        </label>
+                        <select id="modelEthnicitySelect" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; background: white;">
+                            <option value="iranian">🇮🇷 ایرانی (Iranian)</option>
+                            <option value="turkmen">🇹🇲 ترکمن (Turkmen)</option>
+                            <option value="tajik">🇹🇯 تاجیک (Tajik)</option>
+                            <option value="iraqi">🇮🇶 عراقی (Iraqi)</option>
+                            <option value="arab">🇸🇦 عرب (Arab)</option>
+                            <option value="afghan">🇦🇫 افغان (Afghan)</option>
+                            <option value="kurdish">کُرد (Kurdish)</option>
+                            <option value="azari">آذری (Azari)</option>
+                            <option value="balochi">بلوچ (Balochi)</option>
+                        </select>
+                        <small style="color: #065f46; display: block; margin-top: 8px;">
+                            💡 انتخاب قومیت به AI کمک می‌کند ویژگی‌های ظاهری صحیح (رنگ پوست، فرم صورت، ویژگی‌های قومی) را تولید کند
+                        </small>
+                    </div>
                 </div>
             </div>
 
@@ -1023,6 +1060,31 @@
         let selectedUserId = null;
         let generatedImageData = null;
 
+        // Age and Ethnicity Settings
+        let selectedModelAge = 25;
+        let selectedModelEthnicity = 'iranian';
+
+        // Age slider functionality
+        const modelAgeSlider = document.getElementById('modelAgeSlider');
+        const modelAgeValue = document.getElementById('modelAgeValue');
+
+        modelAgeSlider.addEventListener('input', (e) => {
+            modelAgeValue.textContent = e.target.value;
+        });
+
+        modelAgeSlider.addEventListener('change', (e) => {
+            selectedModelAge = parseInt(e.target.value);
+            console.log('Selected model age:', selectedModelAge);
+        });
+
+        // Ethnicity selector functionality
+        const modelEthnicitySelect = document.getElementById('modelEthnicitySelect');
+
+        modelEthnicitySelect.addEventListener('change', (e) => {
+            selectedModelEthnicity = e.target.value;
+            console.log('Selected model ethnicity:', selectedModelEthnicity);
+        });
+
         // Load users on page load
         async function loadUsers() {
             try {
@@ -1170,8 +1232,9 @@
         function buildModelPrompt() {
             // Basic info
             const gender = document.getElementById('modelGender').value;
-            const age = document.getElementById('modelAge').value;
-            const ethnicity = document.getElementById('modelEthnicity').value;
+            // Use the new slider and selector values instead of old form fields
+            const age = selectedModelAge; // From age slider
+            const ethnicity = selectedModelEthnicity; // From ethnicity selector
 
             // Face
             const faceShape = document.getElementById('faceShape').value;
