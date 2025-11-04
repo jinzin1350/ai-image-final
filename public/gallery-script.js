@@ -6,6 +6,10 @@ let supabaseClient = null;
 let allImages = [];
 let currentImage = null;
 let currentView = 'grid';
+let currentPage = 1;
+let itemsPerPage = 30;
+let totalPages = 0;
+let totalCount = 0;
 
 // Fetch Supabase config from server
 async function initSupabase() {
@@ -70,6 +74,16 @@ function setupEventListeners() {
         });
     });
 
+    // Items per page selector
+    const itemsPerPageSelect = document.getElementById('itemsPerPageSelect');
+    if (itemsPerPageSelect) {
+        itemsPerPageSelect.addEventListener('change', (e) => {
+            itemsPerPage = parseInt(e.target.value);
+            currentPage = 1; // Reset to first page
+            loadImages();
+        });
+    }
+
     // Close modal on escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -100,8 +114,8 @@ async function loadImages() {
             return;
         }
 
-        // Fetch user-specific images from backend API
-        const response = await fetch('/api/user/gallery', {
+        // Fetch user-specific images from backend API with pagination
+        const response = await fetch(`/api/user/gallery?page=${currentPage}&limit=${itemsPerPage}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -115,6 +129,8 @@ async function loadImages() {
         }
 
         allImages = result.images || [];
+        totalCount = result.totalCount || 0;
+        totalPages = result.totalPages || 0;
 
         // Show admin badge if user is admin
         if (result.isAdmin) {
@@ -131,12 +147,14 @@ async function loadImages() {
 
         loadingState.style.display = 'none';
 
-        if (allImages.length === 0) {
+        if (allImages.length === 0 && currentPage === 1) {
             emptyState.style.display = 'block';
+            document.getElementById('paginationContainer').style.display = 'none';
         } else {
             galleryGrid.style.display = 'grid';
             renderGallery();
             updateStats();
+            renderPagination();
         }
     } catch (error) {
         console.error('Error loading images:', error);
@@ -233,26 +251,7 @@ function filterImages(searchTerm) {
     });
 }
 
-// Update Stats
-function updateStats() {
-    const totalCount = allImages.length;
-    const today = new Date();
-    const todayCount = allImages.filter(img => {
-        const imgDate = new Date(img.created_at);
-        return imgDate.toDateString() === today.toDateString();
-    }).length;
-
-    const thisMonth = today.getMonth();
-    const thisYear = today.getFullYear();
-    const thisMonthCount = allImages.filter(img => {
-        const imgDate = new Date(img.created_at);
-        return imgDate.getMonth() === thisMonth && imgDate.getFullYear() === thisYear;
-    }).length;
-
-    document.getElementById('totalImagesCount').textContent = totalCount.toLocaleString('fa-IR');
-    document.getElementById('thisMonthCount').textContent = thisMonthCount.toLocaleString('fa-IR');
-    document.getElementById('todayCount').textContent = todayCount.toLocaleString('fa-IR');
-}
+// This updateStats function is now at the bottom of the file to avoid duplication
 
 // Open Modal
 function openModal(index) {
@@ -838,8 +837,181 @@ style.textContent = `
         color: #718096;
         margin-bottom: 24px;
     }
+
+    /* Pagination Styles */
+    .pagination-btn {
+        padding: 10px 16px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: #4a5568;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: 'Vazirmatn', sans-serif;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+        border-color: #667eea;
+        background: #f7fafc;
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+
+    .pagination-btn.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f7fafc;
+    }
+
+    .pagination-dots {
+        padding: 10px 8px;
+        color: #a0aec0;
+        font-weight: bold;
+    }
 `;
 document.head.appendChild(style);
 
+// Render Pagination Controls
+function renderPagination() {
+    const paginationContainer = document.getElementById('paginationContainer');
+
+    if (!paginationContainer) {
+        console.warn('Pagination container not found');
+        return;
+    }
+
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+
+    paginationContainer.style.display = 'flex';
+
+    // Calculate page range to show
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    // Adjust if we're at the end
+    if (endPage - startPage + 1 < maxPagesToShow) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    let paginationHTML = '';
+
+    // Previous button
+    paginationHTML += `
+        <button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}"
+                onclick="goToPage(${currentPage - 1})"
+                ${currentPage === 1 ? 'disabled' : ''}>
+            « قبلی
+        </button>
+    `;
+
+    // First page
+    if (startPage > 1) {
+        paginationHTML += `
+            <button class="pagination-btn" onclick="goToPage(1)">1</button>
+        `;
+        if (startPage > 2) {
+            paginationHTML += `<span class="pagination-dots">...</span>`;
+        }
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <button class="pagination-btn ${i === currentPage ? 'active' : ''}"
+                    onclick="goToPage(${i})">
+                ${i.toLocaleString('fa-IR')}
+            </button>
+        `;
+    }
+
+    // Last page
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `<span class="pagination-dots">...</span>`;
+        }
+        paginationHTML += `
+            <button class="pagination-btn" onclick="goToPage(${totalPages})">
+                ${totalPages.toLocaleString('fa-IR')}
+            </button>
+        `;
+    }
+
+    // Next button
+    paginationHTML += `
+        <button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}"
+                onclick="goToPage(${currentPage + 1})"
+                ${currentPage === totalPages ? 'disabled' : ''}>
+            بعدی »
+        </button>
+    `;
+
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+// Go to specific page
+function goToPage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+
+    currentPage = page;
+    loadImages();
+
+    // Scroll to top of gallery
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Update Stats to use totalCount
+function updateStats() {
+    const displayCount = totalCount > 0 ? totalCount : allImages.length;
+
+    // Update total count
+    document.getElementById('totalImagesCount').textContent = displayCount.toLocaleString('fa-IR');
+
+    // Calculate today and this month counts from current page images (approximation)
+    const today = new Date();
+    const todayCount = allImages.filter(img => {
+        const imgDate = new Date(img.created_at);
+        return imgDate.toDateString() === today.toDateString();
+    }).length;
+
+    const thisMonth = today.getMonth();
+    const thisYear = today.getFullYear();
+    const thisMonthCount = allImages.filter(img => {
+        const imgDate = new Date(img.created_at);
+        return imgDate.getMonth() === thisMonth && imgDate.getFullYear() === thisYear;
+    }).length;
+
+    // Update stats (note: monthly/daily are approximate from current page)
+    const monthElement = document.getElementById('thisMonthCount');
+    const todayElement = document.getElementById('todayCount');
+
+    if (monthElement) monthElement.textContent = thisMonthCount.toLocaleString('fa-IR');
+    if (todayElement) todayElement.textContent = todayCount.toLocaleString('fa-IR');
+
+    // Show pagination info
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, totalCount);
+
+    if (totalCount > itemsPerPage) {
+        const paginationInfo = document.getElementById('paginationInfo');
+        if (paginationInfo) {
+            paginationInfo.textContent = `نمایش ${startIndex.toLocaleString('fa-IR')} - ${endIndex.toLocaleString('fa-IR')} از ${totalCount.toLocaleString('fa-IR')}`;
+            paginationInfo.style.display = 'block';
+        }
+    }
+}
+
 console.log('🎨 صفحه گالری آماده است!');
-console.log('✨ تمام قابلیت‌های تعاملی فعال شدند');
+console.log('✨ تمام قابلیت‌های تعاملی فعال شدند!');

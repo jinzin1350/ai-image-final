@@ -2530,41 +2530,67 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
   }
 });
 
-// Get user-specific gallery images (with admin override)
+// Get user-specific gallery images (with admin override and pagination)
 app.get('/api/user/gallery', authenticateUser, async (req, res) => {
   try {
     if (!supabase) {
-      return res.json({ success: true, images: [] });
+      return res.json({ success: true, images: [], totalCount: 0, totalPages: 0 });
     }
 
     const userId = req.user.id;
     const userEmail = req.user.email;
 
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 30;
+    const offset = (page - 1) * limit;
+
     // Admin user email - can see ALL images
     const ADMIN_EMAIL = 'engi.alireza@gmail.com';
 
-    let query = supabase
+    // First, get total count
+    let countQuery = supabase
       .from('generated_images')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*', { count: 'exact', head: true });
 
     // If user is NOT admin, filter by user_id
     if (userEmail !== ADMIN_EMAIL) {
-      query = query.eq('user_id', userId);
-      console.log(`📸 Fetching gallery for user: ${userEmail} (ID: ${userId})`);
-    } else {
-      console.log(`👑 Admin user ${userEmail} - fetching ALL images`);
+      countQuery = countQuery.eq('user_id', userId);
     }
 
-    const { data, error } = await query;
+    const { count: totalCount, error: countError } = await countQuery;
+
+    if (countError) throw countError;
+
+    // Then get paginated data
+    let dataQuery = supabase
+      .from('generated_images')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    // If user is NOT admin, filter by user_id
+    if (userEmail !== ADMIN_EMAIL) {
+      dataQuery = dataQuery.eq('user_id', userId);
+      console.log(`📸 Fetching gallery page ${page} for user: ${userEmail} (limit: ${limit})`);
+    } else {
+      console.log(`👑 Admin user ${userEmail} - fetching ALL images page ${page} (limit: ${limit})`);
+    }
+
+    const { data, error } = await dataQuery;
 
     if (error) throw error;
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     res.json({
       success: true,
       images: data || [],
       isAdmin: userEmail === ADMIN_EMAIL,
-      totalCount: data?.length || 0
+      totalCount: totalCount || 0,
+      currentPage: page,
+      totalPages: totalPages,
+      itemsPerPage: limit
     });
   } catch (error) {
     console.error('Error fetching user gallery:', error);
