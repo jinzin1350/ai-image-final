@@ -866,6 +866,87 @@
             </div>
 
         </div>
+
+        <!-- Models Management Section -->
+        <div class="studio-card" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); margin-top: 40px;">
+            <div class="studio-card-inner">
+                <h2 style="margin-bottom: 20px; color: #eef2ff; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📋 مدیریت مدل‌های ساخته شده</span>
+                    <button onclick="loadAllModels()" style="background: #eef2ff; color: #4f46e5; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        🔄 به‌روزرسانی
+                    </button>
+                </h2>
+                <p style="color: #c7d2fe; margin-bottom: 20px; font-size: 15px;">
+                    لیست تمام مدل‌هایی که در سیستم ساخته شده‌اند. می‌توانید ویرایش، حذف، یا تغییر دسترسی دهید.
+                </p>
+
+                <!-- Filter and Search -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس کاربر:</label>
+                        <select id="filterByUser" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه کاربران</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس دسته:</label>
+                        <select id="filterByCategory" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه دسته‌ها</option>
+                            <option value="woman">👩 زن</option>
+                            <option value="man">👨 مرد</option>
+                            <option value="girl">👧 دختر</option>
+                            <option value="boy">👦 پسر</option>
+                            <option value="child">👶 کودک</option>
+                            <option value="couple">💑 زوج</option>
+                            <option value="group">👥 گروه</option>
+                            <option value="elderly">👴 سالمند</option>
+                            <option value="teen">🧑 نوجوان</option>
+                            <option value="plus-size">➕ سایز بزرگ</option>
+                            <option value="accessory">💍 اکسسوری</option>
+                            <option value="underwear">👙 لباس زیر</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس دسترسی:</label>
+                        <select id="filterByVisibility" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه</option>
+                            <option value="public">🌍 عمومی</option>
+                            <option value="private">🔒 خصوصی</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Models Table -->
+                <div id="modelsTableContainer" style="background: white; border-radius: 12px; padding: 20px; max-height: 600px; overflow-y: auto;">
+                    <div id="modelsTableLoading" style="text-align: center; padding: 40px; color: #6b7280;">
+                        ⏳ در حال بارگذاری مدل‌ها...
+                    </div>
+                    <div id="modelsTableContent" style="display: none;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تصویر</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">نام</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسته</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">کاربر</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسترسی</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تاریخ</th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151;">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modelsTableBody">
+                                <!-- Models will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="modelsTableEmpty" style="display: none; text-align: center; padding: 40px; color: #9ca3af;">
+                        <p style="font-size: 18px; margin-bottom: 10px;">📭</p>
+                        <p>هیچ مدلی یافت نشد</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script src="/admin-menu.js"></script>
@@ -1324,8 +1405,203 @@
             showNotification('عکس آپلود شده حذف شد', 'success');
         }
 
-        // Load users on page load
+        // Models Management Functions
+        let allModels = [];
+        let filteredModels = [];
+
+        async function loadAllModels() {
+            const loading = document.getElementById('modelsTableLoading');
+            const content = document.getElementById('modelsTableContent');
+            const empty = document.getElementById('modelsTableEmpty');
+
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            empty.style.display = 'none';
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models');
+                const data = await response.json();
+
+                if (data.success) {
+                    allModels = data.models || [];
+                    filteredModels = allModels;
+
+                    // Populate user filter dropdown
+                    const filterByUser = document.getElementById('filterByUser');
+                    const uniqueUsers = [...new Set(allModels.map(m => m.user_email))];
+                    filterByUser.innerHTML = '<option value="">همه کاربران</option>' +
+                        uniqueUsers.map(email => `<option value="${email}">${email}</option>`).join('');
+
+                    renderModelsTable();
+                } else {
+                    throw new Error(data.error || 'Failed to load models');
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                showNotification('خطا در بارگذاری مدل‌ها: ' + error.message, 'error');
+                loading.style.display = 'none';
+            }
+        }
+
+        function filterModels() {
+            const filterUser = document.getElementById('filterByUser').value;
+            const filterCategory = document.getElementById('filterByCategory').value;
+            const filterVisibility = document.getElementById('filterByVisibility').value;
+
+            filteredModels = allModels.filter(model => {
+                if (filterUser && model.user_email !== filterUser) return false;
+                if (filterCategory && model.category !== filterCategory) return false;
+                if (filterVisibility && model.visibility !== filterVisibility) return false;
+                return true;
+            });
+
+            renderModelsTable();
+        }
+
+        function renderModelsTable() {
+            const loading = document.getElementById('modelsTableLoading');
+            const content = document.getElementById('modelsTableContent');
+            const empty = document.getElementById('modelsTableEmpty');
+            const tbody = document.getElementById('modelsTableBody');
+
+            loading.style.display = 'none';
+
+            if (filteredModels.length === 0) {
+                content.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            content.style.display = 'block';
+            empty.style.display = 'none';
+
+            const categoryEmojis = {
+                'woman': '👩', 'man': '👨', 'girl': '👧', 'boy': '👦',
+                'child': '👶', 'couple': '💑', 'group': '👥', 'elderly': '👴',
+                'teen': '🧑', 'plus-size': '➕', 'accessory': '💍', 'underwear': '👙'
+            };
+
+            tbody.innerHTML = filteredModels.map(model => `
+                <tr style="border-bottom: 1px solid #e5e7eb; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <td style="padding: 12px;">
+                        <img src="${model.image_url}" alt="${model.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    </td>
+                    <td style="padding: 12px; font-weight: 500; color: #1f2937;">
+                        ${model.name || 'بدون نام'}
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: #f3f4f6; padding: 4px 8px; border-radius: 6px; font-size: 13px;">
+                            ${categoryEmojis[model.category] || '❓'} ${model.category}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; color: #6b7280; font-size: 14px;">
+                        ${model.user_email}
+                        ${model.is_premium ? '<span style="color: #f59e0b;">⭐</span>' : ''}
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: ${model.visibility === 'public' ? '#dcfce7' : '#fee2e2'}; color: ${model.visibility === 'public' ? '#166534' : '#991b1b'}; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                            ${model.visibility === 'public' ? '🌍 عمومی' : '🔒 خصوصی'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; color: #9ca3af; font-size: 13px;">
+                        ${new Date(model.created_at).toLocaleDateString('fa-IR')}
+                    </td>
+                    <td style="padding: 12px; text-align: center;">
+                        <button onclick="editModel(${model.id})" style="background: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; margin-left: 5px; font-size: 13px;">
+                            ✏️ ویرایش
+                        </button>
+                        <button onclick="deleteModel(${model.id})" style="background: #ef4444; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                            🗑️ حذف
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function editModel(modelId) {
+            const model = allModels.find(m => m.id === modelId);
+            if (!model) return;
+
+            // Show edit modal/prompt
+            const newName = prompt('نام جدید مدل:', model.name);
+            if (newName === null) return; // User cancelled
+
+            const newVisibility = confirm('آیا می‌خواهید این مدل برای همه قابل دسترسی باشد؟\nOK = عمومی | Cancel = خصوصی')
+                ? 'public' : 'private';
+
+            const newCategory = prompt('دسته جدید (woman, man, girl, boy, child, couple, group, elderly, teen, plus-size, accessory, underwear):', model.category);
+            if (newCategory === null) return; // User cancelled
+
+            // Ask if want to change user assignment
+            const changeUser = confirm('آیا می‌خواهید کاربر مالک را تغییر دهید?');
+            let newUserId = model.user_id;
+
+            if (changeUser) {
+                const userEmail = prompt('ایمیل کاربر جدید را وارد کنید:', model.user_email);
+                if (userEmail) {
+                    const user = allUsers.find(u => u.email === userEmail);
+                    if (user) {
+                        newUserId = user.user_id;
+                    } else {
+                        showNotification('کاربر با این ایمیل یافت نشد', 'error');
+                        return;
+                    }
+                }
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models/' + modelId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: newName,
+                        category: newCategory,
+                        visibility: newVisibility,
+                        user_id: newUserId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('مدل با موفقیت ویرایش شد', 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Update failed');
+                }
+            } catch (error) {
+                console.error('Error updating model:', error);
+                showNotification('خطا در ویرایش مدل: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteModel(modelId) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟\nاین عمل غیرقابل بازگشت است!')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models/' + modelId, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('مدل با موفقیت حذف شد', 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Delete failed');
+                }
+            } catch (error) {
+                console.error('Error deleting model:', error);
+                showNotification('خطا در حذف مدل: ' + error.message, 'error');
+            }
+        }
+
+        // Load users and models on page load
         loadUsers();
+        loadAllModels();
     </script>
 </body>
 </html>

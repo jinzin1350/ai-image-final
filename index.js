@@ -902,6 +902,120 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
   }
 });
 
+// Get all models with user information (for admin model management)
+app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
+  try {
+    const { data: models, error } = await supabaseAdmin
+      .from('content_library')
+      .select(`
+        id,
+        name,
+        category,
+        visibility,
+        image_url,
+        created_at,
+        owner_user_id,
+        users!content_library_owner_user_id_fkey (
+          email,
+          is_premium
+        )
+      `)
+      .eq('content_type', 'model')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Format the response
+    const formattedModels = models.map(model => ({
+      id: model.id,
+      name: model.name,
+      category: model.category,
+      visibility: model.visibility,
+      image_url: model.image_url,
+      created_at: model.created_at,
+      user_id: model.owner_user_id,
+      user_email: model.users?.email || 'Unknown',
+      is_premium: model.users?.is_premium || false
+    }));
+
+    res.json({ success: true, models: formattedModels });
+  } catch (error) {
+    console.error('Error fetching models:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update a model (name, category, visibility, owner)
+app.put('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { name, category, visibility, user_id } = req.body;
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (category !== undefined) updateData.category = category;
+    if (visibility !== undefined) updateData.visibility = visibility;
+    if (user_id !== undefined) updateData.owner_user_id = user_id;
+    updateData.updated_at = new Date().toISOString();
+
+    const { data: model, error } = await supabaseAdmin
+      .from('content_library')
+      .update(updateData)
+      .eq('id', modelId)
+      .eq('content_type', 'model')
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Updated model ${modelId}:`, updateData);
+    res.json({ success: true, model });
+  } catch (error) {
+    console.error('Error updating model:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete a model
+app.delete('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
+  try {
+    const { modelId } = req.params;
+
+    // First get the model to find the storage path for cleanup
+    const { data: model, error: fetchError } = await supabaseAdmin
+      .from('content_library')
+      .select('storage_path, image_url')
+      .eq('id', modelId)
+      .eq('content_type', 'model')
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete from database
+    const { error: deleteError } = await supabaseAdmin
+      .from('content_library')
+      .delete()
+      .eq('id', modelId)
+      .eq('content_type', 'model');
+
+    if (deleteError) throw deleteError;
+
+    // Optionally delete from storage (if you want to clean up the files)
+    // Note: Commented out to preserve images in case they're referenced elsewhere
+    // if (model.storage_path) {
+    //   await supabaseAdmin.storage
+    //     .from('admin-content')
+    //     .remove([model.storage_path]);
+    // }
+
+    console.log(`🗑️ Deleted model ${modelId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting model:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get activity logs
 app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
   try {
