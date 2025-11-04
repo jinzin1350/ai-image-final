@@ -79,31 +79,55 @@ function setupEventListeners() {
     });
 }
 
-// Load Images from Supabase
+// Load Images from Supabase (User-specific or All for admin)
 async function loadImages() {
     const loadingState = document.getElementById('loadingState');
     const emptyState = document.getElementById('emptyState');
     const galleryGrid = document.getElementById('galleryGrid');
-
-    if (!supabaseClient) {
-        showError('اتصال به دیتابیس برقرار نیست');
-        return;
-    }
 
     try {
         loadingState.style.display = 'block';
         emptyState.style.display = 'none';
         galleryGrid.style.display = 'none';
 
-        // Fetch images from Supabase
-        const { data, error } = await supabaseClient
-            .from('generated_images')
-            .select('*')
-            .order('created_at', { ascending: false });
+        // Get auth token
+        const token = localStorage.getItem('supabase_token');
+        if (!token) {
+            showError('لطفاً ابتدا وارد حساب کاربری خود شوید');
+            setTimeout(() => {
+                window.location.href = '/auth';
+            }, 2000);
+            return;
+        }
 
-        if (error) throw error;
+        // Fetch user-specific images from backend API
+        const response = await fetch('/api/user/gallery', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
 
-        allImages = data || [];
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'خطا در بارگذاری گالری');
+        }
+
+        allImages = result.images || [];
+
+        // Show admin badge if user is admin
+        if (result.isAdmin) {
+            console.log('👑 Admin mode - showing all user images');
+            const header = document.querySelector('header h1');
+            if (header && !header.querySelector('.admin-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'admin-badge';
+                badge.textContent = '👑 Admin';
+                badge.style.cssText = 'background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-right: 10px; font-weight: bold;';
+                header.appendChild(badge);
+            }
+        }
 
         loadingState.style.display = 'none';
 
@@ -646,12 +670,26 @@ async function confirmDelete() {
     if (!currentImage) return;
 
     try {
-        const { error } = await supabaseClient
-            .from('generated_images')
-            .delete()
-            .eq('id', currentImage.id);
+        // Get auth token
+        const token = localStorage.getItem('supabase_token');
+        if (!token) {
+            showNotification('لطفاً ابتدا وارد حساب کاربری خود شوید', 'error');
+            return;
+        }
 
-        if (error) throw error;
+        // Use backend API to delete (ensures user can only delete their own images)
+        const response = await fetch(`/api/generations/${currentImage.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'خطا در حذف تصویر');
+        }
 
         showNotification('تصویر با موفقیت حذف شد', 'success');
         closeDeleteModal();

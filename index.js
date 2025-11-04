@@ -2484,27 +2484,94 @@ app.get('/api/generations', authenticateUser, async (req, res) => {
   }
 });
 
-// حذف یک تصویر
+// حذف یک تصویر (user can only delete their own images, unless admin)
 app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id;
+    const userEmail = req.user.email;
 
     if (!supabase) {
       return res.status(500).json({ error: 'Supabase تنظیم نشده است' });
     }
 
-    // حذف از database
-    const { error } = await supabase
+    const ADMIN_EMAIL = 'engi.alireza@gmail.com';
+
+    // If user is admin, they can delete any image
+    let deleteQuery = supabase
       .from('generated_images')
       .delete()
       .eq('id', id);
 
+    // If NOT admin, ensure they can only delete their own images
+    if (userEmail !== ADMIN_EMAIL) {
+      deleteQuery = deleteQuery.eq('user_id', userId);
+      console.log(`🗑️ User ${userEmail} deleting their own image: ${id}`);
+    } else {
+      console.log(`👑 Admin ${userEmail} deleting image: ${id}`);
+    }
+
+    const { error, count } = await deleteQuery;
+
     if (error) throw error;
+
+    // Check if image was actually deleted (returns 0 if user tried to delete someone else's image)
+    if (count === 0) {
+      return res.status(403).json({
+        success: false,
+        error: 'شما مجاز به حذف این تصویر نیستید'
+      });
+    }
 
     res.json({ success: true, message: 'تصویر با موفقیت حذف شد' });
   } catch (error) {
     console.error('خطا در حذف تصویر:', error);
-    res.status(500).json({ error: 'خطا در حذف تصویر' });
+    res.status(500).json({ success: false, error: 'خطا در حذف تصویر' });
+  }
+});
+
+// Get user-specific gallery images (with admin override)
+app.get('/api/user/gallery', authenticateUser, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, images: [] });
+    }
+
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+
+    // Admin user email - can see ALL images
+    const ADMIN_EMAIL = 'engi.alireza@gmail.com';
+
+    let query = supabase
+      .from('generated_images')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    // If user is NOT admin, filter by user_id
+    if (userEmail !== ADMIN_EMAIL) {
+      query = query.eq('user_id', userId);
+      console.log(`📸 Fetching gallery for user: ${userEmail} (ID: ${userId})`);
+    } else {
+      console.log(`👑 Admin user ${userEmail} - fetching ALL images`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      images: data || [],
+      isAdmin: userEmail === ADMIN_EMAIL,
+      totalCount: data?.length || 0
+    });
+  } catch (error) {
+    console.error('Error fetching user gallery:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطا در بارگذاری گالری'
+    });
   }
 });
 
