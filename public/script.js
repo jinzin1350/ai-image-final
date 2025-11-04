@@ -178,7 +178,7 @@ categorySelect.addEventListener('change', (e) => {
 });
 
 // بارگذاری پس‌زمینه‌ها
-async function loadBackgrounds() {
+async function loadBackgrounds(mode = 'complete-outfit') {
     try {
         // Get auth token from localStorage if user is logged in
         const token = localStorage.getItem('supabase_token');
@@ -187,7 +187,8 @@ async function loadBackgrounds() {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch('/api/backgrounds', { headers });
+        // Add mode parameter to fetch appropriate backgrounds
+        const response = await fetch(`/api/backgrounds?mode=${mode}`, { headers });
         const backgrounds = await response.json();
 
         backgroundsGrid.innerHTML = backgrounds.map(bg => `
@@ -763,6 +764,15 @@ function switchMode(mode) {
     if (mode !== 'complete-outfit') {
         selectedHijabType = null;
     }
+
+    // Reload backgrounds with mode-specific list
+    loadBackgrounds(mode);
+
+    // Reset background selection
+    selectedBackgroundId = null;
+    document.querySelectorAll('.background-card').forEach(card => {
+        card.classList.remove('selected');
+    });
 
     checkGenerateButton();
 }

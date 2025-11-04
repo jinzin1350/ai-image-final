@@ -1214,6 +1214,33 @@ const backgrounds = [
   { id: 'alley-charming-brick', name: 'کوچه آجری جذاب', description: 'Charming narrow brick alley with character, vintage urban feel, natural daylight, authentic street photography aesthetic', image: 'https://trrjixlshamhuhlcevtx.supabase.co/storage/v1/object/public/admin-content/30.jpg?w=800&h=600&fit=crop' }
 ];
 
+// Product Photography Backgrounds (for color-collection and flat-lay modes)
+const productBackgrounds = [
+  // Pure Studio Backgrounds
+  { id: 'pure-white', name: 'سفید خالص', description: 'Pure white seamless background, 100% white RGB(255,255,255), infinity wall, professional e-commerce product photography, clean and minimal', image: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&h=600&fit=crop' },
+  { id: 'soft-gray', name: 'خاکستری نرم', description: 'Soft light gray seamless background RGB(240,240,240), neutral studio backdrop, professional product photography, subtle and clean', image: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=800&h=600&fit=crop' },
+  { id: 'off-white-cream', name: 'کرم ملایم', description: 'Off-white cream background with warm undertones, soft beige seamless backdrop, elegant product display, lifestyle product photography', image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop' },
+  { id: 'charcoal-dark', name: 'ذغالی تیره', description: 'Deep charcoal dark background RGB(40,40,40), dramatic product photography, high contrast, luxury product showcase', image: 'https://images.unsplash.com/photo-1557672199-6dec25919530?w=800&h=600&fit=crop' },
+
+  // Textured Surfaces
+  { id: 'marble-white', name: 'مرمر سفید', description: 'White marble surface with subtle gray veining, luxury product display, elegant natural stone texture, high-end e-commerce aesthetic', image: 'https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?w=800&h=600&fit=crop' },
+  { id: 'wood-light', name: 'چوب روشن', description: 'Light natural wood surface, warm oak or maple, clean grain texture, organic product photography, lifestyle aesthetic', image: 'https://images.unsplash.com/photo-1563298723-dcfebaa392e3?w=800&h=600&fit=crop' },
+  { id: 'wood-dark', name: 'چوب تیره', description: 'Dark walnut wood surface, rich brown tones, elegant natural texture, premium product display, sophisticated look', image: 'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=800&h=600&fit=crop' },
+  { id: 'concrete-smooth', name: 'بتن صاف', description: 'Smooth concrete surface, modern industrial aesthetic, neutral gray texture, contemporary product photography, urban minimal style', image: 'https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?w=800&h=600&fit=crop' },
+
+  // Fabric & Soft Textures
+  { id: 'linen-natural', name: 'کتان طبیعی', description: 'Natural linen fabric background, soft beige texture, wrinkled organic look, lifestyle product photography, casual elegant aesthetic', image: 'https://images.unsplash.com/photo-1631889993959-41b4e9c6e3c5?w=800&h=600&fit=crop' },
+  { id: 'cotton-white', name: 'پنبه سفید', description: 'White cotton fabric background, soft textile texture, clean and fresh, casual product display, natural material aesthetic', image: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=800&h=600&fit=crop' },
+  { id: 'velvet-navy', name: 'مخمل سورمه‌ای', description: 'Navy blue velvet fabric, rich deep color, luxurious soft texture, premium product photography, elegant showcase', image: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=800&h=600&fit=crop' },
+  { id: 'silk-champagne', name: 'ابریشم شامپاینی', description: 'Champagne silk fabric, subtle sheen, elegant draping, luxury product display, sophisticated and refined', image: 'https://images.unsplash.com/photo-1618221469555-7f3ad97540d6?w=800&h=600&fit=crop' },
+
+  // Modern Minimal
+  { id: 'pastel-pink', name: 'صورتی پاستل', description: 'Soft pastel pink background, modern minimal aesthetic, gentle blush tone, trendy product photography, feminine elegant look', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop' },
+  { id: 'pastel-blue', name: 'آبی پاستل', description: 'Soft pastel blue background, calm serene color, minimal modern style, clean product display, fresh aesthetic', image: 'https://images.unsplash.com/photo-1614963326505-842a6f39a194?w=800&h=600&fit=crop' },
+  { id: 'sage-green', name: 'سبز مریمی', description: 'Sage green muted background, natural earthy tone, modern botanical aesthetic, organic product photography, calm sophisticated look', image: 'https://images.unsplash.com/photo-1615799278677-e5a3e04f5ae4?w=800&h=600&fit=crop' },
+  { id: 'terracotta', name: 'خاکی تراکوتا', description: 'Terracotta clay background, warm earthy orange-brown, natural material aesthetic, artisanal product display, warm inviting look', image: 'https://images.unsplash.com/photo-1615655096345-61c72c990126?w=800&h=600&fit=crop' }
+];
+
 // لیست حالت‌های بدن (Poses)
 const poses = [
   { id: 'standing-front', name: 'ایستاده رو به جلو', description: 'Standing straight facing camera' },
@@ -1488,7 +1515,17 @@ app.get('/api/models', async (req, res) => {
 // دریافت لیست پس‌زمینه‌ها
 app.get('/api/backgrounds', async (req, res) => {
   try {
-    let allBackgrounds = [...backgrounds]; // Start with hardcoded backgrounds
+    const mode = req.query.mode || 'complete-outfit'; // Get mode from query parameter
+
+    // Select appropriate background list based on mode
+    let baseBackgrounds;
+    if (mode === 'color-collection' || mode === 'flat-lay') {
+      baseBackgrounds = [...productBackgrounds]; // Product photography backgrounds
+    } else {
+      baseBackgrounds = [...backgrounds]; // Regular location backgrounds
+    }
+
+    let allBackgrounds = baseBackgrounds;
 
     // If user is authenticated and Supabase is configured, add their custom backgrounds
     const authHeader = req.headers.authorization;
@@ -1901,7 +1938,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     // Find background (check hardcoded first, then custom from database)
-    let selectedBackground = backgroundId ? backgrounds.find(b => b.id === backgroundId) : null;
+    // Search in both regular and product backgrounds
+    let selectedBackground = backgroundId ?
+      (backgrounds.find(b => b.id === backgroundId) || productBackgrounds.find(b => b.id === backgroundId))
+      : null;
 
     // If not found in hardcoded backgrounds and ID starts with 'custom-', fetch from database
     if (!selectedBackground && backgroundId && backgroundId.startsWith('custom-') && supabase) {
