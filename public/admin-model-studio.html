@@ -144,6 +144,69 @@
                 </select>
             </div>
 
+            <!-- Upload Model Photo Section -->
+            <div class="studio-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <div class="studio-card-inner">
+                    <h2 style="margin-bottom: 20px; color: #047857;">📤 آپلود عکس مدل (اختیاری)</h2>
+                    <p style="color: #065f46; margin-bottom: 20px; font-size: 15px;">
+                        ⚠️ اگر عکس خاصی دارید که می‌خواهید به عنوان مدل استفاده کنید، می‌توانید اینجا آپلود کنید.
+                        <br>در غیر این صورت، مدل با تنظیمات زیر از صفر ساخته می‌شود.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #047857;">
+                                انتخاب عکس مدل:
+                            </label>
+                            <input type="file" id="modelPhotoUpload" accept="image/*"
+                                   style="width: 100%; padding: 12px; border: 2px dashed #10b981; border-radius: 8px; background: #f0fdf4; cursor: pointer; font-size: 14px;">
+                            <small style="color: #065f46; display: block; margin-top: 8px;">
+                                💡 فرمت‌های مجاز: JPG, PNG, WEBP (حداکثر 10MB)
+                            </small>
+                        </div>
+
+                        <div id="uploadedModelPreview" style="display: none; text-align: center;">
+                            <img id="uploadedModelImage" src="" alt="Uploaded Model"
+                                 style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px;">
+                            <button onclick="clearUploadedModel()"
+                                    style="background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                                ❌ حذف عکس
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <p style="color: #92400e; font-size: 14px; margin: 0;">
+                            <strong>⚠️ توجه:</strong> با آپلود عکس، همه تنظیمات پایین (صورت، مو، بدن و...) نادیده گرفته می‌شود
+                            و مدل از همین عکس استفاده می‌کند. فقط تنظیمات ژست، نورپردازی و پس‌زمینه اعمال خواهد شد.
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #047857;">
+                            دسته‌بندی مدل آپلود شده:
+                        </label>
+                        <select id="uploadedModelCategory" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px;">
+                            <option value="woman">👩 زن (Woman)</option>
+                            <option value="man">👨 مرد (Man)</option>
+                            <option value="girl">👧 دختر (Girl)</option>
+                            <option value="boy">👦 پسر (Boy)</option>
+                            <option value="child">👶 کودک (Child)</option>
+                            <option value="couple">💑 زوج (Couple)</option>
+                            <option value="group">👥 گروه (Group)</option>
+                            <option value="elderly">👴 سالمند (Elderly)</option>
+                            <option value="teen">🧑 نوجوان (Teen)</option>
+                            <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                            <option value="accessory">💍 اکسسوری (Accessory)</option>
+                            <option value="underwear">👙 لباس زیر (Underwear)</option>
+                        </select>
+                        <small style="color: #065f46; display: block; margin-top: 8px;">
+                            💡 دسته‌بندی کمک می‌کند تا مدل در بخش مناسب ذخیره شود
+                        </small>
+                    </div>
+                </div>
+            </div>
+
             <!-- Model Studio -->
             <div class="studio-card">
                 <div class="studio-card-inner">
@@ -877,6 +940,28 @@
             generateBtn.textContent = '⏳ در حال تولید...';
 
             try {
+                // Check if user uploaded a model photo
+                if (uploadedModelDataUrl) {
+                    // Use the uploaded photo directly
+                    generatedImageData = {
+                        imageUrl: uploadedModelDataUrl,
+                        prompt: 'User uploaded model photo',
+                        isUploadedPhoto: true
+                    };
+
+                    document.getElementById('generatedImage').src = uploadedModelDataUrl;
+                    document.getElementById('previewSection').style.display = 'block';
+                    document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+                    // Pre-fill the category from the upload section
+                    document.getElementById('saveCategory').value = document.getElementById('uploadedModelCategory').value;
+
+                    showNotification('عکس آپلود شده آماده ذخیره است!', 'success');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '✨ تولید مدل حرفه‌ای';
+                    return;
+                }
+
                 // Build comprehensive prompt from all form fields
                 const prompt = buildModelPrompt();
                 console.log('Generated prompt:', prompt);
@@ -1193,6 +1278,50 @@
             generatedImageData = null;
             document.getElementById('previewSection').style.display = 'none';
             document.getElementById('saveName').value = '';
+        }
+
+        // Handle model photo upload
+        let uploadedModelFile = null;
+        let uploadedModelDataUrl = null;
+
+        document.getElementById('modelPhotoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                showNotification('حجم فایل نباید بیشتر از 10 مگابایت باشد', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showNotification('لطفاً فقط فایل تصویری انتخاب کنید', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            uploadedModelFile = file;
+
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                uploadedModelDataUrl = event.target.result;
+                document.getElementById('uploadedModelImage').src = uploadedModelDataUrl;
+                document.getElementById('uploadedModelPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            showNotification('عکس آپلود شد! این عکس به عنوان مدل استفاده خواهد شد', 'success');
+        });
+
+        function clearUploadedModel() {
+            uploadedModelFile = null;
+            uploadedModelDataUrl = null;
+            document.getElementById('modelPhotoUpload').value = '';
+            document.getElementById('uploadedModelPreview').style.display = 'none';
+            showNotification('عکس آپلود شده حذف شد', 'success');
         }
 
         // Load users on page load
