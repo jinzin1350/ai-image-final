@@ -1814,13 +1814,15 @@ function loadSavedModels() {
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
     const {
-      mode = 'complete-outfit',  // NEW: 'complete-outfit', 'accessories-only', 'underwear'
+      mode = 'complete-outfit',  // NEW: 'complete-outfit', 'accessories-only', 'underwear', 'color-collection'
       garmentPath,      // For backward compatibility (single garment)
       garmentPaths,     // New: array of garment paths
       accessoryPath,    // NEW: For accessories-only mode (product photo)
       accessoryType,    // NEW: Type of accessory (handbag, watch, etc.)
       underwearPath,    // NEW: For underwear mode (product photo)
       underwearType,    // NEW: Type of underwear (bra, panty, etc.)
+      colorVariants,    // NEW: For color-collection mode (array of color variant paths)
+      displayScenario,  // NEW: Display scenario (on-arm, hanging-rack, folded-stack, laid-out)
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
@@ -1861,6 +1863,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     } else if (mode === 'underwear') {
       if (!underwearPath || !underwearType || !modelId || !backgroundId) {
         return res.status(400).json({ error: 'لطفاً تصویر لباس زیر، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
+      }
+    } else if (mode === 'color-collection') {
+      if (!colorVariants || !colorVariants.length || !displayScenario || !backgroundId) {
+        return res.status(400).json({ error: 'لطفاً حداقل یک رنگ، نوع نمایش و پس‌زمینه را انتخاب کنید' });
       }
     }
 
@@ -2010,6 +2016,18 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       modelBase64 = await imageUrlToBase64(selectedModel.image);
 
       garmentDescription = `the ${underwearType} from the first image`;
+      locationDescription = customLocation && customLocation.trim() !== ''
+        ? customLocation.trim()
+        : `${selectedBackground.name} - ${selectedBackground.description}`;
+
+    } else if (mode === 'color-collection') {
+      // For color collection mode, load ALL color variant images (no model needed)
+      garmentBase64Array = await Promise.all(
+        colorVariants.map(path => imageUrlToBase64(path))
+      );
+      modelBase64 = null; // No model needed for color collection display
+
+      garmentDescription = `${colorVariants.length} color variants of the same garment`;
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
@@ -2285,6 +2303,90 @@ DO NOT:
 - Ignore construction details like seams, elastic bands, or straps
 
 Create a professional fashion product photography shot suitable for retail e-commerce - elegant, clean, and showcasing the garment naturally on the model in the style of major fashion retailers.`;
+
+    } else if (mode === 'color-collection') {
+      // COLOR COLLECTION MODE: Multiple color variants display
+
+      const scenarioDescriptions = {
+        'on-arm': {
+          name: 'draped over an arm',
+          details: 'All garments beautifully draped over a person\'s forearm, showing fabric drape and texture. Each color clearly visible, stacked elegantly on the arm like a salesperson showing options to a customer.',
+          positioning: 'Stack the garments on the forearm naturally, with each color variant clearly visible'
+        },
+        'hanging-rack': {
+          name: 'hanging on a clothing rack',
+          details: 'All garments hanging on wooden or metal hangers on a clothing rack, side by side. Retail boutique style with professional lighting.',
+          positioning: 'Hang each color variant on individual hangers, arranged side by side on the rack'
+        },
+        'folded-stack': {
+          name: 'neatly folded and stacked',
+          details: 'All garments folded neatly and stacked on top of each other, with each color visible from the stack. Like in a retail store shelf display.',
+          positioning: 'Stack the folded garments neatly, slightly offset so each color is visible'
+        },
+        'laid-out': {
+          name: 'laid out flat on a surface',
+          details: 'All garments laid flat on a surface side by side or slightly overlapping, showing colors clearly. Top-down or slight angle view.',
+          positioning: 'Arrange garments flat on the surface, side by side or with slight overlap to show all colors'
+        }
+      };
+
+      const scenario = scenarioDescriptions[displayScenario] || scenarioDescriptions['laid-out'];
+
+      prompt = `Create a professional product photography image showing multiple color variants of the same garment ${scenario.name}.
+
+IMAGES PROVIDED:
+${colorVariants.map((_, index) => `- Image ${index + 1}: Garment color variant ${index + 1}`).join('\n')}
+
+TOTAL: ${colorVariants.length} color variants of the SAME garment/product
+
+TASK:
+Generate a professional e-commerce product photo showing ALL ${colorVariants.length} color variants ${scenario.name}.
+${scenario.details}
+
+DISPLAY SCENARIO: ${displayScenario.toUpperCase()}
+${scenario.positioning}
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Lighting: ${selectedLighting.description}
+- Background Blur: ${selectedBgBlur.description}
+- Depth of Field: ${selectedDoF.description}
+- Color Temperature: ${selectedColorTemp.description}
+- Shadow Quality: ${selectedShadow.description}
+
+SCENE & ENVIRONMENT:
+- Location/Background: ${locationDescription}
+- Style: ${selectedStyle.description}
+- Camera Angle: ${selectedCameraAngle.description}
+- Mood: Professional e-commerce product photography
+
+KEY REQUIREMENTS:
+1. Show ALL ${colorVariants.length} garments - each in its exact color from the provided images
+2. ${scenario.positioning}
+3. Each color variant must be clearly visible and distinguishable
+4. Professional retail/e-commerce photography quality
+5. Natural lighting and shadows
+6. Clean, sharp focus on all garments
+7. Maintain exact garment details from each image (style, cut, features)
+8. CRITICAL DETAIL ATTENTION:
+   - Preserve ALL fabric details for each color: stitching, seams, texture
+   - Maintain exact color accuracy for each variant
+   - Show fabric drape and texture naturally for each garment
+   - Keep consistent garment style across all colors
+   - Display any logos, patterns, or decorative elements accurately
+   - Natural wrinkles and fabric physics for each piece
+
+DO NOT:
+- Mix up or change the colors from the provided images
+- Make any color variant look fake or pasted
+- Miss showing any of the ${colorVariants.length} color variants
+- Change the garment style or design between colors
+- Over-smooth or make fabric look artificial
+- Add text, watermarks, or graphics
+- Create unrealistic composites
+
+Generate a professional e-commerce product photo perfect for showcasing the complete color collection - like in online stores or catalogs.`;
     }
 
     console.log('🎯 Mode:', mode);
@@ -2355,6 +2457,20 @@ Create a professional fashion product photography shot suitable for retail e-com
           mimeType: 'image/jpeg'
         }
       });
+
+    } else if (mode === 'color-collection') {
+      // Color Collection mode: Load ALL color variant images
+      garmentBase64Array.forEach((colorBase64, index) => {
+        contentParts.push({ text: `COLOR VARIANT ${index + 1} IMAGE:` });
+        contentParts.push({
+          inlineData: {
+            data: colorBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      });
+
+      // NOTE: No model image needed - AI generates the display scenario naturally
     }
 
     // Add the prompt
