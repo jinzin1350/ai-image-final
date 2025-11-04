@@ -98,6 +98,8 @@ const garmentUploadSection = document.getElementById('garmentUploadSection');
 const accessoryUploadSection = document.getElementById('accessoryUploadSection');
 const colorCollectionUploadSection = document.getElementById('colorCollectionUploadSection');
 const flatLayUploadSection = document.getElementById('flatLayUploadSection');
+const modelSection = document.getElementById('modelSection');
+const backgroundSection = document.getElementById('backgroundSection');
 
 // NEW: Accessory upload elements
 const accessoryInput = document.getElementById('accessoryInput');
@@ -698,6 +700,10 @@ function switchMode(mode) {
         accessoryUploadSection.style.display = 'none';
         colorCollectionUploadSection.style.display = 'none';
         displayScenarioSection.style.display = 'none';
+        flatLayUploadSection.style.display = 'none';
+        flatLayArrangementSection.style.display = 'none';
+        modelSection.style.display = 'block';
+        backgroundSection.style.display = 'block';
 
         // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
@@ -708,6 +714,10 @@ function switchMode(mode) {
         accessoryUploadSection.style.display = 'block';
         colorCollectionUploadSection.style.display = 'none';
         displayScenarioSection.style.display = 'none';
+        flatLayUploadSection.style.display = 'none';
+        flatLayArrangementSection.style.display = 'none';
+        modelSection.style.display = 'block';
+        backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
 
     } else if (mode === 'color-collection') {
@@ -718,6 +728,8 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'block';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
+        modelSection.style.display = 'none'; // No model needed
+        backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
 
     } else if (mode === 'flat-lay') {
@@ -728,6 +740,8 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'block';
         flatLayArrangementSection.style.display = 'block';
+        modelSection.style.display = 'none'; // No model needed
+        backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
     }
 
