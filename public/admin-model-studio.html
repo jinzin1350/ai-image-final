@@ -949,6 +949,68 @@
 
     </main>
 
+    <!-- Edit Model Modal -->
+    <div id="editModelModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h2 style="margin-bottom: 20px; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                ✏️ ویرایش مدل
+            </h2>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">نام مدل:</label>
+                <input type="text" id="editModelName" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">دسته:</label>
+                <select id="editModelCategory" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                    <option value="woman">👩 زن (Woman)</option>
+                    <option value="man">👨 مرد (Man)</option>
+                    <option value="girl">👧 دختر (Girl)</option>
+                    <option value="boy">👦 پسر (Boy)</option>
+                    <option value="child">👶 کودک (Child)</option>
+                    <option value="couple">💑 زوج (Couple)</option>
+                    <option value="group">👥 گروه (Group)</option>
+                    <option value="elderly">👴 سالمند (Elderly)</option>
+                    <option value="teen">🧑 نوجوان (Teen)</option>
+                    <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                    <option value="accessory">💍 اکسسوری (Accessory)</option>
+                    <option value="underwear">👙 لباس زیر (Underwear)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">دسترسی:</label>
+                <select id="editModelVisibility" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                    <option value="private">🔒 خصوصی (فقط این کاربر)</option>
+                    <option value="public">🌍 عمومی (همه کاربران)</option>
+                </select>
+                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                    💡 خصوصی: فقط کاربر انتخاب شده می‌بیند | عمومی: همه کاربران می‌بینند
+                </small>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">کاربر مالک:</label>
+                <select id="editModelUser" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                    <!-- Will be populated with users -->
+                </select>
+                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                    💡 می‌توانید این مدل را به کاربر دیگری منتقل کنید
+                </small>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                <button onclick="saveModelEdit()" style="background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    💾 ذخیره تغییرات
+                </button>
+                <button onclick="closeEditModal()" style="background: #6b7280; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    ❌ انصراف
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="/admin-menu.js"></script>
     <script src="/admin-common.js"></script>
     <script>
@@ -1518,39 +1580,51 @@
             `).join('');
         }
 
-        async function editModel(modelId) {
+        let currentEditingModelId = null;
+
+        function editModel(modelId) {
             const model = allModels.find(m => m.id === modelId);
             if (!model) return;
 
-            // Show edit modal/prompt
-            const newName = prompt('نام جدید مدل:', model.name);
-            if (newName === null) return; // User cancelled
+            currentEditingModelId = modelId;
 
-            const newVisibility = confirm('آیا می‌خواهید این مدل برای همه قابل دسترسی باشد؟\nOK = عمومی | Cancel = خصوصی')
-                ? 'public' : 'private';
+            // Populate modal fields with current values
+            document.getElementById('editModelName').value = model.name || '';
+            document.getElementById('editModelCategory').value = model.category || 'woman';
+            document.getElementById('editModelVisibility').value = model.visibility || 'private';
 
-            const newCategory = prompt('دسته جدید (woman, man, girl, boy, child, couple, group, elderly, teen, plus-size, accessory, underwear):', model.category);
-            if (newCategory === null) return; // User cancelled
+            // Populate users dropdown
+            const userSelect = document.getElementById('editModelUser');
+            userSelect.innerHTML = allUsers.map(user =>
+                `<option value="${user.user_id}" ${user.user_id === model.user_id ? 'selected' : ''}>
+                    ${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}
+                </option>`
+            ).join('');
 
-            // Ask if want to change user assignment
-            const changeUser = confirm('آیا می‌خواهید کاربر مالک را تغییر دهید?');
-            let newUserId = model.user_id;
+            // Show modal
+            document.getElementById('editModelModal').style.display = 'flex';
+        }
 
-            if (changeUser) {
-                const userEmail = prompt('ایمیل کاربر جدید را وارد کنید:', model.user_email);
-                if (userEmail) {
-                    const user = allUsers.find(u => u.email === userEmail);
-                    if (user) {
-                        newUserId = user.user_id;
-                    } else {
-                        showNotification('کاربر با این ایمیل یافت نشد', 'error');
-                        return;
-                    }
-                }
+        function closeEditModal() {
+            document.getElementById('editModelModal').style.display = 'none';
+            currentEditingModelId = null;
+        }
+
+        async function saveModelEdit() {
+            if (!currentEditingModelId) return;
+
+            const newName = document.getElementById('editModelName').value;
+            const newCategory = document.getElementById('editModelCategory').value;
+            const newVisibility = document.getElementById('editModelVisibility').value;
+            const newUserId = document.getElementById('editModelUser').value;
+
+            if (!newName.trim()) {
+                showNotification('نام مدل نمی‌تواند خالی باشد', 'error');
+                return;
             }
 
             try {
-                const response = await fetchWithAuth('/api/admin/models/' + modelId, {
+                const response = await fetchWithAuth('/api/admin/models/' + currentEditingModelId, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1565,6 +1639,7 @@
 
                 if (data.success) {
                     showNotification('مدل با موفقیت ویرایش شد', 'success');
+                    closeEditModal();
                     loadAllModels(); // Reload the list
                 } else {
                     throw new Error(data.error || 'Update failed');
