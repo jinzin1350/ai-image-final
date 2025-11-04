@@ -52,6 +52,10 @@ let selectedDisplayScenario = null; // 'on-arm', 'hanging-rack', 'folded-stack',
 let uploadedFlatLayProducts = []; // Array of uploaded product paths for flat lay
 let selectedArrangement = null; // 'grid', 'scattered', 'circular', 'diagonal'
 
+// NEW: Scene Recreation mode variables
+let uploadedReferencePhoto = null; // Path to uploaded reference photo
+let sceneAnalysis = null; // AI-generated scene analysis/description
+
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
 let selectedDofId = 'medium';
@@ -129,6 +133,17 @@ const flatLayUploadArea = document.getElementById('flatLayUploadArea');
 const flatLayPlaceholder = document.getElementById('flatLayPlaceholder');
 const flatLayPreviews = document.getElementById('flatLayPreviews');
 const flatLayArrangementSection = document.getElementById('flatLayArrangementSection');
+
+// NEW: Scene Recreation elements
+const sceneRecreationSection = document.getElementById('sceneRecreationSection');
+const referencePhotoInput = document.getElementById('referencePhotoInput');
+const referencePhotoUploadArea = document.getElementById('referencePhotoUploadArea');
+const referencePhotoPlaceholder = document.getElementById('referencePhotoPlaceholder');
+const referencePhotoPreview = document.getElementById('referencePhotoPreview');
+const referencePhotoImg = document.getElementById('referencePhotoImg');
+const sceneAnalysisSection = document.getElementById('sceneAnalysisSection');
+const sceneAnalysisText = document.getElementById('sceneAnalysisText');
+const reanalyzeBtn = document.getElementById('reanalyzeBtn');
 
 // بارگذاری مدل‌ها
 async function loadModels(mode = 'complete-outfit') {
@@ -692,6 +707,84 @@ function selectArrangement(arrangement) {
 }
 
 // ========================================
+// Scene Recreation Functions
+// ========================================
+
+// Upload reference photo
+async function uploadReferencePhoto(file) {
+    const formData = new FormData();
+    formData.append('referencePhoto', file);
+
+    try {
+        const response = await fetch('/api/upload-reference', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            uploadedReferencePhoto = data.filePath;
+
+            // Show preview
+            referencePhotoImg.src = data.filePath;
+            referencePhotoPlaceholder.style.display = 'none';
+            referencePhotoPreview.style.display = 'block';
+
+            // Analyze the photo
+            await analyzeReferencePhoto(data.filePath);
+
+            checkGenerateButton();
+        } else {
+            alert('خطا در آپلود عکس: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error uploading reference photo:', error);
+        alert('خطا در آپلود عکس مرجع');
+    }
+}
+
+// Analyze reference photo with Gemini
+async function analyzeReferencePhoto(photoPath) {
+    try {
+        sceneAnalysisSection.style.display = 'block';
+        sceneAnalysisText.innerHTML = '<p style="color: #666;">🔄 در حال تحلیل عکس توسط هوش مصنوعی...</p>';
+
+        const response = await fetch('/api/analyze-scene', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ photoPath })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            sceneAnalysis = data.analysis;
+            sceneAnalysisText.innerHTML = `<p>${data.analysis}</p>`;
+        } else {
+            sceneAnalysisText.innerHTML = '<p style="color: red;">❌ خطا در تحلیل عکس</p>';
+            alert('خطا در تحلیل عکس: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error analyzing scene:', error);
+        sceneAnalysisText.innerHTML = '<p style="color: red;">❌ خطا در تحلیل عکس</p>';
+    }
+}
+
+// Remove reference photo
+function removeReferencePhoto() {
+    uploadedReferencePhoto = null;
+    sceneAnalysis = null;
+    referencePhotoPlaceholder.style.display = 'flex';
+    referencePhotoPreview.style.display = 'none';
+    sceneAnalysisSection.style.display = 'none';
+    referencePhotoInput.value = '';
+    checkGenerateButton();
+}
+
+// ========================================
 // NEW: Mode Switching Functions
 // ========================================
 
@@ -712,6 +805,7 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
+        sceneRecreationSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
         // Show category selector for complete outfit
@@ -729,6 +823,7 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
+        sceneRecreationSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
@@ -744,6 +839,7 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'block';
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
+        sceneRecreationSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'none'; // No model needed
         if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
@@ -756,9 +852,25 @@ function switchMode(mode) {
         displayScenarioSection.style.display = 'none';
         flatLayUploadSection.style.display = 'block';
         flatLayArrangementSection.style.display = 'block';
+        sceneRecreationSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'none'; // No model needed
         if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
+
+    } else if (mode === 'scene-recreation') {
+        // Scene Recreation mode: upload reference photo, analyze, then select model+garment
+        garmentUploadSection.style.display = 'block'; // Still need to upload garment
+        accessoryUploadSection.style.display = 'none';
+        colorCollectionUploadSection.style.display = 'none';
+        displayScenarioSection.style.display = 'none';
+        flatLayUploadSection.style.display = 'none';
+        flatLayArrangementSection.style.display = 'none';
+        sceneRecreationSection.style.display = 'block';
+        if (modelSection) modelSection.style.display = 'block'; // Need model
+        if (backgroundSection) backgroundSection.style.display = 'none'; // Background from reference photo
+        hijabSection.style.display = 'block'; // May need hijab
+        const categorySelector = document.querySelector('.category-selector');
+        if (categorySelector) categorySelector.style.display = 'block';
     }
 
     // Reset selections when switching modes
@@ -768,7 +880,9 @@ function switchMode(mode) {
     selectedDisplayScenario = null;
     uploadedFlatLayProducts = [];
     selectedArrangement = null;
-    if (mode !== 'complete-outfit') {
+    uploadedReferencePhoto = null;
+    sceneAnalysis = null;
+    if (mode !== 'complete-outfit' && mode !== 'scene-recreation') {
         selectedHijabType = null;
     }
 
@@ -856,6 +970,17 @@ function checkGenerateButton() {
         isValid = uploadedFlatLayProducts.length >= 1 &&
                   selectedArrangement !== null &&
                   selectedBackgroundId;
+
+    } else if (currentMode === 'scene-recreation') {
+        // Scene Recreation mode: need reference photo, scene analysis, garment, model, and hijab
+        const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+        const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
+
+        isValid = uploadedReferencePhoto !== null &&
+                  sceneAnalysis !== null &&
+                  uploadedGarmentPaths.length > 0 &&
+                  selectedModelId &&
+                  hijabCondition;
     }
 
     generateBtn.disabled = !isValid;
@@ -1016,6 +1141,14 @@ generateBtn.addEventListener('click', async () => {
             requestBody.arrangement = selectedArrangement;
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+
+        } else if (currentMode === 'scene-recreation') {
+            // Scene Recreation mode - recreate scene from reference photo
+            requestBody.referencePhotoPath = uploadedReferencePhoto;
+            requestBody.sceneAnalysis = sceneAnalysis;
+            requestBody.garmentPaths = uploadedGarmentPaths;
+            requestBody.modelId = selectedModelId;
+            requestBody.hijabType = selectedHijabType;
         }
 
         console.log('🚀 Sending request:', requestBody);
@@ -1155,3 +1288,45 @@ document.querySelectorAll('[data-arrangement]').forEach(card => {
         selectArrangement(arrangement);
     });
 });
+
+// Event listeners for scene recreation
+if (referencePhotoUploadArea) {
+    referencePhotoUploadArea.addEventListener('click', () => {
+        referencePhotoInput.click();
+    });
+
+    referencePhotoUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        referencePhotoUploadArea.style.borderColor = 'var(--primary-color)';
+    });
+
+    referencePhotoUploadArea.addEventListener('dragleave', () => {
+        referencePhotoUploadArea.style.borderColor = '#ddd';
+    });
+
+    referencePhotoUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        referencePhotoUploadArea.style.borderColor = '#ddd';
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            uploadReferencePhoto(files[0]);
+        }
+    });
+}
+
+if (referencePhotoInput) {
+    referencePhotoInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadReferencePhoto(files[0]);
+        }
+    });
+}
+
+if (reanalyzeBtn) {
+    reanalyzeBtn.addEventListener('click', () => {
+        if (uploadedReferencePhoto) {
+            analyzeReferencePhoto(uploadedReferencePhoto);
+        }
+    });
+}

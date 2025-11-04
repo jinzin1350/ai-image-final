@@ -1737,6 +1737,152 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
   }
 });
 
+// آپلود عکس مرجع برای Scene Recreation mode
+app.post('/api/upload-reference', upload.single('referencePhoto'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'لطفاً یک عکس مرجع آپلود کنید' });
+    }
+
+    // بررسی تنظیمات Supabase
+    if (!supabase) {
+      console.error('❌ Supabase تنظیم نشده است!');
+      return res.status(500).json({
+        error: 'خطا در تنظیمات سرور',
+        details: 'لطفاً فایل .env را با اطلاعات Supabase تنظیم کنید'
+      });
+    }
+
+    const fileName = `reference-${Date.now()}-${req.file.originalname}`;
+    const fileBuffer = req.file.buffer;
+
+    console.log(`📤 در حال آپلود عکس مرجع: ${fileName}`);
+
+    // آپلود به Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('garments')
+      .upload(fileName, fileBuffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (error) {
+      console.error('❌ خطای Supabase Storage:', error);
+      return res.status(500).json({
+        error: 'خطا در آپلود به Supabase',
+        details: error.message
+      });
+    }
+
+    // دریافت URL عمومی فایل
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    console.log(`✅ آپلود عکس مرجع موفق: ${urlData.publicUrl}`);
+
+    res.json({
+      success: true,
+      filePath: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    console.error('❌ خطای سرور:', error);
+    res.status(500).json({
+      error: 'خطا در آپلود عکس مرجع',
+      details: error.message
+    });
+  }
+});
+
+// تحلیل عکس مرجع با Gemini برای Scene Recreation mode
+app.post('/api/analyze-scene', async (req, res) => {
+  try {
+    const { photoPath } = req.body;
+
+    if (!photoPath) {
+      return res.status(400).json({ error: 'مسیر عکس مشخص نشده است' });
+    }
+
+    console.log(`🔍 در حال تحلیل صحنه: ${photoPath}`);
+
+    // دانلود تصویر و تبدیل به base64
+    const imageBase64 = await imageUrlToBase64(photoPath);
+
+    // استفاده از Gemini Vision برای تحلیل صحنه
+    const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    const analysisPrompt = `You are an expert fashion photographer and scene analyst. Analyze this reference photo in detail and provide a comprehensive description that will be used to recreate a similar fashion photo with a model wearing different clothing.
+
+Focus on these key aspects:
+
+1. **People Analysis** (if any people are present):
+   - How many people are in the photo?
+   - Their positions, poses, and body language
+   - Their facial expressions and mood
+   - How they are interacting (if multiple people)
+   - Camera angle relative to the person/people
+
+2. **Location & Environment**:
+   - Type of location (indoor/outdoor, specific place)
+   - Background elements and scenery
+   - Setting characteristics (urban, natural, studio, etc.)
+   - Depth of field and background focus
+
+3. **Lighting**:
+   - Light source (natural/artificial, direction)
+   - Time of day (if outdoor)
+   - Lighting mood (bright, moody, dramatic, soft)
+   - Shadows and highlights
+   - Color temperature (warm/cool)
+
+4. **Composition**:
+   - Camera angle (eye level, low angle, high angle)
+   - Shot type (close-up, medium shot, full body, etc.)
+   - Rule of thirds or other composition techniques
+   - Framing and negative space
+
+5. **Color Palette & Atmosphere**:
+   - Dominant colors in the scene
+   - Color harmony and mood
+   - Overall atmosphere (energetic, calm, mysterious, etc.)
+   - Visual style (minimalist, busy, elegant, casual)
+
+6. **Technical Details**:
+   - Apparent focal length (wide, normal, telephoto)
+   - Depth of field (shallow/deep)
+   - Any special effects or filters
+
+Provide your analysis in Persian (فارسی) in a clear, structured format that a photographer can use to recreate the scene. Be specific and detailed.`;
+
+    const result = await visionModel.generateContent([
+      analysisPrompt,
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: imageBase64
+        }
+      }
+    ]);
+
+    const response = await result.response;
+    const analysis = response.text();
+
+    console.log(`✅ تحلیل صحنه کامل شد`);
+
+    res.json({
+      success: true,
+      analysis: analysis
+    });
+  } catch (error) {
+    console.error('❌ خطا در تحلیل صحنه:', error);
+    res.status(500).json({
+      error: 'خطا در تحلیل صحنه',
+      details: error.message
+    });
+  }
+});
+
 // تابع دانلود تصویر از URL و تبدیل به base64
 async function imageUrlToBase64(url) {
   try {
@@ -1881,6 +2027,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       displayScenario,  // NEW: Display scenario (on-arm, hanging-rack, folded-stack, laid-out)
       flatLayProducts,  // NEW: For flat-lay mode (array of product paths)
       arrangement,      // NEW: Flat lay arrangement (grid, scattered, circular, diagonal)
+      referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate)
+      sceneAnalysis,    // NEW: AI analysis of the reference photo
       modelId,
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
@@ -1929,6 +2077,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     } else if (mode === 'flat-lay') {
       if (!flatLayProducts || !flatLayProducts.length || !arrangement || !backgroundId) {
         return res.status(400).json({ error: 'لطفاً حداقل یک محصول، نوع چیدمان و پس‌زمینه را انتخاب کنید' });
+      }
+    } else if (mode === 'scene-recreation') {
+      if (!referencePhotoPath || !sceneAnalysis || !garments.length || !modelId) {
+        return res.status(400).json({ error: 'لطفاً عکس مرجع، لباس و مدل را انتخاب کنید' });
       }
     }
 
@@ -2014,6 +2166,11 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       // These modes don't need a model, only background
       if (!selectedBackground) {
         return res.status(400).json({ error: 'پس‌زمینه نامعتبر است' });
+      }
+    } else if (mode === 'scene-recreation') {
+      // Scene recreation needs model but not background (uses reference photo environment)
+      if (!selectedModel) {
+        return res.status(400).json({ error: 'مدل نامعتبر است' });
       }
     } else {
       // Other modes need both model and background
@@ -2121,6 +2278,22 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
         : `${selectedBackground.name} - ${selectedBackground.description}`;
+
+    } else if (mode === 'scene-recreation') {
+      // For scene recreation mode, load reference photo, garment, and model
+      const referencePhotoBase64 = await imageUrlToBase64(referencePhotoPath);
+      garmentBase64Array = await Promise.all(
+        garments.map(path => imageUrlToBase64(path))
+      );
+      modelBase64 = await imageUrlToBase64(selectedModel.image);
+
+      garmentDescription = garments.length === 1
+        ? 'the garment/clothing from the garment image'
+        : `ALL ${garments.length} garments/clothing items (combine them on the model)`;
+
+      // Store reference photo for later use
+      selectedModel.referencePhotoBase64 = referencePhotoBase64;
+      locationDescription = 'Scene from reference photo';
     }
 
     console.log('📍 Using location description:', locationDescription);
@@ -2628,6 +2801,73 @@ DO NOT:
 - Use dramatic angles or perspectives
 
 Generate a professional flat lay photograph perfect for e-commerce product listings, social media, or catalog use - clean, organized, and beautifully composed.`;
+
+    } else if (mode === 'scene-recreation') {
+      // SCENE RECREATION MODE: Recreate a photo with model wearing garment in same scene
+      prompt = `Create a photorealistic fashion photo that RECREATES the scene, lighting, composition, and atmosphere from the reference photo, but with the specified model wearing the specified garment.
+
+IMAGES PROVIDED:
+- Image 1: REFERENCE PHOTO - the scene/environment/lighting/composition to recreate
+- Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: Garment/clothing to wear
+- Image ${garments.length + 2}: Model (person)
+
+TASK:
+Recreate the EXACT scene from the reference photo, but replace any people in the reference with the specified model wearing ${garmentDescription}.
+
+AI SCENE ANALYSIS:
+The reference photo has been analyzed by AI with these findings:
+${sceneAnalysis}
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Fabric Type: ${selectedFabric.description}
+- Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
+
+KEY REQUIREMENTS - SCENE RECREATION:
+1. **Match the Reference Scene**:
+   - Recreate the EXACT location, environment, and background from reference photo
+   - Copy the lighting direction, quality, intensity, and color temperature
+   - Match the time of day, weather conditions, and atmospheric mood
+   - Replicate the composition, framing, and camera angle
+   - Preserve the color palette and overall visual style
+
+2. **People Handling**:
+   - If reference has NO people: Place the model naturally in the scene
+   - If reference has ONE person: Replace that person with the model
+   - If reference has MULTIPLE people: Replace the main/central person with the model, keep others OR recreate the group dynamic with the model in a similar pose/position
+
+3. **Model Integration**:
+   - Use the provided model image for the person's appearance
+   - Match the pose and body language from reference photo (if person present)
+   - Keep model's face and body features EXACTLY as shown in model image
+   - Model should wear ${garmentDescription}
+
+4. **Garment Accuracy**:
+   - Garment should fit naturally with realistic wrinkles and fabric draping
+   - Accurate garment colors and patterns from the garment image
+   - Realistic fabric physics, wrinkles, and natural shadows
+   - Preserve ALL fabric details: stitching, seams, texture, buttons, zippers, pockets
+   - Show material quality indicators (sheen, texture, weight)${hijabDescription ? `\n   - Apply the specified hijab style correctly: ${hijabDescription}` : ''}
+
+5. **Photographic Quality**:
+   - Natural skin texture (no plastic smoothing)
+   - Clean, sharp focus appropriate to the reference photo's style
+   - Realistic lighting and shadows matching the reference scene
+   - Professional fashion photography quality
+   - Make it look like a real photo taken in that actual location
+
+DO NOT:
+- Change the scene, location, or environment from the reference
+- Alter the lighting mood or atmosphere
+- Change the camera angle or composition significantly
+- Make the model look different from the provided model image
+- Create obvious fake composites or artificial effects
+- Add text, watermarks, or logos
+- Simplify or omit garment details
+- Over-smooth skin or create plastic-looking results
+
+The goal is to create a NEW photo that looks like it was taken in the SAME place, at the SAME time, with the SAME camera and lighting - but featuring the specified model wearing the specified garment.`;
     }
 
     console.log('🎯 Mode:', mode);
@@ -2726,6 +2966,34 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
       });
 
       // NOTE: No model needed - AI generates overhead flat lay composition naturally
+
+    } else if (mode === 'scene-recreation') {
+      // Scene Recreation mode: Load reference photo + garment images + model image
+      contentParts.push({ text: `REFERENCE PHOTO (scene to recreate):` });
+      contentParts.push({
+        inlineData: {
+          data: selectedModel.referencePhotoBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
+
+      garmentBase64Array.forEach((garmentBase64, index) => {
+        contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1}:` });
+        contentParts.push({
+          inlineData: {
+            data: garmentBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      });
+
+      contentParts.push({ text: "MODEL IMAGE:" });
+      contentParts.push({
+        inlineData: {
+          data: modelBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
     }
 
     // Add the prompt
