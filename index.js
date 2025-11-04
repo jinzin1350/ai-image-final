@@ -2805,20 +2805,25 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
 
     } else if (mode === 'scene-recreation') {
       // SCENE RECREATION MODE: Recreate a photo with model wearing garment in same scene
-      prompt = `Create a photorealistic fashion photo that RECREATES the scene, lighting, composition, and atmosphere from the reference photo, but with a DIFFERENT PERSON (the specified model) wearing the specified garment.
+      prompt = `Create a photorealistic fashion photo showing the MODEL wearing the GARMENT in the SCENE from the reference photo.
 
-IMAGES PROVIDED:
-- Image 1: REFERENCE PHOTO - ONLY use this for the scene/environment/lighting/composition - DO NOT use the people in this photo
-- Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: Garment/clothing to wear
-- Image ${garments.length + 2}: MODEL - USE THIS PERSON'S FACE AND BODY, not the person from the reference photo
+IMAGES PROVIDED (IN ORDER):
+- Image 1: ⭐ MODEL - THIS IS THE PERSON TO USE - Use their EXACT face, facial features, body type, and appearance
+- Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: GARMENT - Clothing to put on the MODEL
+- Image ${garments.length + 2}: REFERENCE PHOTO - Copy ONLY the scene/environment/lighting/background - DO NOT use the people in this photo
 
-⚠️ CRITICAL: The reference photo is ONLY for the environment, lighting, and composition. You MUST use the MODEL from Image ${garments.length + 2} for the person's face, body, and appearance.
+⚠️ CRITICAL INSTRUCTIONS:
+1. The PERSON in the final photo MUST be the MODEL from Image 1
+2. Use the MODEL'S face, eyes, nose, mouth, skin tone, hair, and body EXACTLY as shown in Image 1
+3. DO NOT use any person's face or body from the reference photo (Image ${garments.length + 2})
+4. The reference photo is ONLY for: scene, location, lighting, atmosphere, composition
+5. Think: "Place THIS model (Image 1) wearing THIS garment (Image 2) in THAT scene (Image ${garments.length + 2})"
 
 TASK:
-1. Copy the scene, environment, background, lighting, and composition from the REFERENCE PHOTO (Image 1)
-2. Place the MODEL (from Image ${garments.length + 2}) in that scene - use their EXACT face and body
-3. Make the MODEL wear ${garmentDescription}
-4. If there's a person in the reference photo, copy their POSE and POSITION, but use the MODEL'S face and body, NOT the reference person's face/body
+1. Use the MODEL from Image 1 as the person - their EXACT appearance
+2. Put the GARMENT from Image 2 on the MODEL
+3. Place the MODEL in the SCENE from Image ${garments.length + 2} (copy the environment, lighting, and composition)
+4. If there's a person in the reference photo, you can copy their POSE, but the face and body MUST be the MODEL from Image 1
 
 AI SCENE ANALYSIS:
 The reference photo has been analyzed by AI with these findings:
@@ -2839,20 +2844,21 @@ KEY REQUIREMENTS - SCENE RECREATION:
    - Preserve the color palette and overall visual style
 
 2. **Use the CORRECT PERSON - EXTREMELY IMPORTANT**:
-   ⚠️ The person in the final image MUST be the MODEL from Image ${garments.length + 2}
-   - Use the MODEL'S EXACT face - facial features, eyes, nose, mouth, skin tone
+   ⚠️ The person in the final image MUST be the MODEL from Image 1 (the FIRST image)
+   - Use the MODEL'S EXACT face - facial features, eyes, nose, mouth, skin tone, hair
    - Use the MODEL'S EXACT body type, height, and build
-   - DO NOT use the face or body of any person from the reference photo
-   - If reference has a person: Copy their POSE only, but the face/body must be the MODEL
-   - If reference has NO people: Place the model naturally in the scene
-   - Think: "What if THIS specific model was photographed in THAT specific scene?"
+   - DO NOT use the face or body of any person from the reference photo (Image ${garments.length + 2})
+   - The reference photo people are ONLY for pose reference, NOT appearance
+   - If reference has a person: Copy their POSE only, but the face/body must be from Image 1
+   - If reference has NO people: Place the model from Image 1 naturally in the scene
+   - Think: "What if the person from Image 1 was photographed in the scene from Image ${garments.length + 2}?"
 
 3. **Model Integration**:
-   - The final photo must show the MODEL from Image ${garments.length + 2}, NOT any person from the reference
-   - Copy pose and positioning from reference person (if present), but use MODEL's appearance
-   - Keep model's face and body features EXACTLY as shown in the model image
+   - The final photo must show the MODEL from Image 1, NOT any person from the reference photo
+   - Copy pose and positioning from reference person (if present), but use the appearance from Image 1
+   - Keep model's face and body features EXACTLY as shown in Image 1
    - Model should wear ${garmentDescription}
-   - The person must be recognizable as the MODEL, not the reference person
+   - The person must be recognizable as the MODEL from Image 1, not anyone from the reference photo
 
 4. **Garment Accuracy**:
    - Garment should fit naturally with realistic wrinkles and fabric draping
@@ -2869,26 +2875,30 @@ KEY REQUIREMENTS - SCENE RECREATION:
    - Make it look like a real photo taken in that actual location
 
 DO NOT:
-- ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo
+- ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo (Image ${garments.length + 2})
 - ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference
-- ❌ The person must be the MODEL from Image ${garments.length + 2}, not the reference person
-- Change the scene, location, or environment from the reference
-- Alter the lighting mood or atmosphere
-- Change the camera angle or composition significantly
-- Make the model look different from the provided model image
+- ❌ The person must be the MODEL from Image 1 (FIRST image), not anyone from the reference photo
+- Change the scene, location, or environment from the reference photo
+- Alter the lighting mood or atmosphere from the reference photo
+- Change the camera angle or composition from the reference photo
+- Make the model look different from Image 1
 - Create obvious fake composites or artificial effects
 - Add text, watermarks, or logos
 - Simplify or omit garment details
 - Over-smooth skin or create plastic-looking results
 
-EXAMPLE TO CLARIFY:
-- Reference photo (Image 1): Shows a blonde woman in a park wearing a red dress
-- Model (Image ${garments.length + 2}): Shows a brunette woman with different face
-- Garment (Image 2): Shows a blue dress
-- CORRECT OUTPUT: The brunette woman from the MODEL image, wearing the blue dress, photographed in the same park with same lighting
-- WRONG OUTPUT: The blonde woman from reference wearing the blue dress
+EXAMPLE TO CLARIFY THE CORRECT APPROACH:
+IMAGE ORDER YOU RECEIVE:
+- Image 1: MODEL - Shows a brunette woman with tan skin (THIS IS WHO TO USE)
+- Image 2: GARMENT - Shows a blue dress
+- Image 3: REFERENCE - Shows a blonde woman in a park wearing a red dress
 
-The goal: Place the MODEL (Image ${garments.length + 2}) in the SCENE (Image 1) wearing the GARMENT (Image 2). The person's face and body must match the MODEL, not the reference.`;
+CORRECT OUTPUT: The brunette woman from Image 1, wearing the blue dress from Image 2, photographed in the park from Image 3 with same lighting
+WRONG OUTPUT: The blonde woman from Image 3 wearing the blue dress
+WRONG OUTPUT: A mix/blend of the two women's faces
+
+The goal: Show the PERSON from Image 1, wearing the GARMENT from Image 2, in the SCENE from Image ${garments.length + 2}.
+The person's face, body, skin tone, hair MUST match Image 1 EXACTLY.`;
     }
 
     console.log('🎯 Mode:', mode);
@@ -2989,17 +2999,19 @@ The goal: Place the MODEL (Image ${garments.length + 2}) in the SCENE (Image 1) 
       // NOTE: No model needed - AI generates overhead flat lay composition naturally
 
     } else if (mode === 'scene-recreation') {
-      // Scene Recreation mode: Load reference photo + garment images + model image
-      contentParts.push({ text: `REFERENCE PHOTO (scene to recreate):` });
+      // Scene Recreation mode: MODEL FIRST (most important), then garments, then reference
+      // This order emphasizes that the MODEL is the person to use
+
+      contentParts.push({ text: "⭐ MODEL IMAGE - THIS IS THE PERSON TO USE (their face and body):" });
       contentParts.push({
         inlineData: {
-          data: selectedModel.referencePhotoBase64,
+          data: modelBase64,
           mimeType: 'image/jpeg'
         }
       });
 
       garmentBase64Array.forEach((garmentBase64, index) => {
-        contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1}:` });
+        contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1} (put this on the MODEL):` });
         contentParts.push({
           inlineData: {
             data: garmentBase64,
@@ -3008,10 +3020,10 @@ The goal: Place the MODEL (Image ${garments.length + 2}) in the SCENE (Image 1) 
         });
       });
 
-      contentParts.push({ text: "MODEL IMAGE:" });
+      contentParts.push({ text: `REFERENCE PHOTO (copy the SCENE/LIGHTING/BACKGROUND only, NOT the people):` });
       contentParts.push({
         inlineData: {
-          data: modelBase64,
+          data: selectedModel.referencePhotoBase64,
           mimeType: 'image/jpeg'
         }
       });
