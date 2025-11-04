@@ -2922,7 +2922,7 @@ WRONG OUTPUTS:
 ❌ The brunette in formal stiff pose (reference was casual)
 ❌ A completely different style that ignores the reference mood
 
-Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the reference photo"
+Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the reference photo"`;
     }
 
     console.log('🎯 Mode:', mode);
