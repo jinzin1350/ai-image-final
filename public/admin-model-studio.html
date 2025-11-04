@@ -204,43 +204,6 @@
                             💡 دسته‌بندی کمک می‌کند تا مدل در بخش مناسب ذخیره شود
                         </small>
                     </div>
-
-                    <!-- انتخاب سن دقیق مدل -->
-                    <div style="margin-top: 20px; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 2px solid #10b981;">
-                        <label for="modelAgeSlider" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #047857;">
-                            🎂 سن مدل: <span id="modelAgeValue" style="color: #10b981; font-size: 18px;">25</span> ساله
-                        </label>
-                        <input type="range" id="modelAgeSlider" min="3" max="80" value="25"
-                               style="width: 100%; height: 8px; border-radius: 5px; background: #d1fae5; outline: none; cursor: pointer; accent-color: #10b981;">
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #065f46; margin-top: 5px;">
-                            <span>3 سال</span>
-                            <span>80 سال</span>
-                        </div>
-                        <small style="color: #065f46; display: block; margin-top: 8px;">
-                            💡 سن دقیق به AI کمک می‌کند ویژگی‌های صورت و بدن متناسب با سن را بسازد
-                        </small>
-                    </div>
-
-                    <!-- انتخاب قومیت مدل -->
-                    <div style="margin-top: 20px; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 2px solid #10b981;">
-                        <label for="modelEthnicitySelect" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #047857;">
-                            🌍 قومیت / Ethnicity
-                        </label>
-                        <select id="modelEthnicitySelect" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; background: white;">
-                            <option value="iranian">🇮🇷 ایرانی (Iranian)</option>
-                            <option value="turkmen">🇹🇲 ترکمن (Turkmen)</option>
-                            <option value="tajik">🇹🇯 تاجیک (Tajik)</option>
-                            <option value="iraqi">🇮🇶 عراقی (Iraqi)</option>
-                            <option value="arab">🇸🇦 عرب (Arab)</option>
-                            <option value="afghan">🇦🇫 افغان (Afghan)</option>
-                            <option value="kurdish">کُرد (Kurdish)</option>
-                            <option value="azari">آذری (Azari)</option>
-                            <option value="balochi">بلوچ (Balochi)</option>
-                        </select>
-                        <small style="color: #065f46; display: block; margin-top: 8px;">
-                            💡 انتخاب قومیت به AI کمک می‌کند ویژگی‌های ظاهری صحیح (رنگ پوست، فرم صورت، ویژگی‌های قومی) را تولید کند
-                        </small>
-                    </div>
                 </div>
             </div>
 
@@ -1063,43 +1026,8 @@
         let selectedUserId = null;
         let generatedImageData = null;
 
-        // Age and Ethnicity Settings
-        let selectedModelAge = 25;
-        let selectedModelEthnicity = 'iranian';
-
-        // Age slider functionality
-        const modelAgeSlider = document.getElementById('modelAgeSlider');
-        const modelAgeValue = document.getElementById('modelAgeValue');
-
-        modelAgeSlider.addEventListener('input', (e) => {
-            modelAgeValue.textContent = e.target.value;
-        });
-
-        modelAgeSlider.addEventListener('change', (e) => {
-            selectedModelAge = parseInt(e.target.value);
-            console.log('Selected model age:', selectedModelAge);
-        });
-
-        // Ethnicity selector functionality
-        const modelEthnicitySelect = document.getElementById('modelEthnicitySelect');
-        const basicInfoEthnicityDropdown = document.getElementById('modelEthnicity');
-
-        modelEthnicitySelect.addEventListener('change', (e) => {
-            selectedModelEthnicity = e.target.value;
-            // Sync with basic info dropdown
-            basicInfoEthnicityDropdown.value = e.target.value;
-            console.log('Selected model ethnicity:', selectedModelEthnicity);
-        });
-
-        // Sync basic info ethnicity dropdown with selector
-        basicInfoEthnicityDropdown.addEventListener('change', (e) => {
-            selectedModelEthnicity = e.target.value;
-            modelEthnicitySelect.value = e.target.value;
-            console.log('Synced ethnicity from dropdown:', selectedModelEthnicity);
-        });
-
-        // Age range dropdown to exact age mapping
-        const ageRangeDropdown = document.getElementById('modelAge');
+        // Age and Ethnicity Settings - use Basic Info dropdowns directly
+        // Age range to exact age mapping
         const ageRangeToExact = {
             'child': 8,        // کودک (5-12) → average 8
             'teen': 15,        // نوجوان (13-17) → average 15
@@ -1108,35 +1036,6 @@
             'middle-aged': 50, // میانسال (41-60) → average 50
             'elderly': 65      // سالمند (60+) → 65
         };
-
-        // Function to convert exact age to range
-        function getAgeRangeFromExactAge(age) {
-            if (age <= 12) return 'child';
-            if (age <= 17) return 'teen';
-            if (age <= 25) return 'young-adult';
-            if (age <= 40) return 'adult';
-            if (age <= 60) return 'middle-aged';
-            return 'elderly';
-        }
-
-        // Sync age slider with age range dropdown
-        modelAgeSlider.addEventListener('change', (e) => {
-            const exactAge = parseInt(e.target.value);
-            selectedModelAge = exactAge;
-            // Update age range dropdown based on exact age
-            ageRangeDropdown.value = getAgeRangeFromExactAge(exactAge);
-            console.log('Selected model age:', selectedModelAge, '-> range:', ageRangeDropdown.value);
-        });
-
-        // Sync age range dropdown with slider
-        ageRangeDropdown.addEventListener('change', (e) => {
-            const range = e.target.value;
-            const exactAge = ageRangeToExact[range] || 25;
-            selectedModelAge = exactAge;
-            modelAgeSlider.value = exactAge;
-            modelAgeValue.textContent = exactAge;
-            console.log('Synced age from range:', range, '-> exact:', exactAge);
-        });
 
         // Load users on page load
         async function loadUsers() {
