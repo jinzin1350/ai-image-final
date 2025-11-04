@@ -2805,25 +2805,38 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
 
     } else if (mode === 'scene-recreation') {
       // SCENE RECREATION MODE: Recreate a photo with model wearing garment in same scene
-      prompt = `Create a photorealistic fashion photo showing the MODEL wearing the GARMENT in the SCENE from the reference photo.
+      prompt = `Create a photorealistic fashion photo by combining THREE elements: the MODEL's appearance (Image 1), the GARMENT (Image 2), and the SCENE from the reference photo (Image 3).
 
 IMAGES PROVIDED (IN ORDER):
-- Image 1: ⭐ MODEL - THIS IS THE PERSON TO USE - Use their EXACT face, facial features, body type, and appearance
+- Image 1: ⭐ MODEL - Use this person's EXACT face and body
 - Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: GARMENT - Clothing to put on the MODEL
-- Image ${garments.length + 2}: REFERENCE PHOTO - Copy ONLY the scene/environment/lighting/background - DO NOT use the people in this photo
+- Image ${garments.length + 2}: REFERENCE PHOTO - Copy the ENTIRE scene (location, lighting, composition, atmosphere)
 
-⚠️ CRITICAL INSTRUCTIONS:
-1. The PERSON in the final photo MUST be the MODEL from Image 1
-2. Use the MODEL'S face, eyes, nose, mouth, skin tone, hair, and body EXACTLY as shown in Image 1
-3. DO NOT use any person's face or body from the reference photo (Image ${garments.length + 2})
-4. The reference photo is ONLY for: scene, location, lighting, atmosphere, composition
-5. Think: "Place THIS model (Image 1) wearing THIS garment (Image 2) in THAT scene (Image ${garments.length + 2})"
+⚠️ TWO CRITICAL REQUIREMENTS (BOTH ARE EQUALLY IMPORTANT):
 
-TASK:
-1. Use the MODEL from Image 1 as the person - their EXACT appearance
-2. Put the GARMENT from Image 2 on the MODEL
-3. Place the MODEL in the SCENE from Image ${garments.length + 2} (copy the environment, lighting, and composition)
-4. If there's a person in the reference photo, you can copy their POSE, but the face and body MUST be the MODEL from Image 1
+**REQUIREMENT 1: Use the MODEL from Image 1**
+- The PERSON must be the MODEL from Image 1 - use their face, facial features, body, skin tone, hair
+- DO NOT use the face or body from any person in the reference photo
+- If reference has a person: copy their POSE/POSITION but use the MODEL's appearance from Image 1
+
+**REQUIREMENT 2: Recreate the SCENE from Image ${garments.length + 2}**
+- Copy the EXACT location, environment, and background from the reference photo
+- Match the lighting direction, quality, intensity, and color temperature EXACTLY
+- Replicate the composition, framing, camera angle, and perspective
+- Preserve the atmospheric mood, time of day, weather conditions
+- Keep the same color palette and visual style as the reference
+
+STEP-BY-STEP TASK:
+1. Study Image ${garments.length + 2} (reference) carefully - note the location, lighting setup, camera angle, atmosphere
+2. Take the MODEL from Image 1 - remember their face and body
+3. Place that MODEL in the SAME location/scene from the reference photo
+4. Position them with the same pose (if reference has a person) or naturally in the scene
+5. Apply the SAME lighting from the reference photo onto the MODEL
+6. Dress the MODEL in the GARMENT from Image 2
+7. Match the camera angle and composition from the reference photo
+8. Ensure the mood and atmosphere match the reference photo
+
+Think of it as: "Teleport the person from Image 1 into the scene from Image ${garments.length + 2}, then photograph them wearing the garment from Image 2"
 
 AI SCENE ANALYSIS:
 The reference photo has been analyzed by AI with these findings:
@@ -2835,15 +2848,16 @@ TECHNICAL SPECS:
 - Fabric Type: ${selectedFabric.description}
 - Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
 
-KEY REQUIREMENTS - SCENE RECREATION:
-1. **Match the Reference Scene**:
-   - Recreate the EXACT location, environment, and background from reference photo
-   - Copy the lighting direction, quality, intensity, and color temperature
-   - Match the time of day, weather conditions, and atmospheric mood
-   - Replicate the composition, framing, and camera angle
-   - Preserve the color palette and overall visual style
+KEY REQUIREMENTS - BALANCED APPROACH:
+1. **Match the Reference Scene (MUST DO THIS)**:
+   - Recreate the EXACT location from Image ${garments.length + 2} - same place, same environment
+   - Copy the EXACT lighting setup - direction, quality, intensity, color temperature from reference
+   - Match the time of day, weather conditions, and atmospheric mood from reference
+   - Use the SAME camera angle, composition, and framing as the reference photo
+   - Preserve the color palette and overall visual style from the reference
+   - The background, setting, and atmosphere must be IDENTICAL to the reference photo
 
-2. **Use the CORRECT PERSON - EXTREMELY IMPORTANT**:
+2. **Use the CORRECT PERSON (MUST DO THIS TOO)**:
    ⚠️ The person in the final image MUST be the MODEL from Image 1 (the FIRST image)
    - Use the MODEL'S EXACT face - facial features, eyes, nose, mouth, skin tone, hair
    - Use the MODEL'S EXACT body type, height, and build
@@ -2889,16 +2903,24 @@ DO NOT:
 
 EXAMPLE TO CLARIFY THE CORRECT APPROACH:
 IMAGE ORDER YOU RECEIVE:
-- Image 1: MODEL - Shows a brunette woman with tan skin (THIS IS WHO TO USE)
-- Image 2: GARMENT - Shows a blue dress
-- Image 3: REFERENCE - Shows a blonde woman in a park wearing a red dress
+- Image 1: MODEL - Shows a brunette woman with tan skin, curly hair
+- Image 2: GARMENT - Shows a blue floral dress
+- Image 3: REFERENCE - Shows a blonde woman in a sunny park at sunset, standing by a tree, wearing a red dress
 
-CORRECT OUTPUT: The brunette woman from Image 1, wearing the blue dress from Image 2, photographed in the park from Image 3 with same lighting
-WRONG OUTPUT: The blonde woman from Image 3 wearing the blue dress
-WRONG OUTPUT: A mix/blend of the two women's faces
+CORRECT OUTPUT:
+✅ The brunette woman from Image 1 (with her face, curly hair, tan skin)
+✅ Wearing the blue floral dress from Image 2
+✅ Standing by the same tree in the same park from Image 3
+✅ With the same sunset lighting from Image 3
+✅ Same camera angle and composition as Image 3
 
-The goal: Show the PERSON from Image 1, wearing the GARMENT from Image 2, in the SCENE from Image ${garments.length + 2}.
-The person's face, body, skin tone, hair MUST match Image 1 EXACTLY.`;
+WRONG OUTPUTS:
+❌ The blonde woman from Image 3 wearing the blue dress (wrong person)
+❌ The brunette woman in a different location with different lighting (wrong scene)
+❌ A mix/blend of the two women's faces (wrong - use Image 1 face only)
+❌ The brunette in a generic studio instead of the park (wrong - must use reference scene)
+
+FINAL CHECK: Does the output show Image-1-person + Image-2-garment + Image-3-scene? All three must be present!`;
     }
 
     console.log('🎯 Mode:', mode);
