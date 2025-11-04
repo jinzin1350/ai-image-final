@@ -2174,6 +2174,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate)
       sceneAnalysis,    // NEW: AI analysis of the reference photo
       modelId,
+      modelAge,         // NEW: Exact age of model (3-80)
+      modelEthnicity,   // NEW: Ethnicity (iranian, turkmen, tajik, iraqi, arab, etc.)
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
       hijabType,        // NEW: نوع حجاب
@@ -2464,22 +2466,50 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     if (mode === 'complete-outfit') {
       // COMPLETE OUTFIT MODE: Garment + Hijab
 
-      // Determine age-specific instructions based on model category
+      // Build age and ethnicity descriptions
+      const ethnicityDescriptions = {
+        'iranian': 'Iranian/Persian facial features and skin tone',
+        'turkmen': 'Turkmen ethnic features with Central Asian appearance',
+        'tajik': 'Tajik facial features with Persian-Central Asian characteristics',
+        'iraqi': 'Iraqi/Mesopotamian facial features and appearance',
+        'arab': 'Arab ethnic features and appearance',
+        'afghan': 'Afghan facial features and appearance',
+        'kurdish': 'Kurdish ethnic features and appearance',
+        'azari': 'Azari/Azerbaijani ethnic features',
+        'balochi': 'Balochi ethnic features and appearance'
+      };
+
+      const ageDescription = modelAge ? `EXACTLY ${modelAge} years old` : 'age-appropriate';
+      const ethnicityDescription = modelEthnicity && ethnicityDescriptions[modelEthnicity]
+        ? ethnicityDescriptions[modelEthnicity]
+        : 'natural ethnic appearance';
+
+      // Determine age-specific instructions based on exact age or model category
       let ageSpecificInstructions = '';
-      if (selectedModel.category === 'girl' || selectedModel.category === 'boy') {
-        ageSpecificInstructions = `\n\nCRITICAL AGE REQUIREMENTS:
-- This is a TEENAGE model (age 13-15 years old)
-- Face MUST have youthful teenage features: rounder face, softer features, younger-looking skin
-- Body proportions should match teenage physique (not adult proportions)
-- Overall appearance must clearly be a teenager, NOT an adult
-- Facial features should look age-appropriate for 13-15 years old`;
-      } else if (selectedModel.category === 'child') {
-        ageSpecificInstructions = `\n\nCRITICAL AGE REQUIREMENTS:
-- This is a CHILD model (age 6-11 years old)
+      const age = modelAge || 25; // Default to 25 if not specified
+
+      if (age < 12) {
+        ageSpecificInstructions = `\n\nCRITICAL AGE & ETHNICITY REQUIREMENTS:
+- This person is ${ageDescription} - a CHILD
+- ${ethnicityDescription}
 - Face MUST have childlike features: round face, soft features, innocent expression, child-like eyes and nose
-- Body proportions should match child physique (shorter stature, child body proportions)
+- Body proportions should match child physique for age ${age} (shorter stature, child body proportions)
 - Overall appearance must clearly be a young child, NOT a teenager or adult
-- Facial features should look age-appropriate for 6-11 years old`;
+- Facial features should look EXACTLY age ${age} years old`;
+      } else if (age < 18) {
+        ageSpecificInstructions = `\n\nCRITICAL AGE & ETHNICITY REQUIREMENTS:
+- This person is ${ageDescription} - a TEENAGER
+- ${ethnicityDescription}
+- Face MUST have youthful teenage features: rounder face, softer features, younger-looking skin
+- Body proportions should match teenage physique for age ${age} (not adult proportions)
+- Overall appearance must clearly be a teenager, NOT an adult
+- Facial features should look EXACTLY age ${age} years old`;
+      } else {
+        ageSpecificInstructions = `\n\nAGE & ETHNICITY REQUIREMENTS:
+- This person is ${ageDescription}
+- ${ethnicityDescription}
+- Face and body should match age ${age} appropriately
+- Natural appearance for a ${age}-year-old person`;
       }
 
       prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
