@@ -2463,6 +2463,25 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     if (mode === 'complete-outfit') {
       // COMPLETE OUTFIT MODE: Garment + Hijab
+
+      // Determine age-specific instructions based on model category
+      let ageSpecificInstructions = '';
+      if (selectedModel.category === 'girl' || selectedModel.category === 'boy') {
+        ageSpecificInstructions = `\n\nCRITICAL AGE REQUIREMENTS:
+- This is a TEENAGE model (age 13-15 years old)
+- Face MUST have youthful teenage features: rounder face, softer features, younger-looking skin
+- Body proportions should match teenage physique (not adult proportions)
+- Overall appearance must clearly be a teenager, NOT an adult
+- Facial features should look age-appropriate for 13-15 years old`;
+      } else if (selectedModel.category === 'child') {
+        ageSpecificInstructions = `\n\nCRITICAL AGE REQUIREMENTS:
+- This is a CHILD model (age 6-11 years old)
+- Face MUST have childlike features: round face, soft features, innocent expression, child-like eyes and nose
+- Body proportions should match child physique (shorter stature, child body proportions)
+- Overall appearance must clearly be a young child, NOT a teenager or adult
+- Facial features should look age-appropriate for 6-11 years old`;
+      }
+
       prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
 IMAGES PROVIDED:
@@ -2470,7 +2489,7 @@ IMAGES PROVIDED:
 - Image ${garments.length + 1}: Model (person)
 
 TASK:
-Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.
+Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.${ageSpecificInstructions}
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -2517,6 +2536,8 @@ KEY REQUIREMENTS:
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
+- Age up the model - if it's a child/teenager, keep them looking their age
+- Make children or teenagers look like adults with mature facial features
 - Make unrealistic distortions or morphing
 - Add text, watermarks, or logos
 - Create obvious fake composites or artificial effects
