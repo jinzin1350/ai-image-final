@@ -3087,7 +3087,7 @@ The goal is to create a NEW photo that looks like it was taken in the SAME place
       success: true,
       imagePath: generatedImageUrl,
       model: selectedModel ? selectedModel.name : 'No model (product photography)',
-      background: selectedBackground.name,
+      background: selectedBackground ? selectedBackground.name : (mode === 'scene-recreation' ? 'Scene from reference photo' : 'No background'),
       description: generatedText,
       prompt: prompt,
       message: 'تصویر با موفقیت تولید شد!'
