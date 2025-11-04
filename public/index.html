@@ -36,6 +36,11 @@
                         <div class="mode-title">عکاسی اکسسوری</div>
                         <div class="mode-description">تولید عکس حرفه‌ای محصولات اکسسوری</div>
                     </div>
+                    <div class="mode-card" data-mode="color-collection">
+                        <div class="mode-icon">🎨</div>
+                        <div class="mode-title">نمایش کالکشن رنگی</div>
+                        <div class="mode-description">نمایش چند رنگ از یک محصول در کنار هم</div>
+                    </div>
                 </div>
             </section>
 
@@ -159,6 +164,61 @@
                     <p style="font-size: 12px; color: #666; margin-top: 8px;">
                         💡 انتخاب نوع اکسسوری به هوش مصنوعی کمک می‌کند تا بهتر آن را روی مدل قرار دهد
                     </p>
+                </div>
+            </section>
+
+            <!-- بخش آپلود کالکشن رنگی -->
+            <section class="upload-section" id="colorCollectionUploadSection" style="display: none;">
+                <h2>۱. آپلود تصاویر رنگ‌های مختلف</h2>
+                <p style="margin-bottom: 20px; color: #666;">تصاویر تمام رنگ‌های محصول را آپلود کنید (حداقل ۱ رنگ، حداکثر ۱۰ رنگ)</p>
+                <div class="upload-area" id="colorCollectionUploadArea">
+                    <input type="file" id="colorCollectionInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="colorCollectionPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصاویر رنگ‌ها</h3>
+                        <p>عکس‌های تمام رنگ‌بندی‌های محصول را آپلود کنید</p>
+                        <p class="multi-hint">🎨 شامل: رنگ قرمز، آبی، سبز، زرد، سیاه، سفید و...</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="colorCollectionPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب سناریو نمایش -->
+            <section class="selection-section" id="displayScenarioSection" style="display: none;">
+                <h2>۲. انتخاب نوع نمایش</h2>
+                <p class="section-description">نحوه نمایش رنگ‌های محصول را انتخاب کنید</p>
+                <div class="scenario-grid">
+                    <div class="scenario-card" data-scenario="on-arm">
+                        <div class="scenario-icon">👐</div>
+                        <div class="scenario-name">روی دست</div>
+                        <div class="scenario-desc">تمام رنگ‌ها روی دست</div>
+                    </div>
+                    <div class="scenario-card" data-scenario="hanging-rack">
+                        <div class="scenario-icon">👔</div>
+                        <div class="scenario-name">آویزان روی رگال</div>
+                        <div class="scenario-desc">روی رگال با چوب لباسی</div>
+                    </div>
+                    <div class="scenario-card" data-scenario="folded-stack">
+                        <div class="scenario-icon">📚</div>
+                        <div class="scenario-name">تا شده روی هم</div>
+                        <div class="scenario-desc">مرتب تا شده و چیده شده</div>
+                    </div>
+                    <div class="scenario-card" data-scenario="laid-out">
+                        <div class="scenario-icon">📐</div>
+                        <div class="scenario-name">کنار هم روی سطح</div>
+                        <div class="scenario-desc">پهن شده کنار هم</div>
+                    </div>
                 </div>
             </section>
 

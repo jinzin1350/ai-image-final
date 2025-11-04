@@ -911,6 +911,64 @@ button,
 }
 
 /* ========================================
+   Color Collection Display Scenario Cards
+   ======================================== */
+
+.scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.scenario-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.scenario-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+    border-color: var(--primary);
+}
+
+.scenario-card.selected {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.scenario-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-xs);
+}
+
+.scenario-name {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.scenario-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.scenario-card.selected .scenario-name {
+    color: var(--primary);
+}
+
+/* ========================================
    Responsive Adjustments for New Sections
    ======================================== */
 
@@ -925,6 +983,15 @@ button,
     }
 
     .mode-icon {
+        font-size: 2.5rem;
+    }
+
+    .scenario-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-sm);
+    }
+
+    .scenario-icon {
         font-size: 2.5rem;
     }
 }
