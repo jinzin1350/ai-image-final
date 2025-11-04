@@ -2490,6 +2490,13 @@ SCENE & ENVIRONMENT:
 - Camera Angle: ${selectedCameraAngle.description}
 - Mood: Professional fashion photography
 
+FRAMING & COMPOSITION:
+- Show FULL BODY (head to feet) with proper proportions
+- Model should occupy 70-80% of frame height for balanced composition
+- Leave appropriate headroom and foot space in frame
+- Natural body proportions - DO NOT make person disproportionately large or small
+- Standard fashion photography framing with model centered in frame
+
 KEY REQUIREMENTS:
 1. Keep model's face, body, and pose EXACTLY the same - only change the clothes
 2. Garment should fit naturally with realistic wrinkles and fabric draping
