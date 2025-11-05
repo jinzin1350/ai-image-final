@@ -999,9 +999,20 @@ async function uploadContentImage(file) {
             contentImagePreview.style.display = 'block';
             contentImagePlaceholder.style.display = 'none';
 
+            // Show analysis loading indicator
+            const analysisStatus = document.getElementById('contentImageAnalysisStatus');
+            if (analysisStatus) {
+                analysisStatus.style.display = 'block';
+            }
+
             // Analyze content image for lighting/mood/atmosphere
             console.log('🔍 در حال تحلیل عکس محتوا...');
             await analyzeContentImage(data.filePath);
+
+            // Hide analysis loading indicator
+            if (analysisStatus) {
+                analysisStatus.style.display = 'none';
+            }
 
             checkGenerateButton();
         }
@@ -1027,6 +1038,28 @@ async function analyzeContentImage(photoPath) {
             contentImageAnalysis = data.analysis;
             console.log('✅ تحلیل عکس محتوا کامل شد');
             console.log('📊 Analysis:', data.analysis);
+
+            // Show success message briefly
+            const analysisStatus = document.getElementById('contentImageAnalysisStatus');
+            if (analysisStatus) {
+                analysisStatus.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">✅</span>
+                        <span style="color: #155724; font-weight: 500;">تحلیل عکس محتوا کامل شد</span>
+                    </div>
+                `;
+                analysisStatus.style.background = '#d4edda';
+                analysisStatus.style.borderColor = '#28a745';
+
+                // Hide after 2 seconds
+                setTimeout(() => {
+                    if (analysisStatus) {
+                        analysisStatus.style.display = 'none';
+                    }
+                }, 2000);
+            }
+        } else {
+            console.error('خطا در تحلیل:', data.error);
         }
     } catch (error) {
         console.error('خطا در تحلیل عکس محتوا:', error);
