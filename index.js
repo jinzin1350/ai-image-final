@@ -2489,6 +2489,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       if (!selectedModel) {
         return res.status(400).json({ error: 'مدل نامعتبر است' });
       }
+    } else if (mode === 'style-transfer') {
+      // Style transfer doesn't need model or background (uses style images for people and content image for environment)
+      // Validation already done earlier - just need style images and content image
     } else {
       // Other modes need both model and background
       if (!selectedModel || !selectedBackground) {
