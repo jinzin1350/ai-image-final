@@ -2681,7 +2681,14 @@ KEY REQUIREMENTS:
    **DENIM FABRIC (if applicable):**
    - Preserve EXACT denim wash color (light blue, dark blue, black, etc.)
    - Show authentic denim texture with visible weave pattern
-   - Maintain any distressing, fading, or whiskering exactly as shown
+   - ⚠️ CRITICAL - RIPPED/DISTRESSED DETAILS:
+     * If denim has ripped/torn areas (holes, tears): preserve EXACT location, size, and shape of each rip
+     * Show frayed edges on rips with visible white threads/fibers unraveling
+     * Maintain distressed areas (worn spots, scratches, abrasions) exactly as shown in original
+     * Keep fading patterns and whiskering in exact same positions
+     * DO NOT remove, minimize, relocate, or "fix" any ripped or distressed details
+     * Render the "destroyed" or "worn" look authentically if present
+     * Show underlying layers or skin visible through rips where applicable
    - Keep denim stitching visible (typically orange/yellow contrast stitching)
    - Show natural denim wrinkle patterns and creases
 
@@ -2727,6 +2734,7 @@ DO NOT:
 - ❌ CRITICAL: DO NOT change garment colors - keep EXACT colors from garment image
 - ❌ CRITICAL: DO NOT deform or blur zippers - render them with full detail and correct metal color
 - ❌ CRITICAL: DO NOT change denim wash colors or remove denim texture
+- ❌ CRITICAL: DO NOT remove, minimize, or "fix" ripped/distressed areas on denim - keep ALL tears and holes exactly as shown
 - ❌ CRITICAL: DO NOT simplify hardware details (zippers, buttons, rivets, snaps)
 - Simplify or omit garment details like buttons, zippers, stitching, or pockets
 - Smooth out fabric texture or make it look artificial
@@ -3300,6 +3308,7 @@ ${hasTwoModels
    ⚠️ **CRITICAL - EXACT COLOR & DETAIL PRESERVATION:**
    - Use EXACT colors from garment image${hasTwoModels ? 's' : ''} - do NOT change or shift colors
    - If denim: preserve EXACT wash color (light/dark blue, black) and denim texture
+   - RIPPED/DISTRESSED DENIM: If garment has ripped/torn areas, preserve EXACT location, size, shape - show frayed edges and visible skin/layers through holes - DO NOT remove or "fix" distressing
    - ZIPPERS: Render with correct metal color, visible teeth, proper zipper pull - DO NOT deform or blur
    - BUTTONS: Show exact positions, colors, and materials
    - STITCHING: Preserve all visible stitching, especially contrast stitching on denim
@@ -3330,6 +3339,7 @@ ${hasTwoModels
 - ❌ CRITICAL: DO NOT change garment colors - keep EXACT colors from garment image${hasTwoModels ? 's' : ''}
 - ❌ CRITICAL: DO NOT deform or blur zippers - render with full detail and correct metal color
 - ❌ CRITICAL: DO NOT change denim wash colors or remove denim texture
+- ❌ CRITICAL: DO NOT remove, minimize, or "fix" ripped/distressed areas on denim - keep ALL tears and holes exactly as shown
 - ❌ CRITICAL: DO NOT simplify hardware details (zippers, buttons, rivets, snaps)
 - Simplify or omit garment details like stitching, pockets, or decorative elements
 - Smooth out fabric texture or make it look artificial
