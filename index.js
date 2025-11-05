@@ -2307,6 +2307,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       referencePhotoPeopleCount, // NEW: Number of people detected in reference photo
       styleImagePaths,  // NEW: For style-transfer mode (array of 1-3 style reference images)
       contentImagePath, // NEW: For style-transfer mode (content image to apply style to)
+      contentImageAnalysis, // NEW: AI analysis of content image (lighting, mood, atmosphere)
       modelId,
       modelId2,         // NEW: Second model ID (for 2-model mode)
       garmentPaths2,    // NEW: Garments for second model
@@ -3529,13 +3530,19 @@ ${numStyleImages > 1
   : `- Take the person from the style image with their EXACT outfit, face, body, pose`}
 
 **SECONDARY GOAL: Apply lighting/mood from content image**
-- Analyze the content/reference image (Image ${numStyleImages + 1}) for:
+${contentImageAnalysis ? `
+📋 **AI ANALYSIS OF CONTENT/REFERENCE IMAGE:**
+${contentImageAnalysis}
+
+- Use this analysis as your PRIMARY GUIDE for lighting, mood, and atmosphere
+- Match the exact lighting characteristics described above
+` : `- Analyze the content/reference image (Image ${numStyleImages + 1}) for:
   * Lighting direction, intensity, and color temperature
   * Time of day feel (golden hour, midday, blue hour, etc.)
   * Mood and atmosphere (bright, moody, dramatic, soft, romantic)
   * Color grading and tone
   * Shadow characteristics
-- Apply ONLY these lighting/mood aspects to the combined photo
+`}- Apply ONLY these lighting/mood aspects to the combined photo
 - Match the FEEL and VIBE of the lighting in the content image
 
 **What to PRESERVE from style images (MOST CRITICAL):**

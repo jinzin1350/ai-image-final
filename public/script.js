@@ -60,6 +60,7 @@ let referencePhotoPeopleCount = 1; // Number of people detected in reference pho
 // NEW: Style Transfer mode variables
 let uploadedStyleImages = []; // Array of style reference images (1-3)
 let uploadedContentImage = null; // Content image to apply style to
+let contentImageAnalysis = null; // AI analysis of content image (lighting, mood, atmosphere)
 
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
@@ -998,6 +999,10 @@ async function uploadContentImage(file) {
             contentImagePreview.style.display = 'block';
             contentImagePlaceholder.style.display = 'none';
 
+            // Analyze content image for lighting/mood/atmosphere
+            console.log('🔍 در حال تحلیل عکس محتوا...');
+            await analyzeContentImage(data.filePath);
+
             checkGenerateButton();
         }
     } catch (error) {
@@ -1005,9 +1010,33 @@ async function uploadContentImage(file) {
     }
 }
 
+// Analyze content image (similar to reference photo analysis)
+async function analyzeContentImage(photoPath) {
+    try {
+        const response = await fetch('/api/analyze-scene', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ photoPath })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            contentImageAnalysis = data.analysis;
+            console.log('✅ تحلیل عکس محتوا کامل شد');
+            console.log('📊 Analysis:', data.analysis);
+        }
+    } catch (error) {
+        console.error('خطا در تحلیل عکس محتوا:', error);
+    }
+}
+
 // Remove content image
 function removeContentImage() {
     uploadedContentImage = null;
+    contentImageAnalysis = null; // Clear analysis
     const contentImagePreview = document.getElementById('contentImagePreview');
     const contentImagePlaceholder = document.getElementById('contentImagePlaceholder');
     const contentImageInput = document.getElementById('contentImageInput');
@@ -1558,6 +1587,7 @@ generateBtn.addEventListener('click', async () => {
             // Style Transfer mode - apply lighting/mood from style images to content image
             requestBody.styleImagePaths = uploadedStyleImages;
             requestBody.contentImagePath = uploadedContentImage;
+            requestBody.contentImageAnalysis = contentImageAnalysis; // AI analysis of content image lighting/mood
         }
 
         console.log('🚀 Sending request:', requestBody);
