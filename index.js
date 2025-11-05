@@ -2174,6 +2174,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate)
       sceneAnalysis,    // NEW: AI analysis of the reference photo
       modelId,
+      modelId2,         // NEW: Second model ID (for 2-model mode)
+      garmentPaths2,    // NEW: Garments for second model
       modelAge,         // NEW: Exact age of model (3-80)
       modelEthnicity,   // NEW: Ethnicity (iranian, turkmen, tajik, iraqi, arab, etc.)
       backgroundId,
@@ -2256,6 +2258,36 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         };
       }
     }
+
+    // Find model 2 if provided (for 2-model mode)
+    let selectedModel2 = null;
+    if (modelId2) {
+      selectedModel2 = models.find(m => m.id === modelId2) || accessoryModels.find(m => m.id === modelId2);
+
+      // If not found in hardcoded models and ID starts with 'custom-', fetch from database
+      if (!selectedModel2 && modelId2.startsWith('custom-') && supabase) {
+        const customId2 = modelId2.replace('custom-', '');
+        const { data: customModel2 } = await supabase
+          .from('content_library')
+          .select('*')
+          .eq('id', customId2)
+          .eq('content_type', 'model')
+          .single();
+
+        if (customModel2) {
+          selectedModel2 = {
+            id: `custom-${customModel2.id}`,
+            name: customModel2.name,
+            category: customModel2.category,
+            description: customModel2.description || customModel2.name,
+            image: customModel2.image_url
+          };
+        }
+      }
+    }
+
+    // Support garments for model 2
+    const garments2 = garmentPaths2 || [];
 
     // Find background (check hardcoded first, then custom from database)
     // Search in both regular and product backgrounds
@@ -2350,6 +2382,17 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         garments.map(path => imageUrlToBase64(path))
       );
       modelBase64 = await imageUrlToBase64(selectedModel.image);
+
+      // Load model 2 and garments 2 if provided
+      if (selectedModel2 && garments2.length > 0) {
+        const garments2Base64 = await Promise.all(
+          garments2.map(path => imageUrlToBase64(path))
+        );
+        const model2Base64 = await imageUrlToBase64(selectedModel2.image);
+
+        // Add garments2 and model2 to the array
+        garmentBase64Array = [...garmentBase64Array, ...garments2Base64, model2Base64];
+      }
 
       garmentDescription = garments.length === 1
         ? 'the garment/clothing from the first image'
@@ -2518,14 +2561,44 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 - Natural appearance for a ${age}-year-old person`;
       }
 
-      prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
+      // Handle 2-model mode
+      let twoModelInstructions = '';
+      if (selectedModel2 && garments2.length > 0) {
+        const garment2Description = garments2.length === 1
+          ? 'the garment (image ' + (garments.length + 2) + ')'
+          : `the garments (images ${garments.length + 2}-${garments.length + 1 + garments2.length})`;
+
+        twoModelInstructions = `
+
+CRITICAL 2-MODEL REQUIREMENTS:
+- There are EXACTLY 2 people in this photo
+- Model 1 (image ${garments.length + 1}) wears ${garmentDescription}
+- Model 2 (image ${garments.length + garments2.length + 2}) wears ${garment2Description}
+- BOTH models must be clearly visible in the photo
+- Position them naturally side-by-side or in complementary poses
+- Maintain professional composition with both models
+- Each model wears THEIR OWN garment - do NOT mix them up`;
+
+        prompt = `Create a photorealistic fashion photo showing TWO MODELS, each wearing different garments.
+
+IMAGES PROVIDED:
+- Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment for Model 1
+- Image ${garments.length + 1}: Model 1 (person)
+- Image ${garments2.length === 1 ? (garments.length + 2) : `${garments.length + 2}-${garments.length + 1 + garments2.length}`}: Garment for Model 2
+- Image ${garments.length + garments2.length + 2}: Model 2 (person)
+
+TASK:
+Show BOTH models together, each wearing their respective garments. Model 1 wears ${garmentDescription}, Model 2 wears ${garment2Description}. Make it look like a real professional photograph with two people.${ageSpecificInstructions}${twoModelInstructions}`;
+      } else {
+        prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
 
 IMAGES PROVIDED:
 - Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment/clothing to wear
 - Image ${garments.length + 1}: Model (person)
 
 TASK:
-Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.${ageSpecificInstructions}
+Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.${ageSpecificInstructions}`;
+      }
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
