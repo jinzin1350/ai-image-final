@@ -2600,6 +2600,8 @@ TASK:
 Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.${ageSpecificInstructions}`;
       }
 
+      prompt += `
+
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
 - Aspect Ratio: ${selectedAspectRatio.description}
