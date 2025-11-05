@@ -4126,16 +4126,23 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
     // Fetch all user's images (no pagination, just simple list)
     const { data, error } = await supabase
       .from('generated_images')
-      .select('id, generated_image_url as image_url, created_at')
+      .select('id, generated_image_url, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(100); // Limit to recent 100 images
 
     if (error) throw error;
 
+    // Map to format expected by frontend (image_url instead of generated_image_url)
+    const images = data ? data.map(img => ({
+      id: img.id,
+      image_url: img.generated_image_url,
+      created_at: img.created_at
+    })) : [];
+
     res.json({
       success: true,
-      images: data || []
+      images: images
     });
   } catch (error) {
     console.error('Error fetching user images:', error);
