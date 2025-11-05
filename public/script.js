@@ -57,6 +57,10 @@ let uploadedReferencePhoto = null; // Path to uploaded reference photo
 let sceneAnalysis = null; // AI-generated scene analysis/description
 let referencePhotoPeopleCount = 1; // Number of people detected in reference photo
 
+// NEW: Style Transfer mode variables
+let uploadedStyleImages = []; // Array of style reference images (1-3)
+let uploadedContentImage = null; // Content image to apply style to
+
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
 let selectedDofId = 'medium';

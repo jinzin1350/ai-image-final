@@ -85,6 +85,18 @@
                             <span class="feature-tag">✓ نورپردازی مشابه</span>
                         </div>
                     </div>
+
+                    <div class="mode-card" data-mode="style-transfer">
+                        <div class="mode-badge new-badge">✨ جدید</div>
+                        <div class="mode-icon">🎨</div>
+                        <div class="mode-title">انتقال استایل</div>
+                        <div class="mode-description">انتقال فضا و حال عکس‌های استایل به عکس اصلی</div>
+                        <div class="mode-features">
+                            <span class="feature-tag">✓ تا 3 عکس استایل</span>
+                            <span class="feature-tag">✓ حفظ محتوا</span>
+                            <span class="feature-tag">✓ فقط فضا/نور</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -406,6 +418,50 @@
                         <!-- Analysis text will be inserted here -->
                     </div>
                     <button id="reanalyzeBtn" class="secondary-btn" style="margin-top: 15px;">🔄 تحلیل مجدد</button>
+                </div>
+            </section>
+
+            <!-- بخش Style Transfer -->
+            <section class="upload-section" id="styleTransferSection" style="display: none;">
+                <h2>۱. آپلود عکس‌های استایل (۱ تا ۳ عکس)</h2>
+                <p class="section-description">عکس‌هایی را آپلود کنید که می‌خواهید فضا، نور و حال و هوای آن‌ها را به عکس اصلی منتقل کنید</p>
+                <div class="upload-area" id="styleImagesUploadArea">
+                    <input type="file" id="styleImagesInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="styleImagesPlaceholder">
+                        <div class="upload-icon">🎨</div>
+                        <div class="upload-text">
+                            <p><strong>کلیک کنید یا عکس‌های استایل را بکشید و رها کنید</strong></p>
+                            <p class="upload-hint">۱ تا ۳ عکس با فضا و نوری که دوست دارید</p>
+                        </div>
+                        <div class="supported-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="styleImagesPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+
+                <h2 style="margin-top: 40px;">۲. آپلود عکس اصلی (محتوا)</h2>
+                <p class="section-description">عکسی که می‌خواهید استایل به آن اعمال شود (محتوا حفظ می‌شود، فقط فضا و نور تغییر می‌کند)</p>
+                <div class="upload-area" id="contentImageUploadArea">
+                    <input type="file" id="contentImageInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="contentImagePlaceholder">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">
+                            <p><strong>کلیک کنید یا عکس اصلی را بکشید و رها کنید</strong></p>
+                            <p class="upload-hint">این عکس حفظ می‌شود، فقط فضا و نورش تغییر می‌کند</p>
+                        </div>
+                        <div class="supported-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="contentImagePreview" style="display: none; margin-top: 20px;">
+                        <img id="contentImageImg" style="max-width: 100%; max-height: 400px; border-radius: 8px;">
+                        <button class="remove-btn" onclick="removeContentImage()">حذف عکس</button>
+                    </div>
                 </div>
             </section>
 
