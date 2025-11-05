@@ -4114,6 +4114,38 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
   }
 });
 
+// Simple alias for gallery images (used by style transfer gallery selector)
+app.get('/api/user-images', authenticateUser, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, images: [] });
+    }
+
+    const userId = req.user.id;
+
+    // Fetch all user's images (no pagination, just simple list)
+    const { data, error } = await supabase
+      .from('generated_images')
+      .select('id, generated_image_url as image_url, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(100); // Limit to recent 100 images
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      images: data || []
+    });
+  } catch (error) {
+    console.error('Error fetching user images:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطا در بارگذاری تصاویر'
+    });
+  }
+});
+
 // تولید تصاویر مدل‌ها (endpoint برای اجرای دستی)
 app.post('/api/generate-models', async (req, res) => {
   try {
