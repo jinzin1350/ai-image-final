@@ -855,6 +855,24 @@ async function analyzeReferencePhoto(photoPath) {
             sceneAnalysisText.innerHTML = `${peopleInfo}<p>${data.analysis}</p>`;
 
             console.log(`✅ Person count detected: ${referencePhotoPeopleCount}`);
+
+            // Show Model 2 section if 2+ people detected
+            if (referencePhotoPeopleCount >= 2) {
+                model2Section.style.display = 'block';
+                garmentUploadSection2.style.display = 'block';
+                modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+
+                // Load models for model 2
+                displayModelsByCategory2('woman');
+
+                console.log('👥 Showing Model 2 section because reference has multiple people');
+            } else {
+                model2Section.style.display = 'none';
+                garmentUploadSection2.style.display = 'none';
+                modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+                selectedModelId2 = null;
+                uploadedGarmentPaths2 = [];
+            }
         } else {
             sceneAnalysisText.innerHTML = '<p style="color: red;">❌ خطا در تحلیل عکس</p>';
             alert('خطا در تحلیل عکس: ' + data.error);
@@ -1099,11 +1117,22 @@ function checkGenerateButton() {
         const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
-        isValid = uploadedReferencePhoto !== null &&
-                  sceneAnalysis !== null &&
-                  uploadedGarmentPaths.length > 0 &&
-                  selectedModelId &&
-                  hijabCondition;
+        // If 2+ people detected, require model 2 as well
+        if (referencePhotoPeopleCount >= 2) {
+            isValid = uploadedReferencePhoto !== null &&
+                      sceneAnalysis !== null &&
+                      uploadedGarmentPaths.length > 0 &&
+                      uploadedGarmentPaths2.length > 0 &&
+                      selectedModelId &&
+                      selectedModelId2 &&
+                      hijabCondition;
+        } else {
+            isValid = uploadedReferencePhoto !== null &&
+                      sceneAnalysis !== null &&
+                      uploadedGarmentPaths.length > 0 &&
+                      selectedModelId &&
+                      hijabCondition;
+        }
     }
 
     generateBtn.disabled = !isValid;
@@ -1373,6 +1402,12 @@ generateBtn.addEventListener('click', async () => {
             requestBody.modelId = selectedModelId;
             requestBody.hijabType = selectedHijabType;
             requestBody.referencePhotoPeopleCount = referencePhotoPeopleCount; // Send detected person count
+
+            // If 2+ people detected, send model 2 and garments 2
+            if (referencePhotoPeopleCount >= 2) {
+                requestBody.modelId2 = selectedModelId2;
+                requestBody.garmentPaths2 = uploadedGarmentPaths2;
+            }
         }
 
         console.log('🚀 Sending request:', requestBody);

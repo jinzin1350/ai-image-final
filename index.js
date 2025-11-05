@@ -2499,12 +2499,26 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       );
       modelBase64 = await imageUrlToBase64(selectedModel.image);
 
+      // Load Model 2 and its garments if provided (for 2+ people in reference photo)
+      let model2Base64 = null;
+      let garment2Base64Array = [];
+      if (selectedModel2 && garmentPaths2 && garmentPaths2.length > 0) {
+        model2Base64 = await imageUrlToBase64(selectedModel2.image);
+        garment2Base64Array = await Promise.all(
+          garmentPaths2.map(path => imageUrlToBase64(path))
+        );
+        console.log(`👥 Scene recreation with 2 models: Model 1 + Model 2`);
+      }
+
       garmentDescription = garments.length === 1
         ? 'the garment/clothing from the garment image'
         : `ALL ${garments.length} garments/clothing items (combine them on the model)`;
 
-      // Store reference photo for later use
+      // Store additional data for later use
       selectedModel.referencePhotoBase64 = referencePhotoBase64;
+      selectedModel.model2Base64 = model2Base64;
+      selectedModel.garment2Base64Array = garment2Base64Array;
+      selectedModel.garmentPaths2 = garmentPaths2;
       locationDescription = 'Scene from reference photo';
     }
 
@@ -3117,31 +3131,58 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
         ? 'TWO people (BOTH models)'
         : 'THREE people (ALL THREE models)';
 
+      // Check if we have 2 models provided
+      const hasTwoModels = selectedModel.model2Base64 && selectedModel.garment2Base64Array.length > 0;
+
       const multiPersonInstruction = peopleCount > 1
         ? `\n\n⚠️ CRITICAL MULTI-PERSON REQUIREMENT:
 - The reference photo contains ${peopleCount} people
 - Your generated photo MUST also show ${peopleCount} people
 - Recreate the same number of people with similar positioning and interaction
-- Each person should wear the garment/clothing provided
+${hasTwoModels
+  ? '- Model 1 wears Garment 1, Model 2 wears Garment 2 (each person wears their own garment)'
+  : '- Each person should wear the garment/clothing provided'}
 - Maintain natural spacing and composition between people as seen in reference`
         : '';
 
-      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT, INSPIRED BY the style, lighting, and mood of the reference photo.
+      // Build image description based on whether we have 2 models
+      let imageDescription = '';
+      let currentImageIndex = 1;
+
+      if (hasTwoModels) {
+        // 2 models mode: Model 1, Garment 1, Model 2, Garment 2, Reference
+        imageDescription = `- Image ${currentImageIndex}: ⭐ MODEL 1 - First person to photograph (use their EXACT face and body)
+- Image ${currentImageIndex + 1}${garments.length > 1 ? `-${currentImageIndex + garments.length}` : ''}: GARMENT 1 - Clothing for MODEL 1 to wear
+- Image ${currentImageIndex + garments.length + 1}: ⭐ MODEL 2 - Second person to photograph (use their EXACT face and body)
+- Image ${currentImageIndex + garments.length + 2}${selectedModel.garment2Base64Array.length > 1 ? `-${currentImageIndex + garments.length + 1 + selectedModel.garment2Base64Array.length}` : ''}: GARMENT 2 - Clothing for MODEL 2 to wear
+- Image ${currentImageIndex + garments.length + selectedModel.garment2Base64Array.length + 2}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the people's faces)`;
+      } else {
+        // Single model mode
+        imageDescription = `- Image ${currentImageIndex}: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)${peopleCount > 1 ? ` (NOTE: Since reference has ${peopleCount} people, duplicate this model ${peopleCount} times in similar poses)` : ''}
+- Image ${garments.length === 1 ? currentImageIndex + 1 : `${currentImageIndex + 1}-${currentImageIndex + garments.length}`}: GARMENT - Clothing for the MODEL to wear
+- Image ${currentImageIndex + garments.length + 1}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)`;
+      }
+
+      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.
 
 IMAGES PROVIDED (IN ORDER):
-- Image 1: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)${peopleCount > 1 ? ` (NOTE: Since reference has ${peopleCount} people, duplicate this model ${peopleCount} times in similar poses)` : ''}
-- Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: GARMENT - Clothing for the MODEL to wear
-- Image ${garments.length + 2}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)
+${imageDescription}
 
 ⚠️ CRITICAL APPROACH:
 
-**PRIMARY GOAL: Photograph the MODEL from Image 1**
-- The person in the final photo MUST be the MODEL from Image 1
+**PRIMARY GOAL: Photograph the MODEL${hasTwoModels ? 'S' : ''} from the model image${hasTwoModels ? 's' : ''}**
+${hasTwoModels
+  ? `- The TWO people in the final photo MUST be MODEL 1 (Image 1) and MODEL 2 (Image ${garments.length + 2})
+- Use MODEL 1's EXACT face, facial features, body type, skin tone, and hair from Image 1
+- Use MODEL 2's EXACT face, facial features, body type, skin tone, and hair from Image ${garments.length + 2}
+- This is the most important requirement - BOTH models must be recognizable as the people from their respective images
+- DO NOT duplicate Model 1 twice - use BOTH different models`
+  : `- The person in the final photo MUST be the MODEL from Image 1
 - Use their EXACT face, facial features, body type, skin tone, and hair
-- This is the most important requirement - the MODEL must be recognizable as the person from Image 1
+- This is the most important requirement - the MODEL must be recognizable as the person from Image 1`}
 
 **SECONDARY GOAL: Create a SIMILAR style inspired by the reference**
-- Study the reference photo (Image ${garments.length + 2}) for inspiration
+- Study the reference photo (Image ${hasTwoModels ? garments.length + selectedModel.garment2Base64Array.length + 3 : garments.length + 2}) for inspiration
 - Copy the general TYPE of location (e.g., if it's outdoors in nature, shoot outdoors in nature)
 - Match the STYLE of lighting (e.g., if it's golden hour, use golden hour lighting)
 - Recreate the MOOD and atmosphere (e.g., if it's romantic, create romantic mood)
@@ -3163,7 +3204,9 @@ IMAGES PROVIDED (IN ORDER):
 ❌ The exact clothing from the reference
 
 TASK DESCRIPTION:
-Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.${multiPersonInstruction}
+${hasTwoModels
+  ? `Create a NEW professional fashion photo of TWO MODELS: MODEL 1 from Image 1 wearing GARMENT 1, and MODEL 2 from Image ${garments.length + 2} wearing GARMENT 2, photographed in a similar style and mood as the reference photo. The key is: BOTH MODELS (separately) + THEIR GARMENTS + SIMILAR (not identical) SCENE/STYLE.`
+  : `Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.`}${multiPersonInstruction}
 
 AI SCENE ANALYSIS:
 The reference photo has been analyzed by AI with these findings:
@@ -3176,30 +3219,42 @@ TECHNICAL SPECS:
 - Garment Fit: ${selectedFit.description}${hijabDescription ? `\n- Hijab Style: ${hijabDescription}` : ''}
 
 KEY REQUIREMENTS:
-1. **The MODEL is the Star (MOST IMPORTANT)**:
-   - The person in the final photo MUST be the MODEL from Image 1
+1. **The MODEL${hasTwoModels ? 'S ARE' : ' is'} the Star${hasTwoModels ? 's' : ''} (MOST IMPORTANT)**:
+${hasTwoModels
+  ? `   - The TWO people in the final photo MUST be MODEL 1 from Image 1 and MODEL 2 from Image ${garments.length + 2}
+   - Use MODEL 1's EXACT face - every facial feature must match Image 1
+   - Use MODEL 2's EXACT face - every facial feature must match Image ${garments.length + 2}
+   - Use their EXACT body types, skin tones, and hair from their respective images
+   - BOTH models must be clearly recognizable as the people from their images
+   - DO NOT duplicate Model 1 twice - use TWO DIFFERENT models
+   - DO NOT use or blend the faces/bodies from the reference photo`
+  : `   - The person in the final photo MUST be the MODEL from Image 1
    - Use their EXACT face - every facial feature must match Image 1
    - Use their EXACT body type, skin tone, and hair from Image 1
    - The MODEL must be clearly recognizable as the person from Image 1
-   - DO NOT use or blend the face/body from the reference photo
+   - DO NOT use or blend the face/body from the reference photo`}
 
 2. **Create a SIMILAR Scene (Inspired, Not Identical)**:
-   - If reference shows outdoor park → shoot MODEL in a similar outdoor park setting
-   - If reference shows indoor studio → shoot MODEL in a similar studio setting
-   - If reference has golden sunset light → use golden sunset-style lighting on MODEL
-   - If reference has dramatic shadows → create dramatic shadows for MODEL
+   - If reference shows outdoor park → shoot MODEL${hasTwoModels ? 'S' : ''} in a similar outdoor park setting
+   - If reference shows indoor studio → shoot MODEL${hasTwoModels ? 'S' : ''} in a similar studio setting
+   - If reference has golden sunset light → use golden sunset-style lighting on MODEL${hasTwoModels ? 'S' : ''}
+   - If reference has dramatic shadows → create dramatic shadows for MODEL${hasTwoModels ? 'S' : ''}
    - Copy the FEEL and VIBE, not the exact pixels
 
 3. **Pose and Composition Guidance**:
-   - If reference has a person in a specific pose → position MODEL in a similar pose
+   - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}
    - Use a similar camera angle and framing style
    - Match the general composition approach
-   - But the face MUST be the MODEL from Image 1
+   - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}
 
 4. **Garment Integration**:
-   - Dress the MODEL in ${garmentDescription}
-   - Garment should fit naturally with realistic wrinkles and fabric draping
-   - Accurate garment colors and patterns from the garment image
+${hasTwoModels
+  ? `   - Dress MODEL 1 in ${garmentDescription}
+   - Dress MODEL 2 in ${selectedModel.garmentPaths2.length === 1 ? 'the garment from their garment image' : `ALL ${selectedModel.garmentPaths2.length} garments (combine them on Model 2)`}
+   - Each model wears THEIR OWN garment - do NOT mix them up`
+  : `   - Dress the MODEL in ${garmentDescription}`}
+   - Garment${hasTwoModels ? 's' : ''} should fit naturally with realistic wrinkles and fabric draping
+   - Accurate garment colors and patterns from the garment image${hasTwoModels ? 's' : ''}
    - Preserve ALL fabric details: stitching, seams, texture, buttons, zippers, pockets
    - Show material quality indicators (sheen, texture, weight)${hijabDescription ? `\n   - Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
@@ -3211,13 +3266,16 @@ KEY REQUIREMENTS:
    - Make it look like a real photo taken in that actual location
 
 DO NOT:
-- ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo (Image ${garments.length + 2})
+- ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo (Image ${hasTwoModels ? garments.length + selectedModel.garment2Base64Array.length + 3 : garments.length + 2})
 - ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference
-- ❌ The person must be the MODEL from Image 1 (FIRST image), not anyone from the reference photo
+${hasTwoModels
+  ? `- ❌ CRITICAL: DO NOT duplicate Model 1 twice - use BOTH Model 1 AND Model 2 as two DIFFERENT people
+- ❌ The TWO people must be MODEL 1 from Image 1 and MODEL 2 from Image ${garments.length + 2}, not anyone from the reference photo`
+  : `- ❌ The person must be the MODEL from Image 1 (FIRST image), not anyone from the reference photo`}
 - Change the scene, location, or environment from the reference photo
 - Alter the lighting mood or atmosphere from the reference photo
 - Change the camera angle or composition from the reference photo
-- Make the model look different from Image 1
+- Make the model${hasTwoModels ? 's' : ''} look different from ${hasTwoModels ? 'their respective images' : 'Image 1'}
 - Create obvious fake composites or artificial effects
 - Add text, watermarks, or logos
 - Simplify or omit garment details
@@ -3344,34 +3402,85 @@ Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the
       // NOTE: No model needed - AI generates overhead flat lay composition naturally
 
     } else if (mode === 'scene-recreation') {
-      // Scene Recreation mode: MODEL FIRST (most important), then garments, then reference
-      // This order emphasizes that the MODEL is the person to use
+      // Scene Recreation mode: MODEL(S) FIRST (most important), then garments, then reference
+      // This order emphasizes that the MODEL(S) are the people to use
 
-      contentParts.push({ text: "⭐ MODEL IMAGE - THIS IS THE PERSON TO USE (their face and body):" });
-      contentParts.push({
-        inlineData: {
-          data: modelBase64,
-          mimeType: 'image/jpeg'
-        }
-      });
+      // Check if we have 2 models
+      const hasTwoModels = selectedModel.model2Base64 && selectedModel.garment2Base64Array.length > 0;
 
-      garmentBase64Array.forEach((garmentBase64, index) => {
-        contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1} (put this on the MODEL):` });
+      if (hasTwoModels) {
+        // 2 models mode: Model 1, Garment 1, Model 2, Garment 2, Reference
+        contentParts.push({ text: "⭐ MODEL 1 IMAGE - FIRST PERSON TO USE (their face and body):" });
         contentParts.push({
           inlineData: {
-            data: garmentBase64,
+            data: modelBase64,
             mimeType: 'image/jpeg'
           }
         });
-      });
 
-      contentParts.push({ text: `REFERENCE PHOTO (copy the SCENE/LIGHTING/BACKGROUND only, NOT the people):` });
-      contentParts.push({
-        inlineData: {
-          data: selectedModel.referencePhotoBase64,
-          mimeType: 'image/jpeg'
-        }
-      });
+        garmentBase64Array.forEach((garmentBase64, index) => {
+          contentParts.push({ text: `GARMENT ${index + 1} FOR MODEL 1 (put this on MODEL 1):` });
+          contentParts.push({
+            inlineData: {
+              data: garmentBase64,
+              mimeType: 'image/jpeg'
+            }
+          });
+        });
+
+        contentParts.push({ text: "⭐ MODEL 2 IMAGE - SECOND PERSON TO USE (their face and body):" });
+        contentParts.push({
+          inlineData: {
+            data: selectedModel.model2Base64,
+            mimeType: 'image/jpeg'
+          }
+        });
+
+        selectedModel.garment2Base64Array.forEach((garmentBase64, index) => {
+          contentParts.push({ text: `GARMENT ${index + 1} FOR MODEL 2 (put this on MODEL 2):` });
+          contentParts.push({
+            inlineData: {
+              data: garmentBase64,
+              mimeType: 'image/jpeg'
+            }
+          });
+        });
+
+        contentParts.push({ text: `REFERENCE PHOTO (copy the SCENE/LIGHTING/BACKGROUND only, NOT the people):` });
+        contentParts.push({
+          inlineData: {
+            data: selectedModel.referencePhotoBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      } else {
+        // Single model mode
+        contentParts.push({ text: "⭐ MODEL IMAGE - THIS IS THE PERSON TO USE (their face and body):" });
+        contentParts.push({
+          inlineData: {
+            data: modelBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+
+        garmentBase64Array.forEach((garmentBase64, index) => {
+          contentParts.push({ text: `GARMENT/CLOTHING IMAGE ${index + 1} (put this on the MODEL):` });
+          contentParts.push({
+            inlineData: {
+              data: garmentBase64,
+              mimeType: 'image/jpeg'
+            }
+          });
+        });
+
+        contentParts.push({ text: `REFERENCE PHOTO (copy the SCENE/LIGHTING/BACKGROUND only, NOT the people):` });
+        contentParts.push({
+          inlineData: {
+            data: selectedModel.referencePhotoBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      }
     }
 
     // Add the prompt
