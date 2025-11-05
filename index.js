@@ -4144,7 +4144,12 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
       .order('created_at', { ascending: false })
       .limit(100); // Limit to recent 100 images
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Database error fetching images:', error);
+      throw error;
+    }
+
+    console.log(`📸 Found ${data?.length || 0} images for user ${userId}`);
 
     // Map to format expected by frontend (image_url instead of generated_image_url)
     const images = data ? data.map(img => ({
@@ -4152,6 +4157,8 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
       image_url: img.generated_image_url,
       created_at: img.created_at
     })) : [];
+
+    console.log(`✅ Returning ${images.length} images to frontend`);
 
     res.json({
       success: true,
