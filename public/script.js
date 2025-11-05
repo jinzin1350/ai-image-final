@@ -121,6 +121,7 @@ const garmentUploadSection = document.getElementById('garmentUploadSection');
 const accessoryUploadSection = document.getElementById('accessoryUploadSection');
 const colorCollectionUploadSection = document.getElementById('colorCollectionUploadSection');
 const flatLayUploadSection = document.getElementById('flatLayUploadSection');
+const styleTransferSection = document.getElementById('styleTransferSection');
 const modelSection = document.getElementById('modelSection');
 const backgroundSection = document.getElementById('backgroundSection');
 
@@ -899,6 +900,125 @@ function removeReferencePhoto() {
 }
 
 // ========================================
+// Style Transfer Functions
+// ========================================
+
+// Upload multiple style images (1-3)
+async function uploadStyleImages(files) {
+    // Limit to 3 files
+    if (files.length > 3) {
+        alert('حداکثر ۳ عکس استایل می‌توانید آپلود کنید');
+        files = Array.from(files).slice(0, 3);
+    }
+
+    uploadedStyleImages = [];
+
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('styleImage', file);
+
+        try {
+            const response = await fetch('/api/upload-style', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                uploadedStyleImages.push(data.filePath);
+            }
+        } catch (error) {
+            console.error('خطا در آپلود عکس استایل:', error);
+        }
+    }
+
+    // Show previews
+    const styleImagesPreviews = document.getElementById('styleImagesPreviews');
+    const styleImagesPlaceholder = document.getElementById('styleImagesPlaceholder');
+
+    styleImagesPreviews.style.display = 'grid';
+    styleImagesPlaceholder.style.display = 'none';
+
+    styleImagesPreviews.innerHTML = uploadedStyleImages.map((path, index) => `
+        <div class="garment-preview-item">
+            <img src="${path}" alt="عکس استایل ${index + 1}">
+            <button class="remove-garment-btn" onclick="removeStyleImage(${index})">&times;</button>
+            <div class="garment-preview-label">استایل ${index + 1}</div>
+        </div>
+    `).join('');
+
+    checkGenerateButton();
+}
+
+// Remove a style image
+function removeStyleImage(index) {
+    uploadedStyleImages.splice(index, 1);
+    const styleImagesPreviews = document.getElementById('styleImagesPreviews');
+    const styleImagesPlaceholder = document.getElementById('styleImagesPlaceholder');
+
+    if (uploadedStyleImages.length === 0) {
+        styleImagesPreviews.style.display = 'none';
+        styleImagesPlaceholder.style.display = 'flex';
+    } else {
+        styleImagesPreviews.innerHTML = uploadedStyleImages.map((path, idx) => `
+            <div class="garment-preview-item">
+                <img src="${path}" alt="عکس استایل ${idx + 1}">
+                <button class="remove-garment-btn" onclick="removeStyleImage(${idx})">&times;</button>
+                <div class="garment-preview-label">استایل ${idx + 1}</div>
+            </div>
+        `).join('');
+    }
+
+    checkGenerateButton();
+}
+
+// Upload content image
+async function uploadContentImage(file) {
+    const formData = new FormData();
+    formData.append('contentImage', file);
+
+    try {
+        const response = await fetch('/api/upload-content', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            uploadedContentImage = data.filePath;
+
+            // Show preview
+            const contentImagePreview = document.getElementById('contentImagePreview');
+            const contentImageImg = document.getElementById('contentImageImg');
+            const contentImagePlaceholder = document.getElementById('contentImagePlaceholder');
+
+            contentImageImg.src = data.filePath;
+            contentImagePreview.style.display = 'block';
+            contentImagePlaceholder.style.display = 'none';
+
+            checkGenerateButton();
+        }
+    } catch (error) {
+        console.error('خطا در آپلود عکس محتوا:', error);
+    }
+}
+
+// Remove content image
+function removeContentImage() {
+    uploadedContentImage = null;
+    const contentImagePreview = document.getElementById('contentImagePreview');
+    const contentImagePlaceholder = document.getElementById('contentImagePlaceholder');
+    const contentImageInput = document.getElementById('contentImageInput');
+
+    contentImagePreview.style.display = 'none';
+    contentImagePlaceholder.style.display = 'flex';
+    contentImageInput.value = '';
+    checkGenerateButton();
+}
+
+// ========================================
 // NEW: Mode Switching Functions
 // ========================================
 
@@ -996,6 +1116,7 @@ function switchMode(mode) {
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
         sceneRecreationSection.style.display = 'block';
+        styleTransferSection.style.display = 'none';
         model2Section.style.display = 'none';
         garmentUploadSection2.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block'; // Need model
@@ -1003,6 +1124,21 @@ function switchMode(mode) {
         hijabSection.style.display = 'block'; // May need hijab
         const categorySelector = document.querySelector('.category-selector');
         if (categorySelector) categorySelector.style.display = 'block';
+    } else if (mode === 'style-transfer') {
+        // Style Transfer mode: upload style images + content image, apply lighting/mood only
+        garmentUploadSection.style.display = 'none';
+        accessoryUploadSection.style.display = 'none';
+        colorCollectionUploadSection.style.display = 'none';
+        displayScenarioSection.style.display = 'none';
+        flatLayUploadSection.style.display = 'none';
+        flatLayArrangementSection.style.display = 'none';
+        sceneRecreationSection.style.display = 'none';
+        styleTransferSection.style.display = 'block';
+        model2Section.style.display = 'none';
+        garmentUploadSection2.style.display = 'none';
+        if (modelSection) modelSection.style.display = 'none'; // No model selection needed
+        if (backgroundSection) backgroundSection.style.display = 'none'; // No background needed
+        hijabSection.style.display = 'none'; // No hijab needed
     }
 
     // Reset selections when switching modes
@@ -1137,6 +1273,11 @@ function checkGenerateButton() {
                       selectedModelId &&
                       hijabCondition;
         }
+
+    } else if (currentMode === 'style-transfer') {
+        // Style Transfer mode: need at least 1 style image and 1 content image
+        isValid = uploadedStyleImages.length >= 1 &&
+                  uploadedContentImage !== null;
     }
 
     generateBtn.disabled = !isValid;
@@ -1590,6 +1731,78 @@ if (reanalyzeBtn) {
     reanalyzeBtn.addEventListener('click', () => {
         if (uploadedReferencePhoto) {
             analyzeReferencePhoto(uploadedReferencePhoto);
+        }
+    });
+}
+
+// Event listeners for style transfer
+const styleImagesUploadArea = document.getElementById('styleImagesUploadArea');
+const styleImagesInput = document.getElementById('styleImagesInput');
+const contentImageUploadArea = document.getElementById('contentImageUploadArea');
+const contentImageInput = document.getElementById('contentImageInput');
+
+if (styleImagesUploadArea) {
+    styleImagesUploadArea.addEventListener('click', () => {
+        styleImagesInput.click();
+    });
+
+    styleImagesUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        styleImagesUploadArea.style.borderColor = 'var(--primary-color)';
+    });
+
+    styleImagesUploadArea.addEventListener('dragleave', () => {
+        styleImagesUploadArea.style.borderColor = '#ddd';
+    });
+
+    styleImagesUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        styleImagesUploadArea.style.borderColor = '#ddd';
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length > 0) {
+            uploadStyleImages(files);
+        }
+    });
+}
+
+if (styleImagesInput) {
+    styleImagesInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadStyleImages(files);
+        }
+    });
+}
+
+if (contentImageUploadArea) {
+    contentImageUploadArea.addEventListener('click', () => {
+        contentImageInput.click();
+    });
+
+    contentImageUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        contentImageUploadArea.style.borderColor = 'var(--primary-color)';
+    });
+
+    contentImageUploadArea.addEventListener('dragleave', () => {
+        contentImageUploadArea.style.borderColor = '#ddd';
+    });
+
+    contentImageUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        contentImageUploadArea.style.borderColor = '#ddd';
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            uploadContentImage(files[0]);
+        }
+    });
+}
+
+if (contentImageInput) {
+    contentImageInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadContentImage(files[0]);
         }
     });
 }
