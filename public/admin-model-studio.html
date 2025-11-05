@@ -216,6 +216,14 @@
                         <summary style="color: #0369a1;">📋 اطلاعات پایه</summary>
                         <div class="param-grid">
                             <div class="form-group">
+                                <label>تعداد افراد در عکس</label>
+                                <select id="numberOfPeople">
+                                    <option value="1" selected>👤 یک نفر</option>
+                                    <option value="2">👥 دو نفر (Duo)</option>
+                                    <option value="3">👨‍👩‍👦 سه نفر (Group)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>جنسیت</label>
                                 <select id="modelGender">
                                     <option value="female">👩 زن</option>
@@ -1298,6 +1306,7 @@
 
         function buildModelPrompt() {
             // Basic info
+            const numberOfPeople = parseInt(document.getElementById('numberOfPeople').value) || 1;
             const gender = document.getElementById('modelGender').value;
 
             // Get exact age directly from input
@@ -1390,19 +1399,37 @@
                 return buildBodyPartPrompt(bodyPartType, gender, ageExact, ethnicity, skinTone, skinTexture, quality);
             }
 
-            let prompt = `Professional ${quality} ${photoType} photograph of a ${ageRange} ${ethnicity} ${gender} model. `;
+            // Handle multiple people in photo
+            let peopleDescription;
+            if (numberOfPeople === 1) {
+                peopleDescription = `a ${ageRange} ${ethnicity} ${gender} model`;
+            } else if (numberOfPeople === 2) {
+                peopleDescription = `two ${ageRange} ${ethnicity} ${gender} models together in the same photo (duo/couple shot)`;
+            } else {
+                peopleDescription = `three ${ageRange} ${ethnicity} ${gender} models together in the same photo (group shot)`;
+            }
+
+            let prompt = `Professional ${quality} ${photoType} photograph of ${peopleDescription}. `;
+
+            // Add group composition instructions for multiple people
+            if (numberOfPeople > 1) {
+                prompt += `IMPORTANT: ${numberOfPeople} people must be clearly visible in the photo, naturally posed together with good composition and spacing. `;
+            }
 
             // For underwear models: HEADLESS/CROPPED (no face shown) for e-commerce focus
             if (!isUnderwear) {
-                prompt += `Face: ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
+                const facePrefix = numberOfPeople > 1 ? 'Each person has' : 'Face:';
+                prompt += `${facePrefix} ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
 
-                prompt += `Hair: ${hairLength} ${hairTexture} ${hairColor} hair styled in ${hairstyle}. `;
+                const hairPrefix = numberOfPeople > 1 ? 'Each has' : 'Hair:';
+                prompt += `${hairPrefix} ${hairLength} ${hairTexture} ${hairColor} hair styled in ${hairstyle}. `;
                 if (gender === 'male' && facialHair !== 'none') {
                     prompt += `${facialHair} facial hair. `;
                 }
             } else {
                 // Headless model for underwear photography
-                prompt += `HEADLESS MODEL - face and head NOT SHOWN, cropped at neck level. E-commerce product photography style focusing only on body and garment. `;
+                const headlessPrefix = numberOfPeople > 1 ? `HEADLESS MODELS - all ${numberOfPeople} people` : 'HEADLESS MODEL';
+                prompt += `${headlessPrefix} - face and head NOT SHOWN, cropped at neck level. E-commerce product photography style focusing only on body and garment. `;
             }
 
             prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
