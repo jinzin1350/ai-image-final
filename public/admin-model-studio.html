@@ -416,43 +416,153 @@
                             <div class="form-group">
                                 <label>رنگ پوست</label>
                                 <select id="skinTone">
-                                    <option value="very-fair">بسیار روشن</option>
-                                    <option value="fair">روشن</option>
-                                    <option value="medium" selected>متوسط</option>
-                                    <option value="olive">زیتونی</option>
-                                    <option value="tan">برنزه</option>
-                                    <option value="brown">قهوه‌ای</option>
-                                    <option value="dark-brown">قهوه‌ای تیره</option>
-                                    <option value="deep">تیره</option>
+                                    <option value="porcelain">چینی (Porcelain) - بسیار بسیار روشن</option>
+                                    <option value="ivory">عاجی (Ivory) - بسیار روشن با لمس گرم</option>
+                                    <option value="very-fair">بسیار روشن (Very Fair)</option>
+                                    <option value="fair">روشن (Fair)</option>
+                                    <option value="light">روشن ملایم (Light)</option>
+                                    <option value="light-medium">روشن تا متوسط (Light Medium)</option>
+                                    <option value="medium" selected>متوسط (Medium)</option>
+                                    <option value="medium-tan">متوسط برنزه (Medium Tan)</option>
+                                    <option value="olive">زیتونی (Olive)</option>
+                                    <option value="tan">برنزه (Tan)</option>
+                                    <option value="golden-tan">برنزه طلایی (Golden Tan)</option>
+                                    <option value="caramel">کارامل (Caramel)</option>
+                                    <option value="honey">عسلی (Honey)</option>
+                                    <option value="bronze">برنزی (Bronze)</option>
+                                    <option value="brown">قهوه‌ای (Brown)</option>
+                                    <option value="dark-brown">قهوه‌ای تیره (Dark Brown)</option>
+                                    <option value="deep-brown">قهوه‌ای عمیق (Deep Brown)</option>
+                                    <option value="chocolate">شکلاتی (Chocolate)</option>
+                                    <option value="mahogany">ماهون (Mahogany)</option>
+                                    <option value="ebony">آبنوسی (Ebony)</option>
+                                    <option value="deep">تیره (Deep)</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>بافت پوست</label>
-                                <select id="skinTexture">
-                                    <option value="smooth" selected>صاف و بی‌عیب</option>
-                                    <option value="natural">طبیعی</option>
-                                    <option value="freckled">کک و مک دار</option>
-                                    <option value="with-beauty-marks">با خال زیبایی</option>
-                                </select>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>بافت پوست (می‌توانید چند مورد انتخاب کنید)</label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; padding: 10px; background: white; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="smooth" checked> صاف و بی‌عیب (Smooth)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="natural"> طبیعی (Natural)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="flawless"> بی‌نقص (Flawless)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="glowing"> درخشان (Glowing)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="matte"> مات (Matte)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="dewy"> شبنم‌دار (Dewy)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="radiant"> تابان (Radiant)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="freckled"> کک و مک دار (Freckled)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="with-beauty-marks"> با خال زیبایی (Beauty Marks)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="dimpled"> چال‌دار (Dimpled)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="textured"> بافت‌دار (Textured)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="porous"> منفذدار (Porous)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="velvety"> مخملی (Velvety)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="silky"> ابریشمی (Silky)
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>نوع بدن</label>
-                                <select id="bodyType">
-                                    <option value="slim">لاغر</option>
-                                    <option value="athletic" selected>ورزشکاری</option>
-                                    <option value="average">متوسط</option>
-                                    <option value="curvy">خوش اندام</option>
-                                    <option value="plus-size">سایز بزرگ</option>
-                                    <option value="muscular">عضلانی</option>
-                                </select>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>نوع بدن (می‌توانید چند مورد انتخاب کنید)</label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; padding: 10px; background: white; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="petite"> ریزنقش (Petite)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="slim"> لاغر (Slim)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="slender"> باریک (Slender)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="lean"> لاغر اندام (Lean)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="athletic" checked> ورزشکاری (Athletic)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="toned"> تناسب اندام (Toned)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="fit"> آماده (Fit)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="muscular"> عضلانی (Muscular)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="bodybuilder"> بدنساز (Bodybuilder)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="average"> متوسط (Average)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="curvy"> خوش اندام (Curvy)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="hourglass"> ساعت شنی (Hourglass)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="pear-shaped"> گلابی (Pear-shaped)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="apple-shaped"> سیبی (Apple-shaped)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="rectangular"> مستطیلی (Rectangular)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="voluptuous"> برومند (Voluptuous)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="plus-size"> سایز بزرگ (Plus-size)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="full-figured"> پراندام (Full-figured)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="stocky"> تنومند (Stocky)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="broad-shouldered"> شانه‌پهن (Broad-shouldered)
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>قد</label>
                                 <select id="height">
-                                    <option value="petite">کوتاه (زیر 163 سانتی)</option>
-                                    <option value="average" selected>متوسط (163-173 سانتی)</option>
-                                    <option value="tall">بلند (173-183 سانتی)</option>
-                                    <option value="very-tall">خیلی بلند (بالای 183 سانتی)</option>
+                                    <option value="very-short">خیلی کوتاه (زیر 150 سانتی)</option>
+                                    <option value="short">کوتاه (150-160 سانتی)</option>
+                                    <option value="petite">کوتاه متوسط (160-165 سانتی)</option>
+                                    <option value="below-average">کمتر از متوسط (165-170 سانتی)</option>
+                                    <option value="average" selected>متوسط (170-175 سانتی)</option>
+                                    <option value="above-average">بالاتر از متوسط (175-180 سانتی)</option>
+                                    <option value="tall">بلند (180-185 سانتی)</option>
+                                    <option value="very-tall">خیلی بلند (185-190 سانتی)</option>
+                                    <option value="extremely-tall">بلندقد (بالای 190 سانتی)</option>
                                 </select>
                             </div>
                         </div>
@@ -1232,8 +1342,10 @@
 
             // Skin & Body
             const skinTone = document.getElementById('skinTone').value;
-            const skinTexture = document.getElementById('skinTexture').value;
-            const bodyType = document.getElementById('bodyType').value;
+            const selectedSkinTextures = Array.from(document.querySelectorAll('.skin-texture-checkbox:checked')).map(cb => cb.value);
+            const skinTexture = selectedSkinTextures.length > 0 ? selectedSkinTextures.join(', ') : 'smooth';
+            const selectedBodyTypes = Array.from(document.querySelectorAll('.body-type-checkbox:checked')).map(cb => cb.value);
+            const bodyType = selectedBodyTypes.length > 0 ? selectedBodyTypes.join(', ') : 'athletic';
             const height = document.getElementById('height').value;
 
             // Expression & Pose
