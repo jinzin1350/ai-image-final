@@ -1781,6 +1781,7 @@ function saveToLocalStorage(imageData) {
 }
 
 // بارگذاری اولیه
+console.log('🔧 Initializing page data...');
 loadModels();
 loadBackgrounds();
 loadPoses();
@@ -1796,6 +1797,7 @@ loadShadowQualities();
 loadAspectRatios();
 loadBackgroundBlurs();
 loadGarmentFits();
+console.log('✅ Page data initialization started');
 
 // ========================================
 // NEW: Event Listeners for Mode Switching
