@@ -1632,8 +1632,8 @@ app.post('/api/auth/signout', authenticateUser, async (req, res) => {
 app.get('/api/models', async (req, res) => {
   try {
     // Always start with regular models as base
-    // For accessories mode, we'll rely on database models with category='accessory'
-    let allModels = [...models];
+    // Include accessoryModels for accessories mode
+    let allModels = [...models, ...accessoryModels];
 
     // If user is authenticated and Supabase is configured, add their custom models
     const authHeader = req.headers.authorization;
