@@ -248,24 +248,32 @@ function selectModel2(modelId) {
 }
 
 // تغییر دسته‌بندی
-categorySelect.addEventListener('change', (e) => {
-    currentCategory = e.target.value;
-    selectedModelId = null; // پاک کردن انتخاب قبلی
-    displayModelsByCategory(currentCategory);
-    checkGenerateButton();
-});
+const categorySelectEl = document.getElementById('categorySelect');
+if (categorySelectEl) {
+    categorySelectEl.addEventListener('change', (e) => {
+        currentCategory = e.target.value;
+        selectedModelId = null; // پاک کردن انتخاب قبلی
+        displayModelsByCategory(currentCategory);
+        checkGenerateButton();
+    });
+}
 
 // تغییر دسته‌بندی مدل دوم
-categorySelect2.addEventListener('change', (e) => {
-    const currentCategory2 = e.target.value;
-    selectedModelId2 = null; // پاک کردن انتخاب قبلی
-    displayModelsByCategory2(currentCategory2);
-    checkGenerateButton();
-});
+const categorySelect2El = document.getElementById('categorySelect2');
+if (categorySelect2El) {
+    categorySelect2El.addEventListener('change', (e) => {
+        const currentCategory2 = e.target.value;
+        selectedModelId2 = null; // پاک کردن انتخاب قبلی
+        displayModelsByCategory2(currentCategory2);
+        checkGenerateButton();
+    });
+}
 
 // تغییر تعداد مدل‌ها
-numberOfModelsSelect.addEventListener('change', (e) => {
-    const numModels = parseInt(e.target.value);
+const numberOfModelsSelectEl = document.getElementById('numberOfModelsSelect');
+if (numberOfModelsSelectEl) {
+    numberOfModelsSelectEl.addEventListener('change', (e) => {
+        const numModels = parseInt(e.target.value);
 
     if (numModels === 2) {
         // نمایش بخش‌های مدل دوم
@@ -285,7 +293,8 @@ numberOfModelsSelect.addEventListener('change', (e) => {
     }
 
     checkGenerateButton();
-});
+    });
+}
 
 // بارگذاری پس‌زمینه‌ها
 async function loadBackgrounds(mode = 'complete-outfit') {
@@ -600,7 +609,7 @@ async function loadGarmentFits() {
 // ========================================
 
 // Accessory upload area click
-if (accessoryUploadArea) {
+if (accessoryUploadArea && accessoryInput) {
     accessoryUploadArea.addEventListener('click', () => accessoryInput.click());
 }
 
@@ -694,7 +703,9 @@ if (colorCollectionUploadArea && colorCollectionInput) {
     colorCollectionUploadArea.addEventListener('click', () => {
         colorCollectionInput.click();
     });
+}
 
+if (colorCollectionInput) {
     colorCollectionInput.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
         if (files.length > 0) {
@@ -786,7 +797,9 @@ if (flatLayUploadArea && flatLayInput) {
     flatLayUploadArea.addEventListener('click', () => {
         flatLayInput.click();
     });
+}
 
+if (flatLayInput) {
     flatLayInput.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
         if (files.length > 0) {
@@ -1418,32 +1431,38 @@ function checkGenerateButton() {
 }
 
 // رویدادهای آپلود فایل
-uploadArea.addEventListener('click', () => garmentInput.click());
+if (uploadArea && garmentInput) {
+    uploadArea.addEventListener('click', () => garmentInput.click());
+}
 
-uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = '#764ba2';
-});
+if (uploadArea) {
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#764ba2';
+    });
 
-uploadArea.addEventListener('dragleave', () => {
-    uploadArea.style.borderColor = '#667eea';
-});
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#667eea';
+    });
 
-uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = '#667eea';
-    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
-    if (files.length > 0) {
-        uploadFiles(files);
-    }
-});
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#667eea';
+        const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+        if (files.length > 0) {
+            uploadFiles(files);
+        }
+    });
+}
 
-garmentInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length > 0) {
-        uploadFiles(files);
-    }
-});
+if (garmentInput) {
+    garmentInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadFiles(files);
+        }
+    });
+}
 
 // آپلود چند فایل
 async function uploadFiles(files) {
@@ -1503,17 +1522,21 @@ function addGarmentPreview(filePath, index) {
 // ================== GARMENT 2 HANDLERS ==================
 
 // کلیک روی ناحیه آپلود مدل 2
-garmentUploadArea2.addEventListener('click', () => {
-    garmentInput2.click();
-});
+if (garmentUploadArea2 && garmentInput2) {
+    garmentUploadArea2.addEventListener('click', () => {
+        garmentInput2.click();
+    });
+}
 
 // تغییر فایل آپلود مدل 2
-garmentInput2.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length > 0) {
-        uploadFiles2(files);
-    }
-});
+if (garmentInput2) {
+    garmentInput2.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadFiles2(files);
+        }
+    });
+}
 
 // آپلود چند فایل برای مدل 2
 async function uploadFiles2(files) {
@@ -1614,9 +1637,10 @@ function removeGarment(index) {
 }
 
 // تولید تصویر
-generateBtn.addEventListener('click', async () => {
-    loadingOverlay.style.display = 'flex';
-    resultSection.style.display = 'none';
+if (generateBtn) {
+    generateBtn.addEventListener('click', async () => {
+        loadingOverlay.style.display = 'flex';
+        resultSection.style.display = 'none';
 
     try {
         // Build request body based on current mode
@@ -1732,15 +1756,18 @@ generateBtn.addEventListener('click', async () => {
     } finally {
         loadingOverlay.style.display = 'none';
     }
-});
+    });
+}
 
 // دانلود تصویر
-downloadBtn.addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.href = resultImage.src;
-    link.download = 'fashion-ai-result.jpg';
-    link.click();
-});
+if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.href = resultImage.src;
+        link.download = 'fashion-ai-result.jpg';
+        link.click();
+    });
+}
 
 // ذخیره تصویر در localStorage
 function saveToLocalStorage(imageData) {
@@ -1804,43 +1831,56 @@ console.log('✅ Page data initialization started');
 // ========================================
 
 // Mode card click handlers
-modeCards.forEach(card => {
-    card.addEventListener('click', () => {
-        const mode = card.dataset.mode;
-        switchMode(mode);
+if (modeCards && modeCards.length > 0) {
+    modeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const mode = card.dataset.mode;
+            switchMode(mode);
+        });
     });
-});
+}
 
 // افزودن event listener برای انتخاب حجاب
-document.querySelectorAll('.hijab-option-card').forEach(card => {
-    card.addEventListener('click', () => {
-        const hijabType = card.dataset.hijabType;
-        selectHijabType(hijabType);
+const hijabOptionCards = document.querySelectorAll('.hijab-option-card');
+if (hijabOptionCards && hijabOptionCards.length > 0) {
+    hijabOptionCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const hijabType = card.dataset.hijabType;
+            selectHijabType(hijabType);
+        });
     });
-});
+}
 
 // Event listener for display scenario selection
-document.querySelectorAll('.scenario-card').forEach(card => {
-    card.addEventListener('click', () => {
-        const scenario = card.dataset.scenario;
-        selectDisplayScenario(scenario);
+const scenarioCards = document.querySelectorAll('.scenario-card');
+if (scenarioCards && scenarioCards.length > 0) {
+    scenarioCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const scenario = card.dataset.scenario;
+            selectDisplayScenario(scenario);
+        });
     });
-});
+}
 
 // Event listener for flat lay arrangement selection
-document.querySelectorAll('[data-arrangement]').forEach(card => {
-    card.addEventListener('click', () => {
-        const arrangement = card.dataset.arrangement;
-        selectArrangement(arrangement);
+const arrangementCards = document.querySelectorAll('[data-arrangement]');
+if (arrangementCards && arrangementCards.length > 0) {
+    arrangementCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const arrangement = card.dataset.arrangement;
+            selectArrangement(arrangement);
+        });
     });
-});
+}
 
 // Event listeners for scene recreation
-if (referencePhotoUploadArea) {
+if (referencePhotoUploadArea && referencePhotoInput) {
     referencePhotoUploadArea.addEventListener('click', () => {
         referencePhotoInput.click();
     });
+}
 
+if (referencePhotoUploadArea) {
     referencePhotoUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         referencePhotoUploadArea.style.borderColor = 'var(--primary-color)';
@@ -1883,11 +1923,13 @@ const styleImagesInput = document.getElementById('styleImagesInput');
 const contentImageUploadArea = document.getElementById('contentImageUploadArea');
 const contentImageInput = document.getElementById('contentImageInput');
 
-if (styleImagesUploadArea) {
+if (styleImagesUploadArea && styleImagesInput) {
     styleImagesUploadArea.addEventListener('click', () => {
         styleImagesInput.click();
     });
+}
 
+if (styleImagesUploadArea) {
     styleImagesUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         styleImagesUploadArea.style.borderColor = 'var(--primary-color)';
@@ -1916,11 +1958,13 @@ if (styleImagesInput) {
     });
 }
 
-if (contentImageUploadArea) {
+if (contentImageUploadArea && contentImageInput) {
     contentImageUploadArea.addEventListener('click', () => {
         contentImageInput.click();
     });
+}
 
+if (contentImageUploadArea) {
     contentImageUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         contentImageUploadArea.style.borderColor = 'var(--primary-color)';
