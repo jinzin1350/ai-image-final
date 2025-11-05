@@ -2678,6 +2678,19 @@ KEY REQUIREMENTS:
 6. Clean, sharp focus on the model and clothing
 7. ⚠️ CRITICAL DETAIL ATTENTION - FABRIC & HARDWARE:
 
+   **FABRIC PATTERNS & PRINTS (MOST CRITICAL):**
+   - ⚠️ If garment has printed design (flowers, graphics, text, logos): preserve EXACTLY as shown
+   - ⚠️ If garment has woven pattern (stripes, checks, plaids, geometric): maintain exact pattern and scale
+   - DO NOT simplify, blur, or alter any printed designs or patterns
+   - Keep pattern alignment, repeat, and placement exactly as in garment image
+   - Preserve ALL colors within the pattern - do not reduce color palette
+   - Maintain pattern scale and proportion on the garment
+   - Show how pattern follows fabric draping and wrinkles naturally
+   - If floral print: show each flower detail, leaf, and stem accurately
+   - If geometric pattern: keep lines, shapes, and spacing precise
+   - If text/logo print: render text clearly and accurately
+   - Pattern should wrap around body naturally following fabric flow
+
    **DENIM FABRIC (if applicable):**
    - Preserve EXACT denim wash color (light blue, dark blue, black, etc.)
    - Show authentic denim texture with visible weave pattern
@@ -2725,6 +2738,8 @@ DO NOT:
 - Add text, watermarks, or logos
 - Create obvious fake composites or artificial effects
 - ❌ CRITICAL: DO NOT change garment colors - keep EXACT colors from garment image
+- ❌ CRITICAL: DO NOT simplify, blur, or alter fabric patterns and prints - preserve exact design
+- ❌ CRITICAL: DO NOT change pattern colors, scale, or placement on garment
 - ❌ CRITICAL: DO NOT deform or blur zippers - render them with full detail and correct metal color
 - ❌ CRITICAL: DO NOT change denim wash colors or remove denim texture
 - ❌ CRITICAL: DO NOT simplify hardware details (zippers, buttons, rivets, snaps)
@@ -3299,6 +3314,8 @@ ${hasTwoModels
 
    ⚠️ **CRITICAL - EXACT COLOR & DETAIL PRESERVATION:**
    - Use EXACT colors from garment image${hasTwoModels ? 's' : ''} - do NOT change or shift colors
+   - PATTERNS & PRINTS: If garment has printed design or woven pattern, preserve EXACTLY - do NOT simplify, blur, or alter patterns/prints
+   - Keep pattern colors, scale, alignment, and placement exactly as shown
    - If denim: preserve EXACT wash color (light/dark blue, black) and denim texture
    - ZIPPERS: Render with correct metal color, visible teeth, proper zipper pull - DO NOT deform or blur
    - BUTTONS: Show exact positions, colors, and materials
@@ -3328,6 +3345,8 @@ ${hasTwoModels
 - Create obvious fake composites or artificial effects
 - Add text, watermarks, or logos
 - ❌ CRITICAL: DO NOT change garment colors - keep EXACT colors from garment image${hasTwoModels ? 's' : ''}
+- ❌ CRITICAL: DO NOT simplify, blur, or alter fabric patterns and prints - preserve exact design
+- ❌ CRITICAL: DO NOT change pattern colors, scale, or placement on garment
 - ❌ CRITICAL: DO NOT deform or blur zippers - render with full detail and correct metal color
 - ❌ CRITICAL: DO NOT change denim wash colors or remove denim texture
 - ❌ CRITICAL: DO NOT simplify hardware details (zippers, buttons, rivets, snaps)
