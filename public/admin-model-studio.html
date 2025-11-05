@@ -1123,6 +1123,10 @@
                     return;
                 }
 
+                // Get age and ethnicity for backend
+                const modelAge = parseInt(document.getElementById('modelAge').value) || 25;
+                const modelEthnicity = document.getElementById('modelEthnicity').value;
+
                 // Build comprehensive prompt from all form fields
                 const prompt = buildModelPrompt();
                 console.log('Generated prompt:', prompt);
@@ -1133,7 +1137,9 @@
                     body: JSON.stringify({
                         prompt: prompt,
                         contentType: 'model',
-                        aspectRatio: document.getElementById('aspectRatio').value
+                        aspectRatio: document.getElementById('aspectRatio').value,
+                        modelAge: modelAge,
+                        modelEthnicity: modelEthnicity
                     })
                 });
 

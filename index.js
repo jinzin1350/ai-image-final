@@ -3695,7 +3695,7 @@ ${productDetails}
 // Generate AI image only (for custom content creation)
 app.post('/api/generate-image-only', async (req, res) => {
   try {
-    const { prompt, aspectRatio, contentType } = req.body;
+    const { prompt, aspectRatio, contentType, modelAge, modelEthnicity } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
@@ -3735,7 +3735,62 @@ app.post('/api/generate-image-only', async (req, res) => {
     let enhancedPrompt = '';
 
     if (contentType === 'model') {
+      // Build age and ethnicity specific instructions
+      const ethnicityDescriptions = {
+        'iranian': 'Iranian/Persian facial features and skin tone',
+        'turkmen': 'Turkmen ethnic features with Central Asian appearance',
+        'tajik': 'Tajik facial features with Persian-Central Asian characteristics',
+        'iraqi': 'Iraqi/Mesopotamian facial features and appearance',
+        'arab': 'Arab ethnic features and appearance',
+        'afghan': 'Afghan facial features and appearance',
+        'kurdish': 'Kurdish ethnic features and appearance',
+        'azari': 'Azari/Azerbaijani ethnic features',
+        'balochi': 'Balochi ethnic features and appearance',
+        'african': 'African ethnic features with dark skin tone and African facial characteristics',
+        'middle-east': 'Middle Eastern facial features and appearance',
+        'korean': 'Korean/East Asian facial features with Korean appearance',
+        'mixed': 'Mixed ethnicity with diverse multicultural features',
+        'caucasian': 'Caucasian/European facial features and skin tone',
+        'russian': 'Russian/Slavic facial features and appearance'
+      };
+
+      const ageDescription = modelAge ? `EXACTLY ${modelAge} years old` : 'age-appropriate';
+      const ethnicityDescription = modelEthnicity && ethnicityDescriptions[modelEthnicity]
+        ? ethnicityDescriptions[modelEthnicity]
+        : 'natural ethnic appearance';
+
+      // Determine age-specific instructions
+      let ageSpecificInstructions = '';
+      const age = modelAge || 25;
+
+      if (age < 12) {
+        ageSpecificInstructions = `\n\nCRITICAL AGE & ETHNICITY REQUIREMENTS:
+- This person is ${ageDescription} - a CHILD
+- ${ethnicityDescription}
+- Face MUST have childlike features: round face, soft features, innocent expression, child-like eyes and nose
+- Body proportions should match child physique for age ${age} (shorter stature, child body proportions)
+- Overall appearance must clearly be a young child, NOT a teenager or adult
+- Facial features should look EXACTLY age ${age} years old
+- Child's height and body size appropriate for age ${age}`;
+      } else if (age < 18) {
+        ageSpecificInstructions = `\n\nCRITICAL AGE & ETHNICITY REQUIREMENTS:
+- This person is ${ageDescription} - a TEENAGER
+- ${ethnicityDescription}
+- Face MUST have youthful teenage features: rounder face, softer features, younger-looking skin
+- Body proportions should match teenage physique for age ${age} (not adult proportions)
+- Overall appearance must clearly be a teenager, NOT an adult
+- Facial features should look EXACTLY age ${age} years old
+- Teen's height and body size appropriate for age ${age}`;
+      } else {
+        ageSpecificInstructions = `\n\nAGE & ETHNICITY REQUIREMENTS:
+- This person is ${ageDescription}
+- ${ethnicityDescription}
+- Face and body should match age ${age} appropriately
+- Natural appearance for a ${age}-year-old person`;
+      }
+
       enhancedPrompt = `Generate a high-quality, professional fashion model photograph based on this description: ${prompt}
+${ageSpecificInstructions}
 
 CRITICAL REQUIREMENTS:
 - Create a photorealistic portrait of a fashion model
