@@ -1553,6 +1553,11 @@ generateBtn.addEventListener('click', async () => {
                 requestBody.modelId2 = selectedModelId2;
                 requestBody.garmentPaths2 = uploadedGarmentPaths2;
             }
+
+        } else if (currentMode === 'style-transfer') {
+            // Style Transfer mode - apply lighting/mood from style images to content image
+            requestBody.styleImagePaths = uploadedStyleImages;
+            requestBody.contentImagePath = uploadedContentImage;
         }
 
         console.log('🚀 Sending request:', requestBody);

@@ -1939,6 +1939,116 @@ app.post('/api/upload-reference', upload.single('referencePhoto'), async (req, r
   }
 });
 
+// آپلود عکس‌های استایل برای Style Transfer mode
+app.post('/api/upload-style', upload.single('styleImage'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'لطفاً یک عکس استایل آپلود کنید' });
+    }
+
+    if (!supabase) {
+      console.error('❌ Supabase تنظیم نشده است!');
+      return res.status(500).json({
+        error: 'خطا در تنظیمات سرور',
+        details: 'لطفاً فایل .env را با اطلاعات Supabase تنظیم کنید'
+      });
+    }
+
+    const fileName = `style-${Date.now()}-${req.file.originalname}`;
+    const fileBuffer = req.file.buffer;
+
+    console.log(`📤 در حال آپلود عکس استایل: ${fileName}`);
+
+    const { data, error } = await supabase.storage
+      .from('garments')
+      .upload(fileName, fileBuffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (error) {
+      console.error('❌ خطای Supabase Storage:', error);
+      return res.status(500).json({
+        error: 'خطا در آپلود به Supabase',
+        details: error.message
+      });
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    console.log(`✅ آپلود عکس استایل موفق: ${urlData.publicUrl}`);
+
+    res.json({
+      success: true,
+      filePath: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    console.error('❌ خطای سرور:', error);
+    res.status(500).json({
+      error: 'خطا در آپلود عکس استایل',
+      details: error.message
+    });
+  }
+});
+
+// آپلود عکس محتوا برای Style Transfer mode
+app.post('/api/upload-content', upload.single('contentImage'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'لطفاً یک عکس محتوا آپلود کنید' });
+    }
+
+    if (!supabase) {
+      console.error('❌ Supabase تنظیم نشده است!');
+      return res.status(500).json({
+        error: 'خطا در تنظیمات سرور',
+        details: 'لطفاً فایل .env را با اطلاعات Supabase تنظیم کنید'
+      });
+    }
+
+    const fileName = `content-${Date.now()}-${req.file.originalname}`;
+    const fileBuffer = req.file.buffer;
+
+    console.log(`📤 در حال آپلود عکس محتوا: ${fileName}`);
+
+    const { data, error } = await supabase.storage
+      .from('garments')
+      .upload(fileName, fileBuffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (error) {
+      console.error('❌ خطای Supabase Storage:', error);
+      return res.status(500).json({
+        error: 'خطا در آپلود به Supabase',
+        details: error.message
+      });
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    console.log(`✅ آپلود عکس محتوا موفق: ${urlData.publicUrl}`);
+
+    res.json({
+      success: true,
+      filePath: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    console.error('❌ خطای سرور:', error);
+    res.status(500).json({
+      error: 'خطا در آپلود عکس محتوا',
+      details: error.message
+    });
+  }
+});
+
 // تحلیل عکس مرجع با Gemini برای Scene Recreation mode
 app.post('/api/analyze-scene', async (req, res) => {
   try {
@@ -2195,6 +2305,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate)
       sceneAnalysis,    // NEW: AI analysis of the reference photo
       referencePhotoPeopleCount, // NEW: Number of people detected in reference photo
+      styleImagePaths,  // NEW: For style-transfer mode (array of 1-3 style reference images)
+      contentImagePath, // NEW: For style-transfer mode (content image to apply style to)
       modelId,
       modelId2,         // NEW: Second model ID (for 2-model mode)
       garmentPaths2,    // NEW: Garments for second model
@@ -2251,6 +2363,10 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     } else if (mode === 'scene-recreation') {
       if (!referencePhotoPath || !sceneAnalysis || !garments.length || !modelId) {
         return res.status(400).json({ error: 'لطفاً عکس مرجع، لباس و مدل را انتخاب کنید' });
+      }
+    } else if (mode === 'style-transfer') {
+      if (!styleImagePaths || !styleImagePaths.length || !contentImagePath) {
+        return res.status(400).json({ error: 'لطفاً حداقل یک عکس استایل و یک عکس محتوا را آپلود کنید' });
       }
     }
 

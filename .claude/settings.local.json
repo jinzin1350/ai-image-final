@@ -17,7 +17,14 @@
       "Bash(git checkout:*)",
       "Bash(cat:*)",
       "Bash(git revert:*)",
-      "Bash(git cherry-pick:*)"
+      "Bash(git cherry-pick:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(timeout 5 curl:*)",
+      "Bash(nul)",
+      "Bash(python -m http.server:*)",
+      "Bash(node -c:*)"
     ],
     "deny": [],
     "ask": []
