@@ -1958,14 +1958,17 @@ app.post('/api/analyze-scene', async (req, res) => {
 
     const analysisPrompt = `You are an expert fashion photographer and scene analyst. Analyze this reference photo in detail and provide a comprehensive description that will be used to recreate a similar fashion photo with a model wearing different clothing.
 
+CRITICAL FIRST TASK: Count the number of COMPLETE people visible in this photo (1, 2, 3, or more). Only count people where you can see most of their body, not just a hand or partial view.
+
 Focus on these key aspects:
 
-1. **People Analysis** (if any people are present):
-   - How many people are in the photo?
+1. **People Analysis** (MOST IMPORTANT - if any people are present):
+   - EXACTLY how many complete people are in the photo? (State the number clearly at the start)
    - Their positions, poses, and body language
    - Their facial expressions and mood
    - How they are interacting (if multiple people)
    - Camera angle relative to the person/people
+   - If there are 2 or 3 people, describe how they are positioned relative to each other
 
 2. **Location & Environment**:
    - Type of location (indoor/outdoor, specific place)
@@ -2012,11 +2015,29 @@ Provide your analysis in Persian (فارسی) in a clear, structured format that
     const response = await result.response;
     const analysis = response.text();
 
-    console.log(`✅ تحلیل صحنه کامل شد`);
+    // Now detect the number of people separately for use in generation
+    const peopleCountPrompt = `Count EXACTLY how many full people/persons are clearly visible in this image. Respond with ONLY a single number (1, 2, or 3). If you see 4 or more people, respond with 3 (we support up to 3).`;
+
+    const countResult = await visionModel.generateContent([
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: imageBase64
+        }
+      },
+      peopleCountPrompt
+    ]);
+
+    const countResponse = await countResult.response;
+    const detectedCount = parseInt(countResponse.text().trim());
+    const numberOfPeople = Math.max(1, Math.min(3, isNaN(detectedCount) ? 1 : detectedCount));
+
+    console.log(`✅ تحلیل صحنه کامل شد - تعداد افراد: ${numberOfPeople}`);
 
     res.json({
       success: true,
-      analysis: analysis
+      analysis: analysis,
+      numberOfPeople: numberOfPeople
     });
   } catch (error) {
     console.error('❌ خطا در تحلیل صحنه:', error);
@@ -2173,6 +2194,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       arrangement,      // NEW: Flat lay arrangement (grid, scattered, circular, diagonal)
       referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate)
       sceneAnalysis,    // NEW: AI analysis of the reference photo
+      referencePhotoPeopleCount, // NEW: Number of people detected in reference photo
       modelId,
       modelId2,         // NEW: Second model ID (for 2-model mode)
       garmentPaths2,    // NEW: Garments for second model
@@ -3088,10 +3110,26 @@ Generate a professional flat lay photograph perfect for e-commerce product listi
 
     } else if (mode === 'scene-recreation') {
       // SCENE RECREATION MODE: Create inspired photo using reference as style guide
-      prompt = `Create a photorealistic fashion photo showing the MODEL wearing the GARMENT, INSPIRED BY the style, lighting, and mood of the reference photo.
+      const peopleCount = referencePhotoPeopleCount || 1;
+      const peopleText = peopleCount === 1
+        ? 'the MODEL'
+        : peopleCount === 2
+        ? 'TWO people (BOTH models)'
+        : 'THREE people (ALL THREE models)';
+
+      const multiPersonInstruction = peopleCount > 1
+        ? `\n\n⚠️ CRITICAL MULTI-PERSON REQUIREMENT:
+- The reference photo contains ${peopleCount} people
+- Your generated photo MUST also show ${peopleCount} people
+- Recreate the same number of people with similar positioning and interaction
+- Each person should wear the garment/clothing provided
+- Maintain natural spacing and composition between people as seen in reference`
+        : '';
+
+      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT, INSPIRED BY the style, lighting, and mood of the reference photo.
 
 IMAGES PROVIDED (IN ORDER):
-- Image 1: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)
+- Image 1: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)${peopleCount > 1 ? ` (NOTE: Since reference has ${peopleCount} people, duplicate this model ${peopleCount} times in similar poses)` : ''}
 - Image ${garments.length === 1 ? '2' : `2-${garments.length + 1}`}: GARMENT - Clothing for the MODEL to wear
 - Image ${garments.length + 2}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)
 
@@ -3125,7 +3163,7 @@ IMAGES PROVIDED (IN ORDER):
 ❌ The exact clothing from the reference
 
 TASK DESCRIPTION:
-Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.
+Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.${multiPersonInstruction}
 
 AI SCENE ANALYSIS:
 The reference photo has been analyzed by AI with these findings:

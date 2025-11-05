@@ -55,6 +55,7 @@ let selectedArrangement = null; // 'grid', 'scattered', 'circular', 'diagonal'
 // NEW: Scene Recreation mode variables
 let uploadedReferencePhoto = null; // Path to uploaded reference photo
 let sceneAnalysis = null; // AI-generated scene analysis/description
+let referencePhotoPeopleCount = 1; // Number of people detected in reference photo
 
 // Professional Quality Parameters (Used in prompt)
 let selectedColorTempId = 'auto';
@@ -845,7 +846,15 @@ async function analyzeReferencePhoto(photoPath) {
 
         if (data.success) {
             sceneAnalysis = data.analysis;
-            sceneAnalysisText.innerHTML = `<p>${data.analysis}</p>`;
+            referencePhotoPeopleCount = data.numberOfPeople || 1;
+
+            // Show analysis with person count info
+            const peopleInfo = referencePhotoPeopleCount > 1
+                ? `<p style="color: #059669; font-weight: bold; margin-bottom: 10px;">👥 تعداد افراد شناسایی شده: ${referencePhotoPeopleCount} نفر - عکس نهایی شامل ${referencePhotoPeopleCount} نفر خواهد بود</p>`
+                : '';
+            sceneAnalysisText.innerHTML = `${peopleInfo}<p>${data.analysis}</p>`;
+
+            console.log(`✅ Person count detected: ${referencePhotoPeopleCount}`);
         } else {
             sceneAnalysisText.innerHTML = '<p style="color: red;">❌ خطا در تحلیل عکس</p>';
             alert('خطا در تحلیل عکس: ' + data.error);
@@ -1363,6 +1372,7 @@ generateBtn.addEventListener('click', async () => {
             requestBody.garmentPaths = uploadedGarmentPaths;
             requestBody.modelId = selectedModelId;
             requestBody.hijabType = selectedHijabType;
+            requestBody.referencePhotoPeopleCount = referencePhotoPeopleCount; // Send detected person count
         }
 
         console.log('🚀 Sending request:', requestBody);
