@@ -2667,18 +2667,54 @@ KEY REQUIREMENTS:
 1. Keep model's face, body, and pose EXACTLY the same - only change the clothes
 2. Garment should fit naturally with realistic wrinkles and fabric draping
 3. Natural skin texture (no plastic smoothing or artificial effects)
-4. Accurate garment colors and patterns from the garment image
+4. ⚠️ CRITICAL - EXACT COLOR PRESERVATION:
+   - Use the EXACT colors from the garment image - do NOT change or shift colors
+   - If garment is blue denim, keep it EXACTLY that shade of blue
+   - If garment is black, keep it pure black - NOT dark gray or navy
+   - If garment is white, keep it pure white - NOT cream or off-white
+   - Match color intensity and saturation EXACTLY as shown in garment image
+   - Preserve color variations in fabric (fading, distressing, wash effects)
 5. Realistic fabric physics, wrinkles, and natural shadows
 6. Clean, sharp focus on the model and clothing
-7. CRITICAL DETAIL ATTENTION:
-   - Preserve ALL fabric details: stitching, seams, texture, and weave patterns
+7. ⚠️ CRITICAL DETAIL ATTENTION - FABRIC & HARDWARE:
+
+   **DENIM FABRIC (if applicable):**
+   - Preserve EXACT denim wash color (light blue, dark blue, black, etc.)
+   - Show authentic denim texture with visible weave pattern
+   - Maintain any distressing, fading, or whiskering exactly as shown
+   - Keep denim stitching visible (typically orange/yellow contrast stitching)
+   - Show natural denim wrinkle patterns and creases
+
+   **ZIPPERS (MOST CRITICAL):**
+   - Render zippers with EXACT metal color (silver, gold, brass, black, etc.)
+   - Show individual zipper teeth clearly and accurately
+   - Display zipper pull/slider with correct shape and color
+   - Maintain zipper placement and length exactly as in garment image
+   - Show zipper stitching on both sides of the zipper tape
+   - DO NOT deform, blur, or simplify zipper details
+   - Keep zipper hardware looking metallic and three-dimensional
+
+   **BUTTONS & SNAPS:**
    - Show exact button positions, button holes, and button design
-   - Accurately render zippers with proper metal/plastic texture and zipper teeth
+   - Maintain button color and material (metal, plastic, fabric-covered)
+   - Render snap buttons with proper metallic appearance
+
+   **POCKETS:**
    - Maintain pocket shapes, pocket stitching, and pocket flaps exactly as shown
-   - Display fabric texture realistically (smooth, rough, ribbed, woven, knit, etc.)
-   - Show material quality indicators (sheen for silk, matte for cotton, etc.)
+   - Show pocket rivets or metal reinforcements if present
+   - Display pocket topstitching and any decorative elements
+
+   **STITCHING & SEAMS:**
+   - Preserve ALL visible stitching lines and seam placements
+   - Show contrast stitching in correct color (common in denim/jeans)
+   - Maintain topstitching details, especially on collars, cuffs, hems
+   - Display any decorative or reinforcement stitching
+
+   **FABRIC TEXTURE:**
+   - Display fabric texture realistically (denim weave, smooth, rough, ribbed, woven, knit)
+   - Show material quality indicators (sheen for silk, matte for cotton, worn texture for denim)
    - Render collar details, cuff details, and hem stitching precisely
-   - Maintain any decorative elements (embroidery, prints, patches, logos)
+   - Maintain any decorative elements (embroidery, prints, patches, logos, labels)
    - Show fabric weight through natural draping and wrinkle patterns${hijabDescription ? `\n8. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
 DO NOT:
@@ -2688,10 +2724,16 @@ DO NOT:
 - Make unrealistic distortions or morphing
 - Add text, watermarks, or logos
 - Create obvious fake composites or artificial effects
-- Simplify or omit garment details like buttons, zippers, stitching
+- ❌ CRITICAL: DO NOT change garment colors - keep EXACT colors from garment image
+- ❌ CRITICAL: DO NOT deform or blur zippers - render them with full detail and correct metal color
+- ❌ CRITICAL: DO NOT change denim wash colors or remove denim texture
+- ❌ CRITICAL: DO NOT simplify hardware details (zippers, buttons, rivets, snaps)
+- Simplify or omit garment details like buttons, zippers, stitching, or pockets
 - Smooth out fabric texture or make it look artificial
+- Change stitching colors, especially contrast stitching on denim
 - Ignore small but important details like seams, hems, or decorative elements
 - Over-smooth skin or create plastic-looking results
+- Make fabric look too perfect - natural wrinkles and texture should be visible
 
 Make it simple and natural - like this person is actually wearing these clothes in a real professional photo shoot.`;
 
@@ -3254,9 +3296,16 @@ ${hasTwoModels
    - Each model wears THEIR OWN garment - do NOT mix them up`
   : `   - Dress the MODEL in ${garmentDescription}`}
    - Garment${hasTwoModels ? 's' : ''} should fit naturally with realistic wrinkles and fabric draping
-   - Accurate garment colors and patterns from the garment image${hasTwoModels ? 's' : ''}
-   - Preserve ALL fabric details: stitching, seams, texture, buttons, zippers, pockets
-   - Show material quality indicators (sheen, texture, weight)${hijabDescription ? `\n   - Apply the specified hijab style correctly: ${hijabDescription}` : ''}
+
+   ⚠️ **CRITICAL - EXACT COLOR & DETAIL PRESERVATION:**
+   - Use EXACT colors from garment image${hasTwoModels ? 's' : ''} - do NOT change or shift colors
+   - If denim: preserve EXACT wash color (light/dark blue, black) and denim texture
+   - ZIPPERS: Render with correct metal color, visible teeth, proper zipper pull - DO NOT deform or blur
+   - BUTTONS: Show exact positions, colors, and materials
+   - STITCHING: Preserve all visible stitching, especially contrast stitching on denim
+   - POCKETS: Maintain exact shapes, stitching, rivets, and placement
+   - FABRIC TEXTURE: Show authentic material texture (denim weave, smooth, knit, etc.)
+   - Show material quality indicators (sheen, texture, weight, worn effects)${hijabDescription ? `\n   - Apply the specified hijab style correctly: ${hijabDescription}` : ''}
 
 5. **Photographic Quality**:
    - Natural skin texture (no plastic smoothing)
@@ -3278,7 +3327,13 @@ ${hasTwoModels
 - Make the model${hasTwoModels ? 's' : ''} look different from ${hasTwoModels ? 'their respective images' : 'Image 1'}
 - Create obvious fake composites or artificial effects
 - Add text, watermarks, or logos
-- Simplify or omit garment details
+- ❌ CRITICAL: DO NOT change garment colors - keep EXACT colors from garment image${hasTwoModels ? 's' : ''}
+- ❌ CRITICAL: DO NOT deform or blur zippers - render with full detail and correct metal color
+- ❌ CRITICAL: DO NOT change denim wash colors or remove denim texture
+- ❌ CRITICAL: DO NOT simplify hardware details (zippers, buttons, rivets, snaps)
+- Simplify or omit garment details like stitching, pockets, or decorative elements
+- Smooth out fabric texture or make it look artificial
+- Change stitching colors, especially contrast stitching on denim
 - Over-smooth skin or create plastic-looking results
 
 EXAMPLE TO CLARIFY THE APPROACH:
