@@ -935,8 +935,10 @@ async function uploadReferencePhoto(file) {
 // Analyze reference photo with Gemini
 async function analyzeReferencePhoto(photoPath) {
     try {
-        sceneAnalysisSection.style.display = 'block';
-        sceneAnalysisText.innerHTML = '<p style="color: #666;">🔄 در حال تحلیل عکس توسط هوش مصنوعی...</p>';
+        const sceneAnalysisSection = document.getElementById('sceneAnalysisSection');
+        if (sceneAnalysisSection) {
+            sceneAnalysisSection.style.display = 'block';
+        }
 
         const response = await fetch('/api/analyze-scene', {
             method: 'POST',
@@ -952,12 +954,8 @@ async function analyzeReferencePhoto(photoPath) {
             sceneAnalysis = data.analysis;
             referencePhotoPeopleCount = data.numberOfPeople || 1;
 
-            // Show analysis with person count info
-            const peopleInfo = referencePhotoPeopleCount > 1
-                ? `<p style="color: #059669; font-weight: bold; margin-bottom: 10px;">👥 تعداد افراد شناسایی شده: ${referencePhotoPeopleCount} نفر - عکس نهایی شامل ${referencePhotoPeopleCount} نفر خواهد بود</p>`
-                : '';
-            sceneAnalysisText.innerHTML = `${peopleInfo}<p>${data.analysis}</p>`;
-
+            // Just log the analysis, don't show it to user
+            console.log('📋 Scene Analysis:', data.analysis);
             console.log(`✅ Person count detected: ${referencePhotoPeopleCount}`);
 
             // Show Model 2 section if 2+ people detected
