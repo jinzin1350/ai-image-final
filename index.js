@@ -2466,6 +2466,36 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     if (mode === 'complete-outfit') {
       // COMPLETE OUTFIT MODE: Garment + Hijab
 
+      // Detect number of people in model image
+      let numberOfPeople = 1;
+      if (selectedModel && selectedModel.image) {
+        try {
+          const imageBase64 = await imageUrlToBase64(selectedModel.image);
+          const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+          const detectPrompt = `Count EXACTLY how many full people are clearly visible in this image. Respond with ONLY a single number (1, 2, or 3).`;
+
+          const detectResult = await visionModel.generateContent([
+            {
+              inlineData: {
+                data: imageBase64,
+                mimeType: "image/jpeg"
+              }
+            },
+            detectPrompt
+          ]);
+
+          const detectResponse = await detectResult.response;
+          const detectedCount = parseInt(detectResponse.text().trim());
+          numberOfPeople = Math.max(1, Math.min(3, isNaN(detectedCount) ? 1 : detectedCount));
+
+          console.log(`👥 Detected ${numberOfPeople} people in model image`);
+        } catch (error) {
+          console.error('Error detecting people count:', error);
+          numberOfPeople = 1; // Default to 1 on error
+        }
+      }
+
       // Build age and ethnicity descriptions
       const ethnicityDescriptions = {
         'iranian': 'Iranian/Persian facial features and skin tone',
@@ -2518,14 +2548,30 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 - Natural appearance for a ${age}-year-old person`;
       }
 
-      prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
+      // Build people-specific description
+      const peopleDescription = numberOfPeople === 1
+        ? 'the model'
+        : numberOfPeople === 2
+        ? 'BOTH models (2 people total)'
+        : 'ALL THREE models (3 people total)';
+
+      const peopleInstruction = numberOfPeople > 1
+        ? `\n\nCRITICAL MULTI-PERSON REQUIREMENTS:
+- There are EXACTLY ${numberOfPeople} people in the model image
+- ALL ${numberOfPeople} people must appear in the generated photo
+- Each person should be wearing ${garmentDescription}
+- Maintain natural positioning and composition of all ${numberOfPeople} people
+- Keep the same poses and arrangement as in the original model image`
+        : '';
+
+      prompt = `Create a photorealistic fashion photo showing ${peopleDescription} wearing the garment.
 
 IMAGES PROVIDED:
 - Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment/clothing to wear
-- Image ${garments.length + 1}: Model (person)
+- Image ${garments.length + 1}: Model (${numberOfPeople} ${numberOfPeople === 1 ? 'person' : 'people'})
 
 TASK:
-Show this exact model wearing ${garmentDescription}. Make it look like a real professional photograph.${ageSpecificInstructions}
+Show ${peopleDescription} wearing ${garmentDescription}. Make it look like a real professional photograph.${ageSpecificInstructions}${peopleInstruction}
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
@@ -4040,6 +4086,69 @@ ${productInfo && productInfo.discount ? '⚡ تخفیف رو خیلی برجست
     res.status(500).json({
       error: 'خطا در تولید کپشن',
       details: error.message
+    });
+  }
+});
+
+// Detect number of people in a model image
+app.post('/api/detect-people-count', async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'Image URL is required' });
+    }
+
+    console.log('👥 Detecting number of people in image:', imageUrl);
+
+    // Download image and convert to base64
+    const imageBase64 = await imageUrlToBase64(imageUrl);
+
+    // Use Gemini Vision to detect people
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    const prompt = `Analyze this image and count EXACTLY how many full people/persons are clearly visible.
+
+IMPORTANT RULES:
+- Count only COMPLETE people (showing most of their body, not just a hand or partial view)
+- Each distinct person counts as 1
+- If you see 1 person, return: 1
+- If you see 2 people, return: 2
+- If you see 3 people, return: 3
+- If you see 4 or more people, return: 3 (we only support up to 3)
+
+CRITICAL: Respond with ONLY A SINGLE NUMBER (1, 2, or 3). No text, no explanation, just the number.`;
+
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: imageBase64,
+          mimeType: "image/jpeg"
+        }
+      },
+      prompt
+    ]);
+
+    const response = await result.response;
+    const detectedCount = parseInt(response.text().trim());
+
+    // Validate and clamp between 1-3
+    const numberOfPeople = Math.max(1, Math.min(3, isNaN(detectedCount) ? 1 : detectedCount));
+
+    console.log(`✅ Detected ${numberOfPeople} people in image`);
+
+    res.json({
+      success: true,
+      numberOfPeople: numberOfPeople
+    });
+
+  } catch (error) {
+    console.error('Error detecting people count:', error);
+    // Default to 1 person on error
+    res.json({
+      success: true,
+      numberOfPeople: 1,
+      note: 'Detection failed, defaulting to 1 person'
     });
   }
 });
