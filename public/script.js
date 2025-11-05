@@ -1039,24 +1039,23 @@ async function analyzeContentImage(photoPath) {
             console.log('✅ تحلیل عکس محتوا کامل شد');
             console.log('📊 Analysis:', data.analysis);
 
-            // Show success message briefly
+            // Show success message and keep it visible
             const analysisStatus = document.getElementById('contentImageAnalysisStatus');
             if (analysisStatus) {
                 analysisStatus.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 20px;">✅</span>
-                        <span style="color: #155724; font-weight: 500;">تحلیل عکس محتوا کامل شد</span>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-direction: column;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 24px;">✅</span>
+                            <span style="color: #155724; font-weight: 600; font-size: 16px;">تحلیل کامل شد!</span>
+                        </div>
+                        <span style="color: #155724; font-weight: 500; font-size: 14px;">✨ حالا می‌توانید عکس را تولید کنید</span>
                     </div>
                 `;
                 analysisStatus.style.background = '#d4edda';
                 analysisStatus.style.borderColor = '#28a745';
+                analysisStatus.style.display = 'block';
 
-                // Hide after 2 seconds
-                setTimeout(() => {
-                    if (analysisStatus) {
-                        analysisStatus.style.display = 'none';
-                    }
-                }, 2000);
+                // Keep it visible - don't hide automatically
             }
         } else {
             console.error('خطا در تحلیل:', data.error);
@@ -1921,7 +1920,7 @@ async function loadGalleryImages() {
                 const imageCard = document.createElement('div');
                 imageCard.style.cssText = 'position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; border: 3px solid transparent; transition: all 0.2s;';
                 imageCard.innerHTML = `
-                    <img src="${image.image_url}" style="width: 100%; height: 200px; object-fit: cover;">
+                    <img src="${image.image_url}" style="width: 100%; height: 150px; object-fit: cover;">
                     <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; display: none;" class="selection-badge">✓</div>
                 `;
 
