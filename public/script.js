@@ -898,6 +898,16 @@ function switchMode(mode) {
         // Restore original upload section text
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
 
+        // Show/hide model 2 sections based on numberOfModelsSelect
+        const numModels = parseInt(numberOfModelsSelect.value);
+        if (numModels === 2) {
+            model2Section.style.display = 'block';
+            garmentUploadSection2.style.display = 'block';
+        } else {
+            model2Section.style.display = 'none';
+            garmentUploadSection2.style.display = 'none';
+        }
+
     } else if (mode === 'accessories-only') {
         // Accessories mode: upload accessory product photo, select hand/arm model
         garmentUploadSection.style.display = 'none';
@@ -907,6 +917,8 @@ function switchMode(mode) {
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
         sceneRecreationSection.style.display = 'none';
+        model2Section.style.display = 'none'; // Hide model 2 in accessories mode
+        garmentUploadSection2.style.display = 'none'; // Hide garment 2 upload
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
@@ -917,6 +929,8 @@ function switchMode(mode) {
     } else if (mode === 'color-collection') {
         // Color Collection mode: upload multiple color variants and select display scenario
         garmentUploadSection.style.display = 'none';
+        model2Section.style.display = 'none';
+        garmentUploadSection2.style.display = 'none';
         accessoryUploadSection.style.display = 'none';
         colorCollectionUploadSection.style.display = 'block';
         displayScenarioSection.style.display = 'block';
@@ -936,6 +950,8 @@ function switchMode(mode) {
         flatLayUploadSection.style.display = 'block';
         flatLayArrangementSection.style.display = 'block';
         sceneRecreationSection.style.display = 'none';
+        model2Section.style.display = 'none';
+        garmentUploadSection2.style.display = 'none';
         if (modelSection) modelSection.style.display = 'none'; // No model needed
         if (backgroundSection) backgroundSection.style.display = 'block';
         hijabSection.style.display = 'none'; // Hide hijab section
@@ -949,6 +965,8 @@ function switchMode(mode) {
         flatLayUploadSection.style.display = 'none';
         flatLayArrangementSection.style.display = 'none';
         sceneRecreationSection.style.display = 'block';
+        model2Section.style.display = 'none';
+        garmentUploadSection2.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block'; // Need model
         if (backgroundSection) backgroundSection.style.display = 'none'; // Background from reference photo
         hijabSection.style.display = 'block'; // May need hijab
