@@ -1185,7 +1185,7 @@
             // Basic info
             const gender = document.getElementById('modelGender').value;
 
-            // Convert age range to exact age
+            // Get age range string for prompt and convert to exact age for logic
             const ageRange = document.getElementById('modelAge').value;
             const ageRangeToExact = {
                 'child': 8,
@@ -1195,7 +1195,7 @@
                 'middle-aged': 50,
                 'elderly': 65
             };
-            const age = ageRangeToExact[ageRange] || 25;
+            const ageExact = ageRangeToExact[ageRange] || 25;
 
             // Get ethnicity from dropdown
             const ethnicity = document.getElementById('modelEthnicity').value;
@@ -1263,10 +1263,10 @@
 
             // SPECIAL HANDLING: Body-part models for accessory photography
             if (isBodyPart && bodyPartType) {
-                return buildBodyPartPrompt(bodyPartType, gender, age, ethnicity, skinTone, skinTexture, quality);
+                return buildBodyPartPrompt(bodyPartType, gender, ageExact, ethnicity, skinTone, skinTexture, quality);
             }
 
-            let prompt = `Professional ${quality} ${photoType} photograph of a ${age.replace('-', ' ')} ${ethnicity} ${gender} model. `;
+            let prompt = `Professional ${quality} ${photoType} photograph of a ${ageRange.replace('-', ' ')} ${ethnicity} ${gender} model. `;
 
             // For underwear models: HEADLESS/CROPPED (no face shown) for e-commerce focus
             if (!isUnderwear) {
