@@ -40,7 +40,8 @@ let selectedStyleId = 'professional';
 let selectedLightingId = 'studio';
 
 // NEW: Mode selection variables
-let currentMode = 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'color-collection'
+// Check if mode is set from the HTML page (for individual service pages)
+let currentMode = window.currentMode || 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'color-collection'
 let uploadedAccessoryPath = null; // Path to uploaded accessory product image
 let selectedAccessoryType = null; // Type of accessory (handbag, watch, etc.)
 
@@ -2049,4 +2050,14 @@ function showStyleImagesPreviews() {
         previewsContainer.style.display = 'none';
         placeholder.style.display = 'flex';
     }
+}
+
+// ========================================
+// Initialize page based on currentMode
+// ========================================
+// If we're on a service-specific page, switch to that mode
+if (window.currentMode && currentMode !== 'complete-outfit') {
+    console.log('🎯 Initializing page with mode:', currentMode);
+    // Call switchMode to show/hide appropriate sections
+    switchMode(currentMode);
 }
