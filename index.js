@@ -3525,21 +3525,24 @@ Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the
       // STYLE TRANSFER MODE: Combine multiple people/outfits with lighting from content image
       const numStyleImages = selectedModel.styleImagesBase64.length;
 
-      prompt = `Create a COMBINED fashion photo that merges ${numStyleImages} ${numStyleImages === 1 ? 'person' : 'people'} from the style images into ONE photo, applying the lighting, mood, and atmosphere from the content/reference image.
+      prompt = `Create a COMBINED fashion photo that merges ${numStyleImages} ${numStyleImages === 1 ? 'person' : 'people'} from the style images into ONE photo, applying the lighting, mood, atmosphere, POSES, and EXPRESSIONS from the content/reference image.
 
 IMAGES PROVIDED (IN ORDER):
-${selectedModel.styleImagesBase64.map((_, index) => `- Image ${index + 1}: STYLE IMAGE ${index + 1} - Person with their outfit (PRESERVE EXACTLY)`).join('\n')}
-- Image ${numStyleImages + 1}: CONTENT/REFERENCE IMAGE - Use ONLY for lighting, mood, atmosphere analysis (NOT for people or clothes)
+${selectedModel.styleImagesBase64.map((_, index) => `- Image ${index + 1}: STYLE IMAGE ${index + 1} - Person with their outfit (PRESERVE face, skin tone, and clothing EXACTLY)`).join('\n')}
+- Image ${numStyleImages + 1}: CONTENT/REFERENCE IMAGE - Use for lighting, mood, atmosphere, POSES, and EXPRESSIONS (NOT for faces, skin tones, or clothes)
 
 ⚠️ CRITICAL APPROACH:
 
 **PRIMARY GOAL: COMBINE the people from style images**
 ${numStyleImages > 1
   ? `- Take ALL ${numStyleImages} people from the style images and place them together in ONE photo
-- Each person keeps their EXACT outfit, face, body, pose from their style image
-- Position them naturally together (side by side, interacting, or in complementary poses)
-- They should look like they're in the same photo together`
-  : `- Take the person from the style image with their EXACT outfit, face, body, pose`}
+- Each person keeps their EXACT outfit, face, and body from their style image
+- Use the POSES, EXPRESSIONS, and INTERACTIONS from the content/reference image
+- If content image shows people holding hands, smiling, or specific gestures - recreate those poses
+- Position them naturally together matching the pose dynamics from content image`
+  : `- Take the person from the style image with their EXACT outfit, face, and body
+- Use the POSE and EXPRESSION from the content/reference image
+- If the content image shows someone smiling, laughing, or in a specific pose - match that exactly`}
 
 **SECONDARY GOAL: Apply lighting/mood from content image**
 ${contentImageAnalysis ? `
@@ -3563,10 +3566,13 @@ ${contentImageAnalysis}
 ✅ EXACT fabric patterns and prints - do NOT simplify or alter
 ✅ EXACT hardware details (zippers, buttons, rivets) with correct colors
 ✅ EXACT garment colors - do NOT shift or change
-✅ Poses and body language of each person
 ✅ All garment details: stitching, pockets, seams, decorative elements
 
 **What to TAKE from content image:**
+✅ Poses and body language - match the poses, expressions, and interactions from content image
+✅ Facial expressions and emotions (smiling, serious, laughing, etc.)
+✅ Body positioning and interactions (holding hands, standing close, specific gestures)
+✅ Model vibe and energy
 ✅ Lighting style (natural/artificial, soft/dramatic)
 ✅ Light direction and shadows
 ✅ Color temperature (warm/cool/neutral)
@@ -3575,10 +3581,11 @@ ${contentImageAnalysis}
 ✅ Color grading style
 
 **What NOT to take from content image:**
-❌ People, faces, or bodies
+❌ People's faces or identities
+❌ People's bodies or skin tones
 ❌ Clothing or outfits
 ❌ Specific location or background details
-❌ Props or objects
+❌ Props or objects (unless they're part of the interaction like holding hands)
 
 CRITICAL DETAIL PRESERVATION:
 ${numStyleImages > 1 ? `Since you're combining ${numStyleImages} people, make sure:
@@ -3628,12 +3635,12 @@ TECHNICAL SPECS:
 DO NOT:
 - ❌ CRITICAL: DO NOT change any garment colors - keep EXACT colors from style images
 - ❌ CRITICAL: DO NOT simplify, blur, or alter fabric patterns and prints
-- ❌ CRITICAL: DO NOT change faces, bodies, or outfits from style images
-- ❌ CRITICAL: DO NOT use people or clothes from the content image
+- ❌ CRITICAL: DO NOT change faces or identities from style images (but DO use poses/expressions from content)
+- ❌ CRITICAL: DO NOT use clothing or outfits from the content image - ONLY use clothes from style images
 - ❌ CRITICAL: DO NOT deform or blur zippers, buttons, or hardware
 - ❌ CRITICAL: DO NOT change pattern colors, scale, or placement
 ${numStyleImages > 1 ? `- ❌ CRITICAL: DO NOT mix clothes between people - each keeps their own outfit\n- ❌ CRITICAL: DO NOT omit any people - include ALL ${numStyleImages} people` : ''}
-- Change the content/structure of the style images
+- Change the content/structure of the garments from style images
 - Alter garment details, stitching, pockets, or decorative elements
 - Over-smooth skin or create plastic-looking results
 - Add text, watermarks, or logos
@@ -3644,38 +3651,43 @@ ${numStyleImages > 1
   ? `IMAGES YOU RECEIVE:
 - Image 1: Woman in blue dress (style image)
 - Image 2: Man in black suit (style image)
-- Image 3: Park at golden hour with warm lighting (content image)
+- Image 3: Couple holding hands and smiling at golden hour (content image)
 
 CORRECT OUTPUT:
 ✅ Woman in EXACT blue dress + Man in EXACT black suit
-✅ BOTH together in one photo (side by side or interacting)
+✅ BOTH holding hands and smiling (poses from Image 3)
 ✅ With golden hour warm lighting from Image 3
 ✅ All garment details preserved exactly
-✅ Faces and bodies exactly from Images 1 and 2
+✅ Faces and skin tones exactly from Images 1 and 2
+✅ But expressions and poses matching Image 3
 
 WRONG OUTPUT:
 ❌ Only one person (missing someone)
 ❌ Changed dress or suit colors
-❌ Using people from the park image
+❌ Using the actual people/faces from the park image
 ❌ Cold lighting instead of golden hour
-❌ Simplified patterns or missing details`
+❌ Simplified patterns or missing details
+❌ Not matching the holding hands pose from Image 3`
   : `IMAGES YOU RECEIVE:
-- Image 1: Woman in floral dress (style image)
-- Image 2: Studio with dramatic side lighting (content image)
+- Image 1: Woman in floral dress standing neutral (style image)
+- Image 2: Model smiling and posing with hand on hip in dramatic side lighting (content image)
 
 CORRECT OUTPUT:
 ✅ Woman in EXACT floral dress
+✅ Smiling and posing with hand on hip (pose/expression from Image 2)
 ✅ With dramatic side lighting from Image 2
 ✅ All floral pattern details preserved
-✅ Face and body exactly from Image 1
+✅ Face and skin tone exactly from Image 1
+✅ But expression and pose matching Image 2
 
 WRONG OUTPUT:
 ❌ Changed dress pattern or colors
-❌ Using person from studio image
+❌ Using the actual person/face from studio image
 ❌ Flat lighting instead of dramatic
-❌ Simplified or blurred floral pattern`}
+❌ Simplified or blurred floral pattern
+❌ Not matching the smiling expression or hand-on-hip pose from Image 2`}
 
-Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' : `these ${numStyleImages} people with their outfits`}, photograph them together, and light them like the content image"`;
+Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' : `these ${numStyleImages} people with their outfits`}, pose them like the content image, and light them like the content image - but keep the exact clothing from the style images"`;
     }
 
     console.log('🎯 Mode:', mode);
