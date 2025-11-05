@@ -4135,21 +4135,33 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
     }
 
     const userId = req.user.id;
+    const userEmail = req.user.email;
+
+    // Check if user is admin
+    const ADMIN_EMAIL = 'engi.alireza@gmail.com';
+    const isAdmin = userEmail === ADMIN_EMAIL;
 
     // Fetch all user's images (no pagination, just simple list)
-    const { data, error } = await supabase
+    // Admin sees ALL images, regular users see only their own
+    let query = supabase
       .from('generated_images')
-      .select('id, generated_image_url, created_at')
-      .eq('user_id', userId)
+      .select('id, generated_image_url, created_at, user_id')
       .order('created_at', { ascending: false })
       .limit(100); // Limit to recent 100 images
+
+    // If not admin, filter by user_id
+    if (!isAdmin) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('❌ Database error fetching images:', error);
       throw error;
     }
 
-    console.log(`📸 Found ${data?.length || 0} images for user ${userId}`);
+    console.log(`📸 Found ${data?.length || 0} images for ${isAdmin ? 'admin (all users)' : `user ${userId}`}`);
 
     // Map to format expected by frontend (image_url instead of generated_image_url)
     const images = data ? data.map(img => ({
