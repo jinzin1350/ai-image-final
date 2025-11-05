@@ -1184,9 +1184,21 @@
         function buildModelPrompt() {
             // Basic info
             const gender = document.getElementById('modelGender').value;
-            // Use the new slider and selector values instead of old form fields
-            const age = selectedModelAge; // From age slider
-            const ethnicity = selectedModelEthnicity; // From ethnicity selector
+
+            // Convert age range to exact age
+            const ageRange = document.getElementById('modelAge').value;
+            const ageRangeToExact = {
+                'child': 8,
+                'teen': 15,
+                'young-adult': 22,
+                'adult': 33,
+                'middle-aged': 50,
+                'elderly': 65
+            };
+            const age = ageRangeToExact[ageRange] || 25;
+
+            // Get ethnicity from dropdown
+            const ethnicity = document.getElementById('modelEthnicity').value;
 
             // Face
             const faceShape = document.getElementById('faceShape').value;
