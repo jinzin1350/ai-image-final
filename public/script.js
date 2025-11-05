@@ -193,7 +193,19 @@ function displayModelsByCategory(category) {
     const modelsGrid = document.getElementById('modelsGrid');
     if (!modelsGrid) return;
 
+    console.log('🔍 Filtering models by category:', category);
+    console.log('📋 All models count:', allModels.length);
+    console.log('📋 All model categories:', [...new Set(allModels.map(m => m.category))]);
+
     const filteredModels = allModels.filter(model => model.category === category);
+
+    console.log('✅ Filtered models count:', filteredModels.length);
+    console.log('✅ Filtered models:', filteredModels.map(m => `${m.name} (${m.category})`));
+
+    if (filteredModels.length === 0) {
+        modelsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; padding: 40px;">هیچ مدلی در این دسته‌بندی یافت نشد</p>';
+        return;
+    }
 
     modelsGrid.innerHTML = filteredModels.map(model => `
         <div class="model-card" data-id="${model.id}">
