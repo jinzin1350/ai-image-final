@@ -190,6 +190,9 @@ async function loadModels(mode = 'complete-outfit') {
 
 // نمایش مدل‌های یک دسته‌بندی خاص
 function displayModelsByCategory(category) {
+    const modelsGrid = document.getElementById('modelsGrid');
+    if (!modelsGrid) return;
+
     const filteredModels = allModels.filter(model => model.category === category);
 
     modelsGrid.innerHTML = filteredModels.map(model => `
@@ -286,6 +289,9 @@ numberOfModelsSelect.addEventListener('change', (e) => {
 
 // بارگذاری پس‌زمینه‌ها
 async function loadBackgrounds(mode = 'complete-outfit') {
+    const backgroundsGrid = document.getElementById('backgroundsGrid');
+    if (!backgroundsGrid) return;
+
     try {
         // Get auth token from localStorage if user is logged in
         const token = localStorage.getItem('supabase_token');
@@ -322,6 +328,9 @@ async function loadBackgrounds(mode = 'complete-outfit') {
 
 // بارگذاری حالت‌های بدن
 async function loadPoses() {
+    const poseSelect = document.getElementById('poseSelect');
+    if (!poseSelect) return;
+
     try {
         const response = await fetch('/api/poses');
         const poses = await response.json();
@@ -338,6 +347,9 @@ async function loadPoses() {
 
 // بارگذاری زاویه‌های دوربین
 async function loadCameraAngles() {
+    const cameraAngleSelect = document.getElementById('cameraAngleSelect');
+    if (!cameraAngleSelect) return;
+
     try {
         const response = await fetch('/api/camera-angles');
         const angles = await response.json();
@@ -354,6 +366,9 @@ async function loadCameraAngles() {
 
 // بارگذاری استایل‌ها
 async function loadStyles() {
+    const styleSelect = document.getElementById('styleSelect');
+    if (!styleSelect) return;
+
     try {
         const response = await fetch('/api/styles');
         const styles = await response.json();
@@ -370,6 +385,9 @@ async function loadStyles() {
 
 // بارگذاری نورپردازی‌ها
 async function loadLightings() {
+    const lightingSelect = document.getElementById('lightingSelect');
+    if (!lightingSelect) return;
+
     try {
         const response = await fetch('/api/lightings');
         const lightings = await response.json();
@@ -385,54 +403,90 @@ async function loadLightings() {
 }
 
 // Event listeners برای پارامترهای پیشرفته
-poseSelect.addEventListener('change', (e) => {
-    selectedPoseId = e.target.value;
-});
+const poseSelectEl = document.getElementById('poseSelect');
+if (poseSelectEl) {
+    poseSelectEl.addEventListener('change', (e) => {
+        selectedPoseId = e.target.value;
+    });
+}
 
-cameraAngleSelect.addEventListener('change', (e) => {
-    selectedCameraAngleId = e.target.value;
-});
+const cameraAngleSelectEl = document.getElementById('cameraAngleSelect');
+if (cameraAngleSelectEl) {
+    cameraAngleSelectEl.addEventListener('change', (e) => {
+        selectedCameraAngleId = e.target.value;
+    });
+}
 
-styleSelect.addEventListener('change', (e) => {
-    selectedStyleId = e.target.value;
-});
+const styleSelectEl = document.getElementById('styleSelect');
+if (styleSelectEl) {
+    styleSelectEl.addEventListener('change', (e) => {
+        selectedStyleId = e.target.value;
+    });
+}
 
-lightingSelect.addEventListener('change', (e) => {
-    selectedLightingId = e.target.value;
-});
+const lightingSelectEl = document.getElementById('lightingSelect');
+if (lightingSelectEl) {
+    lightingSelectEl.addEventListener('change', (e) => {
+        selectedLightingId = e.target.value;
+    });
+}
 
 // PHASE 1: Event listeners for critical quality parameters
-colorTempSelect.addEventListener('change', (e) => {
-    selectedColorTempId = e.target.value;
-});
+const colorTempSelectEl = document.getElementById('colorTempSelect');
+if (colorTempSelectEl) {
+    colorTempSelectEl.addEventListener('change', (e) => {
+        selectedColorTempId = e.target.value;
+    });
+}
 
-dofSelect.addEventListener('change', (e) => {
-    selectedDofId = e.target.value;
-});
+const dofSelectEl = document.getElementById('dofSelect');
+if (dofSelectEl) {
+    dofSelectEl.addEventListener('change', (e) => {
+        selectedDofId = e.target.value;
+    });
+}
 
-fabricSelect.addEventListener('change', (e) => {
-    selectedFabricId = e.target.value;
-});
+const fabricSelectEl = document.getElementById('fabricSelect');
+if (fabricSelectEl) {
+    fabricSelectEl.addEventListener('change', (e) => {
+        selectedFabricId = e.target.value;
+    });
+}
 
-shadowSelect.addEventListener('change', (e) => {
-    selectedShadowId = e.target.value;
-});
+const shadowSelectEl = document.getElementById('shadowSelect');
+if (shadowSelectEl) {
+    shadowSelectEl.addEventListener('change', (e) => {
+        selectedShadowId = e.target.value;
+    });
+}
 
 // PHASE 2: Event listeners for professional touch
-aspectRatioSelect.addEventListener('change', (e) => {
-    selectedAspectRatioId = e.target.value;
-});
+const aspectRatioSelectEl = document.getElementById('aspectRatioSelect');
+if (aspectRatioSelectEl) {
+    aspectRatioSelectEl.addEventListener('change', (e) => {
+        selectedAspectRatioId = e.target.value;
+    });
+}
 
-bgBlurSelect.addEventListener('change', (e) => {
-    selectedBgBlurId = e.target.value;
-});
+const bgBlurSelectEl = document.getElementById('bgBlurSelect');
+if (bgBlurSelectEl) {
+    bgBlurSelectEl.addEventListener('change', (e) => {
+        selectedBgBlurId = e.target.value;
+    });
+}
 
-fitSelect.addEventListener('change', (e) => {
-    selectedFitId = e.target.value;
-});
+const fitSelectEl = document.getElementById('fitSelect');
+if (fitSelectEl) {
+    fitSelectEl.addEventListener('change', (e) => {
+        selectedFitId = e.target.value;
+    });
+}
 
 // Load functions for new quality parameters
 async function loadColorTemperatures() {
+    const colorTempSelect = document.getElementById('colorTempSelect');
+    if (!colorTempSelect) return;
+
     try {
         const response = await fetch('/api/color-temperatures');
         const items = await response.json();
@@ -446,6 +500,9 @@ async function loadColorTemperatures() {
 }
 
 async function loadDepthOfFields() {
+    const dofSelect = document.getElementById('dofSelect');
+    if (!dofSelect) return;
+
     try {
         const response = await fetch('/api/depth-of-fields');
         const items = await response.json();
@@ -459,6 +516,9 @@ async function loadDepthOfFields() {
 }
 
 async function loadFabricTypes() {
+    const fabricSelect = document.getElementById('fabricSelect');
+    if (!fabricSelect) return;
+
     try {
         const response = await fetch('/api/fabric-types');
         const items = await response.json();
@@ -472,6 +532,9 @@ async function loadFabricTypes() {
 }
 
 async function loadShadowQualities() {
+    const shadowSelect = document.getElementById('shadowSelect');
+    if (!shadowSelect) return;
+
     try {
         const response = await fetch('/api/shadow-qualities');
         const items = await response.json();
@@ -485,6 +548,9 @@ async function loadShadowQualities() {
 }
 
 async function loadAspectRatios() {
+    const aspectRatioSelect = document.getElementById('aspectRatioSelect');
+    if (!aspectRatioSelect) return;
+
     try {
         const response = await fetch('/api/aspect-ratios');
         const items = await response.json();
@@ -498,6 +564,9 @@ async function loadAspectRatios() {
 }
 
 async function loadBackgroundBlurs() {
+    const bgBlurSelect = document.getElementById('bgBlurSelect');
+    if (!bgBlurSelect) return;
+
     try {
         const response = await fetch('/api/background-blurs');
         const items = await response.json();
@@ -511,6 +580,9 @@ async function loadBackgroundBlurs() {
 }
 
 async function loadGarmentFits() {
+    const fitSelect = document.getElementById('fitSelect');
+    if (!fitSelect) return;
+
     try {
         const response = await fetch('/api/garment-fits');
         const items = await response.json();
