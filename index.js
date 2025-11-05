@@ -2476,7 +2476,13 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         'afghan': 'Afghan facial features and appearance',
         'kurdish': 'Kurdish ethnic features and appearance',
         'azari': 'Azari/Azerbaijani ethnic features',
-        'balochi': 'Balochi ethnic features and appearance'
+        'balochi': 'Balochi ethnic features and appearance',
+        'african': 'African ethnic features with dark skin tone and African facial characteristics',
+        'middle-east': 'Middle Eastern facial features and appearance',
+        'korean': 'Korean/East Asian facial features with Korean appearance',
+        'mixed': 'Mixed ethnicity with diverse multicultural features',
+        'caucasian': 'Caucasian/European facial features and skin tone',
+        'russian': 'Russian/Slavic facial features and appearance'
       };
 
       const ageDescription = modelAge ? `EXACTLY ${modelAge} years old` : 'age-appropriate';

@@ -224,15 +224,8 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>محدوده سنی</label>
-                                <select id="modelAge">
-                                    <option value="child">👶 کودک (5-12)</option>
-                                    <option value="teen">🧒 نوجوان (13-17)</option>
-                                    <option value="young-adult" selected>👤 جوان (18-25)</option>
-                                    <option value="adult">🧑 بزرگسال (26-40)</option>
-                                    <option value="middle-aged">👨‍🦳 میانسال (41-60)</option>
-                                    <option value="elderly">👴 سالمند (60+)</option>
-                                </select>
+                                <label>سن دقیق (3-80 سال)</label>
+                                <input type="number" id="modelAge" min="3" max="80" value="25" placeholder="مثال: 25">
                             </div>
                             <div class="form-group">
                                 <label>قومیت</label>
@@ -246,6 +239,12 @@
                                     <option value="kurdish">کُرد (Kurdish)</option>
                                     <option value="azari">آذری (Azari)</option>
                                     <option value="balochi">بلوچ (Balochi)</option>
+                                    <option value="african">🌍 آفریقایی (African)</option>
+                                    <option value="middle-east">🕌 خاورمیانه‌ای (Middle East)</option>
+                                    <option value="korean">🇰🇷 کره‌ای (Korean)</option>
+                                    <option value="mixed">🌐 ترکیبی (Mixed)</option>
+                                    <option value="caucasian">قفقازی (Caucasian)</option>
+                                    <option value="russian">🇷🇺 روسی (Russian)</option>
                                 </select>
                             </div>
                         </div>
@@ -1185,17 +1184,24 @@
             // Basic info
             const gender = document.getElementById('modelGender').value;
 
-            // Get age range string for prompt and convert to exact age for logic
-            const ageRange = document.getElementById('modelAge').value;
-            const ageRangeToExact = {
-                'child': 8,
-                'teen': 15,
-                'young-adult': 22,
-                'adult': 33,
-                'middle-aged': 50,
-                'elderly': 65
-            };
-            const ageExact = ageRangeToExact[ageRange] || 25;
+            // Get exact age directly from input
+            const ageExact = parseInt(document.getElementById('modelAge').value) || 25;
+
+            // Convert exact age to age range description for prompt
+            let ageRange;
+            if (ageExact < 12) {
+                ageRange = 'child';
+            } else if (ageExact < 18) {
+                ageRange = 'teen';
+            } else if (ageExact < 26) {
+                ageRange = 'young adult';
+            } else if (ageExact < 41) {
+                ageRange = 'adult';
+            } else if (ageExact < 61) {
+                ageRange = 'middle aged';
+            } else {
+                ageRange = 'elderly';
+            }
 
             // Get ethnicity from dropdown
             const ethnicity = document.getElementById('modelEthnicity').value;
@@ -1266,7 +1272,7 @@
                 return buildBodyPartPrompt(bodyPartType, gender, ageExact, ethnicity, skinTone, skinTexture, quality);
             }
 
-            let prompt = `Professional ${quality} ${photoType} photograph of a ${ageRange.replace('-', ' ')} ${ethnicity} ${gender} model. `;
+            let prompt = `Professional ${quality} ${photoType} photograph of a ${ageRange} ${ethnicity} ${gender} model. `;
 
             // For underwear models: HEADLESS/CROPPED (no face shown) for e-commerce focus
             if (!isUnderwear) {
