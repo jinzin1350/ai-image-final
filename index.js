@@ -1631,9 +1631,17 @@ app.post('/api/auth/signout', authenticateUser, async (req, res) => {
 // دریافت لیست مدل‌ها
 app.get('/api/models', async (req, res) => {
   try {
-    // Always start with regular models as base
-    // Include accessoryModels for accessories mode
-    let allModels = [...models, ...accessoryModels];
+    const mode = req.query.mode || 'complete-outfit';
+
+    // Start with appropriate base models based on mode
+    let allModels;
+    if (mode === 'accessories-only') {
+      // For accessories mode, ONLY include accessory models
+      allModels = [...accessoryModels];
+    } else {
+      // For other modes, use regular models (exclude accessory models)
+      allModels = [...models];
+    }
 
     // If user is authenticated and Supabase is configured, add their custom models
     const authHeader = req.headers.authorization;
@@ -1645,16 +1653,22 @@ app.get('/api/models', async (req, res) => {
 
         if (user) {
           // Fetch user's custom models (private + public models from content_library)
-          const { data: customModels } = await supabase
+          let query = supabase
             .from('content_library')
             .select('*')
             .eq('content_type', 'model')
             .eq('is_active', true)
-            .or(`visibility.eq.public,owner_user_id.eq.${user.id}`)
-            .order('created_at', { ascending: false });
+            .or(`visibility.eq.public,owner_user_id.eq.${user.id}`);
+
+          // Filter by category for accessories mode
+          if (mode === 'accessories-only') {
+            query = query.eq('category', 'accessory');
+          }
+
+          const { data: customModels } = await query.order('created_at', { ascending: false });
 
           if (customModels && customModels.length > 0) {
-            console.log(`✅ Found ${customModels.length} custom models for user ${user.id}`);
+            console.log(`✅ Found ${customModels.length} custom models for user ${user.id} (mode: ${mode})`);
             // Transform database models to match frontend format
             const transformedModels = customModels.map(model => ({
               id: `custom-${model.id}`,
@@ -1669,7 +1683,7 @@ app.get('/api/models', async (req, res) => {
             console.log('📋 Custom model categories:', transformedModels.map(m => m.category).join(', '));
             allModels = [...transformedModels, ...allModels];
           } else {
-            console.log(`ℹ️ No custom models found for user ${user.id}`);
+            console.log(`ℹ️ No custom models found for user ${user.id} (mode: ${mode})`);
           }
         }
       } catch (authError) {
