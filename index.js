@@ -1574,10 +1574,19 @@ const authenticateUser = async (req, res, next) => {
 
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Auth error:', error.message);
+      throw error;
+    }
+    if (!user) {
+      console.error('❌ No user found with token');
+      throw new Error('No user found');
+    }
+    console.log('✅ User authenticated:', user.email);
     req.user = user;
     next();
   } catch (error) {
+    console.error('❌ Authentication failed:', error.message);
     res.status(401).json({ error: 'Unauthorized' });
   }
 };
@@ -4119,6 +4128,10 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
   try {
     if (!supabase) {
       return res.json({ success: true, images: [] });
+    }
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, error: 'Not authenticated' });
     }
 
     const userId = req.user.id;
