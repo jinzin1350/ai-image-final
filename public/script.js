@@ -96,6 +96,20 @@ const fitSelect = document.getElementById('fitSelect');
 // Hijab section elements
 const hijabSection = document.getElementById('hijabSection');
 
+// NEW: Model 2 elements
+const numberOfModelsSelect = document.getElementById('numberOfModelsSelect');
+const model2Section = document.getElementById('model2Section');
+const garmentUploadSection2 = document.getElementById('garmentUploadSection2');
+const categorySelect2 = document.getElementById('categorySelect2');
+const modelsGrid2 = document.getElementById('modelsGrid2');
+const garmentInput2 = document.getElementById('garmentInput2');
+const garmentUploadArea2 = document.getElementById('garmentUploadArea2');
+const garmentPreviews2 = document.getElementById('garmentPreviews2');
+const modelSelectorLabel = document.getElementById('modelSelectorLabel');
+
+let selectedModelId2 = null;
+let uploadedGarmentPaths2 = [];
+
 // NEW: Mode selection elements
 const modeCards = document.querySelectorAll('.mode-card');
 const garmentUploadSection = document.getElementById('garmentUploadSection');
@@ -185,11 +199,80 @@ function displayModelsByCategory(category) {
     });
 }
 
+// نمایش مدل‌های یک دسته‌بندی خاص برای مدل دوم
+function displayModelsByCategory2(category) {
+    const filteredModels = allModels.filter(model => model.category === category);
+
+    modelsGrid2.innerHTML = filteredModels.map(model => `
+        <div class="model-card" data-id="${model.id}">
+            <div class="model-image-container">
+                <img src="${model.image}" alt="${model.name}" class="model-image">
+            </div>
+            <div class="card-title">${model.name}</div>
+        </div>
+    `).join('');
+
+    // افزودن رویداد کلیک به مدل‌ها
+    document.querySelectorAll('#modelsGrid2 .model-card').forEach(card => {
+        card.addEventListener('click', () => selectModel2(card.dataset.id));
+    });
+}
+
+// انتخاب مدل دوم
+function selectModel2(modelId) {
+    selectedModelId2 = modelId;
+
+    // حذف کلاس active از تمام کارت‌ها
+    document.querySelectorAll('#modelsGrid2 .model-card').forEach(card => {
+        card.classList.remove('active');
+    });
+
+    // افزودن کلاس active به کارت انتخاب شده
+    const selectedCard = document.querySelector(`#modelsGrid2 .model-card[data-id="${modelId}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('active');
+    }
+
+    checkGenerateButton();
+}
+
 // تغییر دسته‌بندی
 categorySelect.addEventListener('change', (e) => {
     currentCategory = e.target.value;
     selectedModelId = null; // پاک کردن انتخاب قبلی
     displayModelsByCategory(currentCategory);
+    checkGenerateButton();
+});
+
+// تغییر دسته‌بندی مدل دوم
+categorySelect2.addEventListener('change', (e) => {
+    const currentCategory2 = e.target.value;
+    selectedModelId2 = null; // پاک کردن انتخاب قبلی
+    displayModelsByCategory2(currentCategory2);
+    checkGenerateButton();
+});
+
+// تغییر تعداد مدل‌ها
+numberOfModelsSelect.addEventListener('change', (e) => {
+    const numModels = parseInt(e.target.value);
+
+    if (numModels === 2) {
+        // نمایش بخش‌های مدل دوم
+        model2Section.style.display = 'block';
+        garmentUploadSection2.style.display = 'block';
+        modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+
+        // بارگذاری مدل‌ها برای مدل دوم
+        displayModelsByCategory2('woman');
+    } else {
+        // مخفی کردن بخش‌های مدل دوم
+        model2Section.style.display = 'none';
+        garmentUploadSection2.style.display = 'none';
+        modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+        selectedModelId2 = null;
+        uploadedGarmentPaths2 = [];
+    }
+
     checkGenerateButton();
 });
 
@@ -947,10 +1030,23 @@ function checkGenerateButton() {
         const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
-        isValid = uploadedGarmentPaths.length > 0 &&
-                  selectedModelId &&
-                  selectedBackgroundId &&
-                  hijabCondition;
+        const numModels = parseInt(numberOfModelsSelect.value);
+
+        if (numModels === 2) {
+            // For 2 models: need both models and both garments
+            isValid = uploadedGarmentPaths.length > 0 &&
+                      uploadedGarmentPaths2.length > 0 &&
+                      selectedModelId &&
+                      selectedModelId2 &&
+                      selectedBackgroundId &&
+                      hijabCondition;
+        } else {
+            // For 1 model: original logic
+            isValid = uploadedGarmentPaths.length > 0 &&
+                      selectedModelId &&
+                      selectedBackgroundId &&
+                      hijabCondition;
+        }
 
     } else if (currentMode === 'accessories-only') {
         // Accessories mode: need accessory product photo, accessory type, model, and background
@@ -1069,6 +1165,99 @@ function addGarmentPreview(filePath, index) {
     garmentPreviews.appendChild(previewItem);
 }
 
+// ================== GARMENT 2 HANDLERS ==================
+
+// کلیک روی ناحیه آپلود مدل 2
+garmentUploadArea2.addEventListener('click', () => {
+    garmentInput2.click();
+});
+
+// تغییر فایل آپلود مدل 2
+garmentInput2.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+        uploadFiles2(files);
+    }
+});
+
+// آپلود چند فایل برای مدل 2
+async function uploadFiles2(files) {
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('garment', file);
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Add to uploadedGarmentPaths2 array
+                uploadedGarmentPaths2.push(data.filePath);
+
+                // Add preview thumbnail
+                addGarmentPreview2(data.filePath, uploadedGarmentPaths2.length - 1);
+
+                // Hide placeholder and show preview grid
+                const uploadPlaceholder2 = garmentUploadArea2.querySelector('.upload-placeholder');
+                uploadPlaceholder2.style.display = 'none';
+                garmentPreviews2.style.display = 'grid';
+
+                checkGenerateButton();
+            } else {
+                console.error('Upload failed:', data);
+                const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
+                const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
+                alert(`Error: ${errorMsg}${hintMsg}`);
+            }
+        } catch (error) {
+            console.error('خطا در آپلود فایل:', error);
+            alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
+        }
+    }
+}
+
+// افزودن پیش‌نمایش لباس مدل 2
+function addGarmentPreview2(filePath, index) {
+    const previewItem = document.createElement('div');
+    previewItem.className = 'garment-preview-item';
+    previewItem.dataset.index = index;
+
+    previewItem.innerHTML = `
+        <img src="${filePath}" alt="لباس ${index + 1}">
+        <button class="garment-preview-remove" onclick="removeGarment2(${index})" title="حذف">×</button>
+        <div class="garment-preview-label">لباس مدل ۲ - ${index + 1}</div>
+    `;
+
+    garmentPreviews2.appendChild(previewItem);
+}
+
+// حذف لباس مدل 2
+function removeGarment2(index) {
+    // حذف از آرایه
+    uploadedGarmentPaths2.splice(index, 1);
+
+    // پاک کردن پیش‌نمایش‌ها و ایجاد مجدد
+    garmentPreviews2.innerHTML = '';
+
+    if (uploadedGarmentPaths2.length === 0) {
+        const uploadPlaceholder2 = garmentUploadArea2.querySelector('.upload-placeholder');
+        uploadPlaceholder2.style.display = 'flex';
+        garmentPreviews2.style.display = 'none';
+    } else {
+        uploadedGarmentPaths2.forEach((path, idx) => {
+            addGarmentPreview2(path, idx);
+        });
+    }
+
+    checkGenerateButton();
+}
+
+// ================== END GARMENT 2 HANDLERS ==================
+
 // حذف لباس
 function removeGarment(index) {
     // Remove from array
@@ -1119,6 +1308,13 @@ generateBtn.addEventListener('click', async () => {
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
             requestBody.hijabType = selectedHijabType;
+
+            // Check if 2 models mode
+            const numModels = parseInt(numberOfModelsSelect.value);
+            if (numModels === 2) {
+                requestBody.modelId2 = selectedModelId2;
+                requestBody.garmentPaths2 = uploadedGarmentPaths2;
+            }
 
         } else if (currentMode === 'accessories-only') {
             // Accessories mode - accessory product photography

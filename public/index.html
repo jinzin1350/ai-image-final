@@ -117,7 +117,19 @@
             <!-- بخش انتخاب مدل -->
             <section class="selection-section" id="modelSection">
                 <h2>۲. انتخاب مدل</h2>
+
+                <!-- Number of Models Selector -->
+                <div class="category-selector" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">تعداد مدل‌ها:</label>
+                    <select id="numberOfModelsSelect" class="category-dropdown" style="max-width: 300px;">
+                        <option value="1" selected>👤 یک مدل (1 Model)</option>
+                        <option value="2">👥 دو مدل (2 Models)</option>
+                    </select>
+                    <p style="margin-top: 8px; font-size: 14px; color: #6b7280;">هر مدل لباس جداگانه خواهد پوشید</p>
+                </div>
+
                 <div class="category-selector">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;" id="modelSelectorLabel">انتخاب مدل اول:</label>
                     <select id="categorySelect" class="category-dropdown">
                         <option value="woman">👩 زن (Woman)</option>
                         <option value="man">👨 مرد (Man)</option>
@@ -158,6 +170,47 @@
                         <div class="hijab-title">بی حجاب</div>
                         <div class="hijab-description">بدون پوشش سر - موها کاملاً باز</div>
                     </div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب مدل دوم (مخفی به صورت پیش‌فرض) -->
+            <section class="selection-section" id="model2Section" style="display: none;">
+                <h2>۳. انتخاب مدل دوم</h2>
+
+                <div class="category-selector">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">دسته‌بندی مدل دوم:</label>
+                    <select id="categorySelect2" class="category-dropdown">
+                        <option value="woman">👩 زن (Woman)</option>
+                        <option value="man">👨 مرد (Man)</option>
+                        <option value="girl">👧 دختر (Girl)</option>
+                        <option value="boy">👦 پسر (Boy)</option>
+                        <option value="child">👶 کودک (Child)</option>
+                        <option value="couple">💑 زوج (Couple)</option>
+                        <option value="group">👥 گروه (Group)</option>
+                        <option value="elderly">👴 سالمند (Elderly)</option>
+                        <option value="teen">🧑 نوجوان (Teen)</option>
+                        <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                        <option value="accessory">💍 اکسسوری (Accessory)</option>
+                    </select>
+                </div>
+
+                <div class="models-grid" id="modelsGrid2">
+                    <!-- مدل‌های دوم به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- بخش آپلود لباس برای مدل دوم (مخفی به صورت پیش‌فرض) -->
+            <section class="upload-section" id="garmentUploadSection2" style="display: none;">
+                <h2>۴. آپلود تصویر لباس برای مدل دوم</h2>
+                <p class="section-description">لباسی که مدل دوم خواهد پوشید را انتخاب کنید (می‌توانید چند تصویر انتخاب کنید)</p>
+                <div class="upload-area" id="garmentUploadArea2">
+                    <input type="file" id="garmentInput2" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">برای آپلود تصویر لباس کلیک کنید</div>
+                        <div class="upload-hint">یا فایل‌ها را اینجا بکشید (PNG, JPG, JPEG - حداکثر 10MB)</div>
+                    </div>
+                    <div id="garmentPreviews2" class="garment-previews" style="display: none;"></div>
                 </div>
             </section>
 
