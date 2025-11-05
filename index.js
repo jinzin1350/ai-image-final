@@ -2636,6 +2636,21 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       selectedModel.garment2Base64Array = garment2Base64Array;
       selectedModel.garmentPaths2 = garmentPaths2;
       locationDescription = 'Scene from reference photo';
+
+    } else if (mode === 'style-transfer') {
+      // For style transfer mode, load content image (for analysis) and style images (to combine)
+      const contentImageBase64 = await imageUrlToBase64(contentImagePath);
+      const styleImagesBase64 = await Promise.all(
+        styleImagePaths.map(path => imageUrlToBase64(path))
+      );
+
+      console.log(`🎨 Style transfer mode: ${styleImagePaths.length} style images + 1 content image`);
+
+      // Store for later use
+      selectedModel = selectedModel || {};
+      selectedModel.contentImageBase64 = contentImageBase64;
+      selectedModel.styleImagesBase64 = styleImagesBase64;
+      locationDescription = 'Style Transfer Mode';
     }
 
     console.log('📍 Using location description:', locationDescription);
@@ -3492,6 +3507,156 @@ WRONG OUTPUTS:
 ❌ A completely different style that ignores the reference mood
 
 Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the reference photo"`;
+
+    } else if (mode === 'style-transfer') {
+      // STYLE TRANSFER MODE: Combine multiple people/outfits with lighting from content image
+      const numStyleImages = selectedModel.styleImagesBase64.length;
+
+      prompt = `Create a COMBINED fashion photo that merges ${numStyleImages} ${numStyleImages === 1 ? 'person' : 'people'} from the style images into ONE photo, applying the lighting, mood, and atmosphere from the content/reference image.
+
+IMAGES PROVIDED (IN ORDER):
+${selectedModel.styleImagesBase64.map((_, index) => `- Image ${index + 1}: STYLE IMAGE ${index + 1} - Person with their outfit (PRESERVE EXACTLY)`).join('\n')}
+- Image ${numStyleImages + 1}: CONTENT/REFERENCE IMAGE - Use ONLY for lighting, mood, atmosphere analysis (NOT for people or clothes)
+
+⚠️ CRITICAL APPROACH:
+
+**PRIMARY GOAL: COMBINE the people from style images**
+${numStyleImages > 1
+  ? `- Take ALL ${numStyleImages} people from the style images and place them together in ONE photo
+- Each person keeps their EXACT outfit, face, body, pose from their style image
+- Position them naturally together (side by side, interacting, or in complementary poses)
+- They should look like they're in the same photo together`
+  : `- Take the person from the style image with their EXACT outfit, face, body, pose`}
+
+**SECONDARY GOAL: Apply lighting/mood from content image**
+- Analyze the content/reference image (Image ${numStyleImages + 1}) for:
+  * Lighting direction, intensity, and color temperature
+  * Time of day feel (golden hour, midday, blue hour, etc.)
+  * Mood and atmosphere (bright, moody, dramatic, soft, romantic)
+  * Color grading and tone
+  * Shadow characteristics
+- Apply ONLY these lighting/mood aspects to the combined photo
+- Match the FEEL and VIBE of the lighting in the content image
+
+**What to PRESERVE from style images (MOST CRITICAL):**
+✅ EXACT faces, bodies, skin tones of all people
+✅ EXACT outfits/garments - every detail, color, pattern, texture
+✅ EXACT fabric patterns and prints - do NOT simplify or alter
+✅ EXACT hardware details (zippers, buttons, rivets) with correct colors
+✅ EXACT garment colors - do NOT shift or change
+✅ Poses and body language of each person
+✅ All garment details: stitching, pockets, seams, decorative elements
+
+**What to TAKE from content image:**
+✅ Lighting style (natural/artificial, soft/dramatic)
+✅ Light direction and shadows
+✅ Color temperature (warm/cool/neutral)
+✅ Time of day atmosphere
+✅ Overall mood and feel
+✅ Color grading style
+
+**What NOT to take from content image:**
+❌ People, faces, or bodies
+❌ Clothing or outfits
+❌ Specific location or background details
+❌ Props or objects
+
+CRITICAL DETAIL PRESERVATION:
+${numStyleImages > 1 ? `Since you're combining ${numStyleImages} people, make sure:
+- Each person maintains their individual style and outfit
+- No mixing of clothes between people
+- Each outfit stays exactly as shown in its style image
+- People are positioned naturally together (not overlapping awkwardly)
+
+` : ''}⚠️ **FABRIC PATTERNS & PRINTS:**
+- If garments have printed designs or patterns, preserve EXACTLY
+- Do NOT simplify, blur, or alter any patterns
+- Keep pattern colors, scale, and placement exact
+- Show how patterns follow fabric draping naturally
+
+⚠️ **HARDWARE & DETAILS:**
+- Zippers: render with exact metal color, visible teeth
+- Buttons: exact positions, colors, materials
+- Stitching: preserve all visible stitching, especially contrast stitching
+- Pockets: exact shapes, stitching, rivets
+- Fabric texture: authentic material appearance
+
+⚠️ **COLOR PRESERVATION:**
+- Use EXACT colors from style images
+- Do NOT change garment colors even with new lighting
+- Lighting can affect brightness/shadows but NOT base colors
+- Preserve color variations in fabric (fading, distressing, wash effects)
+
+COMPOSITION:
+${numStyleImages > 1
+  ? `- Position all ${numStyleImages} people in a natural, balanced composition
+- They should interact or relate to each other naturally
+- Use appropriate spacing - not too cramped, not too far apart
+- Create visual harmony between all people`
+  : `- Center the person in the frame appropriately
+- Use natural, professional composition`}
+- Apply the lighting from content image consistently across the scene
+- Maintain professional fashion photography quality
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+- Professional fashion photography quality
+- Natural skin texture (no plastic smoothing)
+- Sharp focus on people and clothing
+- Lighting should feel natural and consistent
+
+DO NOT:
+- ❌ CRITICAL: DO NOT change any garment colors - keep EXACT colors from style images
+- ❌ CRITICAL: DO NOT simplify, blur, or alter fabric patterns and prints
+- ❌ CRITICAL: DO NOT change faces, bodies, or outfits from style images
+- ❌ CRITICAL: DO NOT use people or clothes from the content image
+- ❌ CRITICAL: DO NOT deform or blur zippers, buttons, or hardware
+- ❌ CRITICAL: DO NOT change pattern colors, scale, or placement
+${numStyleImages > 1 ? `- ❌ CRITICAL: DO NOT mix clothes between people - each keeps their own outfit\n- ❌ CRITICAL: DO NOT omit any people - include ALL ${numStyleImages} people` : ''}
+- Change the content/structure of the style images
+- Alter garment details, stitching, pockets, or decorative elements
+- Over-smooth skin or create plastic-looking results
+- Add text, watermarks, or logos
+- Create obvious fake composites
+
+EXAMPLE TO CLARIFY:
+${numStyleImages > 1
+  ? `IMAGES YOU RECEIVE:
+- Image 1: Woman in blue dress (style image)
+- Image 2: Man in black suit (style image)
+- Image 3: Park at golden hour with warm lighting (content image)
+
+CORRECT OUTPUT:
+✅ Woman in EXACT blue dress + Man in EXACT black suit
+✅ BOTH together in one photo (side by side or interacting)
+✅ With golden hour warm lighting from Image 3
+✅ All garment details preserved exactly
+✅ Faces and bodies exactly from Images 1 and 2
+
+WRONG OUTPUT:
+❌ Only one person (missing someone)
+❌ Changed dress or suit colors
+❌ Using people from the park image
+❌ Cold lighting instead of golden hour
+❌ Simplified patterns or missing details`
+  : `IMAGES YOU RECEIVE:
+- Image 1: Woman in floral dress (style image)
+- Image 2: Studio with dramatic side lighting (content image)
+
+CORRECT OUTPUT:
+✅ Woman in EXACT floral dress
+✅ With dramatic side lighting from Image 2
+✅ All floral pattern details preserved
+✅ Face and body exactly from Image 1
+
+WRONG OUTPUT:
+❌ Changed dress pattern or colors
+❌ Using person from studio image
+❌ Flat lighting instead of dramatic
+❌ Simplified or blurred floral pattern`}
+
+Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' : `these ${numStyleImages} people with their outfits`}, photograph them together, and light them like the content image"`;
     }
 
     console.log('🎯 Mode:', mode);
@@ -3671,6 +3836,28 @@ Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the
           }
         });
       }
+
+    } else if (mode === 'style-transfer') {
+      // Style Transfer mode: Style images FIRST (people to combine), then content image (for lighting)
+      // Upload style images (these contain the people and outfits to preserve)
+      selectedModel.styleImagesBase64.forEach((styleImageBase64, index) => {
+        contentParts.push({ text: `⭐ STYLE IMAGE ${index + 1} - Person with outfit (PRESERVE THIS EXACTLY):` });
+        contentParts.push({
+          inlineData: {
+            data: styleImageBase64,
+            mimeType: 'image/jpeg'
+          }
+        });
+      });
+
+      // Upload content image (this provides the lighting/mood reference)
+      contentParts.push({ text: `📸 CONTENT/REFERENCE IMAGE - Use ONLY for lighting, mood, atmosphere (NOT for people or clothes):` });
+      contentParts.push({
+        inlineData: {
+          data: selectedModel.contentImageBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
     }
 
     // Add the prompt
