@@ -1220,18 +1220,18 @@ function switchMode(mode) {
 
     } else if (mode === 'accessories-only') {
         // Accessories mode: upload accessory product photo, select hand/arm model
-        garmentUploadSection.style.display = 'none';
-        accessoryUploadSection.style.display = 'block';
-        colorCollectionUploadSection.style.display = 'none';
-        displayScenarioSection.style.display = 'none';
-        flatLayUploadSection.style.display = 'none';
-        flatLayArrangementSection.style.display = 'none';
-        sceneRecreationSection.style.display = 'none';
-        model2Section.style.display = 'none'; // Hide model 2 in accessories mode
-        garmentUploadSection2.style.display = 'none'; // Hide garment 2 upload
+        if (garmentUploadSection) garmentUploadSection.style.display = 'none';
+        if (accessoryUploadSection) accessoryUploadSection.style.display = 'block';
+        if (colorCollectionUploadSection) colorCollectionUploadSection.style.display = 'none';
+        if (displayScenarioSection) displayScenarioSection.style.display = 'none';
+        if (flatLayUploadSection) flatLayUploadSection.style.display = 'none';
+        if (flatLayArrangementSection) flatLayArrangementSection.style.display = 'none';
+        if (sceneRecreationSection) sceneRecreationSection.style.display = 'none';
+        if (model2Section) model2Section.style.display = 'none'; // Hide model 2 in accessories mode
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'none'; // Hide garment 2 upload
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
-        hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
+        if (hijabSection) hijabSection.style.display = 'none'; // Hide hijab section in accessories mode
         // Hide category selector - only show hand models
         const categorySelector = document.querySelector('.category-selector');
         if (categorySelector) categorySelector.style.display = 'none';
@@ -1318,15 +1318,14 @@ function switchMode(mode) {
 
     // Reload models and set appropriate category
     if (mode === 'accessories-only') {
-        loadModels(mode);
+        // Set category to 'accessory' BEFORE loading models
+        currentCategory = 'accessory';
+        loadModels(mode); // This will call displayModelsByCategory(currentCategory) which is now 'accessory'
         // Reset model selection
         selectedModelId = null;
         document.querySelectorAll('.model-card').forEach(card => {
             card.classList.remove('selected');
         });
-        // Set category to 'accessory' to show accessory models from database
-        currentCategory = 'accessory';
-        displayModelsByCategory('accessory');
     } else if (mode === 'complete-outfit') {
         loadModels(mode);
         // Reset model selection
