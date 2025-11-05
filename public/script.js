@@ -1874,3 +1874,180 @@ if (contentImageInput) {
         }
     });
 }
+
+// ============================================
+// GALLERY SELECTION FOR STYLE TRANSFER
+// ============================================
+
+let galleryMode = null; // 'style-images' or 'content-image'
+let selectedGalleryImages = []; // Array of selected image URLs
+
+// Open gallery for style images (allow multiple selection up to 3)
+async function openGalleryForStyleImages() {
+    galleryMode = 'style-images';
+    selectedGalleryImages = [];
+    document.getElementById('gallerySelectionInfo').textContent = 'حداکثر 3 عکس انتخاب کنید (برای عکس‌های استایل)';
+    await loadGalleryImages();
+    document.getElementById('galleryModal').style.display = 'block';
+}
+
+// Open gallery for content image (single selection)
+async function openGalleryForContentImage() {
+    galleryMode = 'content-image';
+    selectedGalleryImages = [];
+    document.getElementById('gallerySelectionInfo').textContent = 'یک عکس برای محتوای مرجع انتخاب کنید';
+    await loadGalleryImages();
+    document.getElementById('galleryModal').style.display = 'block';
+}
+
+// Load images from gallery
+async function loadGalleryImages() {
+    const galleryGrid = document.getElementById('galleryGrid');
+    galleryGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">در حال بارگذاری گالری...</p>';
+
+    try {
+        const token = localStorage.getItem('supabase_token');
+        const response = await fetch('/api/user-images', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.images && data.images.length > 0) {
+            galleryGrid.innerHTML = '';
+            data.images.forEach(image => {
+                const imageCard = document.createElement('div');
+                imageCard.style.cssText = 'position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; border: 3px solid transparent; transition: all 0.2s;';
+                imageCard.innerHTML = `
+                    <img src="${image.image_url}" style="width: 100%; height: 200px; object-fit: cover;">
+                    <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; display: none;" class="selection-badge">✓</div>
+                `;
+
+                imageCard.addEventListener('click', () => toggleImageSelection(image.image_url, imageCard));
+                galleryGrid.appendChild(imageCard);
+            });
+        } else {
+            galleryGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">هیچ عکسی در گالری وجود ندارد. ابتدا یک عکس تولید کنید.</p>';
+        }
+    } catch (error) {
+        console.error('خطا در بارگذاری گالری:', error);
+        galleryGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">خطا در بارگذاری گالری</p>';
+    }
+}
+
+// Toggle image selection
+function toggleImageSelection(imageUrl, imageCard) {
+    const badge = imageCard.querySelector('.selection-badge');
+    const isSelected = selectedGalleryImages.includes(imageUrl);
+
+    if (isSelected) {
+        // Deselect
+        selectedGalleryImages = selectedGalleryImages.filter(url => url !== imageUrl);
+        imageCard.style.border = '3px solid transparent';
+        badge.style.display = 'none';
+    } else {
+        // Select
+        if (galleryMode === 'style-images' && selectedGalleryImages.length >= 3) {
+            alert('حداکثر 3 عکس می‌توانید انتخاب کنید');
+            return;
+        }
+        if (galleryMode === 'content-image' && selectedGalleryImages.length >= 1) {
+            // Deselect previous selection for content image (only 1 allowed)
+            const allCards = document.querySelectorAll('#galleryGrid > div');
+            allCards.forEach(card => {
+                card.style.border = '3px solid transparent';
+                card.querySelector('.selection-badge').style.display = 'none';
+            });
+            selectedGalleryImages = [];
+        }
+
+        selectedGalleryImages.push(imageUrl);
+        imageCard.style.border = '3px solid #10b981';
+        badge.style.display = 'block';
+    }
+}
+
+// Close gallery modal
+function closeGalleryModal() {
+    document.getElementById('galleryModal').style.display = 'none';
+    galleryMode = null;
+    selectedGalleryImages = [];
+}
+
+// Confirm gallery selection
+async function confirmGallerySelection() {
+    if (selectedGalleryImages.length === 0) {
+        alert('لطفاً حداقل یک عکس انتخاب کنید');
+        return;
+    }
+
+    if (galleryMode === 'style-images') {
+        // Add selected images to style images
+        uploadedStyleImages = [...uploadedStyleImages, ...selectedGalleryImages];
+
+        // Limit to 3 images
+        if (uploadedStyleImages.length > 3) {
+            uploadedStyleImages = uploadedStyleImages.slice(0, 3);
+        }
+
+        // Show previews
+        showStyleImagesPreviews();
+
+    } else if (galleryMode === 'content-image') {
+        // Set content image
+        uploadedContentImage = selectedGalleryImages[0];
+
+        // Show preview
+        const contentImagePreview = document.getElementById('contentImagePreview');
+        const contentImageImg = document.getElementById('contentImageImg');
+        const contentImagePlaceholder = document.getElementById('contentImagePlaceholder');
+
+        contentImageImg.src = uploadedContentImage;
+        contentImagePreview.style.display = 'block';
+        contentImagePlaceholder.style.display = 'none';
+
+        // Show analysis loading indicator
+        const analysisStatus = document.getElementById('contentImageAnalysisStatus');
+        if (analysisStatus) {
+            analysisStatus.style.display = 'block';
+        }
+
+        // Analyze content image for lighting/mood/atmosphere
+        console.log('🔍 در حال تحلیل عکس محتوا...');
+        await analyzeContentImage(uploadedContentImage);
+
+        // Hide analysis loading indicator
+        if (analysisStatus) {
+            analysisStatus.style.display = 'none';
+        }
+    }
+
+    checkGenerateButton();
+    closeGalleryModal();
+}
+
+// Show style images previews
+function showStyleImagesPreviews() {
+    const previewsContainer = document.getElementById('styleImagesPreviews');
+    const placeholder = document.getElementById('styleImagesPlaceholder');
+
+    if (uploadedStyleImages.length > 0) {
+        previewsContainer.innerHTML = '';
+        uploadedStyleImages.forEach((imagePath, index) => {
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'garment-preview';
+            previewDiv.innerHTML = `
+                <img src="${imagePath}" alt="Style ${index + 1}">
+                <button class="remove-btn" onclick="removeStyleImage(${index})">حذف</button>
+            `;
+            previewsContainer.appendChild(previewDiv);
+        });
+        previewsContainer.style.display = 'grid';
+        placeholder.style.display = 'none';
+    } else {
+        previewsContainer.style.display = 'none';
+        placeholder.style.display = 'flex';
+    }
+}
