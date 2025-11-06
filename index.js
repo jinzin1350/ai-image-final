@@ -278,11 +278,18 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       return {
         user_id: authUser.id,
         email: authUser.email,
+        // New tier system fields
+        tier: limits?.tier || 'bronze',
+        credits_used: limits?.credits_used || 0,
+        credits_limit: limits?.credits_limit || 50,
+        // Legacy fields (for backward compatibility)
         is_premium: limits?.is_premium || false,
         images_used: limits?.images_used || 0,
         images_limit: limits?.images_limit || 10,
         captions_used: limits?.captions_used || 0,
         captions_limit: limits?.captions_limit || 5,
+        // Additional info
+        last_reset_date: limits?.last_reset_date,
         created_at: authUser.created_at
       };
     });
@@ -1132,6 +1139,10 @@ app.get('/admin/dashboard', (req, res) => {
 
 app.get('/admin/users', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-users.html'));
+});
+
+app.get('/admin/tier-settings', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-tier-settings.html'));
 });
 
 app.get('/admin/content', (req, res) => {
