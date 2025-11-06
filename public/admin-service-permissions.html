@@ -6,7 +6,6 @@
     <title>Service Permissions | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/admin-style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .permissions-container {
             max-width: 1400px;
@@ -290,11 +289,58 @@
     </style>
 </head>
 <body>
-    <div class="permissions-container">
-        <div class="page-header">
-            <h1 class="page-title">🔐 Service Permissions Management</h1>
-            <p class="page-subtitle">Control which services each tier can access</p>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                    <path d="M20 10 L12 18 L20 26 L28 18 Z" fill="white"/>
+                    <circle cx="20" cy="20" r="3" fill="white"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
         </div>
+
+        <div class="sidebar-nav-container" data-active-page="service-permissions"></div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Service Permissions</h1>
+                    <p>Control which services each tier can access</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="permissions-container">
 
         <div class="info-card">
             <h3>💡 How It Works</h3>
@@ -342,10 +388,14 @@
         </div>
     </div>
 
-    <div id="successMessage" class="success-message">
-        ✓ Permission updated successfully
-    </div>
+        <div id="successMessage" class="success-message">
+            ✓ Permission updated successfully
+        </div>
+        </div>
+    </main>
 
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
     <script>
         const services = [
             {
@@ -392,28 +442,7 @@
 
         async function loadPermissions() {
             try {
-                const email = localStorage.getItem('admin_email');
-                const password = localStorage.getItem('admin_password');
-
-                if (!email || !password) {
-                    window.location.href = '/admin-login.html';
-                    return;
-                }
-
-                const response = await fetch('/api/admin/service-permissions', {
-                    headers: {
-                        'admin-email': email,
-                        'admin-password': password
-                    }
-                });
-
-                if (response.status === 401) {
-                    localStorage.removeItem('admin_email');
-                    localStorage.removeItem('admin_password');
-                    window.location.href = '/admin-login.html';
-                    return;
-                }
-
+                const response = await fetchWithAuth('/api/admin/service-permissions');
                 const data = await response.json();
 
                 if (data.success) {
@@ -488,25 +517,10 @@
                 // Disable toggle during update
                 toggle.disabled = true;
 
-                const email = localStorage.getItem('admin_email');
-                const password = localStorage.getItem('admin_password');
-
-                const response = await fetch(`/api/admin/service-permissions/${tier}/${serviceKey}`, {
+                const response = await fetchWithAuth(`/api/admin/service-permissions/${tier}/${serviceKey}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'admin-email': email,
-                        'admin-password': password
-                    },
                     body: JSON.stringify({ has_access: hasAccess })
                 });
-
-                if (response.status === 401) {
-                    localStorage.removeItem('admin_email');
-                    localStorage.removeItem('admin_password');
-                    window.location.href = '/admin-login.html';
-                    return;
-                }
 
                 const data = await response.json();
 
