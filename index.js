@@ -2566,6 +2566,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     // ============================================
     // CHECK AND DEDUCT CREDITS BEFORE GENERATION
     // ============================================
+    console.log('🔍 req.user before credit check:', req.user);
+    console.log('🔍 req.user.id:', req.user?.id);
     const creditCheck = await checkAndDeductCredits(req.user?.id, mode);
 
     if (!creditCheck.allowed) {
