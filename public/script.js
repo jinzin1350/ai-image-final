@@ -1730,10 +1730,12 @@ if (generateBtn) {
 
         console.log('🚀 Sending request:', requestBody);
 
+        const token = localStorage.getItem('supabase_token');
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(requestBody)
         });
