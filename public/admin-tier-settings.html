@@ -205,6 +205,25 @@
 
         <div class="content-section">
             <div class="tier-cards">
+                <!-- Test Limit Tier -->
+                <div class="tier-card" style="border-color: #3b82f6;">
+                    <div class="tier-icon">🧪</div>
+                    <div class="tier-name">Test Limit Tier</div>
+
+                    <div class="tier-info">
+                        Testing tier for new users. Limited credits to try the service.
+                    </div>
+
+                    <div class="tier-input-group">
+                        <label class="tier-label">Monthly Credits</label>
+                        <input type="number" class="tier-input" id="testlimit-credits" value="5" min="1">
+                    </div>
+
+                    <button class="tier-btn" onclick="saveTierSettings('testlimit')">
+                        Save Test Limit Settings
+                    </button>
+                </div>
+
                 <!-- Bronze Tier -->
                 <div class="tier-card bronze">
                     <div class="tier-icon">🥉</div>
@@ -346,6 +365,7 @@
             const settings = localStorage.getItem(TIER_SETTINGS_KEY);
             if (settings) {
                 const parsed = JSON.parse(settings);
+                document.getElementById('testlimit-credits').value = parsed.testlimit || 5;
                 document.getElementById('bronze-credits').value = parsed.bronze || 50;
                 document.getElementById('silver-credits').value = parsed.silver || 100;
                 document.getElementById('gold-credits').value = parsed.gold || 130;
@@ -376,6 +396,7 @@
         function getTierSettings() {
             const settings = localStorage.getItem(TIER_SETTINGS_KEY);
             return settings ? JSON.parse(settings) : {
+                testlimit: 5,
                 bronze: 50,
                 silver: 100,
                 gold: 130
