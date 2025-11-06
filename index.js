@@ -4441,7 +4441,7 @@ app.get('/api/user/usage', authenticateUser, async (req, res) => {
         percentage: Math.round((creditsUsed / creditsLimit) * 100)
       },
       lastResetDate: userLimit.last_reset_date,
-      email: userLimit.email
+      email: userLimit.email || req.user?.email || null
     });
 
   } catch (error) {

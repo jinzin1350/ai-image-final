@@ -385,8 +385,8 @@
 
         function renderProfile(data) {
             const { tier, tierName, credits, email } = data;
-            const username = email.split('@')[0];
-            const firstLetter = email.charAt(0).toUpperCase();
+            const username = email ? email.split('@')[0] : 'کاربر';
+            const firstLetter = email ? email.charAt(0).toUpperCase() : 'U';
 
             const percentage = credits.percentage || 0;
             const isLow = credits.remaining < 10;
@@ -424,7 +424,7 @@
                 <div class="profile-header">
                     <div class="profile-avatar">${firstLetter}</div>
                     <div class="profile-name">${username}</div>
-                    <div class="profile-email">${email}</div>
+                    <div class="profile-email">${email || 'ایمیل تنظیم نشده'}</div>
                     <div class="${tierClasses[tier]} tier-badge-large">
                         <span>${tierIcons[tier]}</span>
                         <span>پلن ${tierName}</span>

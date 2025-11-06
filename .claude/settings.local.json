@@ -24,7 +24,19 @@
       "Bash(timeout 5 curl:*)",
       "Bash(nul)",
       "Bash(python -m http.server:*)",
-      "Bash(node -c:*)"
+      "Bash(node -c:*)",
+      "Bash(git log:*)",
+      "Bash(node --check:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run:*)",
+      "Bash(for file in accessories-only.html color-collection.html complete-outfit.html flat-lay.html gallery.html scene-recreation.html style-transfer.html)",
+      "Bash(do)",
+      "Bash(if grep -q \"گالری تصاویر من\" \"$file\")",
+      "Bash(! grep -q \"پروفایل من\" \"$file\")",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(fi)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
