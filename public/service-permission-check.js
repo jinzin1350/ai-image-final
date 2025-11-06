@@ -121,10 +121,25 @@ function showUpgradeModal(accessInfo, serviceKey) {
     const service = SERVICE_INFO[serviceKey] || {};
     const currentTierInfo = TIER_INFO[userTier] || TIER_INFO['testlimit'];
 
-    // Find the lowest tier that has access
-    const tierOrder = ['bronze', 'silver', 'gold'];
-    const lowestRequiredTier = tierOrder.find(tier => requiredTiers.includes(tier)) || 'silver';
-    const suggestedTierInfo = TIER_INFO[lowestRequiredTier];
+    // Find the lowest tier that has access AND is higher than user's current tier
+    const tierOrder = ['testlimit', 'bronze', 'silver', 'gold'];
+    const currentTierIndex = tierOrder.indexOf(userTier);
+
+    // Filter required tiers to only those higher than current tier
+    const higherTiers = requiredTiers.filter(tier => {
+        const tierIndex = tierOrder.indexOf(tier);
+        return tierIndex > currentTierIndex;
+    });
+
+    // Find the lowest tier from the higher tiers
+    let suggestedTier = 'gold'; // Default to gold if nothing found
+    if (higherTiers.length > 0) {
+        // Sort by tier order and get the first (lowest)
+        higherTiers.sort((a, b) => tierOrder.indexOf(a) - tierOrder.indexOf(b));
+        suggestedTier = higherTiers[0];
+    }
+
+    const suggestedTierInfo = TIER_INFO[suggestedTier];
 
     // Create modal HTML
     const modalHTML = `

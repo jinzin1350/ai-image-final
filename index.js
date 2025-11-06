@@ -1165,6 +1165,10 @@ app.get('/admin/service-permissions', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-service-permissions.html'));
 });
 
+app.get('/admin/pricing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-pricing.html'));
+});
+
 app.get('/admin/content', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
 });

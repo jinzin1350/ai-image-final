@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Management | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .pricing-card.testlimit {
+            border-color: #3b82f6;
+        }
+
+        .pricing-card.bronze {
+            border-color: #f59e0b;
+        }
+
+        .pricing-card.silver {
+            border-color: #6b7280;
+        }
+
+        .pricing-card.gold {
+            border-color: #eab308;
+        }
+
+        .tier-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .tier-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .tier-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .tier-key {
+            font-size: 12px;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input[type="number"] {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: 'تومان';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #6b7280;
+            pointer-events: none;
+        }
+
+        .currency-input input {
+            padding-left: 70px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .info-banner h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .info-banner p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .preview-section {
+            margin-top: 48px;
+            padding: 32px;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+
+        .preview-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .preview-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-card .tier-name {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .preview-card .price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .preview-card .credits {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .success-toast.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                    <path d="M20 10 L12 18 L20 26 L28 18 Z" fill="white"/>
+                    <circle cx="20" cy="20" r="3" fill="white"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-nav-container" data-active-page="pricing"></div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Pricing Management</h1>
+                    <p>Configure pricing for each subscription tier</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="saveAllPricing()">
+                    💾 Save All Changes
+                </button>
+            </div>
+        </header>
+
+        <div class="pricing-container">
+            <div class="info-banner">
+                <h3>💰 How Pricing Works</h3>
+                <p>Set the monthly price and credit limit for each tier. These values will be displayed on the pricing page (/pricing.html) and in upgrade modals. Changes take effect immediately after saving.</p>
+            </div>
+
+            <div class="pricing-grid" id="pricingGrid">
+                <!-- Pricing cards will be loaded here -->
+            </div>
+
+            <div class="preview-section">
+                <h2>📊 Pricing Preview</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 24px;">
+                    This is how your pricing will appear to users
+                </p>
+                <div class="preview-grid" id="previewGrid">
+                    <!-- Preview cards will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="successToast" class="success-toast">
+        ✓ Pricing updated successfully
+    </div>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        const tiers = [
+            { key: 'testlimit', name: 'Test Limit', icon: '🧪', defaultPrice: 0, defaultCredits: 5 },
+            { key: 'bronze', name: 'Bronze', icon: '🥉', defaultPrice: 199000, defaultCredits: 50 },
+            { key: 'silver', name: 'Silver', icon: '🥈', defaultPrice: 399000, defaultCredits: 100 },
+            { key: 'gold', name: 'Gold', icon: '🥇', defaultPrice: 599000, defaultCredits: 130 }
+        ];
+
+        let pricingData = {};
+
+        // Load pricing from localStorage or use defaults
+        function loadPricing() {
+            const savedPricing = localStorage.getItem('admin_pricing_data');
+            if (savedPricing) {
+                pricingData = JSON.parse(savedPricing);
+            } else {
+                // Initialize with defaults
+                tiers.forEach(tier => {
+                    pricingData[tier.key] = {
+                        price: tier.defaultPrice,
+                        credits: tier.defaultCredits
+                    };
+                });
+            }
+            renderPricingCards();
+            renderPreview();
+        }
+
+        function renderPricingCards() {
+            const container = document.getElementById('pricingGrid');
+            container.innerHTML = '';
+
+            tiers.forEach(tier => {
+                const data = pricingData[tier.key] || { price: tier.defaultPrice, credits: tier.defaultCredits };
+
+                const card = document.createElement('div');
+                card.className = `pricing-card ${tier.key}`;
+                card.innerHTML = `
+                    <div class="tier-header">
+                        <div class="tier-icon">${tier.icon}</div>
+                        <div class="tier-name">${tier.name}</div>
+                        <div class="tier-key">${tier.key}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Monthly Price (Toman)</label>
+                        <div class="currency-input">
+                            <input type="number"
+                                   class="form-input"
+                                   id="price-${tier.key}"
+                                   value="${data.price}"
+                                   min="0"
+                                   step="1000"
+                                   onchange="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Monthly Credits</label>
+                        <input type="number"
+                               class="form-input"
+                               id="credits-${tier.key}"
+                               value="${data.credits}"
+                               min="1"
+                               onchange="updatePreview()">
+                    </div>
+
+                    <button class="save-btn" onclick="saveTierPricing('${tier.key}')">
+                        Save ${tier.name} Pricing
+                    </button>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function renderPreview() {
+            const container = document.getElementById('previewGrid');
+            container.innerHTML = '';
+
+            tiers.forEach(tier => {
+                const data = pricingData[tier.key] || { price: tier.defaultPrice, credits: tier.defaultCredits };
+
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.innerHTML = `
+                    <div class="tier-icon">${tier.icon}</div>
+                    <div class="tier-name">${tier.name}</div>
+                    <div class="price">${parseInt(data.price).toLocaleString('fa-IR')}</div>
+                    <div class="credits">${data.credits} credits/month</div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function updatePreview() {
+            // Update pricing data from inputs
+            tiers.forEach(tier => {
+                const priceInput = document.getElementById(`price-${tier.key}`);
+                const creditsInput = document.getElementById(`credits-${tier.key}`);
+
+                if (priceInput && creditsInput) {
+                    pricingData[tier.key] = {
+                        price: parseInt(priceInput.value) || 0,
+                        credits: parseInt(creditsInput.value) || 0
+                    };
+                }
+            });
+
+            renderPreview();
+        }
+
+        function saveTierPricing(tierKey) {
+            const priceInput = document.getElementById(`price-${tierKey}`);
+            const creditsInput = document.getElementById(`credits-${tierKey}`);
+
+            pricingData[tierKey] = {
+                price: parseInt(priceInput.value) || 0,
+                credits: parseInt(creditsInput.value) || 0
+            };
+
+            // Save to localStorage
+            localStorage.setItem('admin_pricing_data', JSON.stringify(pricingData));
+
+            showSuccess();
+            renderPreview();
+        }
+
+        function saveAllPricing() {
+            updatePreview();
+            localStorage.setItem('admin_pricing_data', JSON.stringify(pricingData));
+            showSuccess();
+        }
+
+        function showSuccess() {
+            const toast = document.getElementById('successToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Load on page load
+        loadPricing();
+    </script>
+</body>
+</html>
