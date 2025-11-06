@@ -70,30 +70,56 @@
                             <thead style="background:#f3f4f6;">
                                 <tr>
                                     <th style="padding:12px; text-align:left;">Email</th>
-                                    <th style="padding:12px; text-align:center;">Premium</th>
-                                    <th style="padding:12px; text-align:center;">Images Used</th>
-                                    <th style="padding:12px; text-align:center;">Captions</th>
+                                    <th style="padding:12px; text-align:center;">Tier</th>
+                                    <th style="padding:12px; text-align:center;">Credits Used</th>
+                                    <th style="padding:12px; text-align:center;">Last Reset</th>
                                     <th style="padding:12px; text-align:center;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${data.users.map(user => `
+                                ${data.users.map(user => {
+                                    const tier = user.tier || 'bronze';
+                                    const tierColors = {
+                                        bronze: { bg: '#fef3c7', text: '#92400e', label: 'Bronze' },
+                                        silver: { bg: '#e5e7eb', text: '#374151', label: 'Silver' },
+                                        gold: { bg: '#fef3c7', text: '#92400e', label: 'Gold' }
+                                    };
+                                    const creditsUsed = user.credits_used || 0;
+                                    const creditsLimit = user.credits_limit || 50;
+                                    const tierStyle = tierColors[tier];
+
+                                    return `
                                     <tr style="border-bottom:1px solid #e5e7eb;">
                                         <td style="padding:12px;">${user.email}</td>
                                         <td style="padding:12px; text-align:center;">
-                                            <span style="padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:${user.is_premium ? '#dbeafe' : '#fef3c7'}; color:${user.is_premium ? '#1e40af' : '#92400e'};">
-                                                ${user.is_premium ? 'Premium' : 'Free'}
+                                            <span style="padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:${tierStyle.bg}; color:${tierStyle.text};">
+                                                ${tierStyle.label}
                                             </span>
                                         </td>
-                                        <td style="padding:12px; text-align:center;">${user.images_used || 0}/${user.images_limit || 10}</td>
-                                        <td style="padding:12px; text-align:center;">${user.captions_used || 0}/${user.captions_limit || 5}</td>
                                         <td style="padding:12px; text-align:center;">
-                                            <button onclick="togglePremium('${user.user_id}', ${!user.is_premium})" style="padding:8px 16px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:8px; cursor:pointer;">
-                                                ${user.is_premium ? 'Remove Premium' : 'Make Premium'}
+                                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                                                <span>${creditsUsed}/${creditsLimit}</span>
+                                                <div style="width:100%; height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden;">
+                                                    <div style="width:${Math.min((creditsUsed/creditsLimit)*100, 100)}%; height:100%; background:${creditsUsed >= creditsLimit ? '#ef4444' : '#667eea'};"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="padding:12px; text-align:center; font-size:12px; color:#6b7280;">
+                                            ${user.last_reset_date ? new Date(user.last_reset_date).toLocaleDateString() : 'N/A'}
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <select onchange="changeTier('${user.user_id}', this.value)" style="padding:6px 12px; background:white; border:2px solid #e5e7eb; border-radius:8px; cursor:pointer; font-weight:600;">
+                                                <option value="">Change Tier...</option>
+                                                <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>Bronze (50)</option>
+                                                <option value="silver" ${tier === 'silver' ? 'selected' : ''}>Silver (100)</option>
+                                                <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (130)</option>
+                                            </select>
+                                            <button onclick="resetCredits('${user.user_id}')" style="margin-left:8px; padding:6px 12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                                                Reset
                                             </button>
                                         </td>
                                     </tr>
-                                `).join('')}
+                                `}).join('')}
                             </tbody>
                         </table>
                     `;
@@ -106,28 +132,66 @@
             }
         }
 
-        async function togglePremium(userId, makePremium) {
+        async function changeTier(userId, newTier) {
+            if (!newTier) return;
+
             try {
+                const tierLimits = {
+                    bronze: { credits: 50, name: 'Bronze' },
+                    silver: { credits: 100, name: 'Silver' },
+                    gold: { credits: 130, name: 'Gold' }
+                };
+
+                const tierInfo = tierLimits[newTier];
+
                 const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
                     method: 'PUT',
                     body: JSON.stringify({
-                        is_premium: makePremium,
-                        images_limit: makePremium ? 1000 : 10,
-                        captions_limit: makePremium ? 500 : 5
+                        tier: newTier,
+                        credits_limit: tierInfo.credits,
+                        is_premium: newTier === 'gold' // Gold is premium
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showNotification(`User ${makePremium ? 'upgraded to' : 'downgraded from'} premium`, 'success');
+                    showNotification(`User tier changed to ${tierInfo.name}`, 'success');
                     loadUsers();
                 } else {
-                    showNotification('Failed to update user', 'error');
+                    showNotification('Failed to update user tier', 'error');
                 }
             } catch (error) {
-                console.error('Error updating user:', error);
-                showNotification('Failed to update user', 'error');
+                console.error('Error updating user tier:', error);
+                showNotification('Failed to update user tier', 'error');
+            }
+        }
+
+        async function resetCredits(userId) {
+            if (!confirm('Are you sure you want to reset this user\'s credits to 0?')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        credits_used: 0,
+                        last_reset_date: new Date().toISOString()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('User credits reset successfully', 'success');
+                    loadUsers();
+                } else {
+                    showNotification('Failed to reset credits', 'error');
+                }
+            } catch (error) {
+                console.error('Error resetting credits:', error);
+                showNotification('Failed to reset credits', 'error');
             }
         }
 

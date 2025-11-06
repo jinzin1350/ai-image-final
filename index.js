@@ -2310,6 +2310,97 @@ function loadSavedModels() {
   return false;
 }
 
+// ============================================
+// USAGE TRACKING HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get credit cost for a service mode
+ * Standard services: 1 credit
+ * Premium services: 2 credits
+ */
+function getServiceCreditCost(mode) {
+  const premiumServices = ['style-transfer', 'scene-recreation'];
+  return premiumServices.includes(mode) ? 2 : 1;
+}
+
+/**
+ * Get tier limits based on tier name
+ */
+function getTierLimits(tier) {
+  const limits = {
+    bronze: { credits: 50, name: 'برنزی' },
+    silver: { credits: 100, name: 'نقره‌ای' },
+    gold: { credits: 130, name: 'طلایی' }
+  };
+  return limits[tier] || limits.bronze;
+}
+
+/**
+ * Check if user has enough credits and deduct if yes
+ * Returns: { allowed: boolean, message: string, remaining: number }
+ */
+async function checkAndDeductCredits(userId, mode) {
+  if (!supabase || !userId) {
+    return { allowed: true, message: 'Demo mode - no limits', remaining: 999 };
+  }
+
+  try {
+    // Get user's current limits
+    const { data: userLimit, error: fetchError } = await supabase
+      .from('user_limits')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError || !userLimit) {
+      console.error('Error fetching user limits:', fetchError);
+      return { allowed: false, message: 'خطا در بررسی محدودیت‌های کاربر', remaining: 0 };
+    }
+
+    const creditCost = getServiceCreditCost(mode);
+    const creditsUsed = userLimit.credits_used || 0;
+    const creditsLimit = userLimit.credits_limit || getTierLimits(userLimit.tier || 'bronze').credits;
+    const remainingCredits = creditsLimit - creditsUsed;
+
+    // Check if user has enough credits
+    if (remainingCredits < creditCost) {
+      const tierInfo = getTierLimits(userLimit.tier || 'bronze');
+      return {
+        allowed: false,
+        message: `اعتبار شما به پایان رسیده است. پلن ${tierInfo.name}: ${creditsUsed}/${creditsLimit} اعتبار استفاده شده`,
+        remaining: remainingCredits
+      };
+    }
+
+    // Deduct credits
+    const { error: updateError } = await supabase
+      .from('user_limits')
+      .update({
+        credits_used: creditsUsed + creditCost,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.error('Error updating user credits:', updateError);
+      return { allowed: false, message: 'خطا در به‌روزرسانی اعتبار', remaining: remainingCredits };
+    }
+
+    return {
+      allowed: true,
+      message: `${creditCost} اعتبار کسر شد`,
+      remaining: remainingCredits - creditCost,
+      creditsUsed: creditsUsed + creditCost,
+      creditsLimit: creditsLimit
+    };
+
+  } catch (error) {
+    console.error('Error in checkAndDeductCredits:', error);
+    return { allowed: false, message: 'خطا در سیستم محدودیت', remaining: 0 };
+  }
+}
+
 // تولید عکس با Gemini 2.5 Flash
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
@@ -2393,6 +2484,21 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً حداقل یک عکس استایل و یک عکس محتوا را آپلود کنید' });
       }
     }
+
+    // ============================================
+    // CHECK AND DEDUCT CREDITS BEFORE GENERATION
+    // ============================================
+    const creditCheck = await checkAndDeductCredits(req.user?.id, mode);
+
+    if (!creditCheck.allowed) {
+      return res.status(403).json({
+        error: creditCheck.message,
+        remaining: creditCheck.remaining,
+        needsUpgrade: true
+      });
+    }
+
+    console.log(`✅ Credits deducted: ${creditCheck.message}, Remaining: ${creditCheck.remaining}`);
 
     // Find model (check hardcoded first, then custom from database)
     // Search in both regular models and accessory models
@@ -4207,6 +4313,66 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'خطا در بارگذاری تصاویر'
+    });
+  }
+});
+
+// ============================================
+// USER USAGE STATS ENDPOINT
+// ============================================
+app.get('/api/user/usage', authenticateUser, async (req, res) => {
+  try {
+    if (!supabase || !req.user || !req.user.id) {
+      return res.json({
+        success: true,
+        tier: 'bronze',
+        credits: { used: 0, limit: 50, remaining: 50 },
+        isDemo: true
+      });
+    }
+
+    const userId = req.user.id;
+
+    // Get user's limits and usage
+    const { data: userLimit, error } = await supabase
+      .from('user_limits')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error || !userLimit) {
+      console.error('Error fetching user usage:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'خطا در دریافت اطلاعات کاربر'
+      });
+    }
+
+    const tier = userLimit.tier || 'bronze';
+    const tierInfo = getTierLimits(tier);
+    const creditsUsed = userLimit.credits_used || 0;
+    const creditsLimit = userLimit.credits_limit || tierInfo.credits;
+    const remaining = creditsLimit - creditsUsed;
+
+    res.json({
+      success: true,
+      tier: tier,
+      tierName: tierInfo.name,
+      credits: {
+        used: creditsUsed,
+        limit: creditsLimit,
+        remaining: remaining,
+        percentage: Math.round((creditsUsed / creditsLimit) * 100)
+      },
+      lastResetDate: userLimit.last_reset_date,
+      email: userLimit.email
+    });
+
+  } catch (error) {
+    console.error('Error in /api/user/usage:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطا در سیستم'
     });
   }
 });
