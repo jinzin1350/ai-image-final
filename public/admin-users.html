@@ -110,9 +110,10 @@
                                         <td style="padding:12px; text-align:center;">
                                             <select onchange="changeTier('${user.user_id}', this.value)" style="padding:6px 12px; background:white; border:2px solid #e5e7eb; border-radius:8px; cursor:pointer; font-weight:600;">
                                                 <option value="">Change Tier...</option>
-                                                <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>Bronze (50)</option>
-                                                <option value="silver" ${tier === 'silver' ? 'selected' : ''}>Silver (100)</option>
-                                                <option value="gold" ${tier === 'gold' ? 'selected' : ''}>Gold (130)</option>
+                                                <option value="testlimit" ${tier === 'testlimit' ? 'selected' : ''}>🧪 Test Limit (5)</option>
+                                                <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>🥉 Bronze (50)</option>
+                                                <option value="silver" ${tier === 'silver' ? 'selected' : ''}>⭐ Silver (100)</option>
+                                                <option value="gold" ${tier === 'gold' ? 'selected' : ''}>👑 Gold (130)</option>
                                             </select>
                                             <button onclick="resetCredits('${user.user_id}')" style="margin-left:8px; padding:6px 12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
                                                 Reset
@@ -137,6 +138,7 @@
 
             try {
                 const tierLimits = {
+                    testlimit: { credits: 5, name: 'Test Limit' },
                     bronze: { credits: 50, name: 'Bronze' },
                     silver: { credits: 100, name: 'Silver' },
                     gold: { credits: 130, name: 'Gold' }

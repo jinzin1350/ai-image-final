@@ -17,6 +17,12 @@ SET
   credits_limit = 5
 WHERE tier = 'bronze' AND credits_used = 0;
 
+-- 4. Update default value for tier column to testlimit
+ALTER TABLE user_limits ALTER COLUMN tier SET DEFAULT 'testlimit';
+
+-- 5. Update default value for credits_limit column to 5
+ALTER TABLE user_limits ALTER COLUMN credits_limit SET DEFAULT 5;
+
 -- 4. Update comment
 COMMENT ON COLUMN user_limits.tier IS 'User tier: testlimit (5 for testing), bronze (50), silver (100), gold (130)';
 
