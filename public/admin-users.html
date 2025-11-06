@@ -78,11 +78,12 @@
                             </thead>
                             <tbody>
                                 ${data.users.map(user => {
-                                    const tier = user.tier || 'bronze';
+                                    const tier = user.tier || 'testlimit';
                                     const tierColors = {
-                                        bronze: { bg: '#fef3c7', text: '#92400e', label: 'Bronze' },
-                                        silver: { bg: '#e5e7eb', text: '#374151', label: 'Silver' },
-                                        gold: { bg: '#fef3c7', text: '#92400e', label: 'Gold' }
+                                        testlimit: { bg: '#dbeafe', text: '#1e40af', label: '🧪 Test' },
+                                        bronze: { bg: '#fef3c7', text: '#92400e', label: '🥉 Bronze' },
+                                        silver: { bg: '#e5e7eb', text: '#374151', label: '⭐ Silver' },
+                                        gold: { bg: '#fef3c7', text: '#92400e', label: '👑 Gold' }
                                     };
                                     const creditsUsed = user.credits_used || 0;
                                     const creditsLimit = user.credits_limit || 50;
