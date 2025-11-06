@@ -321,7 +321,10 @@
         <div class="pricing-container">
             <div class="info-banner">
                 <h3>💰 How Pricing Works</h3>
-                <p>Set the monthly price and credit limit for each tier. These values will be displayed on the pricing page (/pricing.html) and in upgrade modals. Changes take effect immediately after saving.</p>
+                <p>Set the monthly price for each tier. Prices will be displayed on the pricing page (/pricing.html) and in upgrade modals. Changes take effect immediately after saving.</p>
+                <p style="margin-top: 12px; opacity: 0.9;">
+                    <strong>Note:</strong> Credit limits are managed in <a href="/admin/tier-settings" style="color: white; text-decoration: underline;">Tier Settings</a> to avoid conflicts.
+                </p>
             </div>
 
             <div class="pricing-grid" id="pricingGrid">
@@ -420,12 +423,25 @@
 
                     <div class="form-group">
                         <label class="form-label">Monthly Credits</label>
-                        <input type="number"
-                               class="form-input"
-                               id="credits-${tier.key}"
-                               value="${data.credits}"
-                               min="1"
-                               onchange="updatePreview()">
+                        <div style="
+                            padding: 12px 16px;
+                            background: #f3f4f6;
+                            border-radius: 8px;
+                            font-size: 18px;
+                            font-weight: 600;
+                            color: #6b7280;
+                            text-align: center;
+                        ">
+                            ${data.credits} credits
+                        </div>
+                        <div style="
+                            font-size: 12px;
+                            color: #9ca3af;
+                            margin-top: 8px;
+                            text-align: center;
+                        ">
+                            Credits are managed in <a href="/admin/tier-settings" style="color: #667eea; text-decoration: underline;">Tier Settings</a>
+                        </div>
                     </div>
 
                     <button class="save-btn" onclick="saveTierPricing('${tier.key}')">
@@ -458,16 +474,13 @@
         }
 
         function updatePreview() {
-            // Update pricing data from inputs
+            // Update pricing data from inputs (only price, credits are read-only)
             tiers.forEach(tier => {
                 const priceInput = document.getElementById(`price-${tier.key}`);
-                const creditsInput = document.getElementById(`credits-${tier.key}`);
 
-                if (priceInput && creditsInput) {
-                    pricingData[tier.key] = {
-                        price: parseInt(priceInput.value) || 0,
-                        credits: parseInt(creditsInput.value) || 0
-                    };
+                if (priceInput) {
+                    pricingData[tier.key].price = parseInt(priceInput.value) || 0;
+                    // Keep existing credits value from database
                 }
             });
 
@@ -476,11 +489,10 @@
 
         async function saveTierPricing(tierKey) {
             const priceInput = document.getElementById(`price-${tierKey}`);
-            const creditsInput = document.getElementById(`credits-${tierKey}`);
             const saveBtn = event.target;
 
             const price = parseInt(priceInput.value) || 0;
-            const credits = parseInt(creditsInput.value) || 0;
+            // Don't send credits - they're managed in Tier Settings
 
             try {
                 saveBtn.disabled = true;
@@ -488,13 +500,14 @@
 
                 const response = await fetchWithAuth(`/api/admin/pricing/${tierKey}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ price, credits })
+                    body: JSON.stringify({ price })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    pricingData[tierKey] = { price, credits };
+                    pricingData[tierKey].price = price;
+                    // Credits remain unchanged from database
                     renderPreview();
                     showSuccess();
                 } else {
@@ -513,11 +526,11 @@
         async function saveAllPricing() {
             updatePreview();
 
-            // Prepare batch data
+            // Prepare batch data (only prices, credits managed in Tier Settings)
             const pricingArray = tiers.map(tier => ({
                 tier: tier.key,
-                price: pricingData[tier.key].price,
-                credits: pricingData[tier.key].credits
+                price: pricingData[tier.key].price
+                // Don't send credits - they're managed in Tier Settings
             }));
 
             try {

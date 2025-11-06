@@ -5240,24 +5240,34 @@ app.put('/api/admin/pricing/:tier', authenticateAdmin, async (req, res) => {
     const { tier } = req.params;
     const { price, credits } = req.body;
 
-    if (price === undefined || credits === undefined) {
-      return res.status(400).json({ success: false, error: 'price and credits are required' });
+    if (price === undefined) {
+      return res.status(400).json({ success: false, error: 'price is required' });
+    }
+
+    // Build update object - only include fields that are provided
+    const updateData = {
+      price: parseInt(price),
+      updated_at: new Date().toISOString()
+    };
+
+    // Only update credits if explicitly provided (for tier settings page)
+    if (credits !== undefined) {
+      updateData.credits = parseInt(credits);
     }
 
     const { data: pricing, error } = await supabaseAdmin
       .from('tier_pricing')
-      .update({
-        price: parseInt(price),
-        credits: parseInt(credits),
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('tier', tier)
       .select()
       .single();
 
     if (error) throw error;
 
-    console.log(`✅ Updated pricing: ${tier} - ${price} IRR, ${credits} credits`);
+    const logMsg = credits !== undefined
+      ? `✅ Updated pricing: ${tier} - ${price} IRR, ${credits} credits`
+      : `✅ Updated price: ${tier} - ${price} IRR`;
+    console.log(logMsg);
     res.json({ success: true, pricing });
   } catch (error) {
     console.error('Error updating pricing:', error);
@@ -5281,13 +5291,20 @@ app.post('/api/admin/pricing/batch', authenticateAdmin, async (req, res) => {
     // Update each tier
     const updates = await Promise.all(
       pricing.map(async (item) => {
+        // Build update object - only include fields that are provided
+        const updateData = {
+          price: parseInt(item.price),
+          updated_at: new Date().toISOString()
+        };
+
+        // Only update credits if explicitly provided
+        if (item.credits !== undefined) {
+          updateData.credits = parseInt(item.credits);
+        }
+
         const { data, error } = await supabaseAdmin
           .from('tier_pricing')
-          .update({
-            price: parseInt(item.price),
-            credits: parseInt(item.credits),
-            updated_at: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('tier', item.tier)
           .select()
           .single();
