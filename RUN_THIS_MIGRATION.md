@@ -4,23 +4,23 @@
 You're getting a 500 error when trying to update users in the admin panel because the database doesn't have the new `tier` and `credits` columns yet.
 
 ## The Solution
-Run the migration SQL file to add these columns to your database.
+Run the migration SQL file to add these columns to your existing database.
 
 ---
 
 ## Step-by-Step Instructions:
 
-### Option 1: Using Supabase Dashboard (Recommended)
+### Option 1: Using Supabase Dashboard (Recommended) ⭐
 
 1. Go to your Supabase Dashboard: https://supabase.com/dashboard
 2. Select your project
 3. Click on **SQL Editor** in the left sidebar
 4. Click **New Query**
-5. Open this file: `migrations/add-tier-system.sql`
-6. Copy ALL the contents
+5. Open this file: **`migrations/update-existing-schema-for-tier-system.sql`** ⬅️ USE THIS ONE!
+6. Copy ALL the contents (it's a long file, make sure you get everything!)
 7. Paste into the SQL Editor
 8. Click **Run** button (bottom right)
-9. Wait for "Success. No rows returned" message
+9. Wait for success message with ✅ checkmarks
 
 ### Option 2: Using Command Line (Advanced)
 
@@ -30,7 +30,7 @@ If you have `psql` installed:
 # Get your database connection string from Supabase Dashboard > Settings > Database
 # It looks like: postgres://postgres:[password]@[host]:5432/postgres
 
-psql "your-connection-string-here" -f migrations/add-tier-system.sql
+psql "your-connection-string-here" -f migrations/update-existing-schema-for-tier-system.sql
 ```
 
 ---
