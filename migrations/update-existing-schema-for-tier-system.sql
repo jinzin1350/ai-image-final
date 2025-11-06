@@ -133,7 +133,7 @@ BEGIN
   )
   VALUES (
     NEW.id,
-    NEW.email,
+    COALESCE(NEW.email, NEW.raw_user_meta_data->>'email', ''),  -- Handle different email locations
     'bronze',  -- Default tier
     50,        -- Default credits for bronze
     0,         -- No credits used initially
