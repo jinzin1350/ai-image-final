@@ -5118,11 +5118,12 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
       .select('has_access')
       .eq('tier', userTier)
       .eq('service_key', serviceKey)
-      .single();
+      .maybeSingle();
 
+    // If permission record doesn't exist, default to false (no access)
     if (permError) {
       console.error('Error checking permission:', permError);
-      return res.status(500).json({ success: false, error: 'Error checking permission' });
+      // Don't return error, just default to no access
     }
 
     const hasAccess = permission?.has_access || false;
