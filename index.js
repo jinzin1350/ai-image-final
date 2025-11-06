@@ -309,21 +309,70 @@ app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase not configured' });
     }
 
-    // Use upsert to create entry if it doesn't exist
-    const { data, error } = await supabase
+    // First check if user_limits entry exists
+    const { data: existing, error: fetchError } = await supabase
       .from('user_limits')
-      .upsert({
-        user_id: userId,
-        ...updates
-      }, {
-        onConflict: 'user_id'
-      })
-      .select();
+      .select('*')
+      .eq('user_id', userId)
+      .single();
 
-    if (error) throw error;
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = not found
+      console.error('Error fetching user limits:', fetchError);
+      throw fetchError;
+    }
 
-    console.log(`✅ Updated user ${userId} with premium status: ${updates.is_premium}`);
-    res.json({ success: true, data });
+    // Prepare update object with only allowed fields
+    const updateData = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Add fields if they exist in the request
+    if (updates.tier !== undefined) updateData.tier = updates.tier;
+    if (updates.credits_limit !== undefined) updateData.credits_limit = updates.credits_limit;
+    if (updates.credits_used !== undefined) updateData.credits_used = updates.credits_used;
+    if (updates.is_premium !== undefined) updateData.is_premium = updates.is_premium;
+    if (updates.last_reset_date !== undefined) updateData.last_reset_date = updates.last_reset_date;
+    if (updates.notes !== undefined) updateData.notes = updates.notes;
+
+    // Legacy fields (for backward compatibility)
+    if (updates.images_limit !== undefined) updateData.images_limit = updates.images_limit;
+    if (updates.images_used !== undefined) updateData.images_used = updates.images_used;
+    if (updates.captions_limit !== undefined) updateData.captions_limit = updates.captions_limit;
+    if (updates.captions_used !== undefined) updateData.captions_used = updates.captions_used;
+
+    let result;
+
+    if (!existing) {
+      // Create new entry if doesn't exist
+      const { data, error } = await supabase
+        .from('user_limits')
+        .insert([{
+          user_id: userId,
+          email: updates.email || '',
+          tier: updates.tier || 'bronze',
+          credits_limit: updates.credits_limit || 50,
+          credits_used: updates.credits_used || 0,
+          is_premium: updates.is_premium || false,
+          ...updateData
+        }])
+        .select();
+
+      if (error) throw error;
+      result = data;
+    } else {
+      // Update existing entry
+      const { data, error } = await supabase
+        .from('user_limits')
+        .update(updateData)
+        .eq('user_id', userId)
+        .select();
+
+      if (error) throw error;
+      result = data;
+    }
+
+    console.log(`✅ Updated user ${userId}:`, updateData);
+    res.json({ success: true, data: result });
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ success: false, error: error.message });

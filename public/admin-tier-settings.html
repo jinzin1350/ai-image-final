@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tier Settings | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .tier-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .tier-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tier-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .tier-card.bronze {
+            border-color: #f59e0b;
+        }
+
+        .tier-card.silver {
+            border-color: #6b7280;
+        }
+
+        .tier-card.gold {
+            border-color: #eab308;
+        }
+
+        .tier-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .tier-name {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .tier-input-group {
+            margin-bottom: 20px;
+        }
+
+        .tier-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+
+        .tier-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tier-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .tier-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tier-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .tier-btn:active {
+            transform: translateY(0);
+        }
+
+        .tier-info {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .service-costs {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-costs-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 24px;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .service-cost {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .service-cost.premium {
+            color: #f59e0b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-standard {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-premium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                    <path d="M20 10 L12 18 L20 26 L28 18 Z" fill="white"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+        <div class="sidebar-nav-container" data-active-page="tier-settings"></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1>Tier Settings</h1>
+                <p>Configure credit limits for each user tier</p>
+            </div>
+        </header>
+
+        <div class="content-section">
+            <div class="tier-cards">
+                <!-- Bronze Tier -->
+                <div class="tier-card bronze">
+                    <div class="tier-icon">🥉</div>
+                    <div class="tier-name">Bronze Tier</div>
+
+                    <div class="tier-info">
+                        Default tier for new users. Basic access to all standard services.
+                    </div>
+
+                    <div class="tier-input-group">
+                        <label class="tier-label">Monthly Credits</label>
+                        <input type="number" class="tier-input" id="bronze-credits" value="50" min="1">
+                    </div>
+
+                    <button class="tier-btn" onclick="saveTierSettings('bronze')">
+                        Save Bronze Settings
+                    </button>
+                </div>
+
+                <!-- Silver Tier -->
+                <div class="tier-card silver">
+                    <div class="tier-icon">⭐</div>
+                    <div class="tier-name">Silver Tier</div>
+
+                    <div class="tier-info">
+                        Mid-tier for growing businesses. More credits for regular usage.
+                    </div>
+
+                    <div class="tier-input-group">
+                        <label class="tier-label">Monthly Credits</label>
+                        <input type="number" class="tier-input" id="silver-credits" value="100" min="1">
+                    </div>
+
+                    <button class="tier-btn" onclick="saveTierSettings('silver')">
+                        Save Silver Settings
+                    </button>
+                </div>
+
+                <!-- Gold Tier -->
+                <div class="tier-card gold">
+                    <div class="tier-icon">👑</div>
+                    <div class="tier-name">Gold Tier</div>
+
+                    <div class="tier-info">
+                        Premium tier for established brands and agencies. Maximum credits.
+                    </div>
+
+                    <div class="tier-input-group">
+                        <label class="tier-label">Monthly Credits</label>
+                        <input type="number" class="tier-input" id="gold-credits" value="130" min="1">
+                    </div>
+
+                    <button class="tier-btn" onclick="saveTierSettings('gold')">
+                        Save Gold Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service Costs Info -->
+            <div class="service-costs">
+                <div class="service-costs-title">Service Credit Costs</div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Standard Services</span>
+                        <span class="badge badge-standard">STANDARD</span>
+                    </div>
+                    <div class="service-cost">1 Credit</div>
+                </div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Professional Modeling Photography</span>
+                    </div>
+                    <div class="service-cost">1 Credit</div>
+                </div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Flat Lay Photography</span>
+                    </div>
+                    <div class="service-cost">1 Credit</div>
+                </div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Catalog Collection Photography</span>
+                    </div>
+                    <div class="service-cost">1 Credit</div>
+                </div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Luxury Product Photography</span>
+                    </div>
+                    <div class="service-cost">1 Credit</div>
+                </div>
+
+                <div style="height: 1px; background: #e5e7eb; margin: 20px 0;"></div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Premium Services</span>
+                        <span class="badge badge-premium">PREMIUM</span>
+                    </div>
+                    <div class="service-cost premium">2 Credits</div>
+                </div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Style Transfer Photography</span>
+                    </div>
+                    <div class="service-cost premium">2 Credits</div>
+                </div>
+
+                <div class="service-item">
+                    <div>
+                        <span class="service-name">Brand Theme Recreation</span>
+                    </div>
+                    <div class="service-cost premium">2 Credits</div>
+                </div>
+
+                <div style="margin-top: 24px; padding: 16px; background: #f0f9ff; border-radius: 8px; font-size: 14px; color: #1e40af;">
+                    <strong>💡 Note:</strong> Credit costs are hardcoded in the backend. To change service costs, modify the <code>getServiceCreditCost()</code> function in <code>index.js</code>.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        // Tier settings are stored in localStorage for now
+        // In production, these should be stored in database
+
+        const TIER_SETTINGS_KEY = 'tier_settings';
+
+        function loadTierSettings() {
+            const settings = localStorage.getItem(TIER_SETTINGS_KEY);
+            if (settings) {
+                const parsed = JSON.parse(settings);
+                document.getElementById('bronze-credits').value = parsed.bronze || 50;
+                document.getElementById('silver-credits').value = parsed.silver || 100;
+                document.getElementById('gold-credits').value = parsed.gold || 130;
+            }
+        }
+
+        function saveTierSettings(tier) {
+            const settings = JSON.parse(localStorage.getItem(TIER_SETTINGS_KEY) || '{}');
+
+            const inputId = `${tier}-credits`;
+            const credits = parseInt(document.getElementById(inputId).value);
+
+            if (credits < 1) {
+                showNotification('Credits must be at least 1', 'error');
+                return;
+            }
+
+            settings[tier] = credits;
+            localStorage.setItem(TIER_SETTINGS_KEY, JSON.stringify(settings));
+
+            showNotification(`${tier.charAt(0).toUpperCase() + tier.slice(1)} tier settings saved successfully!`, 'success');
+
+            // Update the getTierLimits function note
+            console.log(`To apply these settings server-side, update getTierLimits() in index.js:`);
+            console.log(`${tier}: { credits: ${credits}, name: '...' }`);
+        }
+
+        function getTierSettings() {
+            const settings = localStorage.getItem(TIER_SETTINGS_KEY);
+            return settings ? JSON.parse(settings) : {
+                bronze: 50,
+                silver: 100,
+                gold: 130
+            };
+        }
+
+        // Load settings on page load
+        loadTierSettings();
+
+        // Expose globally for admin panel
+        window.getTierSettings = getTierSettings;
+    </script>
+</body>
+</html>

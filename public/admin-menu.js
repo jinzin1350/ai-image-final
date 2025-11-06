@@ -23,6 +23,12 @@ function renderAdminMenu(activePage) {
                     </svg>
                     <span>Users</span>
                 </a>
+                <a href="/admin/tier-settings" class="nav-item ${activePage === 'tier-settings' ? 'active' : ''}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>
+                    </svg>
+                    <span>Tier Settings</span>
+                </a>
                 <a href="/admin/analytics" class="nav-item ${activePage === 'analytics' ? 'active' : ''}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="20" x2="12" y2="10"/>
