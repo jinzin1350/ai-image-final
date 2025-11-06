@@ -16,7 +16,7 @@ Run the migration SQL file to add these columns to your existing database.
 2. Select your project
 3. Click on **SQL Editor** in the left sidebar
 4. Click **New Query**
-5. Open this file: **`migrations/simple-tier-system-migration.sql`** ⬅️ USE THIS ONE!
+5. Open this file: **`migrations/FINAL-safe-migration.sql`** ⬅️ USE THIS ONE!
 6. Copy ALL the contents (it's a long file, make sure you get everything!)
 7. Paste into the SQL Editor
 8. Click **Run** button (bottom right)
