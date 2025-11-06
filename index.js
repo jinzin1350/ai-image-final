@@ -1161,6 +1161,10 @@ app.get('/admin/tier-settings', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-tier-settings.html'));
 });
 
+app.get('/admin/service-permissions', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-service-permissions.html'));
+});
+
 app.get('/admin/content', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
 });
@@ -4994,6 +4998,158 @@ ${productInfo && productInfo.discount ? '⚡ تخفیف رو خیلی برجست
       error: 'خطا در تولید کپشن',
       details: error.message
     });
+  }
+});
+
+// ================== SERVICE PERMISSIONS API ENDPOINTS ==================
+
+// Get all service permissions for all tiers
+app.get('/api/admin/service-permissions', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { data: permissions, error } = await supabaseAdmin
+      .from('tier_service_permissions')
+      .select('*')
+      .order('tier', { ascending: true })
+      .order('service_key', { ascending: true });
+
+    if (error) throw error;
+
+    // Group permissions by tier
+    const permissionsByTier = {
+      testlimit: [],
+      bronze: [],
+      silver: [],
+      gold: []
+    };
+
+    permissions.forEach(permission => {
+      if (permissionsByTier[permission.tier]) {
+        permissionsByTier[permission.tier].push(permission);
+      }
+    });
+
+    console.log('✅ Fetched service permissions');
+    res.json({ success: true, permissions: permissionsByTier });
+  } catch (error) {
+    console.error('Error fetching service permissions:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update service permission for a specific tier and service
+app.put('/api/admin/service-permissions/:tier/:serviceKey', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { tier, serviceKey } = req.params;
+    const { has_access } = req.body;
+
+    if (has_access === undefined) {
+      return res.status(400).json({ success: false, error: 'has_access is required' });
+    }
+
+    const { data: permission, error } = await supabaseAdmin
+      .from('tier_service_permissions')
+      .update({
+        has_access,
+        updated_at: new Date().toISOString()
+      })
+      .eq('tier', tier)
+      .eq('service_key', serviceKey)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Updated permission: ${tier} - ${serviceKey} = ${has_access}`);
+    res.json({ success: true, permission });
+  } catch (error) {
+    console.error('Error updating service permission:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Check user's access to a specific service (used by frontend)
+app.get('/api/check-service-access/:serviceKey', async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { serviceKey } = req.params;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'No authorization token provided' });
+    }
+
+    const token = authHeader.substring(7);
+
+    // Verify user token
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ success: false, error: 'Invalid or expired token' });
+    }
+
+    // Get user's tier from user_limits
+    const { data: userLimits, error: limitsError } = await supabase
+      .from('user_limits')
+      .select('tier')
+      .eq('user_id', user.id)
+      .single();
+
+    if (limitsError) {
+      console.error('Error fetching user limits:', limitsError);
+      return res.status(500).json({ success: false, error: 'Error fetching user tier' });
+    }
+
+    const userTier = userLimits?.tier || 'testlimit';
+
+    // Check if user has access to this service
+    const { data: permission, error: permError } = await supabase
+      .from('tier_service_permissions')
+      .select('has_access')
+      .eq('tier', userTier)
+      .eq('service_key', serviceKey)
+      .single();
+
+    if (permError) {
+      console.error('Error checking permission:', permError);
+      return res.status(500).json({ success: false, error: 'Error checking permission' });
+    }
+
+    const hasAccess = permission?.has_access || false;
+
+    // Get tiers that have access to this service (for upgrade suggestions)
+    const { data: availableTiers, error: tiersError } = await supabase
+      .from('tier_service_permissions')
+      .select('tier')
+      .eq('service_key', serviceKey)
+      .eq('has_access', true);
+
+    if (tiersError) {
+      console.error('Error fetching available tiers:', tiersError);
+    }
+
+    const requiredTiers = availableTiers ? availableTiers.map(t => t.tier) : [];
+
+    res.json({
+      success: true,
+      hasAccess,
+      userTier,
+      serviceKey,
+      requiredTiers
+    });
+  } catch (error) {
+    console.error('Error checking service access:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

@@ -102,6 +102,7 @@
         </div>
     </div>
 
+    <script src="/service-permission-check.js"></script>
     <script>
         // Check authentication on page load
         (function checkAuth() {
@@ -132,6 +133,55 @@
             localStorage.removeItem('supabase_session');
             window.location.replace('/auth');
         }
+
+        // Add click handlers to service cards to check permissions
+        document.addEventListener('DOMContentLoaded', function() {
+            const serviceCards = document.querySelectorAll('.mode-card[href^="/"]');
+
+            serviceCards.forEach(card => {
+                const originalHref = card.getAttribute('href');
+
+                // Extract service key from href (e.g., '/complete-outfit.html' -> 'complete-outfit')
+                const match = originalHref.match(/\/([^.]+)\.html/);
+                if (!match) return;
+
+                const serviceKey = match[1];
+
+                // Remove default href behavior
+                card.removeAttribute('href');
+                card.style.cursor = 'pointer';
+
+                // Add click handler
+                card.addEventListener('click', async function(e) {
+                    e.preventDefault();
+
+                    // Show loading state
+                    const originalText = card.innerHTML;
+                    card.style.opacity = '0.6';
+                    card.style.pointerEvents = 'none';
+
+                    try {
+                        const accessInfo = await checkServiceAccess(serviceKey);
+
+                        if (accessInfo.hasAccess) {
+                            // User has access, navigate to service
+                            window.location.href = originalHref;
+                        } else {
+                            // User doesn't have access, show upgrade modal
+                            showUpgradeModal(accessInfo, serviceKey);
+                        }
+                    } catch (error) {
+                        console.error('Error checking service access:', error);
+                        // On error, allow navigation (fail open)
+                        window.location.href = originalHref;
+                    } finally {
+                        // Restore card state
+                        card.style.opacity = '1';
+                        card.style.pointerEvents = 'auto';
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

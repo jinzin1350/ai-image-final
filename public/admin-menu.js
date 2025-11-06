@@ -29,6 +29,14 @@ function renderAdminMenu(activePage) {
                     </svg>
                     <span>Tier Settings</span>
                 </a>
+                <a href="/admin/service-permissions" class="nav-item ${activePage === 'service-permissions' ? 'active' : ''}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="11" width="14" height="10" rx="2" ry="2"/>
+                        <circle cx="12" cy="16" r="1"/>
+                        <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                    </svg>
+                    <span>Service Permissions</span>
+                </a>
                 <a href="/admin/analytics" class="nav-item ${activePage === 'analytics' ? 'active' : ''}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="20" x2="12" y2="10"/>

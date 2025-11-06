@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Permissions | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .permissions-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .info-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .info-card p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .permissions-table {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 280px repeat(4, 1fr);
+            background: #f9fafb;
+            padding: 20px 24px;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 280px repeat(4, 1fr);
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+
+        .table-row:hover {
+            background: #f9fafb;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .service-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .service-icon {
+            font-size: 32px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            border-radius: 12px;
+        }
+
+        .service-details {
+            flex: 1;
+        }
+
+        .service-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .service-key {
+            font-size: 12px;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        .tier-column {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tier-badge.testlimit {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tier-badge.bronze {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .tier-badge.silver {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .tier-badge.gold {
+            background: #fef08a;
+            color: #854d0e;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(28px);
+        }
+
+        input:disabled + .toggle-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .legend {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .legend-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-icon.enabled {
+            background: #10b981;
+        }
+
+        .legend-icon.disabled {
+            background: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="permissions-container">
+        <div class="page-header">
+            <h1 class="page-title">🔐 Service Permissions Management</h1>
+            <p class="page-subtitle">Control which services each tier can access</p>
+        </div>
+
+        <div class="info-card">
+            <h3>💡 How It Works</h3>
+            <p>Toggle the switches below to grant or revoke access to services for each tier. When a user tries to access a restricted service, they'll see an upgrade modal with pricing information.</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-icon enabled"></div>
+                <span>Enabled - Users can access this service</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon disabled"></div>
+                <span>Disabled - Users will see upgrade prompt</span>
+            </div>
+        </div>
+
+        <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading permissions...</p>
+        </div>
+
+        <div id="permissionsTable" class="permissions-table" style="display: none;">
+            <div class="table-header">
+                <div>Service</div>
+                <div style="text-align: center;">
+                    <div class="tier-badge testlimit">TestLimit</div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">5 credits</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="tier-badge bronze">Bronze</div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">50 credits</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="tier-badge silver">Silver</div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">100 credits</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="tier-badge gold">Gold</div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">130 credits</div>
+                </div>
+            </div>
+
+            <div id="servicesRows"></div>
+        </div>
+    </div>
+
+    <div id="successMessage" class="success-message">
+        ✓ Permission updated successfully
+    </div>
+
+    <script>
+        const services = [
+            {
+                key: 'complete-outfit',
+                icon: '👗',
+                name: 'عکاسی استایل کامل',
+                nameEn: 'Complete Outfit Photography'
+            },
+            {
+                key: 'accessories-only',
+                icon: '👜',
+                name: 'عکاسی اکسسوری محصول',
+                nameEn: 'Accessories Photography'
+            },
+            {
+                key: 'color-collection',
+                icon: '🎨',
+                name: 'نمایش کالکشن رنگی',
+                nameEn: 'Color Collection Display'
+            },
+            {
+                key: 'flat-lay',
+                icon: '📸',
+                name: 'عکاسی Flat Lay حرفه‌ای',
+                nameEn: 'Professional Flat Lay'
+            },
+            {
+                key: 'scene-recreation',
+                icon: '🎬',
+                name: 'الهام از عکس مرجع',
+                nameEn: 'Scene Recreation'
+            },
+            {
+                key: 'style-transfer',
+                icon: '🎨',
+                name: 'انتقال استایل',
+                nameEn: 'Style Transfer'
+            }
+        ];
+
+        const tiers = ['testlimit', 'bronze', 'silver', 'gold'];
+
+        let permissionsData = {};
+
+        async function loadPermissions() {
+            try {
+                const email = localStorage.getItem('admin_email');
+                const password = localStorage.getItem('admin_password');
+
+                if (!email || !password) {
+                    window.location.href = '/admin-login.html';
+                    return;
+                }
+
+                const response = await fetch('/api/admin/service-permissions', {
+                    headers: {
+                        'admin-email': email,
+                        'admin-password': password
+                    }
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('admin_email');
+                    localStorage.removeItem('admin_password');
+                    window.location.href = '/admin-login.html';
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    permissionsData = data.permissions;
+                    renderPermissionsTable();
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('permissionsTable').style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Failed to load permissions');
+                }
+            } catch (error) {
+                console.error('Error loading permissions:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div style="color: #ef4444;">
+                        <p>❌ Error loading permissions</p>
+                        <p style="font-size: 14px; margin-top: 8px;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPermissionsTable() {
+            const container = document.getElementById('servicesRows');
+            container.innerHTML = '';
+
+            services.forEach(service => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+
+                const serviceInfo = `
+                    <div class="service-info">
+                        <div class="service-icon">${service.icon}</div>
+                        <div class="service-details">
+                            <div class="service-name">${service.nameEn}</div>
+                            <div class="service-key">${service.key}</div>
+                        </div>
+                    </div>
+                `;
+
+                row.innerHTML = serviceInfo;
+
+                tiers.forEach(tier => {
+                    const tierData = permissionsData[tier] || [];
+                    const permission = tierData.find(p => p.service_key === service.key);
+                    const hasAccess = permission ? permission.has_access : false;
+
+                    const tierColumn = document.createElement('div');
+                    tierColumn.className = 'tier-column';
+                    tierColumn.innerHTML = `
+                        <label class="toggle-switch">
+                            <input type="checkbox"
+                                   ${hasAccess ? 'checked' : ''}
+                                   onchange="togglePermission('${tier}', '${service.key}', this.checked)"
+                                   data-tier="${tier}"
+                                   data-service="${service.key}">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    `;
+
+                    row.appendChild(tierColumn);
+                });
+
+                container.appendChild(row);
+            });
+        }
+
+        async function togglePermission(tier, serviceKey, hasAccess) {
+            const toggle = document.querySelector(`input[data-tier="${tier}"][data-service="${serviceKey}"]`);
+            const originalState = !hasAccess;
+
+            try {
+                // Disable toggle during update
+                toggle.disabled = true;
+
+                const email = localStorage.getItem('admin_email');
+                const password = localStorage.getItem('admin_password');
+
+                const response = await fetch(`/api/admin/service-permissions/${tier}/${serviceKey}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'admin-email': email,
+                        'admin-password': password
+                    },
+                    body: JSON.stringify({ has_access: hasAccess })
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('admin_email');
+                    localStorage.removeItem('admin_password');
+                    window.location.href = '/admin-login.html';
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update local data
+                    const tierData = permissionsData[tier] || [];
+                    const permIndex = tierData.findIndex(p => p.service_key === serviceKey);
+                    if (permIndex !== -1) {
+                        tierData[permIndex].has_access = hasAccess;
+                    }
+
+                    // Show success message
+                    showSuccessMessage();
+                } else {
+                    throw new Error(data.error || 'Failed to update permission');
+                }
+            } catch (error) {
+                console.error('Error updating permission:', error);
+                alert('Error updating permission: ' + error.message);
+                // Revert toggle to original state
+                toggle.checked = originalState;
+            } finally {
+                toggle.disabled = false;
+            }
+        }
+
+        function showSuccessMessage() {
+            const message = document.getElementById('successMessage');
+            message.classList.add('show');
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 2000);
+        }
+
+        // Load permissions on page load
+        loadPermissions();
+    </script>
+</body>
+</html>
