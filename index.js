@@ -381,8 +381,19 @@ app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
     console.log(`✅ Updated user ${userId}:`, updateData);
     res.json({ success: true, data: result });
   } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('❌ Error updating user:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      code: error.code,
+      hint: error.hint
+    });
   }
 });
 
