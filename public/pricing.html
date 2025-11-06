@@ -614,9 +614,79 @@
     </div>
 
     <script>
+        // Load pricing from database
+        async function loadPricing() {
+            try {
+                const response = await fetch('/api/pricing');
+                const data = await response.json();
+
+                if (data.success && data.pricing) {
+                    data.pricing.forEach(item => {
+                        if (item.tier === 'bronze' || item.tier === 'silver' || item.tier === 'gold') {
+                            updatePricingCard(item.tier, item.price, item.credits);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading pricing:', error);
+            }
+        }
+
+        function updatePricingCard(tier, price, credits) {
+            // Convert tier to Persian
+            const tierNames = {
+                'bronze': 'برنز',
+                'silver': 'نقره‌ای',
+                'gold': 'طلایی'
+            };
+
+            // Find all price elements for this tier
+            const cards = document.querySelectorAll('.pricing-card');
+            cards.forEach(card => {
+                const tierName = card.querySelector('.tier-name');
+                if (tierName && tierName.textContent === tierNames[tier]) {
+                    // Update price
+                    const priceAmount = card.querySelector('.price-amount');
+                    if (priceAmount) {
+                        priceAmount.textContent = price.toLocaleString('fa-IR');
+                    }
+
+                    // Update credits
+                    const priceNote = card.querySelector('.price-note');
+                    if (priceNote) {
+                        priceNote.textContent = `${credits.toLocaleString('fa-IR')} اعتبار در ماه`;
+                    }
+
+                    // Update features list
+                    const features = card.querySelectorAll('.tier-features li');
+                    if (features[0]) {
+                        const creditText = features[0].querySelector('span:last-child');
+                        if (creditText) {
+                            creditText.textContent = `${credits.toLocaleString('fa-IR')} اعتبار ماهانه`;
+                        }
+                    }
+                }
+            });
+
+            // Update comparison table
+            const comparisonTable = document.querySelector('.comparison-table');
+            if (comparisonTable) {
+                const creditRow = comparisonTable.querySelector('tbody tr:first-child');
+                if (creditRow) {
+                    const cells = creditRow.querySelectorAll('td');
+                    if (tier === 'bronze' && cells[1]) cells[1].textContent = credits.toLocaleString('fa-IR');
+                    if (tier === 'silver' && cells[2]) cells[2].textContent = credits.toLocaleString('fa-IR');
+                    if (tier === 'gold' && cells[3]) cells[3].textContent = credits.toLocaleString('fa-IR');
+                }
+            }
+        }
+
         function selectPlan(tier) {
             alert(`پرداخت آنلاین به زودی راه‌اندازی می‌شود.\n\nپلن انتخابی: ${tier === 'bronze' ? 'برنز' : tier === 'silver' ? 'نقره‌ای' : 'طلایی'}\n\nلطفاً با پشتیبانی تماس بگیرید.`);
         }
+
+        // Load pricing on page load
+        loadPricing();
     </script>
 </body>
 </html>

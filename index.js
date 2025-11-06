@@ -5158,6 +5158,153 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
   }
 });
 
+// ================== PRICING API ENDPOINTS ==================
+
+// Get all pricing (public endpoint)
+app.get('/api/pricing', async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { data: pricing, error } = await supabase
+      .from('tier_pricing')
+      .select('*')
+      .eq('is_active', true)
+      .order('tier', { ascending: true });
+
+    if (error) throw error;
+
+    console.log('✅ Fetched pricing data');
+    res.json({ success: true, pricing });
+  } catch (error) {
+    console.error('Error fetching pricing:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get pricing for specific tier (public endpoint)
+app.get('/api/pricing/:tier', async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const { tier } = req.params;
+
+    const { data: pricing, error } = await supabase
+      .from('tier_pricing')
+      .select('*')
+      .eq('tier', tier)
+      .eq('is_active', true)
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, pricing });
+  } catch (error) {
+    console.error('Error fetching tier pricing:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get all pricing (admin endpoint)
+app.get('/api/admin/pricing', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { data: pricing, error } = await supabaseAdmin
+      .from('tier_pricing')
+      .select('*')
+      .order('tier', { ascending: true });
+
+    if (error) throw error;
+
+    console.log('✅ Admin fetched pricing data');
+    res.json({ success: true, pricing });
+  } catch (error) {
+    console.error('Error fetching pricing:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update pricing for specific tier (admin endpoint)
+app.put('/api/admin/pricing/:tier', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { tier } = req.params;
+    const { price, credits } = req.body;
+
+    if (price === undefined || credits === undefined) {
+      return res.status(400).json({ success: false, error: 'price and credits are required' });
+    }
+
+    const { data: pricing, error } = await supabaseAdmin
+      .from('tier_pricing')
+      .update({
+        price: parseInt(price),
+        credits: parseInt(credits),
+        updated_at: new Date().toISOString()
+      })
+      .eq('tier', tier)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Updated pricing: ${tier} - ${price} IRR, ${credits} credits`);
+    res.json({ success: true, pricing });
+  } catch (error) {
+    console.error('Error updating pricing:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Batch update all pricing (admin endpoint)
+app.post('/api/admin/pricing/batch', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { pricing } = req.body;
+
+    if (!pricing || !Array.isArray(pricing)) {
+      return res.status(400).json({ success: false, error: 'pricing array is required' });
+    }
+
+    // Update each tier
+    const updates = await Promise.all(
+      pricing.map(async (item) => {
+        const { data, error } = await supabaseAdmin
+          .from('tier_pricing')
+          .update({
+            price: parseInt(item.price),
+            credits: parseInt(item.credits),
+            updated_at: new Date().toISOString()
+          })
+          .eq('tier', item.tier)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      })
+    );
+
+    console.log(`✅ Batch updated ${updates.length} pricing entries`);
+    res.json({ success: true, pricing: updates });
+  } catch (error) {
+    console.error('Error batch updating pricing:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);

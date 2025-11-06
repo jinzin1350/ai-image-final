@@ -37,14 +37,14 @@ const SERVICE_INFO = {
     }
 };
 
-const TIER_INFO = {
+let TIER_INFO = {
     'testlimit': {
         icon: '🧪',
         name: 'آزمایشی',
         nameEn: 'Test Limit',
         credits: 5,
         price: 0,
-        color: '#fbbf24'
+        color: '#3b82f6'
     },
     'bronze': {
         icon: '🥉',
@@ -71,6 +71,30 @@ const TIER_INFO = {
         color: '#eab308'
     }
 };
+
+// Load pricing from database
+async function loadPricingData() {
+    try {
+        const response = await fetch('/api/pricing');
+        const data = await response.json();
+
+        if (data.success && data.pricing) {
+            // Update TIER_INFO with database values
+            data.pricing.forEach(item => {
+                if (TIER_INFO[item.tier]) {
+                    TIER_INFO[item.tier].price = item.price;
+                    TIER_INFO[item.tier].credits = item.credits;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading pricing data:', error);
+        // Keep default values if fetch fails
+    }
+}
+
+// Load pricing on page load
+loadPricingData();
 
 /**
  * Check if user has access to current service
