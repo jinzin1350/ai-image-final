@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS tier_service_permissions (
 -- ============================================
 -- 2. Add constraint to tier column
 -- ============================================
-DO $
+DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.constraint_column_usage
@@ -34,12 +34,12 @@ BEGIN
 EXCEPTION
   WHEN duplicate_object THEN
     RAISE NOTICE 'ℹ️  tier constraint already exists';
-END $;
+END $$;
 
 -- ============================================
 -- 3. Add constraint to service_key column
 -- ============================================
-DO $
+DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.constraint_column_usage
@@ -54,7 +54,7 @@ BEGIN
 EXCEPTION
   WHEN duplicate_object THEN
     RAISE NOTICE 'ℹ️  service_key constraint already exists';
-END $;
+END $$;
 
 -- ============================================
 -- 4. Create indexes
@@ -210,33 +210,3 @@ BEGIN
   RAISE NOTICE '╚════════════════════════════════════════╝';
   RAISE NOTICE '';
 END $$;
-
-/*
-  ✅ SERVICE PERMISSIONS SUCCESSFULLY INSTALLED!
-
-  What was installed:
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ✓ tier_service_permissions table
-  ✓ Indexes for performance
-  ✓ Row Level Security policies
-  ✓ Default permissions for all tiers
-  ✓ Helper function check_user_service_access()
-
-  🎯 Services:
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • complete-outfit (عکاسی استایل کامل)
-  • accessories-only (عکاسی اکسسوری محصول)
-  • color-collection (نمایش کالکشن رنگی)
-  • flat-lay (عکاسی Flat Lay حرفه‌ای)
-  • scene-recreation (الهام از عکس مرجع)
-  • style-transfer (انتقال استایل)
-
-  🚀 Next Steps:
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  1. Run this migration in Supabase SQL Editor
-  2. Create admin panel page to manage permissions
-  3. Add permission checks to service pages
-  4. Create upgrade modal for restricted services
-
-  Ready to control service access per tier! 🎉
-*/
