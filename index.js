@@ -1658,7 +1658,7 @@ const authenticateUser = async (req, res, next) => {
       console.error('❌ No user found with token');
       throw new Error('No user found');
     }
-    console.log('✅ User authenticated:', user.email);
+    console.log('✅ User authenticated:', user.email, 'ID:', user.id);
     req.user = user;
     next();
   } catch (error) {
@@ -2417,7 +2417,9 @@ function getTierLimits(tier) {
  * Returns: { allowed: boolean, message: string, remaining: number }
  */
 async function checkAndDeductCredits(userId, mode) {
+  console.log('🔍 checkAndDeductCredits called with userId:', userId, 'mode:', mode);
   if (!supabase || !userId) {
+    console.log('⚠️ Demo mode triggered - supabase:', !!supabase, 'userId:', userId);
     return { allowed: true, message: 'Demo mode - no limits', remaining: 999 };
   }
 
