@@ -2405,11 +2405,12 @@ function getServiceCreditCost(mode) {
  */
 function getTierLimits(tier) {
   const limits = {
+    testlimit: { credits: 5, name: 'تست' },
     bronze: { credits: 50, name: 'برنزی' },
     silver: { credits: 100, name: 'نقره‌ای' },
     gold: { credits: 130, name: 'طلایی' }
   };
-  return limits[tier] || limits.bronze;
+  return limits[tier] || limits.testlimit;
 }
 
 /**

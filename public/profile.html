@@ -393,12 +393,14 @@
             const isCritical = credits.remaining < 5;
 
             const tierIcons = {
+                testlimit: '🧪',
                 bronze: '🥉',
                 silver: '⭐',
                 gold: '👑'
             };
 
             const tierClasses = {
+                testlimit: 'tier-bronze',
                 bronze: 'tier-bronze',
                 silver: 'tier-silver',
                 gold: 'tier-gold'
@@ -507,10 +509,15 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr ${tier === 'testlimit' ? 'class="current"' : ''}>
+                                    <td><strong>🧪 تست</strong></td>
+                                    <td>5 اعتبار</td>
+                                    <td>رایگان (تست)</td>
+                                </tr>
                                 <tr ${tier === 'bronze' ? 'class="current"' : ''}>
                                     <td><strong>🥉 برنزی</strong></td>
                                     <td>50 اعتبار</td>
-                                    <td>رایگان</td>
+                                    <td>تماس با فروش</td>
                                 </tr>
                                 <tr ${tier === 'silver' ? 'class="current"' : ''}>
                                     <td><strong>⭐ نقره‌ای</strong></td>
