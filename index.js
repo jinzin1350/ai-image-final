@@ -127,6 +127,11 @@ app.get('/gallery', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'gallery.html'));
 });
 
+// Profile page route
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
 // Static files - MUST come after specific routes
 app.use(express.static('public'));
 
