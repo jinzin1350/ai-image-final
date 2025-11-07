@@ -350,6 +350,32 @@
     </div>
 
     <script>
+        // Store pricing data globally
+        let pricingData = {};
+
+        // Load pricing data from API
+        async function loadPricingData() {
+            try {
+                const response = await fetch('/api/pricing');
+                const data = await response.json();
+                if (data.success) {
+                    // Convert array to object for easy lookup
+                    data.pricing.forEach(p => {
+                        pricingData[p.tier] = p;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading pricing:', error);
+            }
+        }
+
+        // Format price in Tomans
+        function formatPrice(rials) {
+            if (rials === 0) return 'رایگان';
+            const tomans = Math.floor(rials / 10);
+            return tomans.toLocaleString('fa-IR') + ' تومان';
+        }
+
         async function loadProfile() {
             const token = localStorage.getItem('supabase_token');
             if (!token) {
@@ -358,6 +384,11 @@
             }
 
             try {
+                // Load pricing data first if not loaded
+                if (Object.keys(pricingData).length === 0) {
+                    await loadPricingData();
+                }
+
                 const response = await fetch('/api/user/usage', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -505,29 +536,29 @@
                                 <tr>
                                     <th>پلن</th>
                                     <th>اعتبار ماهانه</th>
-                                    <th>قیمت تقریبی</th>
+                                    <th>قیمت ماهانه</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ${tier === 'testlimit' ? 'class="current"' : ''}>
                                     <td><strong>🧪 تست</strong></td>
-                                    <td>5 اعتبار</td>
-                                    <td>رایگان (تست)</td>
+                                    <td>${pricingData.testlimit?.credits || 5} اعتبار</td>
+                                    <td>${formatPrice(pricingData.testlimit?.price || 0)}</td>
                                 </tr>
                                 <tr ${tier === 'bronze' ? 'class="current"' : ''}>
                                     <td><strong>🥉 برنزی</strong></td>
-                                    <td>50 اعتبار</td>
-                                    <td>تماس با فروش</td>
+                                    <td>${pricingData.bronze?.credits || 100} اعتبار</td>
+                                    <td>${formatPrice(pricingData.bronze?.price || 0)}</td>
                                 </tr>
                                 <tr ${tier === 'silver' ? 'class="current"' : ''}>
                                     <td><strong>⭐ نقره‌ای</strong></td>
-                                    <td>100 اعتبار</td>
-                                    <td>تماس با فروش</td>
+                                    <td>${pricingData.silver?.credits || 130} اعتبار</td>
+                                    <td>${formatPrice(pricingData.silver?.price || 0)}</td>
                                 </tr>
                                 <tr ${tier === 'gold' ? 'class="current"' : ''}>
                                     <td><strong>👑 طلایی</strong></td>
-                                    <td>130 اعتبار</td>
-                                    <td>تماس با فروش</td>
+                                    <td>${pricingData.gold?.credits || 171} اعتبار</td>
+                                    <td>${formatPrice(pricingData.gold?.price || 0)}</td>
                                 </tr>
                             </tbody>
                         </table>
