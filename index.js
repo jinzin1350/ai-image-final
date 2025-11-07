@@ -4500,6 +4500,8 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
     // Admin user email - can see ALL images
     const ADMIN_EMAIL = 'engi.alireza@gmail.com';
 
+    console.log(`🔍 Gallery request - User email: "${userEmail}" | Admin email: "${ADMIN_EMAIL}" | Match: ${userEmail === ADMIN_EMAIL}`);
+
     // First, get total count
     let countQuery = supabase
       .from('generated_images')
@@ -4508,6 +4510,9 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
     // If user is NOT admin, filter by user_id
     if (userEmail !== ADMIN_EMAIL) {
       countQuery = countQuery.eq('user_id', userId);
+      console.log(`👤 Regular user - filtering by user_id: ${userId}`);
+    } else {
+      console.log(`👑 ADMIN USER - showing ALL images`);
     }
 
     const { count: totalCount, error: countError } = await countQuery;
