@@ -262,7 +262,7 @@
 
         // Auto-load on page load
         window.addEventListener('load', () => {
-            if (token) {
+            if (adminEmail && adminPassword) {
                 loadAllPermissions();
             }
         });
