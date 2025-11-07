@@ -47,6 +47,10 @@ try {
   console.error('⚠️  خطا در اتصال به Supabase:', error.message);
 }
 
+// 🚩 FEATURE FLAG: Show content_library models in gallery (temporary for database cleanup)
+// Set to FALSE later when you want to show only generated_images
+const SHOW_CONTENT_LIBRARY_IN_GALLERY = true;
+
 // تنظیمات Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -4499,52 +4503,112 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     // Admin user email - can see ALL images
     const ADMIN_EMAIL = 'engi.alireza@gmail.com';
+    const isAdmin = userEmail === ADMIN_EMAIL;
 
-    console.log(`🔍 Gallery request - User email: "${userEmail}" | Admin email: "${ADMIN_EMAIL}" | Match: ${userEmail === ADMIN_EMAIL}`);
+    console.log(`🔍 Gallery request - User: "${userEmail}" | Admin: ${isAdmin} | Feature Flag: ${SHOW_CONTENT_LIBRARY_IN_GALLERY}`);
 
-    // First, get total count
-    let countQuery = supabase
+    let allImages = [];
+    let totalCount = 0;
+
+    // Fetch from generated_images table
+    let generatedCountQuery = supabase
       .from('generated_images')
       .select('*', { count: 'exact', head: true });
 
-    // If user is NOT admin, filter by user_id
-    if (userEmail !== ADMIN_EMAIL) {
-      countQuery = countQuery.eq('user_id', userId);
-      console.log(`👤 Regular user - filtering by user_id: ${userId}`);
-    } else {
-      console.log(`👑 ADMIN USER - showing ALL images`);
+    if (!isAdmin) {
+      generatedCountQuery = generatedCountQuery.eq('user_id', userId);
     }
 
-    const { count: totalCount, error: countError } = await countQuery;
+    const { count: generatedCount, error: genCountError } = await generatedCountQuery;
+    if (genCountError) throw genCountError;
 
-    if (countError) throw countError;
-
-    // Then get paginated data
-    let dataQuery = supabase
+    let generatedDataQuery = supabase
       .from('generated_images')
       .select('*')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+      .order('created_at', { ascending: false });
 
-    // If user is NOT admin, filter by user_id
-    if (userEmail !== ADMIN_EMAIL) {
-      dataQuery = dataQuery.eq('user_id', userId);
-      console.log(`📸 Fetching gallery page ${page} for user: ${userEmail} (limit: ${limit})`);
-    } else {
-      console.log(`👑 Admin user ${userEmail} - fetching ALL images page ${page} (limit: ${limit})`);
+    if (!isAdmin) {
+      generatedDataQuery = generatedDataQuery.eq('user_id', userId);
     }
 
-    const { data, error } = await dataQuery;
+    const { data: generatedImages, error: genDataError } = await generatedDataQuery;
+    if (genDataError) throw genDataError;
 
-    if (error) throw error;
+    // Add source tag to generated images
+    const taggedGeneratedImages = (generatedImages || []).map(img => ({
+      ...img,
+      generated_image_url: img.generated_image_url,
+      image_source: 'generated_images'
+    }));
 
+    allImages = [...taggedGeneratedImages];
+    totalCount = generatedCount || 0;
+
+    // 🚩 FEATURE FLAG: Conditionally fetch from content_library
+    if (SHOW_CONTENT_LIBRARY_IN_GALLERY) {
+      console.log('🎨 Including content_library models in gallery');
+
+      let contentCountQuery = supabase
+        .from('content_library')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+      if (!isAdmin) {
+        contentCountQuery = contentCountQuery.eq('owner_user_id', userId);
+      }
+
+      const { count: contentCount, error: contentCountError } = await contentCountQuery;
+      if (contentCountError) {
+        console.warn('⚠️  Error counting content_library:', contentCountError);
+      } else {
+        let contentDataQuery = supabase
+          .from('content_library')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (!isAdmin) {
+          contentDataQuery = contentDataQuery.eq('owner_user_id', userId);
+        }
+
+        const { data: contentLibrary, error: contentDataError } = await contentDataQuery;
+        if (contentDataError) {
+          console.warn('⚠️  Error fetching content_library:', contentDataError);
+        } else {
+          // Normalize content_library to match generated_images structure
+          const normalizedContent = (contentLibrary || []).map(item => ({
+            id: item.id,
+            generated_image_url: item.image_url, // Map image_url to generated_image_url
+            created_at: item.created_at,
+            user_id: item.owner_user_id, // Map owner_user_id to user_id
+            prompt: `Model: ${item.name} (${item.category})`,
+            style: item.category,
+            model_type: item.content_type,
+            image_source: 'content_library', // Tag for identification
+            original_data: item // Keep original data for reference
+          }));
+
+          allImages = [...allImages, ...normalizedContent];
+          totalCount += (contentCount || 0);
+          console.log(`✅ Added ${normalizedContent.length} items from content_library`);
+        }
+      }
+    }
+
+    // Sort all images by created_at
+    allImages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Apply pagination AFTER merging
+    const paginatedImages = allImages.slice(offset, offset + limit);
     const totalPages = Math.ceil(totalCount / limit);
+
+    console.log(`📸 Total: ${totalCount} | Page ${page}/${totalPages} | Showing: ${paginatedImages.length}`);
 
     res.json({
       success: true,
-      images: data || [],
-      isAdmin: userEmail === ADMIN_EMAIL,
-      totalCount: totalCount || 0,
+      images: paginatedImages,
+      isAdmin: isAdmin,
+      totalCount: totalCount,
       currentPage: page,
       totalPages: totalPages,
       itemsPerPage: limit
