@@ -977,65 +977,39 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
 // Get all models with user information (for admin model management)
 app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
-    console.log('📋 Fetching models from content_library...');
+    console.log('📋 Fetching models from in-memory array and Storage...');
 
-    // First, get all models
-    const { data: models, error: modelsError } = await supabaseAdmin
-      .from('content_library')
-      .select('id, name, category, visibility, image_url, created_at, owner_user_id')
-      .eq('content_type', 'model')
-      .order('created_at', { ascending: false });
-
-    if (modelsError) {
-      console.error('❌ Error fetching models from content_library:', modelsError);
-      throw modelsError;
-    }
-
-    console.log(`✅ Found ${models?.length || 0} models in content_library`);
+    // Return models from in-memory array (generated with Gemini AI)
+    // These are stored in the global 'models' array and also in generated-models.json file
     if (models && models.length > 0) {
-      console.log('📊 Sample model:', models[0]);
-    }
+      console.log(`✅ Found ${models.length} models in memory`);
 
-    // Get unique user IDs
-    const userIds = [...new Set(models.map(m => m.owner_user_id).filter(Boolean))];
-    console.log(`👥 Found ${userIds.length} unique user IDs:`, userIds);
+      // Format models for admin panel
+      const formattedModels = models.map(model => ({
+        id: model.id,
+        name: model.name,
+        category: model.type || 'AI Generated',
+        visibility: 'public',
+        image_url: model.image,
+        created_at: new Date().toISOString(),
+        user_id: null,
+        user_email: 'System (AI Generated)',
+        is_premium: false
+      }));
 
-    // Fetch user information from user_limits table
-    const { data: users, error: usersError } = await supabaseAdmin
-      .from('user_limits')
-      .select('user_id, email, is_premium')
-      .in('user_id', userIds);
-
-    if (usersError) {
-      console.error('❌ Error fetching users from user_limits:', usersError);
-      // Continue without user info if this fails
+      console.log(`✅ Returning ${formattedModels.length} AI-generated models`);
+      res.json({ success: true, models: formattedModels });
     } else {
-      console.log(`✅ Found ${users?.length || 0} users in user_limits`);
-    }
+      // No models in memory - they might not have been generated yet
+      console.log('⚠️ No models in memory. Models need to be generated first.');
+      console.log('💡 To generate models, send POST request to /api/generate-models');
 
-    // Create a map of user_id to user info
-    const userMap = {};
-    if (users) {
-      users.forEach(user => {
-        userMap[user.user_id] = user;
+      res.json({
+        success: true,
+        models: [],
+        message: 'No models generated yet. Use "Generate Models" button to create them.'
       });
     }
-
-    // Format the response with user information
-    const formattedModels = models.map(model => ({
-      id: model.id,
-      name: model.name,
-      category: model.category,
-      visibility: model.visibility,
-      image_url: model.image_url,
-      created_at: model.created_at,
-      user_id: model.owner_user_id,
-      user_email: userMap[model.owner_user_id]?.email || 'Unknown',
-      is_premium: userMap[model.owner_user_id]?.is_premium || false
-    }));
-
-    console.log(`✅ Returning ${formattedModels.length} formatted models`);
-    res.json({ success: true, models: formattedModels });
   } catch (error) {
     console.error('❌ Error fetching models:', error);
     res.status(500).json({ success: false, error: error.message });
