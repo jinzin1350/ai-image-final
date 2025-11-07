@@ -103,11 +103,16 @@ loadPricingData();
  */
 async function checkServiceAccess(serviceKey) {
     try {
+        console.log('🔍 checkServiceAccess called for:', serviceKey);
+
         const token = localStorage.getItem('supabase_token');
         if (!token) {
+            console.log('❌ No token found - redirecting to auth');
             window.location.href = '/auth';
             return { hasAccess: false };
         }
+
+        console.log('✅ Token found, making API request to:', `/api/check-service-access/${serviceKey}`);
 
         const response = await fetch(`/api/check-service-access/${serviceKey}`, {
             headers: {
@@ -115,7 +120,10 @@ async function checkServiceAccess(serviceKey) {
             }
         });
 
+        console.log('📡 API Response status:', response.status);
+
         if (response.status === 401) {
+            console.log('❌ Unauthorized - clearing tokens and redirecting');
             localStorage.removeItem('supabase_token');
             localStorage.removeItem('supabase_session');
             window.location.href = '/auth';
@@ -123,14 +131,22 @@ async function checkServiceAccess(serviceKey) {
         }
 
         const data = await response.json();
+        console.log('📦 API Response data:', data);
 
         if (data.success) {
+            console.log('✅ Access check result:', {
+                hasAccess: data.hasAccess,
+                userTier: data.userTier,
+                serviceKey: data.serviceKey,
+                requiredTiers: data.requiredTiers
+            });
             return data;
         } else {
+            console.error('❌ API returned error:', data.error);
             throw new Error(data.error || 'Failed to check access');
         }
     } catch (error) {
-        console.error('Error checking service access:', error);
+        console.error('❌ Error checking service access:', error);
         return { hasAccess: false, error: error.message };
     }
 }
