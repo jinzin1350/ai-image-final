@@ -356,58 +356,74 @@
     <script src="/admin-menu.js"></script>
     <script src="/admin-common.js"></script>
     <script>
-        // Tier settings are stored in localStorage for now
-        // In production, these should be stored in database
+        // Load tier credits from database
+        async function loadTierSettings() {
+            try {
+                const response = await fetchWithAuth('/api/admin/pricing');
+                const data = await response.json();
 
-        const TIER_SETTINGS_KEY = 'tier_settings';
-
-        function loadTierSettings() {
-            const settings = localStorage.getItem(TIER_SETTINGS_KEY);
-            if (settings) {
-                const parsed = JSON.parse(settings);
-                document.getElementById('testlimit-credits').value = parsed.testlimit || 5;
-                document.getElementById('bronze-credits').value = parsed.bronze || 50;
-                document.getElementById('silver-credits').value = parsed.silver || 100;
-                document.getElementById('gold-credits').value = parsed.gold || 130;
+                if (data.success && data.pricing) {
+                    data.pricing.forEach(item => {
+                        const inputId = `${item.tier}-credits`;
+                        const input = document.getElementById(inputId);
+                        if (input) {
+                            input.value = item.credits;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading tier settings:', error);
+                showNotification('Failed to load tier settings', 'error');
             }
         }
 
-        function saveTierSettings(tier) {
-            const settings = JSON.parse(localStorage.getItem(TIER_SETTINGS_KEY) || '{}');
-
+        async function saveTierSettings(tier) {
             const inputId = `${tier}-credits`;
-            const credits = parseInt(document.getElementById(inputId).value);
+            const creditsInput = document.getElementById(inputId);
+            const credits = parseInt(creditsInput.value);
 
             if (credits < 1) {
                 showNotification('Credits must be at least 1', 'error');
                 return;
             }
 
-            settings[tier] = credits;
-            localStorage.setItem(TIER_SETTINGS_KEY, JSON.stringify(settings));
+            try {
+                // Get current pricing to get the price value
+                const getResponse = await fetchWithAuth(`/api/admin/pricing`);
+                const getData = await getResponse.json();
 
-            showNotification(`${tier.charAt(0).toUpperCase() + tier.slice(1)} tier settings saved successfully!`, 'success');
+                let currentPrice = 0;
+                if (getData.success && getData.pricing) {
+                    const tierData = getData.pricing.find(p => p.tier === tier);
+                    if (tierData) {
+                        currentPrice = tierData.price;
+                    }
+                }
 
-            // Update the getTierLimits function note
-            console.log(`To apply these settings server-side, update getTierLimits() in index.js:`);
-            console.log(`${tier}: { credits: ${credits}, name: '...' }`);
-        }
+                // Update with credits (and existing price)
+                const response = await fetchWithAuth(`/api/admin/pricing/${tier}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        price: currentPrice,
+                        credits: credits
+                    })
+                });
 
-        function getTierSettings() {
-            const settings = localStorage.getItem(TIER_SETTINGS_KEY);
-            return settings ? JSON.parse(settings) : {
-                testlimit: 5,
-                bronze: 50,
-                silver: 100,
-                gold: 130
-            };
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`${tier.charAt(0).toUpperCase() + tier.slice(1)} tier credits saved successfully!`, 'success');
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+            } catch (error) {
+                console.error('Error saving tier settings:', error);
+                showNotification('Failed to save tier settings: ' + error.message, 'error');
+            }
         }
 
         // Load settings on page load
         loadTierSettings();
-
-        // Expose globally for admin panel
-        window.getTierSettings = getTierSettings;
     </script>
 </body>
 </html>
