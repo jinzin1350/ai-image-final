@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نمایش کالکشن رنگی - هوش مصنوعی</title>
+    <title>عکاسی Flat Lay حرفه‌ای - هوش مصنوعی</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>🎨 نمایش کالکشن رنگی</h1>
-                <p class="subtitle">نمایش همه رنگ‌های محصول در یک عکس</p>
+                <h1>📸 عکاسی Flat Lay حرفه‌ای</h1>
+                <p class="subtitle">عکس از بالا با چیدمان هنری محصولات</p>
             </div>
             <div style="display: flex; gap: 10px;">
                 <a href="/index.html" class="gallery-btn" style="background: #6b7280;">🏠 بازگشت به خدمات</a>
@@ -22,13 +22,13 @@
         </header>
 
         <div class="main-content">
-            <!-- بخش آپلود کالکشن رنگی -->
-            <section class="upload-section" id="colorCollectionUploadSection">
-                <h2>۱. آپلود تصاویر رنگ‌های مختلف</h2>
-                <p style="margin-bottom: 20px; color: #666;">تصاویر تمام رنگ‌های محصول را آپلود کنید (حداقل ۱ رنگ، حداکثر ۱۰ رنگ)</p>
-                <div class="upload-area" id="colorCollectionUploadArea">
-                    <input type="file" id="colorCollectionInput" accept="image/*" multiple hidden>
-                    <div class="upload-placeholder" id="colorCollectionPlaceholder">
+            <!-- بخش آپلود Flat Lay -->
+            <section class="upload-section" id="flatLayUploadSection">
+                <h2>۱. آپلود تصاویر محصولات</h2>
+                <p style="margin-bottom: 20px; color: #666;">تصاویر محصولاتی که می‌خواهید در Flat Lay چیده شوند را آپلود کنید (۱ تا ۶ محصول)</p>
+                <div class="upload-area" id="flatLayUploadArea">
+                    <input type="file" id="flatLayInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="flatLayPlaceholder">
                         <div class="upload-icon">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -36,43 +36,43 @@
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
                         </div>
-                        <h3>انتخاب تصاویر رنگ‌ها</h3>
-                        <p>عکس‌های تمام رنگ‌بندی‌های محصول را آپلود کنید</p>
-                        <p class="multi-hint">🎨 شامل: رنگ قرمز، آبی، سبز، زرد، سیاه، سفید و...</p>
+                        <h3>انتخاب تصاویر محصولات</h3>
+                        <p>عکس‌های محصولاتی که می‌خواهید در Flat Lay چیده شوند</p>
+                        <p class="multi-hint">📸 می‌توانید چند محصول را با هم چیدمان کنید</p>
                         <div class="upload-formats">
                             <span class="format-tag">JPG</span>
                             <span class="format-tag">PNG</span>
                             <span class="format-tag">WEBP</span>
                         </div>
                     </div>
-                    <div id="colorCollectionPreviews" class="garment-previews" style="display: none;"></div>
+                    <div id="flatLayPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
             </section>
 
-            <!-- بخش انتخاب سناریو نمایش -->
-            <section class="selection-section" id="displayScenarioSection">
-                <h2>۲. انتخاب نوع نمایش</h2>
-                <p class="section-description">نحوه نمایش رنگ‌های محصول را انتخاب کنید</p>
+            <!-- بخش انتخاب چیدمان Flat Lay -->
+            <section class="selection-section" id="flatLayArrangementSection">
+                <h2>۲. انتخاب نوع چیدمان</h2>
+                <p class="section-description">نحوه چیدمان محصولات را انتخاب کنید</p>
                 <div class="scenario-grid">
-                    <div class="scenario-card" data-scenario="on-arm">
-                        <div class="scenario-icon">👐</div>
-                        <div class="scenario-name">روی دست</div>
-                        <div class="scenario-desc">تمام رنگ‌ها روی دست</div>
+                    <div class="scenario-card" data-arrangement="grid">
+                        <div class="scenario-icon">⊞</div>
+                        <div class="scenario-name">چیدمان شبکه‌ای</div>
+                        <div class="scenario-desc">منظم و مرتب</div>
                     </div>
-                    <div class="scenario-card" data-scenario="hanging-rack">
-                        <div class="scenario-icon">👔</div>
-                        <div class="scenario-name">آویزان روی رگال</div>
-                        <div class="scenario-desc">روی رگال با چوب لباسی</div>
+                    <div class="scenario-card" data-arrangement="scattered">
+                        <div class="scenario-icon">✨</div>
+                        <div class="scenario-name">چیدمان آزاد</div>
+                        <div class="scenario-desc">طبیعی و پراکنده</div>
                     </div>
-                    <div class="scenario-card" data-scenario="folded-stack">
-                        <div class="scenario-icon">📚</div>
-                        <div class="scenario-name">تا شده روی هم</div>
-                        <div class="scenario-desc">مرتب تا شده و چیده شده</div>
+                    <div class="scenario-card" data-arrangement="circular">
+                        <div class="scenario-icon">⭕</div>
+                        <div class="scenario-name">چیدمان دایره‌ای</div>
+                        <div class="scenario-desc">به شکل دایره</div>
                     </div>
-                    <div class="scenario-card" data-scenario="laid-out">
-                        <div class="scenario-icon">📐</div>
-                        <div class="scenario-name">کنار هم روی سطح</div>
-                        <div class="scenario-desc">پهن شده کنار هم</div>
+                    <div class="scenario-card" data-arrangement="diagonal">
+                        <div class="scenario-icon">⟋</div>
+                        <div class="scenario-name">چیدمان مورب</div>
+                        <div class="scenario-desc">قطری و پویا</div>
                     </div>
                 </div>
             </section>
@@ -94,7 +94,7 @@
                         <input
                             type="text"
                             id="customLocation"
-                            placeholder="مثال: روی میز چوبی با نور طبیعی و گیاهان سبز در پس‌زمینه"
+                            placeholder="مثال: روی زمین چوبی سفید با نور طبیعی نرم"
                             class="param-input"
                             style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; direction: rtl;"
                         >
@@ -191,10 +191,9 @@
         </div>
     </div>
 
-    <script src="/service-auth-check.js"></script>
     <script>
         // Set the current mode for this page
-        window.currentMode = 'color-collection';
+        window.currentMode = 'flat-lay';
     </script>
     <script src="script.js"></script>
 </body>

@@ -5148,6 +5148,8 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
     const { serviceKey } = req.params;
     const authHeader = req.headers.authorization;
 
+    console.log('🔍 Checking service access:', { serviceKey, hasAuth: !!authHeader });
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ success: false, error: 'No authorization token provided' });
     }
@@ -5158,22 +5160,28 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
+      console.error('❌ Auth error:', authError);
       return res.status(401).json({ success: false, error: 'Invalid or expired token' });
     }
+
+    console.log('✅ User authenticated:', { userId: user.id, email: user.email });
 
     // Get user's tier from user_limits
     const { data: userLimits, error: limitsError } = await supabase
       .from('user_limits')
-      .select('tier')
+      .select('tier, email')
       .eq('user_id', user.id)
       .single();
 
+    console.log('📊 User limits query result:', { userLimits, limitsError });
+
     if (limitsError) {
-      console.error('Error fetching user limits:', limitsError);
+      console.error('❌ Error fetching user limits:', limitsError);
       return res.status(500).json({ success: false, error: 'Error fetching user tier' });
     }
 
     const userTier = userLimits?.tier || 'testlimit';
+    console.log('🎯 User tier:', userTier);
 
     // Check if user has access to this service
     const { data: permission, error: permError } = await supabase
@@ -5183,13 +5191,16 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
       .eq('service_key', serviceKey)
       .maybeSingle();
 
+    console.log('🔐 Permission query result:', { permission, permError, tier: userTier, service: serviceKey });
+
     // If permission record doesn't exist, default to false (no access)
     if (permError) {
-      console.error('Error checking permission:', permError);
+      console.error('❌ Error checking permission:', permError);
       // Don't return error, just default to no access
     }
 
     const hasAccess = permission?.has_access || false;
+    console.log('✅ Final access decision:', { hasAccess, permissionExists: !!permission });
 
     // Get tiers that have access to this service (for upgrade suggestions)
     const { data: availableTiers, error: tiersError } = await supabase

@@ -37,7 +37,10 @@
       "Bash(echo:*)",
       "Bash(fi)",
       "Bash(done)",
-      "Bash(powershell -Command \"(Get-Content ''C:\\Users\\alire\\ai-image-final\\ai-image-final\\index.js'').Count\")"
+      "Bash(powershell -Command \"(Get-Content ''C:\\Users\\alire\\ai-image-final\\ai-image-final\\index.js'').Count\")",
+      "Bash(for file in complete-outfit.html accessories-only.html color-collection.html flat-lay.html scene-recreation.html style-transfer.html)",
+      "Bash(if grep -q \"service-auth-check.js\" \"$file\")",
+      "Bash(else)"
     ],
     "deny": [],
     "ask": []
