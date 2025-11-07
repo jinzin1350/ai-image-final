@@ -977,39 +977,75 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
 // Get all models with user information (for admin model management)
 app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
-    console.log('📋 Fetching models from in-memory array and Storage...');
+    console.log('📋 Fetching models from Supabase Storage buckets...');
 
-    // Return models from in-memory array (generated with Gemini AI)
-    // These are stored in the global 'models' array and also in generated-models.json file
-    if (models && models.length > 0) {
-      console.log(`✅ Found ${models.length} models in memory`);
+    const allModels = [];
 
-      // Format models for admin panel
-      const formattedModels = models.map(model => ({
-        id: model.id,
-        name: model.name,
-        category: model.type || 'AI Generated',
-        visibility: 'public',
-        image_url: model.image,
-        created_at: new Date().toISOString(),
-        user_id: null,
-        user_email: 'System (AI Generated)',
-        is_premium: false
-      }));
+    // Fetch from admin-content bucket (manually uploaded models)
+    console.log('📂 Fetching from admin-content bucket...');
+    const { data: adminContentFiles, error: adminContentError } = await supabaseAdmin.storage
+      .from('admin-content')
+      .list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
 
-      console.log(`✅ Returning ${formattedModels.length} AI-generated models`);
-      res.json({ success: true, models: formattedModels });
-    } else {
-      // No models in memory - they might not have been generated yet
-      console.log('⚠️ No models in memory. Models need to be generated first.');
-      console.log('💡 To generate models, send POST request to /api/generate-models');
+    if (adminContentError) {
+      console.error('❌ Error fetching admin-content:', adminContentError);
+    } else if (adminContentFiles && adminContentFiles.length > 0) {
+      console.log(`✅ Found ${adminContentFiles.length} files in admin-content`);
 
-      res.json({
-        success: true,
-        models: [],
-        message: 'No models generated yet. Use "Generate Models" button to create them.'
-      });
+      for (const file of adminContentFiles) {
+        const { data: publicUrlData } = supabaseAdmin.storage
+          .from('admin-content')
+          .getPublicUrl(file.name);
+
+        allModels.push({
+          id: file.id || file.name,
+          name: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
+          category: 'Manually Uploaded',
+          visibility: 'public',
+          image_url: publicUrlData.publicUrl,
+          created_at: file.created_at,
+          user_id: null,
+          user_email: 'Admin Upload',
+          is_premium: false,
+          bucket: 'admin-content'
+        });
+      }
     }
+
+    // Fetch from garments bucket (AI-generated models)
+    console.log('📂 Fetching from garments bucket...');
+    const { data: garmentsFiles, error: garmentsError } = await supabaseAdmin.storage
+      .from('garments')
+      .list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+    if (garmentsError) {
+      console.error('❌ Error fetching garments:', garmentsError);
+    } else if (garmentsFiles && garmentsFiles.length > 0) {
+      console.log(`✅ Found ${garmentsFiles.length} files in garments`);
+
+      for (const file of garmentsFiles) {
+        const { data: publicUrlData } = supabaseAdmin.storage
+          .from('garments')
+          .getPublicUrl(file.name);
+
+        allModels.push({
+          id: file.id || file.name,
+          name: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
+          category: 'AI Generated',
+          visibility: 'public',
+          image_url: publicUrlData.publicUrl,
+          created_at: file.created_at,
+          user_id: null,
+          user_email: 'System (AI Generated)',
+          is_premium: false,
+          bucket: 'garments'
+        });
+      }
+    }
+
+    console.log(`✅ Total models found: ${allModels.length}`);
+    res.json({ success: true, models: allModels });
+
   } catch (error) {
     console.error('❌ Error fetching models:', error);
     res.status(500).json({ success: false, error: error.message });
