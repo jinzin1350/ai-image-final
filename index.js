@@ -989,9 +989,9 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
     // Get unique user IDs
     const userIds = [...new Set(models.map(m => m.owner_user_id).filter(Boolean))];
 
-    // Fetch user information
+    // Fetch user information from user_limits table
     const { data: users, error: usersError } = await supabaseAdmin
-      .from('users')
+      .from('user_limits')
       .select('user_id, email, is_premium')
       .in('user_id', userIds);
 
