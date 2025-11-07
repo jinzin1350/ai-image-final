@@ -5166,8 +5166,8 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
 
     console.log('✅ User authenticated:', { userId: user.id, email: user.email });
 
-    // Get user's tier from user_limits
-    const { data: userLimits, error: limitsError } = await supabase
+    // Get user's tier from user_limits - use supabaseAdmin to bypass RLS
+    const { data: userLimits, error: limitsError } = await supabaseAdmin
       .from('user_limits')
       .select('tier, email')
       .eq('user_id', user.id)
@@ -5183,8 +5183,8 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
     const userTier = userLimits?.tier || 'testlimit';
     console.log('🎯 User tier:', userTier);
 
-    // Check if user has access to this service
-    const { data: permission, error: permError } = await supabase
+    // Check if user has access to this service - use supabaseAdmin to bypass RLS
+    const { data: permission, error: permError } = await supabaseAdmin
       .from('tier_service_permissions')
       .select('has_access')
       .eq('tier', userTier)
@@ -5202,8 +5202,8 @@ app.get('/api/check-service-access/:serviceKey', async (req, res) => {
     const hasAccess = permission?.has_access || false;
     console.log('✅ Final access decision:', { hasAccess, permissionExists: !!permission });
 
-    // Get tiers that have access to this service (for upgrade suggestions)
-    const { data: availableTiers, error: tiersError } = await supabase
+    // Get tiers that have access to this service (for upgrade suggestions) - use supabaseAdmin
+    const { data: availableTiers, error: tiersError } = await supabaseAdmin
       .from('tier_service_permissions')
       .select('tier')
       .eq('service_key', serviceKey)
