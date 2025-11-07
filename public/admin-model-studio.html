@@ -985,6 +985,9 @@
                 <h2 style="margin-bottom: 20px; color: #eef2ff; display: flex; justify-content: space-between; align-items: center;">
                     <span>📋 مدیریت مدل‌های ساخته شده</span>
                     <div style="display: flex; gap: 10px;">
+                        <button onclick="syncStorageToDatabase()" style="background: #f59e0b; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                            🔄 همگام‌سازی Storage
+                        </button>
                         <button onclick="makeAllModelsPublic()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
                             🌍 همه را عمومی کن
                         </button>
@@ -1772,11 +1775,6 @@
             const model = allModels.find(m => m.id === modelId);
             if (!model) return;
 
-            showNotification('فایل‌های Storage قابل ویرایش نیستند. برای تغییر، لطفاً فایل جدید آپلود کنید.', 'warning');
-            return;
-
-            // Storage files cannot be edited - commented out old code
-            /*
             currentEditingModelId = modelId;
 
             // Populate modal fields with current values
@@ -1786,15 +1784,15 @@
 
             // Populate users dropdown
             const userSelect = document.getElementById('editModelUser');
-            userSelect.innerHTML = allUsers.map(user =>
-                `<option value="${user.user_id}" ${user.user_id === model.user_id ? 'selected' : ''}>
-                    ${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}
-                </option>`
-            ).join('');
+            userSelect.innerHTML = '<option value="">-- بدون مالک (سیستمی) --</option>' +
+                allUsers.map(user =>
+                    `<option value="${user.user_id}" ${user.user_id === model.user_id ? 'selected' : ''}>
+                        ${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}
+                    </option>`
+                ).join('');
 
             // Show modal
             document.getElementById('editModelModal').style.display = 'flex';
-            */
         }
 
         function closeEditModal() {
@@ -1843,26 +1841,53 @@
         }
 
         async function deleteModel(modelId, bucket) {
-            if (!confirm('آیا مطمئن هستید که می‌خواهید این فایل را حذف کنید؟\nاین عمل غیرقابل بازگشت است!')) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟\nاین عمل مدل را از دیتابیس و Storage حذف می‌کند و غیرقابل بازگشت است!')) {
                 return;
             }
 
             try {
-                const response = await fetchWithAuth(`/api/admin/models/${encodeURIComponent(modelId)}?bucket=${encodeURIComponent(bucket)}`, {
+                const response = await fetchWithAuth(`/api/admin/models/${modelId}`, {
                     method: 'DELETE'
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    showNotification('✅ فایل با موفقیت حذف شد', 'success');
+                    showNotification('✅ مدل با موفقیت حذف شد', 'success');
                     loadAllModels(); // Reload the list
                 } else {
                     throw new Error(data.error || 'Delete failed');
                 }
             } catch (error) {
                 console.error('Error deleting model:', error);
-                showNotification('خطا در حذف فایل: ' + error.message, 'error');
+                showNotification('خطا در حذف مدل: ' + error.message, 'error');
+            }
+        }
+
+        async function syncStorageToDatabase() {
+            if (!confirm('آیا می‌خواهید فایل‌های Storage را با دیتابیس همگام‌سازی کنید؟\nاین عمل فایل‌های جدید را به دیتابیس اضافه می‌کند.')) {
+                return;
+            }
+
+            try {
+                showNotification('⏳ در حال همگام‌سازی...', 'info');
+
+                const response = await fetchWithAuth('/api/admin/sync-storage-to-db', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`✅ همگام‌سازی موفق: ${data.synced} فایل جدید، ${data.skipped} موجود بود`, 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Sync failed');
+                }
+            } catch (error) {
+                console.error('Error syncing storage:', error);
+                showNotification('خطا در همگام‌سازی: ' + error.message, 'error');
             }
         }
 
