@@ -1042,9 +1042,30 @@
                         ⏳ در حال بارگذاری مدل‌ها...
                     </div>
                     <div id="modelsTableContent" style="display: none;">
+                        <!-- Bulk Edit Toolbar -->
+                        <div id="bulkEditToolbar" style="display: none; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 15px; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-weight: 600; color: #1f2937;">
+                                    <span id="selectedCount">0</span> مدل انتخاب شده
+                                </span>
+                                <button onclick="bulkEdit()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    ✏️ ویرایش دسته‌جمعی
+                                </button>
+                                <button onclick="bulkDelete()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    🗑️ حذف دسته‌جمعی
+                                </button>
+                                <button onclick="clearSelection()" style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    ✖️ لغو انتخاب
+                                </button>
+                            </div>
+                        </div>
+
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151;">
+                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" style="width: 18px; height: 18px; cursor: pointer;">
+                                    </th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تصویر</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">نام</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسته</th>
@@ -1125,6 +1146,75 @@
                     💾 ذخیره تغییرات
                 </button>
                 <button onclick="closeEditModal()" style="background: #6b7280; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    ❌ انصراف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Edit Modal -->
+    <div id="bulkEditModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h2 style="margin-bottom: 20px; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                ✏️ ویرایش دسته‌جمعی (<span id="bulkEditCount">0</span> مدل)
+            </h2>
+
+            <div style="background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                <p style="color: #92400e; font-size: 14px; margin: 0;">
+                    ⚠️ فقط فیلدهایی که تغییر می‌دهید برای همه مدل‌های انتخاب شده اعمال می‌شود
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    دسته‌بندی
+                </label>
+                <select id="bulkEditCategory" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                    <option value="woman">👩 زن</option>
+                    <option value="man">👨 مرد</option>
+                    <option value="girl">👧 دختر</option>
+                    <option value="boy">👦 پسر</option>
+                    <option value="child">👶 کودک</option>
+                    <option value="couple">💑 زوج</option>
+                    <option value="group">👥 گروه</option>
+                    <option value="elderly">👴 سالمند</option>
+                    <option value="teen">🧑 نوجوان</option>
+                    <option value="plus-size">➕ پلاس سایز</option>
+                    <option value="accessory">💍 اکسسوری</option>
+                    <option value="underwear">👙 لباس زیر</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    نوع دسترسی
+                </label>
+                <select id="bulkEditVisibility" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                    <option value="public">🌍 عمومی (همه کاربران)</option>
+                    <option value="private">🔒 خصوصی (فقط مالک)</option>
+                    <option value="premium">⭐ پریمیوم (کاربران پریمیوم)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    مالک مدل
+                </label>
+                <select id="bulkEditUser" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                </select>
+                <small style="color: #6b7280; font-size: 12px; display: block; margin-top: 5px;">
+                    💡 می‌توانید همه مدل‌های انتخاب شده را به یک کاربر منتقل کنید
+                </small>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                <button onclick="saveBulkEdit()" style="background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    💾 اعمال تغییرات
+                </button>
+                <button onclick="closeBulkEditModal()" style="background: #6b7280; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
                     ❌ انصراف
                 </button>
             </div>
@@ -1734,6 +1824,9 @@
 
             tbody.innerHTML = filteredModels.map(model => `
                 <tr style="border-bottom: 1px solid #e5e7eb; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <td style="padding: 12px; text-align: center;">
+                        <input type="checkbox" class="model-checkbox" data-model-id="${model.id}" data-bucket="${model.bucket}" onchange="updateBulkSelection()" style="width: 18px; height: 18px; cursor: pointer;">
+                    </td>
                     <td style="padding: 12px;">
                         <img src="${model.image_url}" alt="${model.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     </td>
@@ -1930,6 +2023,180 @@
             } catch (error) {
                 console.error('Error making models public:', error);
                 showNotification('خطا در تغییر دسترسی مدل‌ها: ' + error.message, 'error');
+            }
+        }
+
+        // Bulk Edit Functions
+        let selectedModels = [];
+
+        function updateBulkSelection() {
+            const checkboxes = document.querySelectorAll('.model-checkbox:checked');
+            selectedModels = Array.from(checkboxes).map(cb => ({
+                id: cb.dataset.modelId,
+                bucket: cb.dataset.bucket
+            }));
+
+            const count = selectedModels.length;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('bulkEditToolbar').style.display = count > 0 ? 'flex' : 'none';
+
+            // Update select all checkbox
+            const allCheckboxes = document.querySelectorAll('.model-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allCheckboxes.length > 0 && checkboxes.length === allCheckboxes.length;
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.model-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
+            updateBulkSelection();
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllCheckbox').checked = false;
+            updateBulkSelection();
+        }
+
+        function bulkEdit() {
+            if (selectedModels.length === 0) {
+                showNotification('لطفاً حداقل یک مدل انتخاب کنید', 'warning');
+                return;
+            }
+
+            // Populate user dropdown
+            const userSelect = document.getElementById('bulkEditUser');
+            userSelect.innerHTML = '<option value="">-- بدون تغییر --</option>' +
+                allUsers.map(user =>
+                    `<option value="${user.user_id}">
+                        ${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}
+                    </option>`
+                ).join('');
+
+            // Reset form
+            document.getElementById('bulkEditCategory').value = '';
+            document.getElementById('bulkEditVisibility').value = '';
+            document.getElementById('bulkEditUser').value = '';
+
+            // Show count
+            document.getElementById('bulkEditCount').textContent = selectedModels.length;
+
+            // Show modal
+            document.getElementById('bulkEditModal').style.display = 'flex';
+        }
+
+        function closeBulkEditModal() {
+            document.getElementById('bulkEditModal').style.display = 'none';
+        }
+
+        async function saveBulkEdit() {
+            const category = document.getElementById('bulkEditCategory').value;
+            const visibility = document.getElementById('bulkEditVisibility').value;
+            const userId = document.getElementById('bulkEditUser').value;
+
+            // Check if at least one field is changed
+            if (!category && !visibility && !userId) {
+                showNotification('لطفاً حداقل یک فیلد را تغییر دهید', 'warning');
+                return;
+            }
+
+            try {
+                showNotification('در حال اعمال تغییرات...', 'info');
+
+                // Update each selected model
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const model of selectedModels) {
+                    try {
+                        const updates = {};
+                        if (category) updates.category = category;
+                        if (visibility) updates.visibility = visibility;
+                        if (userId) updates.user_id = userId || null;
+
+                        const response = await fetchWithAuth(`/api/admin/models/${model.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updates)
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    } catch (error) {
+                        console.error('Error updating model:', model.id, error);
+                        failCount++;
+                    }
+                }
+
+                closeBulkEditModal();
+                clearSelection();
+
+                if (successCount > 0) {
+                    showNotification(`✅ ${successCount} مدل با موفقیت به‌روز شد` + (failCount > 0 ? ` (${failCount} مورد ناموفق)` : ''), 'success');
+                    await loadAllModels();
+                } else {
+                    showNotification('❌ خطا در به‌روزرسانی مدل‌ها', 'error');
+                }
+            } catch (error) {
+                console.error('Bulk edit error:', error);
+                showNotification('خطا در ویرایش دسته‌جمعی: ' + error.message, 'error');
+            }
+        }
+
+        async function bulkDelete() {
+            if (selectedModels.length === 0) {
+                showNotification('لطفاً حداقل یک مدل انتخاب کنید', 'warning');
+                return;
+            }
+
+            if (!confirm(`آیا مطمئن هستید که می‌خواهید ${selectedModels.length} مدل را حذف کنید؟\nاین عمل قابل بازگشت نیست!`)) {
+                return;
+            }
+
+            try {
+                showNotification('در حال حذف مدل‌ها...', 'info');
+
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const model of selectedModels) {
+                    try {
+                        const response = await fetchWithAuth(`/api/admin/models/${model.id}?bucket=${model.bucket}`, {
+                            method: 'DELETE'
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    } catch (error) {
+                        console.error('Error deleting model:', model.id, error);
+                        failCount++;
+                    }
+                }
+
+                clearSelection();
+
+                if (successCount > 0) {
+                    showNotification(`✅ ${successCount} مدل با موفقیت حذف شد` + (failCount > 0 ? ` (${failCount} مورد ناموفق)` : ''), 'success');
+                    await loadAllModels();
+                } else {
+                    showNotification('❌ خطا در حذف مدل‌ها', 'error');
+                }
+            } catch (error) {
+                console.error('Bulk delete error:', error);
+                showNotification('خطا در حذف دسته‌جمعی: ' + error.message, 'error');
             }
         }
 
