@@ -284,9 +284,9 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
         user_id: authUser.id,
         email: authUser.email,
         // New tier system fields
-        tier: limits?.tier || 'bronze',
+        tier: limits?.tier || 'testlimit',
         credits_used: limits?.credits_used || 0,
-        credits_limit: limits?.credits_limit || 50,
+        credits_limit: limits?.credits_limit || 5,
         // Legacy fields (for backward compatibility)
         is_premium: limits?.is_premium || false,
         images_used: limits?.images_used || 0,
@@ -361,8 +361,8 @@ app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
         .insert([{
           user_id: userId,
           email: updates.email || '',
-          tier: updates.tier || 'bronze',
-          credits_limit: updates.credits_limit || 50,
+          tier: updates.tier || 'testlimit',
+          credits_limit: updates.credits_limit || 5,
           credits_used: updates.credits_used || 0,
           is_premium: updates.is_premium || false,
           ...updateData
@@ -2506,7 +2506,7 @@ async function checkAndDeductCredits(userId, mode) {
 
     const creditCost = getServiceCreditCost(mode);
     const creditsUsed = userLimit.credits_used || 0;
-    const tierInfo = await getTierLimits(userLimit.tier || 'bronze');
+    const tierInfo = await getTierLimits(userLimit.tier || 'testlimit');
     const creditsLimit = userLimit.credits_limit || tierInfo.credits;
     const remainingCredits = creditsLimit - creditsUsed;
 
@@ -4473,8 +4473,8 @@ app.get('/api/user/usage', authenticateUser, async (req, res) => {
     if (!supabase || !req.user || !req.user.id) {
       return res.json({
         success: true,
-        tier: 'bronze',
-        credits: { used: 0, limit: 50, remaining: 50 },
+        tier: 'testlimit',
+        credits: { used: 0, limit: 5, remaining: 5 },
         isDemo: true
       });
     }
@@ -4496,7 +4496,7 @@ app.get('/api/user/usage', authenticateUser, async (req, res) => {
       });
     }
 
-    const tier = userLimit.tier || 'bronze';
+    const tier = userLimit.tier || 'testlimit';
     const tierInfo = await getTierLimits(tier);
     const creditsUsed = userLimit.credits_used || 0;
     const creditsLimit = userLimit.credits_limit || tierInfo.credits;
