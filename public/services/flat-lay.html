@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>عکاسی Flat Lay حرفه‌ای | عکس از بالا با چیدمان هنری محصولات</title>
+    <meta name="description" content="عکاسی Flat Lay با هوش مصنوعی - عکس از بالا با چیدمان هنری و زیبای محصولات. مناسب اینستاگرام، کاتالوگ و فروشگاه آنلاین.">
+    <meta name="keywords" content="flat lay, عکاسی از بالا, overhead photography, عکاسی محصول, چیدمان هنری, اینستاگرامی, هوش مصنوعی">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="عکاسی Flat Lay حرفه‌ای با هوش مصنوعی">
+    <meta property="og:description" content="عکس از بالا با چیدمان هنری و زیبای محصولات - مناسب اینستاگرام و فروشگاه آنلاین">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fa_IR">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="/services/flat-lay.html">
+
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            padding: var(--space-2xl) var(--space-md);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-xl);
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+            letter-spacing: -0.02em;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto var(--space-lg);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #fa709a;
+            padding: 16px 40px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-section {
+            background: var(--card-bg);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-section h2 {
+            font-size: 2rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .content-section h3 {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-medium);
+            margin: var(--space-lg) 0 var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .content-section p {
+            font-size: 1.0625rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .benefit-card {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .benefit-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .benefit-card h3 {
+            font-size: 1.25rem;
+            margin: var(--space-sm) 0;
+        }
+
+        .benefit-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .steps-list {
+            list-style: none;
+            counter-reset: step-counter;
+            padding: 0;
+        }
+
+        .steps-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding: var(--space-md) var(--space-md) var(--space-md) 70px;
+            margin-bottom: var(--space-md);
+            background: var(--primary-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .steps-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            right: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.25rem;
+        }
+
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .use-case {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border-right: 4px solid #fa709a;
+        }
+
+        .use-case h3 {
+            font-size: 1.125rem;
+            margin-top: 0;
+        }
+
+        .faq-item {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .faq-item h3 {
+            font-size: 1.125rem;
+            color: #fa709a;
+            margin: 0 0 var(--space-sm);
+        }
+
+        .faq-item p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-lg);
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-hover);
+        }
+
+        .feature-tag-inline {
+            display: inline-block;
+            background: #fa709a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin: 4px;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .style-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .style-example {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: var(--space-lg) var(--space-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .style-example .emoji {
+            font-size: 3rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .style-example h3 {
+            font-size: 1.125rem;
+            margin: var(--space-sm) 0 8px;
+        }
+
+        .style-example p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← بازگشت به صفحه اصلی</a>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1>عکاسی Flat Lay حرفه‌ای</h1>
+            <p>عکس‌های جذاب از بالا (Overhead) با چیدمان هنری محصولات - استایل اینستاگرامی و حرفه‌ای که توجه مخاطب را جلب می‌کند</p>
+            <a href="/flat-lay.html" class="cta-button">شروع عکاسی رایگان</a>
+        </section>
+
+        <!-- What It Is Section -->
+        <section class="content-section">
+            <h2>Flat Lay چیست؟</h2>
+            <p>Flat Lay یک سبک عکاسی محصول است که در آن اقلام به صورت مسطح روی سطح چیده شده و از بالا (دید overhead) عکاسی می‌شوند. این سبک در سال‌های اخیر به خصوص در اینستاگرام بسیار محبوب شده و به یکی از استانداردهای عکاسی محصول تبدیل شده است.</p>
+
+            <p>سرویس Flat Lay ما با استفاده از هوش مصنوعی، محصولات شما را به صورت خودکار در چیدمان‌های هنری و زیبا مرتب کرده و عکس‌هایی حرفه‌ای تولید می‌کند که گویی توسط یک استایلیست و عکاس حرفه‌ای گرفته شده‌اند.</p>
+
+            <h3>ویژگی‌های Flat Lay:</h3>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>دید عمودی (90 درجه از بالا)</li>
+                <li>چیدمان متقارن یا نامتقارن هنری</li>
+                <li>استفاده از پراپ‌ها و عناصر دکوری</li>
+                <li>نورپردازی یکنواخت و بدون سایه سخت</li>
+                <li>ترکیب‌بندی حرفه‌ای و جذاب</li>
+            </ul>
+        </section>
+
+        <!-- Key Benefits Section -->
+        <section class="content-section">
+            <h2>مزایای کلیدی</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">📸</div>
+                    <h3>استایل اینستاگرامی</h3>
+                    <p>سبک محبوب و جذابی که در شبکه‌های اجتماعی تعامل بالایی دارد</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🎨</div>
+                    <h3>چیدمان هنری</h3>
+                    <p>ترکیب‌بندی حرفه‌ای که توجه را جلب کرده و در ذهن می‌ماند</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🛍️</div>
+                    <h3>نمایش چند محصول</h3>
+                    <p>امکان نمایش چندین محصول مرتبط در یک عکس</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">⚡</div>
+                    <h3>تولید سریع</h3>
+                    <p>بدون نیاز به استودیو، چیدمان دستی و ساعت‌ها کار</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🎯</div>
+                    <h3>مناسب لایف‌استایل</h3>
+                    <p>ایجاد احساس و سبک زندگی حول محصولات شما</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">💎</div>
+                    <h3>حرفه‌ای و باکیفیت</h3>
+                    <p>کیفیت استودیویی با نورپردازی و کامپوزیشن عالی</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Styles Section -->
+        <section class="content-section">
+            <h2>انواع استایل Flat Lay</h2>
+            <p>4 استایل محبوب و حرفه‌ای برای انتخاب:</p>
+
+            <div class="style-examples">
+                <div class="style-example">
+                    <div class="emoji">⚪</div>
+                    <h3>مینیمال</h3>
+                    <p>پس‌زمینه سفید، محصول محوری، فضای منفی زیاد</p>
+                </div>
+
+                <div class="style-example">
+                    <div class="emoji">🌿</div>
+                    <h3>طبیعی/ارگانیک</h3>
+                    <p>با گل، برگ، چوب و عناصر طبیعی</p>
+                </div>
+
+                <div class="style-example">
+                    <div class="emoji">💼</div>
+                    <h3>لایف‌استایل</h3>
+                    <p>با قهوه، کتاب، لپ‌تاپ و اقلام روزمره</p>
+                </div>
+
+                <div class="style-example">
+                    <div class="emoji">✨</div>
+                    <h3>لوکس/لایت</h3>
+                    <p>با جواهرات، طلا، رنگ‌های پاستلی و نور نرم</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="content-section">
+            <h2>چگونه کار می‌کند؟</h2>
+            <p>تولید عکس Flat Lay در 4 مرحله ساده:</p>
+
+            <ol class="steps-list">
+                <li>
+                    <strong>آپلود محصولات:</strong> تصاویر محصول یا محصولات خود را آپلود کنید. می‌توانید 1 تا 6 محصول را در یک عکس قرار دهید.
+                </li>
+                <li>
+                    <strong>انتخاب استایل:</strong> یکی از 4 استایل (مینیمال، طبیعی، لایف‌استایل، لوکس) را انتخاب کنید.
+                </li>
+                <li>
+                    <strong>تنظیمات (اختیاری):</strong> پس‌زمینه، پراپ‌ها و چیدمان را سفارشی کنید.
+                </li>
+                <li>
+                    <strong>تولید:</strong> روی دکمه تولید کلیک کنید و در چند ثانیه عکس Flat Lay حرفه‌ای خود را دانلود کنید.
+                </li>
+            </ol>
+
+            <p>هوش مصنوعی ما قوانین ترکیب‌بندی، تعادل بصری، فضای منفی و سایر اصول عکاسی حرفه‌ای را رعایت می‌کند تا نتیجه‌ای زیبا و جذاب تولید کند.</p>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="content-section">
+            <h2>موارد استفاده</h2>
+
+            <div class="use-cases">
+                <div class="use-case">
+                    <h3>📱 محتوای اینستاگرام</h3>
+                    <p>پست‌ها و استوری‌های جذاب با سبک flat lay که تعامل بالایی دارند.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🛍️ فروشگاه‌های آنلاین</h3>
+                    <p>تصویر اصلی محصول یا گالری تصاویر با استایل حرفه‌ای و یکنواخت.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>📊 کاتالوگ محصولات</h3>
+                    <p>عکس‌های جذاب برای صفحات کاتالوگ، بروشور و مواد تبلیغاتی.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🎨 برندینگ و لوگو</h3>
+                    <p>ایجاد هویت بصری منسجم با استایل flat lay یکنواخت.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🎁 محصولات هدیه</h3>
+                    <p>نمایش ست‌های هدیه، پک محصولات و کالکشن‌ها.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>💄 لوازم آرایشی</h3>
+                    <p>نمایش پالت آرایش، محصولات مراقبت پوست و عطر.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Details -->
+        <section class="content-section">
+            <h2>جزئیات فنی</h2>
+
+            <h3>تعداد محصولات</h3>
+            <div>
+                <span class="feature-tag-inline">1 محصول (تک)</span>
+                <span class="feature-tag-inline">2-3 محصول (معمولی)</span>
+                <span class="feature-tag-inline">4-5 محصول (کامل)</span>
+                <span class="feature-tag-inline">6+ محصول (مجموعه)</span>
+            </div>
+
+            <h3>پراپ‌ها و عناصر دکوری</h3>
+            <p>برای هر استایل، پراپ‌های مخصوص آن استایل به صورت خودکار اضافه می‌شوند:</p>
+            <div>
+                <span class="feature-tag-inline">گل و برگ</span>
+                <span class="feature-tag-inline">قهوه و نوشیدنی</span>
+                <span class="feature-tag-inline">کتاب و دفترچه</span>
+                <span class="feature-tag-inline">عینک</span>
+                <span class="feature-tag-inline">ساعت</span>
+                <span class="feature-tag-inline">قلم و ابزار نوشتن</span>
+                <span class="feature-tag-inline">گوشی/لپ‌تاپ</span>
+                <span class="feature-tag-inline">شمع</span>
+            </div>
+
+            <h3>انواع پس‌زمینه</h3>
+            <div>
+                <span class="feature-tag-inline">سفید خالص</span>
+                <span class="feature-tag-inline">چوبی</span>
+                <span class="feature-tag-inline">مرمر</span>
+                <span class="feature-tag-inline">پارچه‌ای</span>
+                <span class="feature-tag-inline">رنگی (پاستلی)</span>
+                <span class="feature-tag-inline">سنگی/بتن</span>
+            </div>
+
+            <h3>کیفیت خروجی</h3>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>وضوح بالا (2048x2048 یا 1080x1350 برای اینستاگرام)</li>
+                <li>نورپردازی یکنواخت و طبیعی</li>
+                <li>سایه‌های نرم و واقعی</li>
+                <li>ترکیب‌بندی متعادل و حرفه‌ای</li>
+                <li>رنگ‌های واقعی و اشباع مناسب</li>
+            </ul>
+        </section>
+
+        <!-- Composition Tips -->
+        <section class="content-section" style="background: linear-gradient(135deg, #c3cfe2 0%, #f5f7fa 100%);">
+            <h2>قوانین ترکیب‌بندی Flat Lay</h2>
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">📐 قانون سوم‌ها (Rule of Thirds)</h3>
+                <p style="color: var(--text-secondary);">محصول اصلی در یکی از نقاط قدرت (تقاطع خطوط) قرار می‌گیرد، نه دقیقاً وسط.</p>
+            </div>
+
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">⚖️ تعادل بصری (Visual Balance)</h3>
+                <p style="color: var(--text-secondary);">اقلام به گونه‌ای چیده می‌شوند که وزن بصری در کل فریم متعادل باشد.</p>
+            </div>
+
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">⚪ فضای منفی (Negative Space)</h3>
+                <p style="color: var(--text-secondary);">فضای خالی حول محصول به چشم استراحت داده و تمرکز را روی محصول می‌برد.</p>
+            </div>
+
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">🌈 هماهنگی رنگ (Color Harmony)</h3>
+                <p style="color: var(--text-secondary);">رنگ‌های محصولات و پراپ‌ها با یکدیگر هماهنگ و متناسب هستند.</p>
+            </div>
+        </section>
+
+        <!-- Pricing/CTA Section -->
+        <section class="content-section" style="text-align: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+            <h2>آماده شروع هستید؟</h2>
+            <p style="font-size: 1.125rem; margin-bottom: var(--space-lg);">اولین عکس Flat Lay خود را رایگان تولید کنید</p>
+            <a href="/flat-lay.html" class="cta-button">شروع کنید - رایگان</a>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="content-section">
+            <h2>سوالات متداول</h2>
+
+            <div class="faq-item">
+                <h3>چرا Flat Lay در اینستاگرام محبوب است؟</h3>
+                <p>Flat Lay به دلیل ساختار ساده، ترکیب‌بندی زیبا و قابلیت نمایش چندین محصول در یک فریم، تعامل و لایک بیشتری نسبت به عکس‌های معمولی دریافت می‌کند. همچنین احساس حرفه‌ای بودن و دقت را منتقل می‌کند.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم پراپ‌ها را خودم انتخاب کنم؟</h3>
+                <p>بله، می‌توانید از پراپ‌های پیش‌فرض استفاده کنید یا پراپ‌های دلخواه خود را مشخص کنید. سیستم ما هوشمندانه آن‌ها را در ترکیب قرار می‌دهد.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>عکس‌ها مناسب چاپ هستند؟</h3>
+                <p>بله، وضوح بالا (تا 3000x3000 پیکسل) برای چاپ تا سایز A4 یا بزرگ‌تر مناسب است.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم محصولات مختلف را در یک عکس قرار دهم؟</h3>
+                <p>بله، تا 6 محصول مختلف می‌توانید در یک عکس flat lay قرار دهید. توصیه می‌شود محصولات از یک دسته یا سبک باشند.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>چه فرقی با عکاسی معمولی محصول دارد؟</h3>
+                <p>Flat Lay داستان و سبک زندگی را روایت می‌کند، در حالی که عکاسی معمولی فقط محصول را نشان می‌دهد. Flat Lay احساس و تجربه ایجاد می‌کند، نه فقط نمایش محصول.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>چند عکس flat lay می‌توانم تولید کنم؟</h3>
+                <p>بسته به پلن شما، محدودیت ماهانه دارید. پلن رایگان 3 عکس، پایه 30 عکس و حرفه‌ای نامحدود است.</p>
+            </div>
+        </section>
+
+        <!-- Back to Homepage -->
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/" class="back-link">← بازگشت به صفحه اصلی</a>
+        </div>
+    </div>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "عکاسی Flat Lay حرفه‌ای",
+        "description": "عکس از بالا با چیدمان هنری محصولات - مناسب اینستاگرام و فروشگاه آنلاین",
+        "provider": {
+            "@type": "Organization",
+            "name": "عکاسی مد با هوش مصنوعی"
+        },
+        "serviceType": "AI Flat Lay Photography",
+        "areaServed": "IR",
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+</body>
+</html>

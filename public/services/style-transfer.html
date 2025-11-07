@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>انتقال استایل به عکس | تغییر فضا و نور با هوش مصنوعی</title>
+    <meta name="description" content="انتقال فضا و حال عکس‌های استایل به عکس محصولات شما. تغییر نورپردازی، رنگ‌بندی و mood بدون تغییر محتوا با هوش مصنوعی.">
+    <meta name="keywords" content="انتقال استایل, style transfer, تغییر فضا, color grading, نورپردازی, mood, هوش مصنوعی, ادیت عکس">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="انتقال استایل به عکس با هوش مصنوعی">
+    <meta property="og:description" content="تغییر فضا، نور و حال عکس‌های شما بدون تغییر محتوا">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fa_IR">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="/services/style-transfer.html">
+
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: var(--space-2xl) var(--space-md);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-xl);
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+            letter-spacing: -0.02em;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto var(--space-lg);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #11998e;
+            padding: 16px 40px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-section {
+            background: var(--card-bg);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-section h2 {
+            font-size: 2rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .content-section h3 {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-medium);
+            margin: var(--space-lg) 0 var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .content-section p {
+            font-size: 1.0625rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .benefit-card {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .benefit-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .benefit-card h3 {
+            font-size: 1.25rem;
+            margin: var(--space-sm) 0;
+        }
+
+        .benefit-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .steps-list {
+            list-style: none;
+            counter-reset: step-counter;
+            padding: 0;
+        }
+
+        .steps-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding: var(--space-md) var(--space-md) var(--space-md) 70px;
+            margin-bottom: var(--space-md);
+            background: var(--primary-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .steps-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            right: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.25rem;
+        }
+
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .use-case {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border-right: 4px solid #11998e;
+        }
+
+        .use-case h3 {
+            font-size: 1.125rem;
+            margin-top: 0;
+        }
+
+        .faq-item {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .faq-item h3 {
+            font-size: 1.125rem;
+            color: #11998e;
+            margin: 0 0 var(--space-sm);
+        }
+
+        .faq-item p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-lg);
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-hover);
+        }
+
+        .feature-tag-inline {
+            display: inline-block;
+            background: #11998e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin: 4px;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .mood-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .mood-example {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: var(--space-lg) var(--space-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .mood-example .emoji {
+            font-size: 3rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .mood-example h3 {
+            font-size: 1.125rem;
+            margin: var(--space-sm) 0 8px;
+        }
+
+        .mood-example p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            margin: var(--space-lg) 0;
+        }
+
+        .comparison-box {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-light);
+        }
+
+        .comparison-box h3 {
+            margin-top: 0;
+            color: #11998e;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← بازگشت به صفحه اصلی</a>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1>انتقال استایل به عکس</h1>
+            <p>فضا، نور و حال (mood) عکس‌های استایل خود را به عکس محصولات منتقل کنید - محتوا حفظ می‌شود، فقط احساس و فضا تغییر می‌کند</p>
+            <a href="/style-transfer.html" class="cta-button">شروع انتقال استایل</a>
+        </section>
+
+        <!-- What It Is Section -->
+        <section class="content-section">
+            <h2>انتقال استایل چیست؟</h2>
+            <p>انتقال استایل (Style Transfer) یک تکنیک پیشرفته هوش مصنوعی است که فضا، رنگ‌بندی و mood یک یا چند عکس استایل را به عکس اصلی شما منتقل می‌کند، بدون اینکه محتوای عکس (مدل، محصول، پوزیشن) تغییر کند.</p>
+
+            <p>به زبان ساده: شما عکس محصول خود را دارید. حالا می‌خواهید فضای آن را تغییر دهید - شاید گرم‌تر، سردتر، عتیقه‌تر، مدرن‌تر و... کافی است 1 تا 3 عکس با فضای دلخواهتان آپلود کنید، و سیستم آن فضا را به عکس شما منتقل می‌کند.</p>
+
+            <h3>چه چیزهایی تغییر می‌کنند؟</h3>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>رنگ‌بندی کلی (Color Grading)</li>
+                <li>تن رنگی (گرم/سرد، مات/درخشان)</li>
+                <li>کنتراست و میزان روشنایی</li>
+                <li>فیلتر و mood کلی</li>
+                <li>احساس و فضای عکس</li>
+            </ul>
+
+            <h3>چه چیزهایی تغییر نمی‌کنند؟</h3>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>محتوای عکس (مدل، محصول همانجا می‌مانند)</li>
+                <li>پوزیشن و ژست</li>
+                <li>پس‌زمینه (فقط رنگش تغییر می‌کند)</li>
+                <li>جزئیات و بافت‌ها (حفظ می‌شوند)</li>
+            </ul>
+        </section>
+
+        <!-- Difference from Scene Recreation -->
+        <section class="content-section">
+            <h2>تفاوت با Scene Recreation</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <h3>🎨 Style Transfer (این سرویس)</h3>
+                    <ul style="color: var(--text-secondary); margin-right: 20px; line-height: 1.8;">
+                        <li>فقط رنگ، نور و mood تغییر می‌کند</li>
+                        <li>محتوا و پوزیشن حفظ می‌شود</li>
+                        <li>سریع‌تر (10-20 ثانیه)</li>
+                        <li>می‌تواند تا 3 عکس استایل ترکیب کند</li>
+                        <li>مناسب برای color grading و فیلتر</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-box">
+                    <h3>🎬 Scene Recreation</h3>
+                    <ul style="color: var(--text-secondary); margin-right: 20px; line-height: 1.8;">
+                        <li>کل صحنه بازسازی می‌شود</li>
+                        <li>مدل و محصول جایگزین می‌شوند</li>
+                        <li>کندتر (30-60 ثانیه)</li>
+                        <li>فقط یک عکس مرجع</li>
+                        <li>مناسب برای کپی کامل یک عکس</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p style="margin-top: var(--space-md);"><strong>نکته:</strong> اگر می‌خواهید عکس خود را نگه دارید و فقط فضای آن را تغییر دهید، از Style Transfer استفاده کنید. اگر می‌خواهید عکسی کاملاً جدید مشابه یک عکس مرجع بسازید، از Scene Recreation استفاده کنید.</p>
+        </section>
+
+        <!-- Key Benefits Section -->
+        <section class="content-section">
+            <h2>مزایای کلیدی</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">🎨</div>
+                    <h3>تغییر فضا بدون ادیت</h3>
+                    <p>بدون نیاز به Photoshop، Lightroom یا مهارت ادیت، فضای عکس را تغییر دهید</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🔄</div>
+                    <h3>آزمایش چند استایل</h3>
+                    <p>همان عکس را با mood های مختلف تست کنید و بهترین را انتخاب کنید</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">⚡</div>
+                    <h3>بسیار سریع</h3>
+                    <p>تنها 10-20 ثانیه - سریع‌تر از هر روش ادیت دستی</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🎯</div>
+                    <h3>یکنواختی برند</h3>
+                    <p>همان استایل را روی تمام عکس‌های محصولات اعمال کنید</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">✨</div>
+                    <h3>ترکیب چند استایل</h3>
+                    <p>تا 3 عکس استایل را ترکیب کنید و mood منحصر به فرد بسازید</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">💎</div>
+                    <h3>حفظ کیفیت</h3>
+                    <p>جزئیات و کیفیت عکس اصلی حفظ می‌شود، فقط رنگ‌ها تغییر می‌کنند</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mood Examples -->
+        <section class="content-section">
+            <h2>انواع Mood و فضا</h2>
+            <p>چند نمونه از فضاهایی که می‌توانید ایجاد کنید:</p>
+
+            <div class="mood-examples">
+                <div class="mood-example">
+                    <div class="emoji">🌅</div>
+                    <h3>Golden Hour</h3>
+                    <p>گرم، طلایی، نرم</p>
+                </div>
+
+                <div class="mood-example">
+                    <div class="emoji">🌙</div>
+                    <h3>شبانه/آبی</h3>
+                    <p>سرد، مینیمال، مدرن</p>
+                </div>
+
+                <div class="mood-example">
+                    <div class="emoji">📷</div>
+                    <h3>عتیقه/Vintage</h3>
+                    <p>کم‌اشباع، فیلمی، نوستالژیک</p>
+                </div>
+
+                <div class="mood-example">
+                    <div class="emoji">☀️</div>
+                    <h3>روشن/Bright</h3>
+                    <p>پرنور، شاد، انرژیک</p>
+                </div>
+
+                <div class="mood-example">
+                    <div class="emoji">🎭</div>
+                    <h3>تیره/Moody</h3>
+                    <p>دراماتیک، کنتراست بالا، لوکس</p>
+                </div>
+
+                <div class="mood-example">
+                    <div class="emoji">🌸</div>
+                    <h3>پاستلی/نرم</h3>
+                    <p>ملایم، رویایی، فمینین</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="content-section">
+            <h2>چگونه کار می‌کند؟</h2>
+            <p>انتقال استایل در 3 مرحله ساده:</p>
+
+            <ol class="steps-list">
+                <li>
+                    <strong>آپلود عکس اصلی:</strong> عکس محصول خود را که می‌خواهید استایل آن تغییر کند آپلود کنید.
+                </li>
+                <li>
+                    <strong>آپلود عکس‌های استایل:</strong> 1 تا 3 عکس که فضای دلخواه شما را دارند آپلود کنید. می‌توانید از هر عکسی استفاده کنید - حتی عکس‌های طبیعت، هنری، فیلم‌ها و...
+                </li>
+                <li>
+                    <strong>تولید:</strong> سیستم ما فضا و رنگ‌بندی عکس‌های استایل را استخراج کرده و به عکس اصلی شما اعمال می‌کند.
+                </li>
+            </ol>
+
+            <p>نتیجه: عکس شما با همان محتوا اما با فضا و mood جدید - در عرض 10-20 ثانیه.</p>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="content-section">
+            <h2>موارد استفاده</h2>
+
+            <div class="use-cases">
+                <div class="use-case">
+                    <h3>🎨 ایجاد هویت بصری برند</h3>
+                    <p>یک استایل منحصر به فرد برای برند خود بسازید و روی تمام عکس‌ها اعمال کنید.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>📸 یکنواخت‌سازی عکس‌ها</h3>
+                    <p>عکس‌های گرفته شده در زمان‌ها و مکان‌های مختلف را با یک فضای یکسان هماهنگ کنید.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🌍 کمپین‌های فصلی</h3>
+                    <p>همان عکس‌ها را برای فصل‌های مختلف با mood متفاوت منتشر کنید (بهار = گرم، زمستان = سرد).</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🎯 A/B Testing</h3>
+                    <p>چند نسخه با mood های مختلف تست کنید و ببینید کدام تعامل بیشتری دارد.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>📱 فیلترهای اینستاگرامی</h3>
+                    <p>فیلترهای حرفه‌ای و منحصر به فرد برای اینستاگرام بدون نیاز به اپلیکیشن‌های ادیت.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🎬 ایجاد سبک سینمایی</h3>
+                    <p>Color grading مشابه فیلم‌های محبوب را روی عکس‌های خود اعمال کنید.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Details -->
+        <section class="content-section">
+            <h2>ویژگی‌های تکنیکی</h2>
+
+            <h3>تعداد عکس‌های استایل</h3>
+            <div>
+                <span class="feature-tag-inline">1 عکس استایل (ساده)</span>
+                <span class="feature-tag-inline">2 عکس استایل (ترکیبی)</span>
+                <span class="feature-tag-inline">3 عکس استایل (پیچیده)</span>
+            </div>
+            <p style="font-size: 0.9375rem; color: var(--text-secondary); margin-top: 8px;">
+                هرچه تعداد عکس استایل بیشتر باشد، mood نهایی ترکیبی و منحصر به فردتر خواهد بود.
+            </p>
+
+            <h3>انواع عکس‌های استایل قابل استفاده</h3>
+            <div>
+                <span class="feature-tag-inline">عکس‌های محصول دیگر</span>
+                <span class="feature-tag-inline">عکس‌های طبیعت</span>
+                <span class="feature-tag-inline">نقاشی و آثار هنری</span>
+                <span class="feature-tag-inline">عکس‌های معماری</span>
+                <span class="feature-tag-inline">عکس‌های سینمایی</span>
+                <span class="feature-tag-inline">پترن‌ها و بافت‌ها</span>
+            </div>
+
+            <h3>شدت انتقال استایل</h3>
+            <p>می‌توانید شدت اعمال استایل را کنترل کنید:</p>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>ملایم (25%) - تغییر خفیف</li>
+                <li>متوسط (50%) - توصیه می‌شود</li>
+                <li>قوی (75%) - تغییر قابل توجه</li>
+                <li>خیلی قوی (100%) - تغییر کامل</li>
+            </ul>
+
+            <h3>کیفیت خروجی</h3>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>همان وضوح عکس اصلی (تا 4096x4096)</li>
+                <li>حفظ جزئیات و بافت‌ها</li>
+                <li>بدون کاهش کیفیت</li>
+                <li>فرمت PNG یا JPG</li>
+            </ul>
+        </section>
+
+        <!-- Tips Section -->
+        <section class="content-section" style="background: linear-gradient(135deg, #ffeaa7 0%, #dfe6e9 100%);">
+            <h2>نکات برای بهترین نتیجه</h2>
+
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">✅ برای عکس استایل:</h3>
+                <ul style="color: var(--text-secondary); margin-right: 20px;">
+                    <li>عکس‌هایی با mood واضح و قوی انتخاب کنید</li>
+                    <li>رنگ‌بندی مشخص و یکنواخت داشته باشد</li>
+                    <li>اگر چند عکس استایل دارید، باید از نظر mood هماهنگ باشند</li>
+                    <li>کیفیت بالا (حداقل 512x512)</li>
+                </ul>
+            </div>
+
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">💡 نکات کاربردی:</h3>
+                <ul style="color: var(--text-secondary); margin-right: 20px;">
+                    <li>برای mood گرم: از عکس‌های sunset، طلایی استفاده کنید</li>
+                    <li>برای mood سرد: از عکس‌های آبی، برفی، شب استفاده کنید</li>
+                    <li>برای vintage: از عکس‌های فیلمی قدیمی استفاده کنید</li>
+                    <li>برای دراماتیک: از عکس‌های پرکنتراست و تیره استفاده کنید</li>
+                </ul>
+            </div>
+
+            <div style="background: white; padding: var(--space-md); border-radius: var(--radius-md); margin-top: var(--space-md);">
+                <h3 style="margin-top: 0;">⚠️ اجتناب کنید از:</h3>
+                <ul style="color: var(--text-secondary); margin-right: 20px;">
+                    <li>عکس‌های شلوغ با رنگ‌های پراکنده</li>
+                    <li>عکس‌های بسیار تیره یا بسیار روشن (overexposed)</li>
+                    <li>ترکیب عکس‌های با mood های متضاد</li>
+                    <li>عکس‌های با کیفیت پایین</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Pricing/CTA Section -->
+        <section class="content-section" style="text-align: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+            <h2>آماده شروع هستید؟</h2>
+            <p style="font-size: 1.125rem; margin-bottom: var(--space-lg);">اولین انتقال استایل خود را رایگان امتحان کنید</p>
+            <a href="/style-transfer.html" class="cta-button">شروع کنید - رایگان</a>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="content-section">
+            <h2>سوالات متداول</h2>
+
+            <div class="faq-item">
+                <h3>تفاوت Style Transfer با فیلترهای اینستاگرام چیست؟</h3>
+                <p>فیلترهای اینستاگرام از پیش تعیین شده و محدود هستند. Style Transfer به شما اجازه می‌دهد از هر عکسی استایل بگیرید و mood منحصر به فرد خودتان را بسازید. همچنین کنترل بیشتری روی شدت دارید.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم از نقاشی‌ها و آثار هنری استفاده کنم؟</h3>
+                <p>بله! استفاده از نقاشی‌ها، آثار هنری و حتی کارتون‌ها می‌تواند نتایج جالب و خلاقانه‌ای ایجاد کند. مثلاً می‌توانید سبک نقاشی ون گوگ را به عکس محصول خود اعمال کنید.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>چه اتفاقی می‌افتد اگر 3 عکس استایل بسیار متفاوت آپلود کنم؟</h3>
+                <p>سیستم سعی می‌کند آن‌ها را ترکیب کند، اما نتیجه ممکن است پیش‌بینی‌ناپذیر باشد. بهترین نتیجه زمانی حاصل می‌شود که عکس‌های استایل از نظر mood مشابه باشند.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا کیفیت عکس کم می‌شود؟</h3>
+                <p>خیر، عکس نهایی همان وضوح عکس اصلی را دارد. فقط رنگ‌ها و تن رنگی تغییر می‌کند، نه کیفیت.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم شدت استایل را تنظیم کنم؟</h3>
+                <p>بله، می‌توانید شدت از 25% تا 100% را انتخاب کنید. 50% معمولاً بهترین تعادل بین حفظ عکس اصلی و اعمال mood جدید است.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>چند عکس می‌توانم در ماه تولید کنم؟</h3>
+                <p>بسته به پلن شما متفاوت است. پلن رایگان 5 عکس، پایه 50 عکس و حرفه‌ای نامحدود است.</p>
+            </div>
+        </section>
+
+        <!-- Back to Homepage -->
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/" class="back-link">← بازگشت به صفحه اصلی</a>
+        </div>
+    </div>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "انتقال استایل به عکس",
+        "description": "تغییر فضا، نور و حال عکس‌های شما بدون تغییر محتوا با هوش مصنوعی",
+        "provider": {
+            "@type": "Organization",
+            "name": "عکاسی مد با هوش مصنوعی"
+        },
+        "serviceType": "AI Style Transfer",
+        "areaServed": "IR",
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+</body>
+</html>

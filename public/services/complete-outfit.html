@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>عکاسی استایل کامل با هوش مصنوعی | تولید عکس مدل با لباس و حجاب</title>
+    <meta name="description" content="تولید عکس‌های حرفه‌ای مدل با لباس کامل، حجاب و اکسسوری با هوش مصنوعی. بدون نیاز به عکاسی واقعی، در چند ثانیه عکس‌های مد حرفه‌ای بسازید.">
+    <meta name="keywords" content="عکاسی مد, عکس مدل, لباس مجلسی, حجاب, مانتو, عکاسی محصول, هوش مصنوعی, AI photography">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="عکاسی استایل کامل با هوش مصنوعی">
+    <meta property="og:description" content="تولید عکس‌های حرفه‌ای مدل با لباس کامل، حجاب و اکسسوری بدون نیاز به عکاسی واقعی">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fa_IR">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="/services/complete-outfit.html">
+
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Landing Page Specific Styles */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: var(--space-2xl) var(--space-md);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-xl);
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+            letter-spacing: -0.02em;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto var(--space-lg);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 16px 40px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-section {
+            background: var(--card-bg);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-section h2 {
+            font-size: 2rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .content-section h3 {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-medium);
+            margin: var(--space-lg) 0 var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .content-section p {
+            font-size: 1.0625rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .benefit-card {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .benefit-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .benefit-card h3 {
+            font-size: 1.25rem;
+            margin: var(--space-sm) 0;
+        }
+
+        .benefit-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .steps-list {
+            list-style: none;
+            counter-reset: step-counter;
+            padding: 0;
+        }
+
+        .steps-list li {
+            counter-increment: step-counter;
+            position: relative;
+            padding: var(--space-md) var(--space-md) var(--space-md) 70px;
+            margin-bottom: var(--space-md);
+            background: var(--primary-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .steps-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            right: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.25rem;
+        }
+
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .use-case {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border-right: 4px solid #667eea;
+        }
+
+        .use-case h3 {
+            font-size: 1.125rem;
+            margin-top: 0;
+        }
+
+        .faq-item {
+            background: var(--primary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .faq-item h3 {
+            font-size: 1.125rem;
+            color: #667eea;
+            margin: 0 0 var(--space-sm);
+        }
+
+        .faq-item p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-lg);
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-hover);
+        }
+
+        .feature-tag-inline {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin: 4px;
+            font-weight: var(--font-weight-medium);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← بازگشت به صفحه اصلی</a>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1>عکاسی استایل کامل با هوش مصنوعی</h1>
+            <p>تولید عکس‌های حرفه‌ای مدل با لباس کامل، حجاب و اکسسوری در چند ثانیه - بدون نیاز به عکاسی واقعی، استودیو یا مدل</p>
+            <a href="/complete-outfit.html" class="cta-button">شروع عکاسی رایگان</a>
+        </section>
+
+        <!-- What It Is Section -->
+        <section class="content-section">
+            <h2>این سرویس چیست؟</h2>
+            <p>عکاسی استایل کامل، پیشرفته‌ترین سرویس عکاسی مد با هوش مصنوعی است که به شما امکان می‌دهد عکس‌های حرفه‌ای مدل را با لباس‌های مختلف، انواع حجاب و اکسسوری‌ها تولید کنید. این سرویس با استفاده از تکنولوژی یادگیری عمیق و شبکه‌های عصبی، تصاویری واقع‌گرایانه و با کیفیت استودیویی تولید می‌کند.</p>
+
+            <p>با این سرویس می‌توانید:</p>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>چندین قطعه لباس را روی یک مدل ترکیب کنید</li>
+                <li>از بین مدل‌های مختلف (زن، مرد، کودک) انتخاب کنید</li>
+                <li>انواع حجاب (مقنعه، شال، روسری) را به استایل اضافه کنید</li>
+                <li>اکسسوری‌هایی مانند کیف، کفش، جواهرات را در عکس قرار دهید</li>
+                <li>پس‌زمینه و نورپردازی را کنترل کنید</li>
+            </ul>
+        </section>
+
+        <!-- Key Benefits Section -->
+        <section class="content-section">
+            <h2>مزایای کلیدی</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">⚡</div>
+                    <h3>سرعت فوق‌العاده</h3>
+                    <p>تولید عکس در کمتر از 30 ثانیه - بدون نیاز به ساعت‌ها عکاسی و ادیت</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">💰</div>
+                    <h3>صرفه‌جویی در هزینه</h3>
+                    <p>بدون نیاز به استودیو، عکاس حرفه‌ای، مدل یا لوکیشن گران‌قیمت</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🎨</div>
+                    <h3>تنوع بی‌نهایت</h3>
+                    <p>امتحان صدها ترکیب مختلف لباس، مدل و استایل بدون محدودیت</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">✨</div>
+                    <h3>کیفیت حرفه‌ای</h3>
+                    <p>تصاویر با وضوح بالا، نورپردازی استاندارد و کیفیت استودیویی</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🔄</div>
+                    <h3>ویرایش آسان</h3>
+                    <p>تغییر سریع مدل، لباس یا حجاب بدون نیاز به عکاسی مجدد</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icon">🌍</div>
+                    <h3>مناسب بازار ایران</h3>
+                    <p>پشتیبانی کامل از حجاب، پوشش محتشمانه و فرهنگ ایرانی</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="content-section">
+            <h2>چگونه کار می‌کند؟</h2>
+            <p>استفاده از این سرویس بسیار آسان است و تنها در 4 مرحله ساده انجام می‌شود:</p>
+
+            <ol class="steps-list">
+                <li>
+                    <strong>انتخاب مدل:</strong> از بین مدل‌های متنوع (زن، مرد، کودک) با ویژگی‌های مختلف، مدل مورد نظر خود را انتخاب کنید.
+                </li>
+                <li>
+                    <strong>آپلود لباس‌ها:</strong> تصاویر لباس‌های خود را آپلود کنید. می‌توانید چندین قطعه مانند بالاتنه، پایین‌تنه، کت و مانتو را ترکیب کنید.
+                </li>
+                <li>
+                    <strong>انتخاب حجاب و اکسسوری:</strong> در صورت نیاز، نوع حجاب (مقنعه، شال، روسری) و اکسسوری‌ها را انتخاب کنید.
+                </li>
+                <li>
+                    <strong>تولید عکس:</strong> روی دکمه تولید کلیک کنید و در عرض چند ثانیه، عکس‌های حرفه‌ای خود را دریافت کنید.
+                </li>
+            </ol>
+
+            <p>تکنولوژی هوش مصنوعی ما به طور هوشمند لباس‌ها را روی مدل قرار داده، چین‌خوردگی‌های طبیعی ایجاد کرده و نورپردازی واقع‌گرایانه اعمال می‌کند.</p>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="content-section">
+            <h2>موارد استفاده</h2>
+            <p>این سرویس برای چه کسانی مناسب است؟</p>
+
+            <div class="use-cases">
+                <div class="use-case">
+                    <h3>👗 فروشگاه‌های آنلاین پوشاک</h3>
+                    <p>نمایش محصولات با مدل‌های متنوع بدون هزینه عکاسی مکرر. ایجاد کاتالوگ گسترده در کمترین زمان.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🧕 برندهای حجاب و مانتو</h3>
+                    <p>نمایش مانتو و حجاب در ترکیب‌های مختلف، با مدل‌های متناسب با فرهنگ ایرانی.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>📱 فروشندگان اینستاگرام</h3>
+                    <p>تولید محتوای بصری جذاب برای پست‌ها و استوری‌ها با صرفه‌جویی زمان و هزینه.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>👔 طراحان لباس</h3>
+                    <p>مشاهده طرح‌های جدید روی مدل قبل از تولید، تست ترکیب‌های رنگی و استایل‌های مختلف.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>🏪 بوتیک‌های محلی</h3>
+                    <p>ایجاد حضور آنلاین حرفه‌ای با عکس‌های باکیفیت بدون سرمایه‌گذاری سنگین.</p>
+                </div>
+
+                <div class="use-case">
+                    <h3>📊 مارکت‌پلیس‌ها</h3>
+                    <p>یکنواخت‌سازی کیفیت عکس محصولات از فروشندگان مختلف، ایجاد تجربه خرید بهتر.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Features -->
+        <section class="content-section">
+            <h2>ویژگی‌های تکنیکی</h2>
+
+            <h3>انواع مدل‌های موجود</h3>
+            <p>دسترسی به کتابخانه گسترده‌ای از مدل‌ها:</p>
+            <div>
+                <span class="feature-tag-inline">مدل زن</span>
+                <span class="feature-tag-inline">مدل مرد</span>
+                <span class="feature-tag-inline">مدل کودک</span>
+                <span class="feature-tag-inline">رنگ پوست متنوع</span>
+                <span class="feature-tag-inline">سن‌های مختلف</span>
+                <span class="feature-tag-inline">ژست‌های متنوع</span>
+            </div>
+
+            <h3>قابلیت‌های ترکیب لباس</h3>
+            <p>امکان ترکیب انواع پوشاک:</p>
+            <div>
+                <span class="feature-tag-inline">بالاتنه (تیشرت، پیراهن، بلوز)</span>
+                <span class="feature-tag-inline">پایین‌تنه (شلوار، دامن)</span>
+                <span class="feature-tag-inline">مانتو و کت</span>
+                <span class="feature-tag-inline">لباس یک‌تکه</span>
+                <span class="feature-tag-inline">لباس مجلسی</span>
+            </div>
+
+            <h3>انواع حجاب</h3>
+            <p>پشتیبانی کامل از انواع پوشش:</p>
+            <div>
+                <span class="feature-tag-inline">مقنعه</span>
+                <span class="feature-tag-inline">شال</span>
+                <span class="feature-tag-inline">روسری</span>
+                <span class="feature-tag-inline">تک‌رنگ و طرح‌دار</span>
+                <span class="feature-tag-inline">طول‌های مختلف</span>
+            </div>
+
+            <h3>کیفیت خروجی</h3>
+            <ul style="font-size: 1.0625rem; line-height: 1.8; color: var(--text-secondary); margin-right: 20px;">
+                <li>وضوح بالا (تا 2048x2048 پیکسل)</li>
+                <li>فرمت PNG با پس‌زمینه شفاف یا JPG</li>
+                <li>نورپردازی طبیعی و سایه‌های واقع‌گرایانه</li>
+                <li>چین‌خوردگی و بافت پارچه طبیعی</li>
+                <li>تناسب اندام و پوزیشن صحیح لباس</li>
+            </ul>
+        </section>
+
+        <!-- Pricing/CTA Section -->
+        <section class="content-section" style="text-align: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+            <h2>آماده شروع هستید؟</h2>
+            <p style="font-size: 1.125rem; margin-bottom: var(--space-lg);">همین حالا شروع کنید و اولین عکس حرفه‌ای خود را رایگان تولید کنید</p>
+            <a href="/complete-outfit.html" class="cta-button">شروع کنید - رایگان</a>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="content-section">
+            <h2>سوالات متداول</h2>
+
+            <div class="faq-item">
+                <h3>چه فرمت‌هایی برای آپلود لباس پشتیبانی می‌شود؟</h3>
+                <p>تصاویر JPG، PNG و WEBP با حداکثر حجم 10 مگابایت پشتیبانی می‌شوند. برای بهترین نتیجه، از تصاویر با پس‌زمینه سفید یا شفاف استفاده کنید.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم از عکس‌های تولیدی برای فروش استفاده کنم؟</h3>
+                <p>بله، کاملاً. تمام عکس‌های تولید شده متعلق به شما هستند و می‌توانید آن‌ها را برای فروش، تبلیغات یا هر منظور تجاری دیگری استفاده کنید.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>تولید هر عکس چقدر طول می‌کشد؟</h3>
+                <p>معمولاً بین 15 تا 30 ثانیه. در ساعات شلوغ ممکن است تا 1 دقیقه طول بکشد.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم چندین لباس را روی یک مدل امتحان کنم؟</h3>
+                <p>بله، می‌توانید تا 5 قطعه لباس را با هم ترکیب کنید. همچنین می‌توانید همان لباس‌ها را روی مدل‌های مختلف تست کنید.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>چه تفاوتی با عکاسی واقعی دارد؟</h3>
+                <p>عکاسی با AI بسیار سریع‌تر، ارزان‌تر و قابل تکرار است. البته برای برخی کمپین‌های تبلیغاتی حرفه‌ای، همچنان عکاسی واقعی توصیه می‌شود. اما برای فروشگاه‌های آنلاین، کاتالوگ محصولات و شبکه‌های اجتماعی، عکاسی AI گزینه‌ای عالی است.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>آیا می‌توانم عکس مدل خودم را آپلود کنم؟</h3>
+                <p>در حال حاضر این امکان وجود ندارد، اما به زودی قابلیت آپلود مدل شخصی اضافه خواهد شد. فعلاً می‌توانید از بین مدل‌های موجود در کتابخانه انتخاب کنید.</p>
+            </div>
+        </section>
+
+        <!-- Back to Homepage -->
+        <div style="text-align: center; margin-top: var(--space-xl);">
+            <a href="/" class="back-link">← بازگشت به صفحه اصلی</a>
+        </div>
+    </div>
+
+    <!-- Schema.org Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "عکاسی استایل کامل با هوش مصنوعی",
+        "description": "تولید عکس‌های حرفه‌ای مدل با لباس کامل، حجاب و اکسسوری با هوش مصنوعی",
+        "provider": {
+            "@type": "Organization",
+            "name": "عکاسی مد با هوش مصنوعی"
+        },
+        "serviceType": "AI Fashion Photography",
+        "areaServed": "IR",
+        "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+</body>
+</html>
