@@ -99,20 +99,44 @@
     </div>
 
     <script>
-        const token = sessionStorage.getItem('admin_token');
+        // Check for admin credentials (email + password based auth)
+        const adminEmail = sessionStorage.getItem('adminEmail');
+        const adminPassword = sessionStorage.getItem('adminPassword');
 
-        if (!token) {
-            document.body.innerHTML = '<div style="text-align:center;padding:40px;"><h2>❌ No Admin Token</h2><p>Please login at <a href="/admin/dashboard">/admin/dashboard</a> first</p></div>';
+        console.log('🔑 Admin auth check:', {
+            adminEmail: adminEmail ? 'EXISTS' : 'MISSING',
+            adminPassword: adminPassword ? 'EXISTS' : 'MISSING'
+        });
+
+        if (!adminEmail || !adminPassword) {
+            document.body.innerHTML = `
+                <div style="text-align:center;padding:40px;">
+                    <h2>❌ Not Authenticated as Admin</h2>
+                    <p>Please login at <a href="/admin/dashboard">/admin/dashboard</a> first</p>
+                    <br>
+                    <p style="color: #6b7280; font-size: 14px;">
+                        Admin Email: ${adminEmail ? '✅ Found' : '❌ Not found'}<br>
+                        Admin Password: ${adminPassword ? '✅ Found' : '❌ Not found'}
+                    </p>
+                    <br>
+                    <button onclick="window.location.href='/admin/dashboard'" style="padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                        Go to Admin Dashboard
+                    </button>
+                </div>
+            `;
         }
 
         async function fetchWithAuth(url, options = {}) {
+            const headers = {
+                'admin-email': adminEmail,
+                'admin-password': adminPassword,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
             return fetch(url, {
                 ...options,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
+                headers
             });
         }
 
