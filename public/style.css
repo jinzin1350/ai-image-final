@@ -863,6 +863,88 @@ button,
     border: 1px solid #bae6fd;
 }
 
+/* Mode Card Actions - Button Container */
+.mode-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    justify-content: center;
+}
+
+/* Mode Button Base Styles */
+.mode-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.9375rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Primary Button (شروع) */
+.mode-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.mode-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.mode-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button (آموزش) */
+.mode-btn-secondary {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.mode-btn-secondary:hover {
+    background: #f0f9ff;
+    transform: translateY(-2px);
+}
+
+.mode-btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Remove hover effect from card when it has buttons */
+.mode-card:has(.mode-actions) {
+    cursor: default;
+}
+
+.mode-card:has(.mode-actions):hover {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments for buttons */
+@media (max-width: 768px) {
+    .mode-selector {
+        grid-template-columns: 1fr;
+    }
+
+    .mode-actions {
+        flex-direction: column;
+    }
+
+    .mode-btn {
+        width: 100%;
+    }
+}
+
 .section-header {
     text-align: center;
     margin-bottom: var(--space-xl);
