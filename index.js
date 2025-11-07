@@ -1173,6 +1173,10 @@ app.get('/test-update-credits', (req, res) => {
   res.sendFile(path.join(__dirname, 'test_update_credits.html'));
 });
 
+app.get('/test-permissions', (req, res) => {
+  res.sendFile(path.join(__dirname, 'test_permissions.html'));
+});
+
 app.get('/admin/content', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
 });
