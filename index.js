@@ -2415,14 +2415,65 @@ function getServiceCreditCost(mode) {
 /**
  * Get tier limits based on tier name
  */
-function getTierLimits(tier) {
-  const limits = {
+// Cache for tier pricing (refresh every 5 minutes)
+let tierPricingCache = null;
+let tierPricingCacheTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+async function getTierLimits(tier) {
+  // Default fallback values
+  const fallbackLimits = {
     testlimit: { credits: 5, name: 'تست' },
-    bronze: { credits: 50, name: 'برنزی' },
-    silver: { credits: 100, name: 'نقره‌ای' },
-    gold: { credits: 130, name: 'طلایی' }
+    bronze: { credits: 100, name: 'برنزی' },
+    silver: { credits: 130, name: 'نقره‌ای' },
+    gold: { credits: 171, name: 'طلایی' }
   };
-  return limits[tier] || limits.testlimit;
+
+  // Try to fetch from database if supabaseAdmin is available
+  if (supabaseAdmin) {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (tierPricingCache && (now - tierPricingCacheTime) < CACHE_DURATION) {
+        return tierPricingCache[tier] || fallbackLimits[tier] || fallbackLimits.testlimit;
+      }
+
+      // Fetch fresh data from database
+      const { data: pricing, error } = await supabaseAdmin
+        .from('tier_pricing')
+        .select('tier, credits')
+        .eq('is_active', true);
+
+      if (!error && pricing) {
+        // Build cache object
+        const newCache = {};
+        const tierNames = {
+          testlimit: 'تست',
+          bronze: 'برنزی',
+          silver: 'نقره‌ای',
+          gold: 'طلایی'
+        };
+
+        pricing.forEach(p => {
+          newCache[p.tier] = {
+            credits: p.credits,
+            name: tierNames[p.tier] || p.tier
+          };
+        });
+
+        // Update cache
+        tierPricingCache = newCache;
+        tierPricingCacheTime = now;
+
+        return newCache[tier] || fallbackLimits[tier] || fallbackLimits.testlimit;
+      }
+    } catch (error) {
+      console.error('Error fetching tier limits from database:', error);
+    }
+  }
+
+  // Fallback to hardcoded values if database fetch fails
+  return fallbackLimits[tier] || fallbackLimits.testlimit;
 }
 
 /**
@@ -2451,12 +2502,12 @@ async function checkAndDeductCredits(userId, mode) {
 
     const creditCost = getServiceCreditCost(mode);
     const creditsUsed = userLimit.credits_used || 0;
-    const creditsLimit = userLimit.credits_limit || getTierLimits(userLimit.tier || 'bronze').credits;
+    const tierInfo = await getTierLimits(userLimit.tier || 'bronze');
+    const creditsLimit = userLimit.credits_limit || tierInfo.credits;
     const remainingCredits = creditsLimit - creditsUsed;
 
     // Check if user has enough credits
     if (remainingCredits < creditCost) {
-      const tierInfo = getTierLimits(userLimit.tier || 'bronze');
       return {
         allowed: false,
         message: `اعتبار شما به پایان رسیده است. پلن ${tierInfo.name}: ${creditsUsed}/${creditsLimit} اعتبار استفاده شده`,
@@ -4442,7 +4493,7 @@ app.get('/api/user/usage', authenticateUser, async (req, res) => {
     }
 
     const tier = userLimit.tier || 'bronze';
-    const tierInfo = getTierLimits(tier);
+    const tierInfo = await getTierLimits(tier);
     const creditsUsed = userLimit.credits_used || 0;
     const creditsLimit = userLimit.credits_limit || tierInfo.credits;
     const remaining = creditsLimit - creditsUsed;
