@@ -345,6 +345,10 @@
         <div class="info-card">
             <h3>💡 How It Works</h3>
             <p>Toggle the switches below to grant or revoke access to services for each tier. When a user tries to access a restricted service, they'll see an upgrade modal with pricing information.</p>
+            <button onclick="initializePermissions()" style="margin-top: 16px; padding: 12px 24px; background: white; color: #667eea; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                🔧 Initialize Missing Permissions
+            </button>
+            <p style="margin-top: 8px; font-size: 13px; opacity: 0.9;">Click this if you don't see testlimit tier or any services are missing</p>
         </div>
 
         <div class="legend">
@@ -575,6 +579,30 @@
             setTimeout(() => {
                 message.classList.remove('show');
             }, 2000);
+        }
+
+        async function initializePermissions() {
+            if (!confirm('This will initialize all missing tier-service permission combinations. Existing permissions will not be changed. Continue?')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/init-permissions', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`✅ Success! Initialized ${data.count} permission combinations.\n\nReloading page to show updated permissions...`);
+                    window.location.reload();
+                } else {
+                    throw new Error(data.error || 'Failed to initialize permissions');
+                }
+            } catch (error) {
+                console.error('Error initializing permissions:', error);
+                alert('❌ Error initializing permissions: ' + error.message);
+            }
         }
 
         // Load permissions on page load

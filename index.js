@@ -5117,14 +5117,17 @@ app.put('/api/admin/service-permissions/:tier/:serviceKey', authenticateAdmin, a
       return res.status(400).json({ success: false, error: 'has_access is required' });
     }
 
+    // Use UPSERT to insert if not exists, update if exists
     const { data: permission, error } = await supabaseAdmin
       .from('tier_service_permissions')
-      .update({
+      .upsert({
+        tier,
+        service_key: serviceKey,
         has_access,
         updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'tier,service_key'
       })
-      .eq('tier', tier)
-      .eq('service_key', serviceKey)
       .select()
       .single();
 
@@ -5134,6 +5137,61 @@ app.put('/api/admin/service-permissions/:tier/:serviceKey', authenticateAdmin, a
     res.json({ success: true, permission });
   } catch (error) {
     console.error('Error updating service permission:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Initialize missing tier-service permission combinations
+app.post('/api/admin/init-permissions', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const tiers = ['testlimit', 'bronze', 'silver', 'gold'];
+    const services = [
+      'complete-outfit',
+      'accessories-only',
+      'color-collection',
+      'flat-lay',
+      'scene-recreation',
+      'style-transfer'
+    ];
+
+    const permissionsToInsert = [];
+
+    // Create all combinations
+    for (const tier of tiers) {
+      for (const service of services) {
+        // Default: testlimit gets complete-outfit only, others get nothing
+        const hasAccess = (tier === 'testlimit' && service === 'complete-outfit');
+
+        permissionsToInsert.push({
+          tier,
+          service_key: service,
+          has_access: hasAccess
+        });
+      }
+    }
+
+    // Use upsert to insert missing rows without affecting existing ones
+    const { data, error } = await supabaseAdmin
+      .from('tier_service_permissions')
+      .upsert(permissionsToInsert, {
+        onConflict: 'tier,service_key',
+        ignoreDuplicates: true
+      });
+
+    if (error) throw error;
+
+    console.log(`✅ Initialized ${permissionsToInsert.length} permission combinations`);
+    res.json({
+      success: true,
+      message: 'Permissions initialized successfully',
+      count: permissionsToInsert.length
+    });
+  } catch (error) {
+    console.error('Error initializing permissions:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
