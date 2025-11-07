@@ -977,6 +977,8 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
 // Get all models with user information (for admin model management)
 app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
+    console.log('📋 Fetching models from content_library...');
+
     // First, get all models
     const { data: models, error: modelsError } = await supabaseAdmin
       .from('content_library')
@@ -984,10 +986,19 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       .eq('content_type', 'model')
       .order('created_at', { ascending: false });
 
-    if (modelsError) throw modelsError;
+    if (modelsError) {
+      console.error('❌ Error fetching models from content_library:', modelsError);
+      throw modelsError;
+    }
+
+    console.log(`✅ Found ${models?.length || 0} models in content_library`);
+    if (models && models.length > 0) {
+      console.log('📊 Sample model:', models[0]);
+    }
 
     // Get unique user IDs
     const userIds = [...new Set(models.map(m => m.owner_user_id).filter(Boolean))];
+    console.log(`👥 Found ${userIds.length} unique user IDs:`, userIds);
 
     // Fetch user information from user_limits table
     const { data: users, error: usersError } = await supabaseAdmin
@@ -996,8 +1007,10 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       .in('user_id', userIds);
 
     if (usersError) {
-      console.error('Error fetching users:', usersError);
+      console.error('❌ Error fetching users from user_limits:', usersError);
       // Continue without user info if this fails
+    } else {
+      console.log(`✅ Found ${users?.length || 0} users in user_limits`);
     }
 
     // Create a map of user_id to user info
@@ -1021,9 +1034,10 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       is_premium: userMap[model.owner_user_id]?.is_premium || false
     }));
 
+    console.log(`✅ Returning ${formattedModels.length} formatted models`);
     res.json({ success: true, models: formattedModels });
   } catch (error) {
-    console.error('Error fetching models:', error);
+    console.error('❌ Error fetching models:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
