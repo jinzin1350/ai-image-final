@@ -1772,8 +1772,18 @@
         let currentEditingModelId = null;
 
         function editModel(modelId, bucket) {
+            console.log('Edit clicked! modelId:', modelId, 'bucket:', bucket);
+            console.log('allModels array:', allModels);
+            console.log('Looking for model with id:', modelId);
+
             const model = allModels.find(m => m.id === modelId);
-            if (!model) return;
+            console.log('Found model:', model);
+
+            if (!model) {
+                console.error('Model not found! modelId:', modelId);
+                alert('خطا: مدل پیدا نشد! شناسه: ' + modelId);
+                return;
+            }
 
             currentEditingModelId = modelId;
 
