@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Credits Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .result {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 2px solid #e5e7eb;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Credits Update</h1>
+    <p>This page tests if credits can be updated in the database.</p>
+
+    <div style="margin: 20px 0; padding: 20px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px;">
+        <strong>⚠️ Important:</strong> Make sure you've run <code>migrations/pricing_table.sql</code> in Supabase first!
+    </div>
+
+    <h2>1. Test GET Pricing</h2>
+    <button onclick="testGetPricing()">Get All Pricing</button>
+
+    <h2>2. Test Update Credits</h2>
+    <div>
+        <label>Tier:</label>
+        <select id="testTier">
+            <option value="testlimit">Test Limit</option>
+            <option value="bronze">Bronze</option>
+            <option value="silver">Silver</option>
+            <option value="gold">Gold</option>
+        </select>
+
+        <label>New Credits:</label>
+        <input type="number" id="testCredits" value="999" min="1">
+
+        <button onclick="testUpdateCredits()">Update Credits</button>
+    </div>
+
+    <h2>3. Direct Database Test</h2>
+    <button onclick="testDirectUpdate()">Test with Both Price & Credits</button>
+
+    <div id="result" class="result">Results will appear here...</div>
+
+    <script>
+        const token = sessionStorage.getItem('admin_token');
+
+        async function testGetPricing() {
+            try {
+                const response = await fetch('/api/admin/pricing', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('result').textContent =
+                    `✅ GET Success!\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                document.getElementById('result').textContent =
+                    `❌ GET Error:\n\n${error.message}\n\n${error.stack}`;
+            }
+        }
+
+        async function testUpdateCredits() {
+            const tier = document.getElementById('testTier').value;
+            const credits = parseInt(document.getElementById('testCredits').value);
+
+            try {
+                // First get current price
+                const getResponse = await fetch('/api/admin/pricing', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const getData = await getResponse.json();
+                const tierData = getData.pricing.find(p => p.tier === tier);
+                const currentPrice = tierData ? tierData.price : 0;
+
+                document.getElementById('result').textContent =
+                    `Step 1: Got current price = ${currentPrice}\n\nStep 2: Sending update...`;
+
+                // Now update with both price and credits
+                const updateResponse = await fetch(`/api/admin/pricing/${tier}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        price: currentPrice,
+                        credits: credits
+                    })
+                });
+
+                const updateData = await updateResponse.json();
+
+                document.getElementById('result').textContent =
+                    `✅ UPDATE Success!\n\nRequest:\n${JSON.stringify({
+                        tier,
+                        price: currentPrice,
+                        credits: credits
+                    }, null, 2)}\n\nResponse:\n${JSON.stringify(updateData, null, 2)}`;
+
+            } catch (error) {
+                document.getElementById('result').textContent =
+                    `❌ UPDATE Error:\n\n${error.message}\n\n${error.stack}`;
+            }
+        }
+
+        async function testDirectUpdate() {
+            try {
+                const response = await fetch(`/api/admin/pricing/bronze`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        price: 3990000,
+                        credits: 888
+                    })
+                });
+
+                const data = await response.json();
+
+                document.getElementById('result').textContent =
+                    `✅ Direct Update Test!\n\nRequest:\n${JSON.stringify({
+                        price: 3990000,
+                        credits: 888
+                    }, null, 2)}\n\nResponse:\n${JSON.stringify(data, null, 2)}`;
+
+            } catch (error) {
+                document.getElementById('result').textContent =
+                    `❌ Direct Update Error:\n\n${error.message}\n\n${error.stack}`;
+            }
+        }
+
+        // Auto-check token
+        if (!token) {
+            document.getElementById('result').textContent =
+                '❌ No admin token found!\n\nPlease login at /admin/dashboard first.';
+        } else {
+            document.getElementById('result').textContent =
+                '✅ Admin token found. Ready to test!';
+        }
+    </script>
+</body>
+</html>

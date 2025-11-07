@@ -1169,6 +1169,10 @@ app.get('/admin/pricing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-pricing.html'));
 });
 
+app.get('/test-update-credits', (req, res) => {
+  res.sendFile(path.join(__dirname, 'test_update_credits.html'));
+});
+
 app.get('/admin/content', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-content.html'));
 });
