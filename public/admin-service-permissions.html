@@ -442,11 +442,21 @@
 
         async function loadPermissions() {
             try {
+                console.log('📥 Loading permissions...');
                 const response = await fetchWithAuth('/api/admin/service-permissions');
                 const data = await response.json();
 
+                console.log('📦 Loaded permissions data:', data);
+
                 if (data.success) {
                     permissionsData = data.permissions;
+                    console.log('✅ Permissions loaded:', permissionsData);
+
+                    // Log bronze tier specifically
+                    if (permissionsData.bronze) {
+                        console.log('🥉 Bronze tier permissions:', permissionsData.bronze);
+                    }
+
                     renderPermissionsTable();
                     document.getElementById('loadingState').style.display = 'none';
                     document.getElementById('permissionsTable').style.display = 'block';
@@ -454,7 +464,7 @@
                     throw new Error(data.error || 'Failed to load permissions');
                 }
             } catch (error) {
-                console.error('Error loading permissions:', error);
+                console.error('❌ Error loading permissions:', error);
                 document.getElementById('loadingState').innerHTML = `
                     <div style="color: #ef4444;">
                         <p>❌ Error loading permissions</p>
@@ -513,6 +523,13 @@
             const toggle = document.querySelector(`input[data-tier="${tier}"][data-service="${serviceKey}"]`);
             const originalState = !hasAccess;
 
+            console.log('🔄 Updating permission:', {
+                tier,
+                serviceKey,
+                hasAccess,
+                url: `/api/admin/service-permissions/${tier}/${serviceKey}`
+            });
+
             try {
                 // Disable toggle during update
                 toggle.disabled = true;
@@ -522,7 +539,10 @@
                     body: JSON.stringify({ has_access: hasAccess })
                 });
 
+                console.log('📡 Response status:', response.status);
+
                 const data = await response.json();
+                console.log('📦 Response data:', data);
 
                 if (data.success) {
                     // Update local data
@@ -532,13 +552,15 @@
                         tierData[permIndex].has_access = hasAccess;
                     }
 
+                    console.log('✅ Permission updated successfully!');
                     // Show success message
                     showSuccessMessage();
                 } else {
+                    console.error('❌ Update failed:', data.error);
                     throw new Error(data.error || 'Failed to update permission');
                 }
             } catch (error) {
-                console.error('Error updating permission:', error);
+                console.error('❌ Error updating permission:', error);
                 alert('Error updating permission: ' + error.message);
                 // Revert toggle to original state
                 toggle.checked = originalState;
