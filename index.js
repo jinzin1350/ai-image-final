@@ -974,6 +974,33 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
   }
 });
 
+// Helper function to determine category from filename
+function getCategoryFromFilename(filename) {
+  const lower = filename.toLowerCase();
+
+  // Model-related keywords
+  if (lower.includes('model') || lower.includes('pro_') || lower.includes('generated-')) {
+    return 'Model';
+  }
+
+  // Background-related keywords
+  if (lower.includes('background') || lower.includes('scene') || lower.includes('backdrop')) {
+    return 'Background';
+  }
+
+  // Garment/clothing keywords
+  if (lower.includes('garment') || lower.includes('content-') || lower.includes('reference-')) {
+    return 'Garment';
+  }
+
+  // Default based on numeric names
+  if (/^\d+$/.test(filename.replace(/\.[^/.]+$/, ''))) {
+    return 'Model';
+  }
+
+  return 'Other';
+}
+
 // Get all models with user information (for admin model management)
 app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
@@ -993,21 +1020,26 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       console.log(`✅ Found ${adminContentFiles.length} files in admin-content`);
 
       for (const file of adminContentFiles) {
+        if (file.name === '.emptyFolderPlaceholder') continue;
+
         const { data: publicUrlData } = supabaseAdmin.storage
           .from('admin-content')
           .getPublicUrl(file.name);
 
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+
         allModels.push({
-          id: file.id || file.name,
-          name: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
-          category: 'Manually Uploaded',
+          id: file.name, // Use filename as ID for Storage files
+          name: nameWithoutExt,
+          category: getCategoryFromFilename(file.name),
           visibility: 'public',
           image_url: publicUrlData.publicUrl,
           created_at: file.created_at,
           user_id: null,
           user_email: 'Admin Upload',
           is_premium: false,
-          bucket: 'admin-content'
+          bucket: 'admin-content',
+          filename: file.name // Keep original filename for edit/delete
         });
       }
     }
@@ -1024,21 +1056,26 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       console.log(`✅ Found ${garmentsFiles.length} files in garments`);
 
       for (const file of garmentsFiles) {
+        if (file.name === '.emptyFolderPlaceholder') continue;
+
         const { data: publicUrlData } = supabaseAdmin.storage
           .from('garments')
           .getPublicUrl(file.name);
 
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+
         allModels.push({
-          id: file.id || file.name,
-          name: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
-          category: 'AI Generated',
+          id: file.name, // Use filename as ID for Storage files
+          name: nameWithoutExt,
+          category: getCategoryFromFilename(file.name),
           visibility: 'public',
           image_url: publicUrlData.publicUrl,
           created_at: file.created_at,
           user_id: null,
           user_email: 'System (AI Generated)',
           is_premium: false,
-          bucket: 'garments'
+          bucket: 'garments',
+          filename: file.name // Keep original filename for edit/delete
         });
       }
     }
@@ -1055,28 +1092,25 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
 // Update a model (name, category, visibility, owner)
 app.put('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
   try {
-    const { modelId } = req.params;
-    const { name, category, visibility, user_id } = req.body;
+    const { modelId } = req.params; // This is the filename
+    const { name, category, bucket } = req.body;
 
-    const updateData = {};
-    if (name !== undefined) updateData.name = name;
-    if (category !== undefined) updateData.category = category;
-    if (visibility !== undefined) updateData.visibility = visibility;
-    if (user_id !== undefined) updateData.owner_user_id = user_id;
-    updateData.updated_at = new Date().toISOString();
+    console.log(`📝 Updating model: ${modelId} in bucket: ${bucket}`);
 
-    const { data: model, error } = await supabaseAdmin
-      .from('content_library')
-      .update(updateData)
-      .eq('id', modelId)
-      .eq('content_type', 'model')
-      .select()
-      .single();
+    // For Storage files, we can't rename them easily, so we'll just return success
+    // The category is determined by filename, so changing category would require moving files
+    // For now, we'll return the updated metadata without actually modifying storage
 
-    if (error) throw error;
+    res.json({
+      success: true,
+      message: 'Storage files cannot be edited directly. To change category or name, please re-upload the file.',
+      model: {
+        id: modelId,
+        name: name,
+        category: category
+      }
+    });
 
-    console.log(`✅ Updated model ${modelId}:`, updateData);
-    res.json({ success: true, model });
   } catch (error) {
     console.error('Error updating model:', error);
     res.status(500).json({ success: false, error: error.message });
@@ -1086,37 +1120,31 @@ app.put('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
 // Delete a model
 app.delete('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const filename = req.params.modelId; // This is the filename
+    const { bucket } = req.query; // Get bucket from query params
 
-    // First get the model to find the storage path for cleanup
-    const { data: model, error: fetchError } = await supabaseAdmin
-      .from('content_library')
-      .select('storage_path, image_url')
-      .eq('id', modelId)
-      .eq('content_type', 'model')
-      .single();
+    console.log(`🗑️ Deleting file: ${filename} from bucket: ${bucket}`);
 
-    if (fetchError) throw fetchError;
+    if (!bucket) {
+      return res.status(400).json({
+        success: false,
+        error: 'Bucket parameter is required'
+      });
+    }
 
-    // Delete from database
-    const { error: deleteError } = await supabaseAdmin
-      .from('content_library')
-      .delete()
-      .eq('id', modelId)
-      .eq('content_type', 'model');
+    // Delete file from Storage
+    const { error } = await supabaseAdmin.storage
+      .from(bucket)
+      .remove([filename]);
 
-    if (deleteError) throw deleteError;
+    if (error) {
+      console.error('❌ Error deleting from storage:', error);
+      throw error;
+    }
 
-    // Optionally delete from storage (if you want to clean up the files)
-    // Note: Commented out to preserve images in case they're referenced elsewhere
-    // if (model.storage_path) {
-    //   await supabaseAdmin.storage
-    //     .from('admin-content')
-    //     .remove([model.storage_path]);
-    // }
-
-    console.log(`🗑️ Deleted model ${modelId}`);
+    console.log(`✅ Successfully deleted ${filename} from ${bucket}`);
     res.json({ success: true });
+
   } catch (error) {
     console.error('Error deleting model:', error);
     res.status(500).json({ success: false, error: error.message });
