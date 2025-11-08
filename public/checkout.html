@@ -630,42 +630,55 @@
         const urlParams = new URLSearchParams(window.location.search);
         const plan = urlParams.get('plan');
 
-        // Plan details
-        const planDetails = {
-            'bronze': {
-                name: 'پلن برنز',
-                icon: '🥉',
-                price: '1,990,000',
-                credits: '100'
-            },
-            'silver': {
-                name: 'پلن نقره‌ای',
-                icon: '🥈',
-                price: '3,990,000',
-                credits: '130'
-            },
-            'gold': {
-                name: 'پلن طلایی',
-                icon: '🥇',
-                price: '5,990,000',
-                credits: '171'
-            }
+        // Plan icons mapping
+        const planIcons = {
+            'bronze': '🥉',
+            'silver': '🥈',
+            'gold': '🥇'
         };
 
-        if (plan && planDetails[plan]) {
-            // Show selected plan box
-            const planBox = document.getElementById('selectedPlanBox');
-            const planIcon = document.getElementById('planIcon');
-            const planName = document.getElementById('planName');
-            const planDetailsText = document.getElementById('planDetails');
-            const planPrice = document.getElementById('planPrice');
+        // Plan names mapping
+        const planNames = {
+            'bronze': 'پلن برنز',
+            'silver': 'پلن نقره‌ای',
+            'gold': 'پلن طلایی'
+        };
 
-            planBox.style.display = 'block';
-            planIcon.textContent = planDetails[plan].icon;
-            planName.textContent = planDetails[plan].name;
-            planDetailsText.textContent = `${planDetails[plan].credits} اعتبار ماهانه`;
-            planPrice.textContent = `${planDetails[plan].price} ریال`;
+        // Load plan details from database
+        async function loadPlanDetails() {
+            if (!plan) return;
+
+            try {
+                const response = await fetch('/api/pricing');
+                const data = await response.json();
+
+                if (data.success && data.pricing) {
+                    const selectedPlan = data.pricing.find(p => p.tier === plan);
+
+                    if (selectedPlan) {
+                        // Show selected plan box
+                        const planBox = document.getElementById('selectedPlanBox');
+                        const planIcon = document.getElementById('planIcon');
+                        const planName = document.getElementById('planName');
+                        const planDetailsText = document.getElementById('planDetails');
+                        const planPrice = document.getElementById('planPrice');
+
+                        planBox.style.display = 'block';
+                        planIcon.textContent = planIcons[plan] || '💎';
+                        planName.textContent = planNames[plan] || selectedPlan.tier;
+                        planDetailsText.textContent = `${selectedPlan.credits.toLocaleString('fa-IR')} اعتبار ماهانه`;
+                        // Convert price to Rial (multiply by 10)
+                        const priceInRial = selectedPlan.price * 10;
+                        planPrice.textContent = `${priceInRial.toLocaleString('fa-IR')} ریال`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading plan details:', error);
+            }
         }
+
+        // Load plan details on page load
+        loadPlanDetails();
     </script>
 </body>
 </html>
