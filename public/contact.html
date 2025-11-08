@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تماس با ما | استودیو AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .header-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        }
+
+        .contact-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+
+        .contact-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .contact-card p {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .contact-value {
+            direction: ltr;
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 18px;
+            margin: 12px 0;
+        }
+
+        .qr-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            margin-bottom: 40px;
+        }
+
+        .qr-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .qr-card {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .qr-card img {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            background: white;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-card h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .qr-card p {
+            font-size: 14px;
+            color: #6b7280;
+            direction: ltr;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-item {
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-item h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .info-item p {
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .contact-grid,
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .qr-section,
+            .info-card {
+                padding: 28px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/landing.html" class="back-link">← بازگشت به صفحه اصلی</a>
+
+        <div class="header">
+            <div class="header-icon">📞</div>
+            <h1>تماس با ما</h1>
+            <p>ما همیشه آماده پاسخگویی به شما هستیم</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Telegram -->
+            <div class="contact-card">
+                <div class="contact-icon">📱</div>
+                <h3>تلگرام</h3>
+                <p>سریع‌ترین راه برای تماس با تیم پشتیبانی</p>
+                <div class="contact-value">@alirezaaaatehrani</div>
+                <a href="https://t.me/alirezaaaatehrani" target="_blank" class="contact-link">
+                    باز کردن تلگرام
+                </a>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>واتساپ</h3>
+                <p>پاسخگویی سریع در ساعات کاری</p>
+                <div class="contact-value">09123791350</div>
+                <a href="https://wa.me/989123791350" target="_blank" class="contact-link">
+                    باز کردن واتساپ
+                </a>
+            </div>
+
+            <!-- Email -->
+            <div class="contact-card">
+                <div class="contact-icon">📧</div>
+                <h3>ایمیل</h3>
+                <p>برای سوالات تخصصی و پیشنهادات</p>
+                <div class="contact-value">support@studioai.ir</div>
+                <a href="mailto:support@studioai.ir" class="contact-link">
+                    ارسال ایمیل
+                </a>
+            </div>
+        </div>
+
+        <!-- QR Codes -->
+        <div class="qr-section">
+            <h2>📲 اسکن کنید و ارتباط بگیرید</h2>
+            <div class="qr-grid">
+                <div class="qr-card">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://t.me/alirezaaaatehrani" alt="Telegram QR">
+                    <h4>تلگرام</h4>
+                    <p>@alirezaaaatehrani</p>
+                </div>
+                <div class="qr-card">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://wa.me/989123791350" alt="WhatsApp QR">
+                    <h4>واتساپ</h4>
+                    <p>09123791350</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="info-card">
+            <h2>🕐 ساعات پاسخگویی</h2>
+            <div class="info-item">
+                <h4>تلگرام و واتساپ</h4>
+                <p>شنبه تا چهارشنبه: ۹ صبح تا ۶ عصر<br>پنج‌شنبه: ۹ صبح تا ۱ بعدازظهر<br>جمعه: تعطیل</p>
+            </div>
+            <div class="info-item">
+                <h4>ایمیل</h4>
+                <p>پاسخ ایمیل‌ها در کمتر از ۲۴ ساعت کاری ارسال می‌شود.</p>
+            </div>
+            <div class="info-item">
+                <h4>پشتیبانی فنی اورژانسی</h4>
+                <p>در صورت بروز مشکلات فنی جدی، از طریق تلگرام با ما در ارتباط باشید. تیم فنی ما در اسرع وقت پاسخگو خواهند بود.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
