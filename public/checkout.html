@@ -358,6 +358,64 @@
             transform: translateY(0);
         }
 
+        .selected-plan-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .plan-icon {
+            font-size: 48px;
+            flex-shrink: 0;
+        }
+
+        .plan-header h3 {
+            color: #1e40af;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .plan-header p {
+            color: #3b82f6;
+            font-size: 14px;
+        }
+
+        .plan-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .price-label {
+            font-size: 15px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .price-value {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         @media (max-width: 640px) {
             body {
                 padding: 20px 16px;
@@ -393,6 +451,21 @@
         </div>
 
         <div class="card">
+            <!-- Selected Plan Box -->
+            <div class="selected-plan-box" id="selectedPlanBox" style="display: none;">
+                <div class="plan-header">
+                    <span class="plan-icon" id="planIcon"></span>
+                    <div>
+                        <h3 id="planName"></h3>
+                        <p id="planDetails"></p>
+                    </div>
+                </div>
+                <div class="plan-price">
+                    <span class="price-label">مبلغ قابل پرداخت:</span>
+                    <span class="price-value" id="planPrice"></span>
+                </div>
+            </div>
+
             <!-- Notice Box -->
             <div class="notice-box">
                 <div class="notice-icon">🚀</div>
@@ -557,9 +630,41 @@
         const urlParams = new URLSearchParams(window.location.search);
         const plan = urlParams.get('plan');
 
-        if (plan) {
-            console.log('Selected plan:', plan);
-            // You can use this to show the plan details on the page if needed
+        // Plan details
+        const planDetails = {
+            'bronze': {
+                name: 'پلن برنز',
+                icon: '🥉',
+                price: '199,000',
+                credits: '100'
+            },
+            'silver': {
+                name: 'پلن نقره‌ای',
+                icon: '🥈',
+                price: '399,000',
+                credits: '130'
+            },
+            'gold': {
+                name: 'پلن طلایی',
+                icon: '🥇',
+                price: '599,000',
+                credits: '171'
+            }
+        };
+
+        if (plan && planDetails[plan]) {
+            // Show selected plan box
+            const planBox = document.getElementById('selectedPlanBox');
+            const planIcon = document.getElementById('planIcon');
+            const planName = document.getElementById('planName');
+            const planDetailsText = document.getElementById('planDetails');
+            const planPrice = document.getElementById('planPrice');
+
+            planBox.style.display = 'block';
+            planIcon.textContent = planDetails[plan].icon;
+            planName.textContent = planDetails[plan].name;
+            planDetailsText.textContent = `${planDetails[plan].credits} اعتبار ماهانه`;
+            planPrice.textContent = `${planDetails[plan].price} تومان`;
         }
     </script>
 </body>
