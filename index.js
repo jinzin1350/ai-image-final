@@ -4454,11 +4454,13 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
     const ADMIN_EMAIL = 'engi.alireza@gmail.com';
 
     // First, try to find the image in generated_images
-    const { data: generatedImage } = await supabase
+    const { data: generatedImage, error: findGenError } = await supabase
       .from('generated_images')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single to handle not found gracefully
+
+    console.log(`🔍 Checking generated_images for ID ${id}:`, generatedImage ? 'Found' : 'Not found');
 
     // If found in generated_images, delete it
     if (generatedImage) {
@@ -4491,11 +4493,13 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
     }
 
     // If not found in generated_images, check if it's from content_library
-    const { data: contentLibraryItem } = await supabase
+    const { data: contentLibraryItem, error: findContentError } = await supabase
       .from('content_library')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single
+
+    console.log(`🔍 Checking content_library for ID ${id}:`, contentLibraryItem ? 'Found' : 'Not found');
 
     if (contentLibraryItem) {
       // Only admin can delete from content_library
