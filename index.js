@@ -4453,33 +4453,92 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
 
     const ADMIN_EMAIL = 'engi.alireza@gmail.com';
 
-    // If user is admin, they can delete any image
-    let deleteQuery = supabase
+    // First, try to find the image in generated_images
+    const { data: generatedImage } = await supabase
       .from('generated_images')
-      .delete()
-      .eq('id', id);
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    // If NOT admin, ensure they can only delete their own images
-    if (userEmail !== ADMIN_EMAIL) {
-      deleteQuery = deleteQuery.eq('user_id', userId);
-      console.log(`🗑️ User ${userEmail} deleting their own image: ${id}`);
-    } else {
-      console.log(`👑 Admin ${userEmail} deleting image: ${id}`);
+    // If found in generated_images, delete it
+    if (generatedImage) {
+      let deleteQuery = supabase
+        .from('generated_images')
+        .delete()
+        .eq('id', id);
+
+      // If NOT admin, ensure they can only delete their own images
+      if (userEmail !== ADMIN_EMAIL) {
+        deleteQuery = deleteQuery.eq('user_id', userId);
+        console.log(`🗑️ User ${userEmail} deleting their own image from generated_images: ${id}`);
+      } else {
+        console.log(`👑 Admin ${userEmail} deleting image from generated_images: ${id}`);
+      }
+
+      const { error, count } = await deleteQuery;
+
+      if (error) throw error;
+
+      if (count === 0) {
+        return res.status(403).json({
+          success: false,
+          error: 'شما مجاز به حذف این تصویر نیستید'
+        });
+      }
+
+      console.log(`✅ Deleted image ${id} from generated_images`);
+      return res.json({ success: true, message: 'تصویر با موفقیت حذف شد' });
     }
 
-    const { error, count } = await deleteQuery;
+    // If not found in generated_images, check if it's from content_library
+    const { data: contentLibraryItem } = await supabase
+      .from('content_library')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (error) throw error;
+    if (contentLibraryItem) {
+      // Only admin can delete from content_library
+      if (userEmail !== ADMIN_EMAIL) {
+        return res.status(403).json({
+          success: false,
+          error: 'فقط ادمین می‌تواند مدل‌ها را حذف کند'
+        });
+      }
 
-    // Check if image was actually deleted (returns 0 if user tried to delete someone else's image)
-    if (count === 0) {
-      return res.status(403).json({
-        success: false,
-        error: 'شما مجاز به حذف این تصویر نیستید'
-      });
+      console.log(`👑 Admin ${userEmail} deleting item from content_library: ${id}`);
+
+      // Delete from content_library
+      const { error: deleteError } = await supabaseAdmin
+        .from('content_library')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) throw deleteError;
+
+      // Delete from Storage if exists
+      if (contentLibraryItem.storage_bucket && contentLibraryItem.storage_filename) {
+        const { error: storageError } = await supabaseAdmin.storage
+          .from(contentLibraryItem.storage_bucket)
+          .remove([contentLibraryItem.storage_filename]);
+
+        if (storageError) {
+          console.warn('⚠️ Warning: Could not delete from storage:', storageError);
+        } else {
+          console.log(`✅ Deleted ${contentLibraryItem.storage_filename} from ${contentLibraryItem.storage_bucket}`);
+        }
+      }
+
+      console.log(`✅ Deleted item ${id} from content_library`);
+      return res.json({ success: true, message: 'مدل با موفقیت حذف شد' });
     }
 
-    res.json({ success: true, message: 'تصویر با موفقیت حذف شد' });
+    // Image not found in either table
+    return res.status(404).json({
+      success: false,
+      error: 'تصویر یافت نشد'
+    });
+
   } catch (error) {
     console.error('خطا در حذف تصویر:', error);
     res.status(500).json({ success: false, error: 'خطا در حذف تصویر' });
