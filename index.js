@@ -136,6 +136,11 @@ app.get('/profile', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
+// Domain verification file route
+app.get('/F4F3Y84YF.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'F4F3Y84YF.txt'));
+});
+
 // Static files - MUST come after specific routes
 app.use(express.static('public'));
 
