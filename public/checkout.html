@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تکمیل خرید | استودیو AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .notice-box {
+            background: linear-gradient(135deg, #fff7e6 0%, #ffe8cc 100%);
+            border: 2px solid #ffb84d;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .notice-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .notice-box h3 {
+            color: #cc7a00;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .notice-box p {
+            color: #996600;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .steps {
+            margin-bottom: 32px;
+        }
+
+        .steps h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            border-right: 4px solid #667eea;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            font-size: 15px;
+            color: #718096;
+            line-height: 1.7;
+        }
+
+        .bank-details {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 32px;
+        }
+
+        .bank-details h3 {
+            color: #0369a1;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .detail-label {
+            font-size: 15px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            direction: ltr;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .contact-section {
+            margin-top: 32px;
+        }
+
+        .contact-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .contact-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .contact-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .contact-card h4 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .contact-card p {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 16px;
+            direction: ltr;
+        }
+
+        .contact-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .qr-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .qr-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .qr-card img {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            background: white;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .qr-card p {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .faq {
+            margin-top: 32px;
+        }
+
+        .faq h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .faq-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .faq-item h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .faq-item p {
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .card {
+                padding: 24px 20px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/pricing.html" class="back-link">← بازگشت به صفحه قیمت‌گذاری</a>
+
+        <div class="header">
+            <h1>🛒 تکمیل خرید</h1>
+            <p>فقط یک قدم تا شروع کار با استودیو AI</p>
+        </div>
+
+        <div class="card">
+            <!-- Notice Box -->
+            <div class="notice-box">
+                <div class="notice-icon">🚀</div>
+                <h3>سیستم پرداخت خودکار به زودی راه‌اندازی می‌شود</h3>
+                <p>ما در حال ارتقای سیستم پرداخت به درگاه بانکی امن هستیم. فعلاً می‌توانید از طریق کارت به کارت اقدام کنید - سریع و ساده!</p>
+            </div>
+
+            <!-- Steps -->
+            <div class="steps">
+                <h2>📋 مراحل خرید</h2>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>واریز وجه به حساب</h3>
+                        <p>مبلغ پلن انتخابی خود را به شماره کارت زیر واریز کنید</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>ارسال رسید واریز</h3>
+                        <p>عکس فیش واریزی را از طریق تلگرام یا واتساپ ارسال کنید</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>فعال‌سازی اکانت</h3>
+                        <p>اکانت شما در کمتر از 2 ساعت فعال خواهد شد</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bank Details -->
+            <div class="bank-details">
+                <h3>🏦 مشخصات حساب</h3>
+
+                <div class="detail-row">
+                    <span class="detail-label">نام بانک</span>
+                    <span class="detail-value">بانک پارسیان</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">صاحب حساب</span>
+                    <span class="detail-value">علیرضا ابراهیم تهرانی</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">شماره کارت</span>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="detail-value" id="cardNumber">5022-2910-2626-2665</span>
+                        <button class="copy-btn" onclick="copyCardNumber()">📋 کپی</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="contact-section">
+                <h3>📤 ارسال رسید واریز</h3>
+                <p style="text-align: center; color: #64748b; margin-bottom: 24px;">
+                    بعد از واریز، عکس فیش را از یکی از راه‌های زیر ارسال کنید:
+                </p>
+
+                <div class="contact-methods">
+                    <!-- Telegram -->
+                    <div class="contact-card">
+                        <div class="contact-icon">📱</div>
+                        <h4>تلگرام</h4>
+                        <p>@alirezaaaatehrani</p>
+                        <a href="https://t.me/alirezaaaatehrani" target="_blank" class="contact-btn">
+                            باز کردن تلگرام
+                        </a>
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="contact-card">
+                        <div class="contact-icon">💬</div>
+                        <h4>واتساپ</h4>
+                        <p>09123791350</p>
+                        <a href="https://wa.me/989123791350" target="_blank" class="contact-btn">
+                            باز کردن واتساپ
+                        </a>
+                    </div>
+                </div>
+
+                <!-- QR Codes -->
+                <div class="qr-section">
+                    <div class="qr-card">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/alirezaaaatehrani" alt="Telegram QR">
+                        <p>اسکن برای تلگرام</p>
+                    </div>
+                    <div class="qr-card">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/989123791350" alt="WhatsApp QR">
+                        <p>اسکن برای واتساپ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="faq">
+                <h3>❓ سوالات متداول</h3>
+
+                <div class="faq-item">
+                    <h4>چقدر طول می‌کشد تا اکانتم فعال بشه؟</h4>
+                    <p>معمولاً در کمتر از 2 ساعت (در ساعات کاری) اکانت شما فعال می‌شود. در غیر این صورت حداکثر تا 24 ساعت.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>آیا پرداخت امن است؟</h4>
+                    <p>بله، واریز مستقیم به کارت بانکی یکی از امن‌ترین روش‌های پرداخت است. همچنین بعد از فعال‌سازی، ایمیل تاییدیه برای شما ارسال می‌شود.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>اگر اشتباهی مبلغ رو واریز کردم چی کار کنم؟</h4>
+                    <p>نگران نباشید! فقط فیش واریز را ارسال کنید و موضوع را توضیح دهید. تیم ما مبلغ اضافی را برگشت می‌زند یا به اکانت شما اضافه می‌کند.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>آیا می‌تونم از طریق ایمیل هم فیش رو بفرستم؟</h4>
+                    <p>بله، می‌توانید به ایمیل support@yourdomain.com ارسال کنید، اما تلگرام و واتساپ سریع‌تر پاسخ داده می‌شوند.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        ✓ شماره کارت کپی شد
+    </div>
+
+    <script>
+        function copyCardNumber() {
+            const cardNumber = '5022291026262665'; // Without dashes for easier paste
+
+            navigator.clipboard.writeText(cardNumber).then(function() {
+                showToast();
+            }).catch(function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = cardNumber;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Get plan from URL params (if coming from pricing page)
+        const urlParams = new URLSearchParams(window.location.search);
+        const plan = urlParams.get('plan');
+
+        if (plan) {
+            console.log('Selected plan:', plan);
+            // You can use this to show the plan details on the page if needed
+        }
+    </script>
+</body>
+</html>

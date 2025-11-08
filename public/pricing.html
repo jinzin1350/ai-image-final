@@ -718,7 +718,8 @@
         }
 
         function selectPlan(tier) {
-            alert(`پرداخت آنلاین به زودی راه‌اندازی می‌شود.\n\nپلن انتخابی: ${tier === 'bronze' ? 'برنز' : tier === 'silver' ? 'نقره‌ای' : 'طلایی'}\n\nلطفاً با پشتیبانی تماس بگیرید.`);
+            // Redirect to checkout page with selected plan
+            window.location.href = `/checkout.html?plan=${tier}`;
         }
 
         // Load pricing on page load
