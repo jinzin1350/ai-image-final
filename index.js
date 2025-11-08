@@ -4489,6 +4489,16 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
       }
 
       console.log(`✅ Deleted image ${id} from generated_images`);
+
+      // Verify deletion by checking if item still exists
+      const { data: verifyCheck } = await supabase
+        .from('generated_images')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+
+      console.log(`🔍 Verification - Item ${id} still exists in DB: ${verifyCheck ? 'YES ⚠️' : 'NO ✅'}`);
+
       return res.json({ success: true, message: 'تصویر با موفقیت حذف شد' });
     }
 
@@ -4534,6 +4544,16 @@ app.delete('/api/generations/:id', authenticateUser, async (req, res) => {
       }
 
       console.log(`✅ Deleted item ${id} from content_library`);
+
+      // Verify deletion by checking if item still exists
+      const { data: verifyCheck } = await supabase
+        .from('content_library')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+
+      console.log(`🔍 Verification - Item ${id} still exists in content_library: ${verifyCheck ? 'YES ⚠️' : 'NO ✅'}`);
+
       return res.json({ success: true, message: 'مدل با موفقیت حذف شد' });
     }
 
@@ -4585,6 +4605,8 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
     const { count: generatedCount, error: genCountError } = await generatedCountQuery;
     if (genCountError) throw genCountError;
 
+    console.log(`📊 generated_images count: ${generatedCount}`);
+
     let generatedDataQuery = supabase
       .from('generated_images')
       .select('*')
@@ -4596,6 +4618,8 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     const { data: generatedImages, error: genDataError } = await generatedDataQuery;
     if (genDataError) throw genDataError;
+
+    console.log(`📊 generated_images actual data rows: ${(generatedImages || []).length}`);
 
     // Add source tag to generated images
     const taggedGeneratedImages = (generatedImages || []).map(img => ({
@@ -4624,6 +4648,8 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
       if (contentCountError) {
         console.warn('⚠️  Error counting content_library:', contentCountError);
       } else {
+        console.log(`📊 content_library count: ${contentCount}`);
+
         let contentDataQuery = supabase
           .from('content_library')
           .select('*')
@@ -4638,6 +4664,8 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
         if (contentDataError) {
           console.warn('⚠️  Error fetching content_library:', contentDataError);
         } else {
+          console.log(`📊 content_library actual data rows: ${(contentLibrary || []).length}`);
+
           // Normalize content_library to match generated_images structure
           const normalizedContent = (contentLibrary || []).map(item => ({
             id: item.id,
