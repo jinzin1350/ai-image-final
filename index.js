@@ -137,8 +137,8 @@ app.get('/profile', (req, res) => {
 });
 
 // Domain verification file route
-app.get('/F4F3Y84YF.txt', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'F4F3Y84YF.txt'));
+app.get('/43021824.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', '43021824.txt'));
 });
 
 // Static files - MUST come after specific routes
