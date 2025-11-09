@@ -695,10 +695,21 @@
                     if (tierPriceDiv) {
                         tierPriceDiv.innerHTML = `
                             ${hasDiscount ? `
-                                <div style="text-align: center; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
                                     <span style="font-size: 12px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">قیمت اصلی</span>
+                                    <div style="
+                                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                        color: white;
+                                        padding: 4px 12px;
+                                        border-radius: 16px;
+                                        font-size: 12px;
+                                        font-weight: 800;
+                                        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+                                    ">
+                                        ${discount_percentage}% تخفیف 🔥
+                                    </div>
                                 </div>
-                                <div style="position: relative; margin-bottom: 16px;">
+                                <div style="text-align: center; margin-bottom: 16px;">
                                     <div class="price-original" style="
                                         font-size: 32px;
                                         color: #9ca3af;
@@ -708,32 +719,10 @@
                                     ">
                                         ${price.toLocaleString('fa-IR')} تومان
                                     </div>
-                                    <div style="
-                                        position: absolute;
-                                        top: -16px;
-                                        right: -10px;
-                                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                                        color: white;
-                                        padding: 8px 20px;
-                                        border-radius: 24px;
-                                        font-size: 16px;
-                                        font-weight: 800;
-                                        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
-                                        transform: rotate(-3deg);
-                                        animation: bounce 2s ease-in-out infinite;
-                                    ">
-                                        ${discount_percentage}% OFF 🔥
-                                    </div>
                                 </div>
                                 <div style="text-align: center; margin-bottom: 8px;">
                                     <span style="font-size: 12px; color: #10b981; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">قیمت با تخفیف</span>
                                 </div>
-                                <style>
-                                    @keyframes bounce {
-                                        0%, 100% { transform: rotate(-3deg) translateY(0px); }
-                                        50% { transform: rotate(-3deg) translateY(-5px); }
-                                    }
-                                </style>
                             ` : ''}
                             <div class="price-amount">${Math.round(discountedPrice).toLocaleString('fa-IR')}</div>
                             <div class="price-period">تومان / ماهانه</div>
