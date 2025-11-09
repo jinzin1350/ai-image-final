@@ -362,25 +362,33 @@
             <!-- Benefits Grid -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 60px;">
                 <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 32px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">🎨</div>
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.1);">
+                        <img src="/images/benefit-custom-design.jpg" alt="طراحی اختصاصی" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                     <h3 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 12px;">طراحی اختصاصی</h3>
                     <p style="color: rgba(255,255,255,0.85); line-height: 1.7;">مدل‌های طراحی شده کاملاً منطبق با هویت بصری و مخاطب هدف برند شما</p>
                 </div>
 
                 <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 32px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.1);">
+                        <img src="/images/benefit-ownership.jpg" alt="مالکیت دائمی" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                     <h3 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 12px;">مالکیت دائمی</h3>
                     <p style="color: rgba(255,255,255,0.85); line-height: 1.7;">مدل‌ها به صورت اختصاصی متعلق به برند شما خواهند بود</p>
                 </div>
 
                 <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 32px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">♾️</div>
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.1);">
+                        <img src="/images/benefit-unlimited.jpg" alt="استفاده نامحدود" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                     <h3 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 12px;">استفاده نامحدود</h3>
                     <p style="color: rgba(255,255,255,0.85); line-height: 1.7;">در تمام کمپین‌ها، عکس‌های محصول و محتوای تبلیغاتی</p>
                 </div>
 
                 <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 32px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.1);">
+                        <img src="/images/benefit-consistency.jpg" alt="یکپارچگی برند" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                     <h3 style="font-size: 20px; font-weight: 700; color: white; margin-bottom: 12px;">یکپارچگی برند</h3>
                     <p style="color: rgba(255,255,255,0.85); line-height: 1.7;">همیشه از یک چهره ثابت و حرفه‌ای در تمام محتوا استفاده کنید</p>
                 </div>
@@ -1023,25 +1031,41 @@
         function showPlaceholders() {
             const gallery = document.getElementById('custom-models-gallery');
             gallery.innerHTML = `
-                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 40px; text-align: center;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">👩</div>
-                    <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">مدل زن</h4>
-                    <p style="font-size: 14px; color: rgba(255,255,255,0.7);">با حجاب و بدون حجاب</p>
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden;">
+                    <div style="aspect-ratio: 3/4; background: rgba(255,255,255,0.05); overflow: hidden;">
+                        <img src="/images/model-example-woman.jpg" alt="مدل زن" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">مدل زن</h4>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.7);">با حجاب و بدون حجاب</p>
+                    </div>
                 </div>
-                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 40px; text-align: center;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">👨</div>
-                    <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">مدل مرد</h4>
-                    <p style="font-size: 14px; color: rgba(255,255,255,0.7);">رسمی و اسپرت</p>
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden;">
+                    <div style="aspect-ratio: 3/4; background: rgba(255,255,255,0.05); overflow: hidden;">
+                        <img src="/images/model-example-man.jpg" alt="مدل مرد" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">مدل مرد</h4>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.7);">رسمی و اسپرت</p>
+                    </div>
                 </div>
-                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 40px; text-align: center;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">✨</div>
-                    <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">مدل لوکس</h4>
-                    <p style="font-size: 14px; color: rgba(255,255,255,0.7);">برای برندهای پریمیوم</p>
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden;">
+                    <div style="aspect-ratio: 3/4; background: rgba(255,255,255,0.05); overflow: hidden;">
+                        <img src="/images/model-example-luxury.jpg" alt="مدل لوکس" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">مدل لوکس</h4>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.7);">برای برندهای پریمیوم</p>
+                    </div>
                 </div>
-                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 40px; text-align: center;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">🎨</div>
-                    <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">طراحی اختصاصی</h4>
-                    <p style="font-size: 14px; color: rgba(255,255,255,0.7);">متناسب با برند شما</p>
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; overflow: hidden;">
+                    <div style="aspect-ratio: 3/4; background: rgba(255,255,255,0.05); overflow: hidden;">
+                        <img src="/images/model-example-custom.jpg" alt="طراحی اختصاصی" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h4 style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">طراحی اختصاصی</h4>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.7);">متناسب با برند شما</p>
+                    </div>
                 </div>
             `;
         }
