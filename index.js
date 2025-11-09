@@ -549,11 +549,33 @@ app.get('/api/user/content', async (req, res) => {
       .select('*')
       .or(`visibility.eq.public,owner_user_id.eq.${user.id}`)
       .eq('is_active', true)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false});
 
     if (error) throw error;
 
-    res.json({ success: true, content: data || [] });
+    // Generate signed URLs for content
+    const contentWithSignedUrls = await Promise.all((data || []).map(async (item) => {
+      let imageUrl = item.image_url;
+
+      // Try to create signed URL if storage info exists
+      if (item.storage_bucket && item.storage_filename) {
+        try {
+          const { data: signedUrlData } = await supabaseAdmin.storage
+            .from(item.storage_bucket)
+            .createSignedUrl(item.storage_filename, 3600);
+
+          if (signedUrlData) {
+            imageUrl = signedUrlData.signedUrl;
+          }
+        } catch (err) {
+          console.warn(`⚠️ Signed URL error for ${item.name}:`, err.message);
+        }
+      }
+
+      return { ...item, image_url: imageUrl };
+    }));
+
+    res.json({ success: true, content: contentWithSignedUrls });
   } catch (error) {
     console.error('Error fetching user content:', error);
     res.status(500).json({ success: false, error: error.message });
@@ -1151,23 +1173,45 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       });
     }
 
-    // Format models for frontend
-    const formattedModels = models.map(model => ({
-      id: model.id,
-      name: model.name,
-      category: model.category,
-      visibility: model.visibility,
-      image_url: model.image_url,
-      created_at: model.created_at,
-      user_id: model.owner_user_id,
-      user_email: model.owner_user_id && userEmails[model.owner_user_id]
-        ? userEmails[model.owner_user_id].email
-        : (model.storage_bucket === 'admin-content' ? 'Admin Upload' : 'System (AI Generated)'),
-      is_premium: model.owner_user_id && userEmails[model.owner_user_id]
-        ? userEmails[model.owner_user_id].is_premium
-        : false,
-      bucket: model.storage_bucket,
-      filename: model.storage_filename
+    // Format models for frontend with signed URLs
+    const formattedModels = await Promise.all(models.map(async (model) => {
+      let imageUrl = model.image_url;
+
+      // If model has storage info, try to get signed URL (fallback to public URL)
+      if (model.storage_bucket && model.storage_filename) {
+        try {
+          const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
+            .from(model.storage_bucket)
+            .createSignedUrl(model.storage_filename, 3600); // 1 hour expiry
+
+          if (signedUrlData && !signedUrlError) {
+            imageUrl = signedUrlData.signedUrl;
+            console.log(`✅ Created signed URL for ${model.name}`);
+          } else if (signedUrlError) {
+            console.warn(`⚠️ Signed URL failed for ${model.name}, using public URL:`, signedUrlError.message);
+          }
+        } catch (err) {
+          console.warn(`⚠️ Error creating signed URL for ${model.name}:`, err.message);
+        }
+      }
+
+      return {
+        id: model.id,
+        name: model.name,
+        category: model.category,
+        visibility: model.visibility,
+        image_url: imageUrl,
+        created_at: model.created_at,
+        user_id: model.owner_user_id,
+        user_email: model.owner_user_id && userEmails[model.owner_user_id]
+          ? userEmails[model.owner_user_id].email
+          : (model.storage_bucket === 'admin-content' ? 'Admin Upload' : 'System (AI Generated)'),
+        is_premium: model.owner_user_id && userEmails[model.owner_user_id]
+          ? userEmails[model.owner_user_id].is_premium
+          : false,
+        bucket: model.storage_bucket,
+        filename: model.storage_filename
+      };
     }));
 
     res.json({ success: true, models: formattedModels });
