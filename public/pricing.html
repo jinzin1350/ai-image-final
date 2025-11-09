@@ -659,7 +659,13 @@
                 if (data.success && data.pricing) {
                     data.pricing.forEach(item => {
                         if (item.tier === 'bronze' || item.tier === 'silver' || item.tier === 'gold') {
-                            updatePricingCard(item.tier, item.price, item.credits);
+                            updatePricingCard(
+                                item.tier,
+                                item.price,
+                                item.credits,
+                                item.discount_percentage || 0,
+                                item.discount_active || false
+                            );
                         }
                     });
                 }
@@ -668,7 +674,7 @@
             }
         }
 
-        function updatePricingCard(tier, price, credits) {
+        function updatePricingCard(tier, price, credits, discount_percentage, discount_active) {
             // Convert tier to Persian
             const tierNames = {
                 'bronze': 'برنز',
@@ -676,21 +682,47 @@
                 'gold': 'طلایی'
             };
 
+            const hasDiscount = discount_active && discount_percentage > 0;
+            const discountedPrice = hasDiscount ? price - (price * discount_percentage / 100) : price;
+
             // Find all price elements for this tier
             const cards = document.querySelectorAll('.pricing-card');
             cards.forEach(card => {
                 const tierName = card.querySelector('.tier-name');
                 if (tierName && tierName.textContent === tierNames[tier]) {
-                    // Update price
-                    const priceAmount = card.querySelector('.price-amount');
-                    if (priceAmount) {
-                        priceAmount.textContent = price.toLocaleString('fa-IR');
-                    }
-
-                    // Update credits
-                    const priceNote = card.querySelector('.price-note');
-                    if (priceNote) {
-                        priceNote.textContent = `${credits.toLocaleString('fa-IR')} اعتبار در ماه`;
+                    // Update price section
+                    const tierPriceDiv = card.querySelector('.tier-price');
+                    if (tierPriceDiv) {
+                        tierPriceDiv.innerHTML = `
+                            ${hasDiscount ? `
+                                <div class="price-original" style="
+                                    font-size: 24px;
+                                    color: #9ca3af;
+                                    text-decoration: line-through;
+                                    margin-bottom: 4px;
+                                ">
+                                    ${price.toLocaleString('fa-IR')}
+                                </div>
+                            ` : ''}
+                            <div class="price-amount">${Math.round(discountedPrice).toLocaleString('fa-IR')}</div>
+                            ${hasDiscount ? `
+                                <div class="discount-badge" style="
+                                    display: inline-block;
+                                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                    color: white;
+                                    padding: 6px 16px;
+                                    border-radius: 20px;
+                                    font-size: 14px;
+                                    font-weight: 700;
+                                    margin: 8px 0;
+                                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+                                ">
+                                    ${discount_percentage}% تخفیف
+                                </div>
+                            ` : ''}
+                            <div class="price-period">تومان / ماهانه</div>
+                            <div class="price-note">${credits.toLocaleString('fa-IR')} اعتبار در ماه</div>
+                        `;
                     }
 
                     // Update features list

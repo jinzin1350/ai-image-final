@@ -137,6 +137,8 @@ async function handleSignUp(event) {
     }
 
     const email = document.getElementById('signUpEmail').value;
+    const phone = document.getElementById('signUpPhone').value;
+    const brandName = document.getElementById('signUpBrandName').value;
     const password = document.getElementById('signUpPassword').value;
     const passwordConfirm = document.getElementById('signUpPasswordConfirm').value;
 
@@ -152,12 +154,25 @@ async function handleSignUp(event) {
         return;
     }
 
+    // Validate phone number format
+    const phonePattern = /^09[0-9]{9}$/;
+    if (!phonePattern.test(phone)) {
+        showError('شماره تلفن باید با 09 شروع شود و 11 رقم باشد');
+        return;
+    }
+
     showLoading();
 
     try {
         const { data, error } = await supabaseClient.auth.signUp({
             email: email,
-            password: password
+            password: password,
+            options: {
+                data: {
+                    phone: phone,
+                    brand_name: brandName || null
+                }
+            }
         });
 
         if (error) throw error;

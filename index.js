@@ -5725,7 +5725,7 @@ app.put('/api/admin/pricing/:tier', authenticateAdmin, async (req, res) => {
     }
 
     const { tier } = req.params;
-    const { price, credits } = req.body;
+    const { price, credits, discount_percentage, discount_active } = req.body;
 
     if (price === undefined) {
       return res.status(400).json({ success: false, error: 'price is required' });
@@ -5742,6 +5742,14 @@ app.put('/api/admin/pricing/:tier', authenticateAdmin, async (req, res) => {
       updateData.credits = parseInt(credits);
     }
 
+    // Update discount fields if provided
+    if (discount_percentage !== undefined) {
+      updateData.discount_percentage = parseInt(discount_percentage);
+    }
+    if (discount_active !== undefined) {
+      updateData.discount_active = discount_active;
+    }
+
     const { data: pricing, error } = await supabaseAdmin
       .from('tier_pricing')
       .update(updateData)
@@ -5752,8 +5760,8 @@ app.put('/api/admin/pricing/:tier', authenticateAdmin, async (req, res) => {
     if (error) throw error;
 
     const logMsg = credits !== undefined
-      ? `✅ Updated pricing: ${tier} - ${price} IRR, ${credits} credits`
-      : `✅ Updated price: ${tier} - ${price} IRR`;
+      ? `✅ Updated pricing: ${tier} - ${price} IRR, ${credits} credits, ${discount_percentage || 0}% discount (${discount_active ? 'active' : 'inactive'})`
+      : `✅ Updated price: ${tier} - ${price} IRR, ${discount_percentage || 0}% discount (${discount_active ? 'active' : 'inactive'})`;
     console.log(logMsg);
     res.json({ success: true, pricing });
   } catch (error) {
@@ -5789,6 +5797,14 @@ app.post('/api/admin/pricing/batch', authenticateAdmin, async (req, res) => {
           updateData.credits = parseInt(item.credits);
         }
 
+        // Update discount fields if provided
+        if (item.discount_percentage !== undefined) {
+          updateData.discount_percentage = parseInt(item.discount_percentage);
+        }
+        if (item.discount_active !== undefined) {
+          updateData.discount_active = item.discount_active;
+        }
+
         const { data, error } = await supabaseAdmin
           .from('tier_pricing')
           .update(updateData)
@@ -5801,7 +5817,7 @@ app.post('/api/admin/pricing/batch', authenticateAdmin, async (req, res) => {
       })
     );
 
-    console.log(`✅ Batch updated ${updates.length} pricing entries`);
+    console.log(`✅ Batch updated ${updates.length} pricing entries (with discount info)`);
     res.json({ success: true, pricing: updates });
   } catch (error) {
     console.error('Error batch updating pricing:', error);
