@@ -1017,14 +1017,17 @@
 
             priceDiv.innerHTML = `
                 ${hasDiscount ? `
-                    <div style="position: relative; text-align: center; margin-bottom: 16px;">
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <span style="font-size: 13px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">قیمت اصلی</span>
+                    </div>
+                    <div style="position: relative; text-align: center; margin-bottom: 20px;">
                         <span style="
                             font-size: 28px;
                             color: #9ca3af;
                             text-decoration: line-through;
                             font-weight: 600;
                             opacity: 0.7;
-                        ">${price.toLocaleString('fa-IR')}</span>
+                        ">${price.toLocaleString('fa-IR')} تومان</span>
                         <div style="
                             position: absolute;
                             top: -12px;
@@ -1040,6 +1043,9 @@
                         ">
                             ${discount_percentage}% تخفیف 🔥
                         </div>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <span style="font-size: 13px; color: #10b981; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">قیمت با تخفیف</span>
                     </div>
                 ` : ''}
                 <div style="text-align: center; margin-bottom: 8px;">

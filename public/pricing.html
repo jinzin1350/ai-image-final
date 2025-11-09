@@ -695,7 +695,10 @@
                     if (tierPriceDiv) {
                         tierPriceDiv.innerHTML = `
                             ${hasDiscount ? `
-                                <div style="position: relative; margin-bottom: 12px;">
+                                <div style="text-align: center; margin-bottom: 8px;">
+                                    <span style="font-size: 12px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">قیمت اصلی</span>
+                                </div>
+                                <div style="position: relative; margin-bottom: 16px;">
                                     <div class="price-original" style="
                                         font-size: 32px;
                                         color: #9ca3af;
@@ -703,7 +706,7 @@
                                         font-weight: 600;
                                         opacity: 0.7;
                                     ">
-                                        ${price.toLocaleString('fa-IR')}
+                                        ${price.toLocaleString('fa-IR')} تومان
                                     </div>
                                     <div style="
                                         position: absolute;
@@ -721,6 +724,9 @@
                                     ">
                                         ${discount_percentage}% OFF 🔥
                                     </div>
+                                </div>
+                                <div style="text-align: center; margin-bottom: 8px;">
+                                    <span style="font-size: 12px; color: #10b981; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">قیمت با تخفیف</span>
                                 </div>
                                 <style>
                                     @keyframes bounce {
