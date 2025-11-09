@@ -40,7 +40,13 @@
       "Bash(powershell -Command \"(Get-Content ''C:\\Users\\alire\\ai-image-final\\ai-image-final\\index.js'').Count\")",
       "Bash(for file in complete-outfit.html accessories-only.html color-collection.html flat-lay.html scene-recreation.html style-transfer.html)",
       "Bash(if grep -q \"service-auth-check.js\" \"$file\")",
-      "Bash(else)"
+      "Bash(else)",
+      "Bash(powershell -Command \"(Get-Content ''C:\\Users\\alire\\ai-image-final\\ai-image-final\\public\\admin-model-studio.html'').Count\")",
+      "Bash(del nul 2)",
+      "Bash(powershell -Command \"(Get-Content ''C:\\Users\\alire\\ai-image-final\\ai-image-final\\public\\gallery.html'').Count\")",
+      "Bash(mkdir:*)",
+      "Bash(del nul)",
+      "Bash(These models belong to you permanently and can be used in all campaigns and product photos.\"\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
