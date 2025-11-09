@@ -1017,28 +1017,45 @@
 
             priceDiv.innerHTML = `
                 ${hasDiscount ? `
-                    <div style="text-align: center; margin-bottom: 8px;">
-                        <span style="font-size: 20px; color: #9ca3af; text-decoration: line-through;">${price.toLocaleString('fa-IR')}</span>
-                    </div>
-                ` : ''}
-                <div style="text-align: center;">
-                    <span style="font-size: 36px; font-weight: 800; color: #1a1a1a;">${Math.round(discountedPrice).toLocaleString('fa-IR')}</span>
-                    <span style="color: #666; font-size: 16px;"> تومان/ماه</span>
-                </div>
-                ${hasDiscount ? `
-                    <div style="text-align: center; margin-top: 8px;">
+                    <div style="position: relative; text-align: center; margin-bottom: 16px;">
                         <span style="
-                            display: inline-block;
+                            font-size: 28px;
+                            color: #9ca3af;
+                            text-decoration: line-through;
+                            font-weight: 600;
+                            opacity: 0.7;
+                        ">${price.toLocaleString('fa-IR')}</span>
+                        <div style="
+                            position: absolute;
+                            top: -12px;
+                            right: 0;
                             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
                             color: white;
-                            padding: 4px 12px;
-                            border-radius: 16px;
-                            font-size: 13px;
-                            font-weight: 700;
-                            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-                        ">${discount_percentage}% تخفیف</span>
+                            padding: 6px 16px;
+                            border-radius: 20px;
+                            font-size: 14px;
+                            font-weight: 800;
+                            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+                            animation: pulse 2s ease-in-out infinite;
+                        ">
+                            ${discount_percentage}% تخفیف 🔥
+                        </div>
                     </div>
                 ` : ''}
+                <div style="text-align: center; margin-bottom: 8px;">
+                    <span style="
+                        font-size: 48px;
+                        font-weight: 900;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        line-height: 1;
+                    ">${Math.round(discountedPrice).toLocaleString('fa-IR')}</span>
+                </div>
+                <div style="text-align: center;">
+                    <span style="color: #666; font-size: 16px; font-weight: 500;">تومان/ماه</span>
+                </div>
             `;
         }
 

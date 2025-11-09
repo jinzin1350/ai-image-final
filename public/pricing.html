@@ -695,31 +695,41 @@
                     if (tierPriceDiv) {
                         tierPriceDiv.innerHTML = `
                             ${hasDiscount ? `
-                                <div class="price-original" style="
-                                    font-size: 24px;
-                                    color: #9ca3af;
-                                    text-decoration: line-through;
-                                    margin-bottom: 4px;
-                                ">
-                                    ${price.toLocaleString('fa-IR')}
+                                <div style="position: relative; margin-bottom: 12px;">
+                                    <div class="price-original" style="
+                                        font-size: 32px;
+                                        color: #9ca3af;
+                                        text-decoration: line-through;
+                                        font-weight: 600;
+                                        opacity: 0.7;
+                                    ">
+                                        ${price.toLocaleString('fa-IR')}
+                                    </div>
+                                    <div style="
+                                        position: absolute;
+                                        top: -16px;
+                                        right: -10px;
+                                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                        color: white;
+                                        padding: 8px 20px;
+                                        border-radius: 24px;
+                                        font-size: 16px;
+                                        font-weight: 800;
+                                        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+                                        transform: rotate(-3deg);
+                                        animation: bounce 2s ease-in-out infinite;
+                                    ">
+                                        ${discount_percentage}% OFF 🔥
+                                    </div>
                                 </div>
+                                <style>
+                                    @keyframes bounce {
+                                        0%, 100% { transform: rotate(-3deg) translateY(0px); }
+                                        50% { transform: rotate(-3deg) translateY(-5px); }
+                                    }
+                                </style>
                             ` : ''}
                             <div class="price-amount">${Math.round(discountedPrice).toLocaleString('fa-IR')}</div>
-                            ${hasDiscount ? `
-                                <div class="discount-badge" style="
-                                    display: inline-block;
-                                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                                    color: white;
-                                    padding: 6px 16px;
-                                    border-radius: 20px;
-                                    font-size: 14px;
-                                    font-weight: 700;
-                                    margin: 8px 0;
-                                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-                                ">
-                                    ${discount_percentage}% تخفیف
-                                </div>
-                            ` : ''}
                             <div class="price-period">تومان / ماهانه</div>
                             <div class="price-note">${credits.toLocaleString('fa-IR')} اعتبار در ماه</div>
                         `;
