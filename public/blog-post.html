@@ -112,6 +112,8 @@
             font-size: 1.1rem;
             line-height: 1.8;
             color: #333;
+            direction: rtl;
+            text-align: right;
         }
 
         .article-body h1 {
@@ -150,12 +152,12 @@
 
         .article-body p {
             margin-bottom: 1.5rem;
-            text-align: justify;
         }
 
         .article-body ul, .article-body ol {
             margin-bottom: 1.5rem;
-            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-left: 0;
         }
 
         .article-body li {
@@ -183,7 +185,9 @@
         }
 
         .article-body blockquote {
-            border-left: 4px solid #667eea;
+            border-right: 4px solid #667eea;
+            border-left: none;
+            padding-right: 1.5rem;
             padding-left: 1.5rem;
             margin: 2rem 0;
             font-style: italic;
