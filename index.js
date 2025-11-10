@@ -5845,19 +5845,59 @@ app.post('/api/admin/analyze-face', authenticateAdmin, async (req, res) => {
 
     const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-    const analysisPrompt = `Analyze this face photo and provide detailed information in JSON format only. No other text.
+    const analysisPrompt = `Analyze this face photo in EXTREME DETAIL and provide comprehensive information in JSON format only. No other text.
 
-Return ONLY this JSON structure:
+Examine EVERY facial feature carefully and return ONLY this JSON structure:
+
 {
   "gender": "male/female",
-  "skinTone": "fair/medium/olive/tan/dark",
-  "hairColor": "black/brown/blonde/red/gray/white",
-  "hairStyle": "short/long/curly/straight/wavy/bald",
-  "eyeColor": "brown/blue/green/hazel/gray",
-  "faceShape": "oval/round/square/heart/oblong",
-  "age": "child/teen/20-30/30-40/40-50/50+",
-  "style": "casual/formal/luxury/streetwear",
-  "ethnicity": "caucasian/asian/african/middle-eastern/mixed"
+  "age": 25,
+  "ethnicity": "iranian/caucasian/asian/african/middle-eastern/mixed/arab/turkish/indian",
+
+  "faceFeatures": {
+    "faceShape": "oval/round/square/heart/oblong/diamond/triangular",
+    "eyeColor": "brown/dark-brown/light-brown/hazel/blue/green/gray/amber",
+    "eyeShape": "almond/round/hooded/monolid/upturned/downturned",
+    "eyebrows": "natural/thick/thin/arched/straight/bushy",
+    "noseType": "straight/roman/button/hooked/flat/upturned/aquiline",
+    "lipFullness": "thin/medium/full/very-full",
+    "cheekbones": "prominent/defined/soft/high/low",
+    "jawline": "defined/soft/angular/rounded/square",
+    "chin": "rounded/pointed/square/cleft/receding/prominent"
+  },
+
+  "hairDetails": {
+    "color": "black/dark-brown/brown/light-brown/blonde/red/gray/white/dyed",
+    "length": "bald/very-short/short/medium/long/very-long",
+    "texture": "straight/wavy/curly/kinky/coily",
+    "style": "natural-loose/ponytail/bun/braided/layered/bob/pixie/slicked-back",
+    "facialHair": "none/stubble/goatee/full-beard/mustache/soul-patch"
+  },
+
+  "skinDetails": {
+    "tone": "very-fair/fair/light/medium/olive/tan/brown/dark/very-dark",
+    "texture": ["smooth/natural/flawless/glowing/matte/dewy/radiant/freckled/beauty-marks/dimpled/textured/porous/velvety/silky"],
+    "complexion": "clear/some-blemishes/acne/scars/wrinkles/age-spots"
+  },
+
+  "bodyType": {
+    "build": ["petite/slim/slender/lean/athletic/toned/fit/muscular/bodybuilder/average/curvy/hourglass/pear-shaped/apple-shaped/rectangular/voluptuous/plus-size/full-figured/stocky/broad-shouldered"],
+    "height": "short/medium/tall/very-tall"
+  },
+
+  "expression": {
+    "mood": "neutral/confident/happy/smiling/serious/relaxed/intense/friendly/mysterious",
+    "pose": ["standing-front/standing-profile/walking/sitting/leaning/hands-on-hips/arms-crossed/dynamic/one-leg-bent/looking-back"],
+    "headAngle": "straight/tilted-left/tilted-right/looking-up/looking-down"
+  },
+
+  "photographyDetails": {
+    "cameraAngle": "eye-level/low-angle/high-angle/dutch-angle",
+    "shotType": "full-length/three-quarter/half-body/upper-body/headshot",
+    "lighting": "studio/natural/soft/dramatic/backlighting/side-lighting/rim-lighting",
+    "background": "white-studio/gray/neutral/simple/plain",
+    "imageQuality": "professional-fashion/high-resolution/8k/commercial/editorial"
+  }
 }`;
 
     const result = await visionModel.generateContent([
@@ -5898,15 +5938,61 @@ app.post('/api/admin/generate-face-model', authenticateAdmin, async (req, res) =
       return res.status(400).json({ success: false, error: 'Analysis data is required' });
     }
 
-    // Build detailed prompt from analysis
-    const prompt = `Professional studio portrait photograph of a ${analysisData.gender},
-${analysisData.age} years old, ${analysisData.ethnicity} ethnicity,
-${analysisData.skinTone} skin tone, ${analysisData.hairColor} ${analysisData.hairStyle} hair,
-${analysisData.eyeColor} eyes, ${analysisData.faceShape} face shape,
-${analysisData.style} style clothing,
-high quality professional photography, studio lighting, neutral background,
-8k resolution, detailed facial features, sharp focus, fashion photography,
-headshot portrait, professional model photoshoot`;
+    // Build ultra-detailed prompt from comprehensive analysis
+    const face = analysisData.faceFeatures || {};
+    const hair = analysisData.hairDetails || {};
+    const skin = analysisData.skinDetails || {};
+    const body = analysisData.bodyType || {};
+    const expr = analysisData.expression || {};
+    const photo = analysisData.photographyDetails || {};
+
+    const prompt = `ULTRA DETAILED Professional Fashion Model Portrait Photography:
+
+SUBJECT: ${analysisData.gender} model, ${analysisData.age} years old, ${analysisData.ethnicity} ethnicity
+
+FACE STRUCTURE:
+- Face shape: ${face.faceShape}
+- Eye color: ${face.eyeColor}, ${face.eyeShape} shaped eyes
+- Eyebrows: ${face.eyebrows}
+- Nose: ${face.noseType} nose
+- Lips: ${face.lipFullness} lips
+- Cheekbones: ${face.cheekbones}
+- Jawline: ${face.jawline}
+- Chin: ${face.chin}
+
+HAIR:
+- Color: ${hair.color}
+- Length: ${hair.length}
+- Texture: ${hair.texture}
+- Style: ${hair.style}
+${hair.facialHair !== 'none' ? `- Facial hair: ${hair.facialHair}` : ''}
+
+SKIN:
+- Tone: ${skin.tone}
+- Texture: ${Array.isArray(skin.texture) ? skin.texture.join(', ') : skin.texture}
+- Complexion: ${skin.complexion}
+
+BODY:
+- Build: ${Array.isArray(body.build) ? body.build[0] : body.build}
+- Height: ${body.height}
+
+EXPRESSION & POSE:
+- Mood: ${expr.mood}
+- Pose: ${Array.isArray(expr.pose) ? expr.pose.join(', ') : expr.pose}
+- Head angle: ${expr.headAngle}
+
+PHOTOGRAPHY SETUP:
+- Camera angle: ${photo.cameraAngle}
+- Shot type: ${photo.shotType}
+- Lighting: ${photo.lighting}
+- Background: ${photo.background}
+- Quality: ${photo.imageQuality}
+
+TECHNICAL REQUIREMENTS:
+Professional fashion photography, 8K ultra high resolution, extremely detailed facial features,
+sharp focus, crisp details, magazine quality, commercial photography standard,
+perfect skin texture, natural beauty, photorealistic rendering, studio-grade lighting setup,
+color-graded, professional retouching, fashion magazine cover quality`;
 
     console.log('🎨 Generating face model with prompt:', prompt);
 
