@@ -691,8 +691,8 @@
                 if (data.success && data.users && data.users.length > 0) {
                     data.users.forEach(user => {
                         const option = document.createElement('option');
-                        option.value = user.id;
-                        option.textContent = `${user.email} (${user.tier || 'No Tier'})`;
+                        option.value = user.user_id;  // Use user_id like model-studio
+                        option.textContent = `${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''} (${user.tier || 'testlimit'})`;
                         select.appendChild(option);
                     });
                     console.log(`✅ Loaded ${data.users.length} user accounts`);
