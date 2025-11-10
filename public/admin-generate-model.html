@@ -98,17 +98,41 @@
         }
 
         .analysis-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
             margin-top: 16px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .analysis-section {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .analysis-section h3 {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
         }
 
         .analysis-item {
             background: #f9fafb;
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
             border-left: 3px solid #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .analysis-label {
@@ -523,30 +547,68 @@
             const placeholder = document.getElementById('analysisPlaceholder');
             const results = document.getElementById('analysisResults');
 
-            grid.innerHTML = '';
+            const face = analysis.faceFeatures || {};
+            const hair = analysis.hairDetails || {};
+            const skin = analysis.skinDetails || {};
+            const body = analysis.bodyType || {};
+            const expr = analysis.expression || {};
+            const photo = analysis.photographyDetails || {};
 
-            const fields = [
-                { key: 'gender', label: 'Gender' },
-                { key: 'skinTone', label: 'Skin Tone' },
-                { key: 'hairColor', label: 'Hair Color' },
-                { key: 'hairStyle', label: 'Hair Style' },
-                { key: 'eyeColor', label: 'Eye Color' },
-                { key: 'faceShape', label: 'Face Shape' },
-                { key: 'age', label: 'Age Range' },
-                { key: 'style', label: 'Style' }
-            ];
+            grid.innerHTML = `
+                <div class="analysis-section">
+                    <h3>📋 اطلاعات پایه</h3>
+                    <div class="analysis-item"><span>جنسیت:</span> <strong>${analysis.gender === 'male' ? '👨 مرد' : '👩 زن'}</strong></div>
+                    <div class="analysis-item"><span>سن دقیق:</span> <strong>${analysis.age} سال</strong></div>
+                    <div class="analysis-item"><span>قومیت:</span> <strong>${analysis.ethnicity}</strong></div>
+                </div>
 
-            fields.forEach(field => {
-                if (analysis[field.key]) {
-                    const item = document.createElement('div');
-                    item.className = 'analysis-item';
-                    item.innerHTML = `
-                        <div class="analysis-label">${field.label}</div>
-                        <div class="analysis-value">${analysis[field.key]}</div>
-                    `;
-                    grid.appendChild(item);
-                }
-            });
+                <div class="analysis-section">
+                    <h3>😊 ویژگی‌های صورت</h3>
+                    <div class="analysis-item"><span>شکل صورت:</span> <strong>${face.faceShape || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>رنگ چشم:</span> <strong>${face.eyeColor || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>شکل چشم:</span> <strong>${face.eyeShape || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>ابرو:</span> <strong>${face.eyebrows || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نوع بینی:</span> <strong>${face.noseType || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>پری لب:</span> <strong>${face.lipFullness || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>استخوان گونه:</span> <strong>${face.cheekbones || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>خط فک:</span> <strong>${face.jawline || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>چانه:</span> <strong>${face.chin || 'N/A'}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>💇 مو و استایل</h3>
+                    <div class="analysis-item"><span>رنگ مو:</span> <strong>${hair.color || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>طول مو:</span> <strong>${hair.length || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>بافت مو:</span> <strong>${hair.texture || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>مدل مو:</span> <strong>${hair.style || 'N/A'}</strong></div>
+                    ${hair.facialHair !== 'none' ? `<div class="analysis-item"><span>موی صورت:</span> <strong>${hair.facialHair}</strong></div>` : ''}
+                </div>
+
+                <div class="analysis-section">
+                    <h3>🎨 پوست و نوع بدن</h3>
+                    <div class="analysis-item"><span>رنگ پوست:</span> <strong>${skin.tone || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>بافت پوست:</span> <strong>${Array.isArray(skin.texture) ? skin.texture.join(', ') : skin.texture || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>پوست:</span> <strong>${skin.complexion || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نوع بدن:</span> <strong>${Array.isArray(body.build) ? body.build.join(', ') : body.build || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>قد:</span> <strong>${body.height || 'N/A'}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>😃 حالت و ژست</h3>
+                    <div class="analysis-item"><span>حالت چهره:</span> <strong>${expr.mood || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>ژست:</span> <strong>${Array.isArray(expr.pose) ? expr.pose.join(', ') : expr.pose || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>زاویه سر:</span> <strong>${expr.headAngle || 'N/A'}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>📸 عکاسی و نورپردازی</h3>
+                    <div class="analysis-item"><span>زاویه دوربین:</span> <strong>${photo.cameraAngle || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نوع نما:</span> <strong>${photo.shotType || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نورپردازی:</span> <strong>${photo.lighting || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>پس‌زمینه:</span> <strong>${photo.background || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>کیفیت تصویر:</span> <strong>${photo.imageQuality || 'N/A'}</strong></div>
+                </div>
+            `;
 
             placeholder.style.display = 'none';
             results.style.display = 'block';
