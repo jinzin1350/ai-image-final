@@ -662,7 +662,20 @@
                 document.getElementById('emptyState').style.display = 'none';
 
                 const response = await fetchWithAuth('/api/admin/blog');
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
+                }
+
                 const data = await response.json();
+
+                // Ensure data is an array
+                if (!Array.isArray(data)) {
+                    console.error('Invalid response format:', data);
+                    throw new Error('Invalid response format from server');
+                }
+
                 allPosts = data;
 
                 if (data.length === 0) {
@@ -673,7 +686,11 @@
                 }
             } catch (error) {
                 console.error('Error loading blog posts:', error);
-                showNotification('Failed to load blog posts', 'error');
+                const errorMsg = error.message.includes('blog_posts')
+                    ? 'Database table not found. Please run database/blog_schema.sql in Supabase first!'
+                    : 'Failed to load blog posts: ' + error.message;
+                showNotification(errorMsg, 'error');
+                document.getElementById('emptyState').style.display = 'block';
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
