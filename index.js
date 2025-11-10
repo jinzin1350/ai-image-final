@@ -5966,7 +5966,7 @@ app.post('/api/admin/save-face-model', authenticateAdmin, async (req, res) => {
     const { data, error } = await supabaseAdmin
       .from('content_library')
       .insert({
-        user_id: ownerId,
+        owner_user_id: ownerId,
         content_type: 'model',
         name: name,
         category: category,
