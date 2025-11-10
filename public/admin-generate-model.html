@@ -625,7 +625,14 @@
             }
 
             if (!ownerId || ownerId === '' || ownerId === 'undefined') {
-                alert('Please select an owner account');
+                const select = document.getElementById('ownerSelect');
+                const optionText = select.options[select.selectedIndex]?.text || '';
+
+                if (optionText.includes('No accounts available') || optionText.includes('Error loading')) {
+                    alert('⚠️ Cannot save: No user accounts available.\n\nThis might be because:\n1. Supabase is not configured\n2. No users exist in the database\n3. Failed to load users\n\nPlease configure Supabase and create users first.');
+                } else {
+                    alert('Please select an owner account from the dropdown');
+                }
                 return;
             }
 
@@ -690,13 +697,25 @@
                     });
                     console.log(`✅ Loaded ${data.users.length} user accounts`);
                 } else {
-                    console.warn('⚠️ No users found or API error');
-                    select.innerHTML = '<option value="">No accounts available</option>';
+                    console.warn('⚠️ No users found or API error:', data);
+                    select.innerHTML = '<option value="">⚠️ No accounts available (Supabase required)</option>';
+
+                    // Show warning banner
+                    const warningDiv = document.createElement('div');
+                    warningDiv.style.cssText = 'background: #fef3c7; border: 2px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 8px; color: #92400e;';
+                    warningDiv.innerHTML = '<strong>⚠️ Warning:</strong> No user accounts available. Please configure Supabase and create users in the admin panel to use this feature.';
+                    document.querySelector('.step-card[id="step3"]').insertBefore(warningDiv, document.getElementById('generatedResults'));
                 }
             } catch (error) {
-                console.error('Error loading accounts:', error);
+                console.error('❌ Error loading accounts:', error);
                 const select = document.getElementById('ownerSelect');
-                select.innerHTML = '<option value="">Error loading accounts</option>';
+                select.innerHTML = '<option value="">❌ Error loading accounts</option>';
+
+                // Show error banner
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #fee2e2; border: 2px solid #ef4444; padding: 16px; margin: 16px 0; border-radius: 8px; color: #991b1b;';
+                errorDiv.innerHTML = `<strong>❌ Error:</strong> Failed to load user accounts. ${error.message}`;
+                document.querySelector('.step-card[id="step3"]').insertBefore(errorDiv, document.getElementById('generatedResults'));
             }
         }
 
