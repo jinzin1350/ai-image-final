@@ -5955,10 +5955,21 @@ app.post('/api/admin/save-face-model', authenticateAdmin, async (req, res) => {
   try {
     const { imageUrl, name, category, ownerId, isActive, analysisData } = req.body;
 
+    console.log('Save face model request:', { imageUrl: imageUrl?.substring(0, 50), name, category, ownerId, isActive });
+
     if (!imageUrl || !name || !category || !ownerId) {
       return res.status(400).json({
         success: false,
         error: 'imageUrl, name, category, and ownerId are required'
+      });
+    }
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(ownerId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid ownerId format. Please select a valid user account.'
       });
     }
 

@@ -619,12 +619,12 @@
                 return;
             }
 
-            if (!category) {
+            if (!category || category === '') {
                 alert('Please select a category');
                 return;
             }
 
-            if (!ownerId) {
+            if (!ownerId || ownerId === '' || ownerId === 'undefined') {
                 alert('Please select an owner account');
                 return;
             }
@@ -678,16 +678,22 @@
                 const select = document.getElementById('ownerSelect');
                 select.innerHTML = '<option value="">Select Account</option>';
 
-                if (data.success && data.users) {
+                if (data.success && data.users && data.users.length > 0) {
                     data.users.forEach(user => {
                         const option = document.createElement('option');
                         option.value = user.id;
-                        option.textContent = `${user.email}`;
+                        option.textContent = `${user.email} (${user.tier || 'No Tier'})`;
                         select.appendChild(option);
                     });
+                    console.log(`✅ Loaded ${data.users.length} user accounts`);
+                } else {
+                    console.warn('⚠️ No users found or API error');
+                    select.innerHTML = '<option value="">No accounts available</option>';
                 }
             } catch (error) {
                 console.error('Error loading accounts:', error);
+                const select = document.getElementById('ownerSelect');
+                select.innerHTML = '<option value="">Error loading accounts</option>';
             }
         }
 
