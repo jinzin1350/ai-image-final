@@ -626,6 +626,7 @@
             btn.innerHTML = '<div class="loading-spinner"></div><span>Generating Model...</span>';
 
             try {
+                console.log('🎨 Starting model generation...');
                 const response = await fetchWithAuth('/api/admin/generate-face-model', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -635,8 +636,10 @@
                 });
 
                 const data = await response.json();
+                console.log('📦 Response received:', data);
 
                 if (data.success) {
+                    console.log('✅ Generation successful! Image URL:', data.imageUrl);
                     generatedImageUrl = data.imageUrl;
                     displayGeneratedModel(data.imageUrl);
 
@@ -651,7 +654,7 @@
                     throw new Error(data.error || 'Generation failed');
                 }
             } catch (error) {
-                console.error('Error generating model:', error);
+                console.error('❌ Error generating model:', error);
                 alert('Failed to generate model: ' + error.message);
             } finally {
                 btn.disabled = false;
@@ -660,16 +663,38 @@
         }
 
         function displayGeneratedModel(imageUrl) {
+            console.log('🖼️ Displaying generated image:', imageUrl);
             const placeholder = document.getElementById('generatePlaceholder');
             const results = document.getElementById('generatedResults');
             const img = document.getElementById('generatedImg');
 
-            img.src = imageUrl;
-            placeholder.style.display = 'none';
-            results.style.display = 'block';
+            console.log('📍 Elements found:', {
+                placeholder: !!placeholder,
+                results: !!results,
+                img: !!img
+            });
 
-            // Mark step 3 as completed
-            document.getElementById('step3').classList.add('completed');
+            // Add loading state to image
+            img.style.opacity = '0.5';
+            img.src = imageUrl;
+
+            // Show image when loaded
+            img.onload = function() {
+                console.log('✅ Image loaded successfully!');
+                img.style.opacity = '1';
+                placeholder.style.display = 'none';
+                results.style.display = 'block';
+
+                // Mark step 3 as completed
+                document.getElementById('step3').classList.add('completed');
+            };
+
+            // Handle image load errors
+            img.onerror = function() {
+                console.error('❌ Failed to load image:', imageUrl);
+                alert('Failed to load generated image. Please try again.');
+                img.style.opacity = '1';
+            };
         }
 
         // Save model to gallery
