@@ -504,12 +504,56 @@
 
                 <div class="form-group">
                     <label class="form-label">Meta Title (SEO)</label>
-                    <input type="text" id="metaTitle" class="form-input">
+                    <input type="text" id="metaTitle" class="form-input" placeholder="SEO optimized title...">
+                    <div class="form-helper">Maximum 60 characters for best results</div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Meta Description (SEO)</label>
-                    <textarea id="metaDescription" class="form-textarea" rows="2"></textarea>
+                    <textarea id="metaDescription" class="form-textarea" rows="2" placeholder="Brief description for search engines..."></textarea>
+                    <div class="form-helper">Maximum 160 characters recommended</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">SEO Keywords</label>
+                    <input type="text" id="seoKeywords" class="form-input" placeholder="SMS marketing, email marketing, restaurants, VIP Promo Club">
+                    <div class="form-helper">Comma-separated keywords for better search visibility</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📋 Article Summary</label>
+                    <textarea id="articleSummary" class="form-textarea" rows="3" placeholder="Brief summary for SMS/WhatsApp distribution..."></textarea>
+                    <div class="form-helper">This will be used for sharing via SMS/WhatsApp</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">🔑 Key Points</label>
+                    <textarea id="keyPoints" class="form-textarea" rows="4" placeholder="Main takeaways from the article (one per line)&#10;&#10;1. SMS marketing boasts a 98% open rate compared to 20% for emails.&#10;2. Immediate delivery of SMS messages drives customer engagement effectively.&#10;3. VIP Promo Club provides seamless SMS marketing solutions."></textarea>
+                    <div class="form-helper">One key point per line</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">❓ FAQ Content</label>
+                    <button type="button" class="btn-sm btn-edit" onclick="generateFaqSchema()" style="margin-bottom: 8px;">
+                        🔄 Generate FAQ Schema
+                    </button>
+                    <textarea id="faqContent" class="form-textarea" rows="5" placeholder="Q: What is SMS marketing?&#10;A: A marketing method that sends text messages to customers.&#10;&#10;Q: Why is SMS better than email?&#10;A: SMS has a higher open rate and reaches customers faster."></textarea>
+                    <div class="form-helper">Format: Q: question, A: answer (one Q&A per section)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📄 Article Schema (JSON-LD)</label>
+                    <button type="button" class="btn-sm btn-edit" onclick="generateArticleSchema()" style="margin-bottom: 8px;">
+                        🔄 Generate Article Schema
+                    </button>
+                    <textarea id="articleSchema" class="form-textarea" rows="6" placeholder='{"@context": "https://schema.org", "@type": "Article", "headline": "Your article title", "author": {"@type": "Organization", "name": "VIP Promo Club"}}'></textarea>
+                    <div class="form-helper">Schema markup for the main article content</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">❓ FAQ Schema (JSON-LD)</label>
+                    <textarea id="faqSchema" class="form-textarea" rows="6" placeholder='{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SMS marketing?", "acceptedAnswer": {"@type": "Answer", "text": "A marketing method..."}}]}'></textarea>
+                    <div class="form-helper">Auto-generated from FAQ content or paste manually</div>
                 </div>
 
                 <div class="form-group">
@@ -690,6 +734,12 @@
                 document.getElementById('postImage').value = post.featured_image || '';
                 document.getElementById('metaTitle').value = post.meta_title || '';
                 document.getElementById('metaDescription').value = post.meta_description || '';
+                document.getElementById('seoKeywords').value = post.seo_keywords || '';
+                document.getElementById('articleSummary').value = post.article_summary || '';
+                document.getElementById('keyPoints').value = post.key_points || '';
+                document.getElementById('faqContent').value = post.faq_content || '';
+                document.getElementById('articleSchema').value = post.article_schema ? JSON.stringify(post.article_schema, null, 2) : '';
+                document.getElementById('faqSchema').value = post.faq_schema ? JSON.stringify(post.faq_schema, null, 2) : '';
                 document.getElementById('postPublished').checked = post.published;
 
                 currentTags = post.tags || [];
@@ -720,6 +770,28 @@
             saveBtn.textContent = 'Saving...';
 
             try {
+                // Parse JSON schemas
+                let articleSchemaObj = null;
+                let faqSchemaObj = null;
+
+                try {
+                    const articleSchemaText = document.getElementById('articleSchema').value.trim();
+                    if (articleSchemaText) {
+                        articleSchemaObj = JSON.parse(articleSchemaText);
+                    }
+                } catch (e) {
+                    console.warn('Invalid Article Schema JSON:', e);
+                }
+
+                try {
+                    const faqSchemaText = document.getElementById('faqSchema').value.trim();
+                    if (faqSchemaText) {
+                        faqSchemaObj = JSON.parse(faqSchemaText);
+                    }
+                } catch (e) {
+                    console.warn('Invalid FAQ Schema JSON:', e);
+                }
+
                 const postData = {
                     slug: document.getElementById('postSlug').value.trim(),
                     title: document.getElementById('postTitle').value.trim(),
@@ -731,6 +803,12 @@
                     featured_image: document.getElementById('postImage').value.trim(),
                     meta_title: document.getElementById('metaTitle').value.trim(),
                     meta_description: document.getElementById('metaDescription').value.trim(),
+                    seo_keywords: document.getElementById('seoKeywords').value.trim(),
+                    article_schema: articleSchemaObj,
+                    faq_schema: faqSchemaObj,
+                    article_summary: document.getElementById('articleSummary').value.trim(),
+                    key_points: document.getElementById('keyPoints').value.trim(),
+                    faq_content: document.getElementById('faqContent').value.trim(),
                     published: document.getElementById('postPublished').checked
                 };
 
@@ -806,6 +884,101 @@
                 console.error('Error deleting post:', error);
                 showNotification(error.message, 'error');
             }
+        }
+
+        // Auto-generate Article Schema
+        function generateArticleSchema() {
+            const title = document.getElementById('postTitle').value.trim();
+            const excerpt = document.getElementById('postExcerpt').value.trim();
+            const author = document.getElementById('postAuthor').value.trim();
+            const featuredImage = document.getElementById('postImage').value.trim();
+
+            if (!title) {
+                showNotification('Please enter a title first', 'error');
+                return;
+            }
+
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": title,
+                "description": excerpt || "Learn more about " + title,
+                "image": featuredImage || "https://example.com/default-image.jpg",
+                "author": {
+                    "@type": "Organization",
+                    "name": author || "VIP Promo Club",
+                    "url": "https://vippromoclub.com"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "VIP Promo Club",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "https://vippromoclub.com/logo.png"
+                    }
+                },
+                "datePublished": new Date().toISOString().split('T')[0],
+                "dateModified": new Date().toISOString().split('T')[0]
+            };
+
+            document.getElementById('articleSchema').value = JSON.stringify(schema, null, 2);
+            showNotification('Article schema generated successfully', 'success');
+        }
+
+        // Auto-generate FAQ Schema from FAQ Content
+        function generateFaqSchema() {
+            const faqContent = document.getElementById('faqContent').value.trim();
+
+            if (!faqContent) {
+                showNotification('Please enter FAQ content first', 'error');
+                return;
+            }
+
+            // Parse FAQ content (Q: question, A: answer format)
+            const lines = faqContent.split('\n');
+            const faqs = [];
+            let currentQ = '';
+            let currentA = '';
+
+            for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith('Q:')) {
+                    // Save previous Q&A if exists
+                    if (currentQ && currentA) {
+                        faqs.push({ question: currentQ, answer: currentA });
+                    }
+                    currentQ = line.substring(2).trim();
+                    currentA = '';
+                } else if (line.startsWith('A:')) {
+                    currentA = line.substring(2).trim();
+                }
+            }
+
+            // Save last Q&A
+            if (currentQ && currentA) {
+                faqs.push({ question: currentQ, answer: currentA });
+            }
+
+            if (faqs.length === 0) {
+                showNotification('No valid Q&A pairs found. Use format: Q: question, A: answer', 'error');
+                return;
+            }
+
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": faqs.map(faq => ({
+                    "@type": "Question",
+                    "name": faq.question,
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": faq.answer
+                    }
+                }))
+            };
+
+            document.getElementById('faqSchema').value = JSON.stringify(schema, null, 2);
+            showNotification(`FAQ schema generated with ${faqs.length} questions`, 'success');
         }
     </script>
 </body>

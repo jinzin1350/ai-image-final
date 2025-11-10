@@ -6186,8 +6186,11 @@ app.post('/api/admin/blog', authenticateAdmin, async (req, res) => {
       featured_image,
       meta_title,
       meta_description,
-      schema_markup,
+      seo_keywords,
+      article_schema,
+      faq_schema,
       article_summary,
+      key_points,
       faq_content,
       published
     } = req.body;
@@ -6221,8 +6224,11 @@ app.post('/api/admin/blog', authenticateAdmin, async (req, res) => {
       featured_image,
       meta_title,
       meta_description,
-      schema_markup,
+      seo_keywords,
+      article_schema,
+      faq_schema,
       article_summary,
+      key_points,
       faq_content,
       published: published || false,
       published_at: published ? new Date().toISOString() : null
@@ -6258,8 +6264,11 @@ app.put('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
       featured_image,
       meta_title,
       meta_description,
-      schema_markup,
+      seo_keywords,
+      article_schema,
+      faq_schema,
       article_summary,
+      key_points,
       faq_content,
       published
     } = req.body;
@@ -6296,8 +6305,11 @@ app.put('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
       featured_image,
       meta_title,
       meta_description,
-      schema_markup,
+      seo_keywords,
+      article_schema,
+      faq_schema,
       article_summary,
+      key_points,
       faq_content,
       published: published || false,
       published_at: published ? new Date().toISOString() : null
