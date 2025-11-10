@@ -636,22 +636,25 @@
             btn.innerHTML = '<div class="loading-spinner"></div><span>Saving...</span>';
 
             try {
-                const response = await fetchWithAuth('/api/admin/save-face-model', {
+                // Use the same endpoint as model-studio
+                const response = await fetchWithAuth('/api/admin/save-generated-to-user', {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         imageUrl: generatedImageUrl,
-                        name,
-                        category,
-                        ownerId,
-                        isActive,
-                        analysisData
+                        user_id: ownerId,
+                        content_type: 'model',
+                        visibility: isActive ? 'public' : 'private',
+                        category: category,
+                        name: name,
+                        description: `AI Generated Face Model: ${JSON.stringify(analysisData)}`
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Model saved successfully!');
+                    alert('✅ Model saved successfully to user gallery!');
 
                     // Reset form
                     setTimeout(() => {

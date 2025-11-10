@@ -5950,58 +5950,6 @@ headshot portrait, professional model photoshoot`;
   }
 });
 
-// Save generated face model to content library
-app.post('/api/admin/save-face-model', authenticateAdmin, async (req, res) => {
-  try {
-    const { imageUrl, name, category, ownerId, isActive, analysisData } = req.body;
-
-    console.log('Save face model request:', { imageUrl: imageUrl?.substring(0, 50), name, category, ownerId, isActive });
-
-    if (!imageUrl || !name || !category || !ownerId) {
-      return res.status(400).json({
-        success: false,
-        error: 'imageUrl, name, category, and ownerId are required'
-      });
-    }
-
-    // Validate UUID format
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(ownerId)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid ownerId format. Please select a valid user account.'
-      });
-    }
-
-    // Save to content_library table
-    const { data, error } = await supabaseAdmin
-      .from('content_library')
-      .insert({
-        owner_user_id: ownerId,
-        content_type: 'model',
-        name: name,
-        category: category,
-        image_url: imageUrl,
-        is_active: isActive !== undefined ? isActive : true,
-        metadata: {
-          source: 'generated_from_face',
-          analysis: analysisData,
-          generated_at: new Date().toISOString()
-        }
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    console.log('✅ Face model saved to gallery:', data.id);
-    res.json({ success: true, model: data });
-  } catch (error) {
-    console.error('Error saving face model:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);
