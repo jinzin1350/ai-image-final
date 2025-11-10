@@ -467,8 +467,9 @@
                     }
                 }
 
-                // Display main content
-                document.getElementById('articleBody').innerHTML = post.content;
+                // Display main content (decode HTML entities if needed)
+                const content = decodeHtmlEntities(post.content);
+                document.getElementById('articleBody').innerHTML = content;
 
                 // Display FAQ
                 if (post.faq_content) {
@@ -528,6 +529,12 @@
                     <div class="faq-answer">A: ${item.answer}</div>
                 </div>
             `).join('');
+        }
+
+        function decodeHtmlEntities(text) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            return textarea.value;
         }
 
         function formatDate(dateString) {
