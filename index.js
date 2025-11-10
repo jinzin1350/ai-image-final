@@ -1413,6 +1413,11 @@ app.get('/blog', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'blog.html'));
 });
 
+// Individual blog post page
+app.get('/blog/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'blog-post.html'));
+});
+
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
 const modelPrompts = [
   // زنان (35 ساله)
