@@ -5825,6 +5825,168 @@ app.post('/api/admin/pricing/batch', authenticateAdmin, async (req, res) => {
   }
 });
 
+// ================== GENERATE FACE MODEL ENDPOINTS ==================
+
+// Analyze face with Gemini Vision
+app.post('/api/admin/analyze-face', authenticateAdmin, async (req, res) => {
+  try {
+    const { image } = req.body;
+
+    if (!image) {
+      return res.status(400).json({ success: false, error: 'Image is required' });
+    }
+
+    // Remove data:image/xxx;base64, prefix if present
+    const base64Image = image.replace(/^data:image\/\w+;base64,/, '');
+
+    const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    const analysisPrompt = `Analyze this face photo and provide detailed information in JSON format only. No other text.
+
+Return ONLY this JSON structure:
+{
+  "gender": "male/female",
+  "skinTone": "fair/medium/olive/tan/dark",
+  "hairColor": "black/brown/blonde/red/gray/white",
+  "hairStyle": "short/long/curly/straight/wavy/bald",
+  "eyeColor": "brown/blue/green/hazel/gray",
+  "faceShape": "oval/round/square/heart/oblong",
+  "age": "child/teen/20-30/30-40/40-50/50+",
+  "style": "casual/formal/luxury/streetwear",
+  "ethnicity": "caucasian/asian/african/middle-eastern/mixed"
+}`;
+
+    const result = await visionModel.generateContent([
+      analysisPrompt,
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: base64Image
+        }
+      }
+    ]);
+
+    const responseText = result.response.text();
+    console.log('Gemini Vision Response:', responseText);
+
+    // Extract JSON from response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Failed to parse JSON from Gemini response');
+    }
+
+    const analysis = JSON.parse(jsonMatch[0]);
+
+    console.log('✅ Face analyzed successfully');
+    res.json({ success: true, analysis });
+  } catch (error) {
+    console.error('Error analyzing face:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Generate face model with Gemini Image
+app.post('/api/admin/generate-face-model', authenticateAdmin, async (req, res) => {
+  try {
+    const { analysisData } = req.body;
+
+    if (!analysisData) {
+      return res.status(400).json({ success: false, error: 'Analysis data is required' });
+    }
+
+    // Build detailed prompt from analysis
+    const prompt = `Professional studio portrait photograph of a ${analysisData.gender},
+${analysisData.age} years old, ${analysisData.ethnicity} ethnicity,
+${analysisData.skinTone} skin tone, ${analysisData.hairColor} ${analysisData.hairStyle} hair,
+${analysisData.eyeColor} eyes, ${analysisData.faceShape} face shape,
+${analysisData.style} style clothing,
+high quality professional photography, studio lighting, neutral background,
+8k resolution, detailed facial features, sharp focus, fashion photography,
+headshot portrait, professional model photoshoot`;
+
+    console.log('🎨 Generating face model with prompt:', prompt);
+
+    const imageModel = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash-image",
+      generationConfig: {
+        responseModalities: ["Image"]
+      }
+    });
+
+    const result = await imageModel.generateContent(prompt);
+    const base64Data = result.response.candidates[0].content.parts[0].inlineData.data;
+
+    // Upload to Supabase storage
+    const buffer = Buffer.from(base64Data, 'base64');
+    const fileName = `generated-face-${Date.now()}.jpg`;
+    const filePath = `generated-models/${fileName}`;
+
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from('admin-content')
+      .upload(filePath, buffer, {
+        contentType: 'image/jpeg',
+        cacheControl: '3600'
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('admin-content')
+      .getPublicUrl(filePath);
+
+    console.log('✅ Face model generated and uploaded:', publicUrl);
+    res.json({
+      success: true,
+      imageUrl: publicUrl,
+      prompt: prompt
+    });
+  } catch (error) {
+    console.error('Error generating face model:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Save generated face model to content library
+app.post('/api/admin/save-face-model', authenticateAdmin, async (req, res) => {
+  try {
+    const { imageUrl, name, category, ownerId, isActive, analysisData } = req.body;
+
+    if (!imageUrl || !name || !category || !ownerId) {
+      return res.status(400).json({
+        success: false,
+        error: 'imageUrl, name, category, and ownerId are required'
+      });
+    }
+
+    // Save to content_library table
+    const { data, error } = await supabaseAdmin
+      .from('content_library')
+      .insert({
+        user_id: ownerId,
+        content_type: 'model',
+        name: name,
+        category: category,
+        image_url: imageUrl,
+        is_active: isActive !== undefined ? isActive : true,
+        metadata: {
+          source: 'generated_from_face',
+          analysis: analysisData,
+          generated_at: new Date().toISOString()
+        }
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log('✅ Face model saved to gallery:', data.id);
+    res.json({ success: true, model: data });
+  } catch (error) {
+    console.error('Error saving face model:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);

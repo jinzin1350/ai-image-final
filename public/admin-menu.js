@@ -75,6 +75,13 @@ function renderAdminMenu(activePage) {
 
             <div class="nav-section">
                 <div class="nav-section-title">AI Studios</div>
+                <a href="/admin/generate-model" class="nav-item ${activePage === 'generate-model' ? 'active' : ''}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                    </svg>
+                    <span>Generate Model</span>
+                </a>
                 <a href="/admin/model-studio" class="nav-item ${activePage === 'model-studio' ? 'active' : ''}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
