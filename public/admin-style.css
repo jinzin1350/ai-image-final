@@ -71,10 +71,39 @@ body {
     display: none;
 }
 
+.sidebar-nav-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    /* For Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}
+
+/* Scrollbar styling for sidebar nav container */
+.sidebar-nav-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 .sidebar-nav {
     flex: 1;
     padding: 20px 12px;
-    overflow-y: auto;
+    overflow-y: visible;
     overflow-x: hidden;
 }
 
