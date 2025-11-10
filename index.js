@@ -5932,10 +5932,14 @@ Examine EVERY facial feature carefully and return ONLY this JSON structure:
 // Generate face model with Gemini Image
 app.post('/api/admin/generate-face-model', authenticateAdmin, async (req, res) => {
   try {
-    const { analysisData } = req.body;
+    const { analysisData, originalImage } = req.body;
 
     if (!analysisData) {
       return res.status(400).json({ success: false, error: 'Analysis data is required' });
+    }
+
+    if (!originalImage) {
+      return res.status(400).json({ success: false, error: 'Original image is required for style transfer' });
     }
 
     // Build ultra-detailed prompt from comprehensive analysis
@@ -5946,9 +5950,19 @@ app.post('/api/admin/generate-face-model', authenticateAdmin, async (req, res) =
     const expr = analysisData.expression || {};
     const photo = analysisData.photographyDetails || {};
 
-    const prompt = `ULTRA DETAILED Professional Fashion Model Portrait Photography:
+    const prompt = `STYLE TRANSFER: Create a professional fashion model portrait that EXACTLY MATCHES the visual style, pose, lighting, and composition of the reference image provided.
 
-SUBJECT: ${analysisData.gender} model, ${analysisData.age} years old, ${analysisData.ethnicity} ethnicity
+COPY THESE ELEMENTS FROM REFERENCE IMAGE:
+- Exact same pose and body position
+- Same camera angle and framing
+- Same lighting setup and direction
+- Same background style
+- Same photography quality and resolution
+- Same color grading and mood
+- Same clothing style and aesthetic
+
+SUBJECT DETAILS (apply to the new model):
+${analysisData.gender} model, ${analysisData.age} years old, ${analysisData.ethnicity} ethnicity
 
 FACE STRUCTURE:
 - Face shape: ${face.faceShape}
@@ -5996,6 +6010,9 @@ color-graded, professional retouching, fashion magazine cover quality`;
 
     console.log('🎨 Generating face model with prompt:', prompt);
 
+    // Remove base64 prefix from original image
+    const base64Image = originalImage.replace(/^data:image\/\w+;base64,/, '');
+
     const imageModel = genAI.getGenerativeModel({
       model: "gemini-2.5-flash-image",
       generationConfig: {
@@ -6003,7 +6020,16 @@ color-graded, professional retouching, fashion magazine cover quality`;
       }
     });
 
-    const result = await imageModel.generateContent(prompt);
+    // Send BOTH the reference image AND the detailed prompt for style transfer
+    const result = await imageModel.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: base64Image
+        }
+      }
+    ]);
     const base64Data = result.response.candidates[0].content.parts[0].inlineData.data;
 
     // Upload to Supabase storage

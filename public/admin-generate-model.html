@@ -566,7 +566,10 @@
             try {
                 const response = await fetchWithAuth('/api/admin/generate-face-model', {
                     method: 'POST',
-                    body: JSON.stringify({ analysisData })
+                    body: JSON.stringify({
+                        analysisData,
+                        originalImage: uploadedImage  // Send reference image for style transfer
+                    })
                 });
 
                 const data = await response.json();
