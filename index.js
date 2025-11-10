@@ -5950,10 +5950,10 @@ app.post('/api/admin/generate-face-model', authenticateAdmin, async (req, res) =
     const expr = analysisData.expression || {};
     const photo = analysisData.photographyDetails || {};
 
-    const prompt = `STYLE TRANSFER: Create a professional fashion model portrait that EXACTLY MATCHES the visual style, pose, lighting, and composition of the reference image provided.
+    const prompt = `STYLE-INSPIRED MODEL GENERATION: Create a NEW professional fashion model portrait inspired by the reference image's style, but with a DIFFERENT FACE to avoid copyright issues.
 
-COPY THESE ELEMENTS FROM REFERENCE IMAGE:
-- Exact same pose and body position
+COPY THESE TECHNICAL ELEMENTS FROM REFERENCE IMAGE:
+- Same pose and body position
 - Same camera angle and framing
 - Same lighting setup and direction
 - Same background style
@@ -5961,18 +5961,25 @@ COPY THESE ELEMENTS FROM REFERENCE IMAGE:
 - Same color grading and mood
 - Same clothing style and aesthetic
 
-SUBJECT DETAILS (apply to the new model):
-${analysisData.gender} model, ${analysisData.age} years old, ${analysisData.ethnicity} ethnicity
+IMPORTANT - CREATE A NEW FACE (NOT A COPY):
+Generate a SIMILAR but DISTINCTLY DIFFERENT face. Use the analysis below as inspiration, but introduce subtle variations:
+- Slightly different facial proportions
+- Unique facial features that distinguish this person from the original
+- Similar but not identical bone structure
+- Different enough to be clearly a different person
 
-FACE STRUCTURE:
-- Face shape: ${face.faceShape}
-- Eye color: ${face.eyeColor}, ${face.eyeShape} shaped eyes
-- Eyebrows: ${face.eyebrows}
-- Nose: ${face.noseType} nose
-- Lips: ${face.lipFullness} lips
-- Cheekbones: ${face.cheekbones}
-- Jawline: ${face.jawline}
-- Chin: ${face.chin}
+SUBJECT DETAILS (use as inspiration, not exact copy):
+${analysisData.gender} model, approximately ${analysisData.age} years old, ${analysisData.ethnicity} ethnicity
+
+FACE STRUCTURE (similar style, different person):
+- Face shape: ${face.faceShape} (with subtle variations)
+- Eye color: ${face.eyeColor}, ${face.eyeShape} shaped eyes (slightly modified)
+- Eyebrows: ${face.eyebrows} (similar style, different shape)
+- Nose: ${face.noseType} nose (unique proportions)
+- Lips: ${face.lipFullness} lips (slightly different fullness)
+- Cheekbones: ${face.cheekbones} (similar but distinct)
+- Jawline: ${face.jawline} (unique angle)
+- Chin: ${face.chin} (different proportions)
 
 HAIR:
 - Color: ${hair.color}
@@ -6006,7 +6013,9 @@ TECHNICAL REQUIREMENTS:
 Professional fashion photography, 8K ultra high resolution, extremely detailed facial features,
 sharp focus, crisp details, magazine quality, commercial photography standard,
 perfect skin texture, natural beauty, photorealistic rendering, studio-grade lighting setup,
-color-graded, professional retouching, fashion magazine cover quality`;
+color-graded, professional retouching, fashion magazine cover quality
+
+REMEMBER: Create a NEW model that looks INSPIRED BY but NOT IDENTICAL TO the reference. The face must be clearly a different person while maintaining the same professional photography style.`;
 
     console.log('🎨 Generating face model with prompt:', prompt);
 
