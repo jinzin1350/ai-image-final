@@ -6071,6 +6071,294 @@ REMEMBER: Create a NEW model that looks INSPIRED BY but NOT IDENTICAL TO the ref
   }
 });
 
+// ============================================
+// BLOG API ENDPOINTS
+// ============================================
+
+// Get all published blog posts (public)
+app.get('/api/blog', async (req, res) => {
+  try {
+    const { search, category } = req.query;
+
+    let query = supabaseAdmin
+      .from('blog_posts')
+      .select('*')
+      .eq('published', true)
+      .order('published_at', { ascending: false });
+
+    // Apply search filter
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%,content.ilike.%${search}%`);
+    }
+
+    // Apply category filter
+    if (category && category !== 'all') {
+      query = query.eq('category', category);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get single blog post by slug (public)
+app.get('/api/blog/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const { data, error } = await supabaseAdmin
+      .from('blog_posts')
+      .select('*')
+      .eq('slug', slug)
+      .eq('published', true)
+      .single();
+
+    if (error) {
+      console.error('Error fetching blog post:', error);
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all blog posts (admin - includes drafts)
+app.get('/api/admin/blog', authenticateAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('blog_posts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching admin blog posts:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get single blog post by ID (admin)
+app.get('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await supabaseAdmin
+      .from('blog_posts')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    res.status(404).json({ error: 'Blog post not found' });
+  }
+});
+
+// Create new blog post (admin)
+app.post('/api/admin/blog', authenticateAdmin, async (req, res) => {
+  try {
+    const {
+      slug,
+      title,
+      excerpt,
+      content,
+      author,
+      category,
+      tags,
+      featured_image,
+      meta_title,
+      meta_description,
+      schema_markup,
+      article_summary,
+      faq_content,
+      published
+    } = req.body;
+
+    // Validate required fields
+    if (!slug || !title || !content) {
+      return res.status(400).json({
+        error: 'Missing required fields: slug, title, and content are required'
+      });
+    }
+
+    // Check if slug already exists
+    const { data: existing } = await supabaseAdmin
+      .from('blog_posts')
+      .select('id')
+      .eq('slug', slug)
+      .single();
+
+    if (existing) {
+      return res.status(400).json({ error: 'Slug already exists. Please use a unique slug.' });
+    }
+
+    const blogPost = {
+      slug,
+      title,
+      excerpt,
+      content,
+      author: author || 'VIP Promo Club Team',
+      category,
+      tags: tags || [],
+      featured_image,
+      meta_title,
+      meta_description,
+      schema_markup,
+      article_summary,
+      faq_content,
+      published: published || false,
+      published_at: published ? new Date().toISOString() : null
+    };
+
+    const { data, error } = await supabaseAdmin
+      .from('blog_posts')
+      .insert([blogPost])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, post: data });
+  } catch (error) {
+    console.error('Error creating blog post:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update blog post (admin)
+app.put('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      slug,
+      title,
+      excerpt,
+      content,
+      author,
+      category,
+      tags,
+      featured_image,
+      meta_title,
+      meta_description,
+      schema_markup,
+      article_summary,
+      faq_content,
+      published
+    } = req.body;
+
+    // Validate required fields
+    if (!title || !content) {
+      return res.status(400).json({
+        error: 'Missing required fields: title and content are required'
+      });
+    }
+
+    // If slug is being changed, check for conflicts
+    if (slug) {
+      const { data: existing } = await supabaseAdmin
+        .from('blog_posts')
+        .select('id')
+        .eq('slug', slug)
+        .neq('id', id)
+        .single();
+
+      if (existing) {
+        return res.status(400).json({ error: 'Slug already exists. Please use a unique slug.' });
+      }
+    }
+
+    const updates = {
+      ...(slug && { slug }),
+      title,
+      excerpt,
+      content,
+      ...(author && { author }),
+      category,
+      tags: tags || [],
+      featured_image,
+      meta_title,
+      meta_description,
+      schema_markup,
+      article_summary,
+      faq_content,
+      published: published || false,
+      published_at: published ? new Date().toISOString() : null
+    };
+
+    const { data, error } = await supabaseAdmin
+      .from('blog_posts')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, post: data });
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete blog post (admin)
+app.delete('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabaseAdmin
+      .from('blog_posts')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.json({ success: true, message: 'Blog post deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting blog post:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Toggle publish status (admin)
+app.post('/api/admin/blog/:id/publish', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { published } = req.body;
+
+    const { data, error } = await supabaseAdmin
+      .from('blog_posts')
+      .update({
+        published,
+        published_at: published ? new Date().toISOString() : null
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, post: data });
+  } catch (error) {
+    console.error('Error toggling publish status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);
