@@ -49,6 +49,142 @@ let selectedAccessoryType = null; // Type of accessory (handbag, watch, etc.)
 let uploadedColorVariants = []; // Array of uploaded color variant paths
 let selectedDisplayScenario = null; // 'on-arm', 'hanging-rack', 'folded-stack', 'laid-out'
 
+// ============================================
+// UPLOAD PROGRESS SYSTEM
+// ============================================
+let uploadProgressModal = null;
+let uploadProgressBar = null;
+let uploadProgressText = null;
+let uploadProgressPercentage = null;
+
+// Create upload progress modal (call once on page load)
+function createUploadProgressModal() {
+    if (uploadProgressModal) return; // Already created
+
+    const modal = document.createElement('div');
+    modal.id = 'uploadProgressModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        backdrop-filter: blur(5px);
+    `;
+
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 20px; padding: 40px; min-width: 400px; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 3em; margin-bottom: 15px; animation: pulse 1.5s ease-in-out infinite;">
+                    📤
+                </div>
+                <h3 style="margin: 0; font-size: 1.5em; color: #333;">در حال آپلود تصویر</h3>
+                <p id="uploadProgressText" style="color: #666; margin: 10px 0 0 0; font-size: 0.95em;">آماده‌سازی...</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div style="background: #f0f0f0; border-radius: 10px; overflow: hidden; height: 20px; position: relative;">
+                    <div id="uploadProgressBar" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 10px;"></div>
+                    <span id="uploadProgressPercentage" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; font-size: 0.85em; color: #333;">0%</span>
+                </div>
+            </div>
+
+            <div style="text-align: center; color: #999; font-size: 0.85em;">
+                <p style="margin: 0;">⏱️ لطفاً صبر کنید، این فرآیند ممکن است چند ثانیه طول بکشد</p>
+            </div>
+        </div>
+
+        <style>
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.1); opacity: 0.8; }
+            }
+        </style>
+    `;
+
+    document.body.appendChild(modal);
+    uploadProgressModal = modal;
+    uploadProgressBar = document.getElementById('uploadProgressBar');
+    uploadProgressText = document.getElementById('uploadProgressText');
+    uploadProgressPercentage = document.getElementById('uploadProgressPercentage');
+}
+
+// Show upload progress
+function showUploadProgress(message = 'در حال آپلود...') {
+    if (!uploadProgressModal) createUploadProgressModal();
+    uploadProgressModal.style.display = 'flex';
+    uploadProgressText.textContent = message;
+    uploadProgressBar.style.width = '0%';
+    uploadProgressPercentage.textContent = '0%';
+}
+
+// Update upload progress
+function updateUploadProgress(percentage, message = null) {
+    if (!uploadProgressModal) return;
+    uploadProgressBar.style.width = `${percentage}%`;
+    uploadProgressPercentage.textContent = `${Math.round(percentage)}%`;
+    if (message) {
+        uploadProgressText.textContent = message;
+    }
+}
+
+// Hide upload progress
+function hideUploadProgress() {
+    if (uploadProgressModal) {
+        uploadProgressModal.style.display = 'none';
+    }
+}
+
+// Enhanced fetch with progress tracking
+async function uploadFileWithProgress(endpoint, formData, onProgress) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                if (onProgress) onProgress(percentComplete);
+            }
+        });
+
+        // Handle completion
+        xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    resolve(response);
+                } catch (error) {
+                    reject(new Error('Invalid JSON response'));
+                }
+            } else {
+                reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+        });
+
+        // Handle errors
+        xhr.addEventListener('error', () => {
+            reject(new Error('Network error during upload'));
+        });
+
+        xhr.addEventListener('timeout', () => {
+            reject(new Error('Upload timeout (30s exceeded)'));
+        });
+
+        // Set timeout (30 seconds)
+        xhr.timeout = 30000;
+
+        // Open and send
+        xhr.open('POST', endpoint);
+        xhr.send(formData);
+    });
+}
+
 // NEW: Flat Lay mode variables
 let uploadedFlatLayProducts = []; // Array of uploaded product paths for flat lay
 let selectedArrangement = null; // 'grid', 'scattered', 'circular', 'diagonal'
@@ -640,15 +776,21 @@ async function uploadAccessoryFile(file) {
     const formData = new FormData();
     formData.append('garment', file); // Use same endpoint as garment
 
+    // Show progress modal
+    showUploadProgress(`در حال آپلود ${file.name}...`);
+
     try {
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
+        const data = await uploadFileWithProgress('/api/upload', formData, (percentage) => {
+            updateUploadProgress(percentage, `در حال آپلود: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
         });
 
-        const data = await response.json();
-
         if (data.success) {
+            // Show completion
+            updateUploadProgress(100, 'آپلود با موفقیت انجام شد! ✅');
+
+            // Wait a moment to show success
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             uploadedAccessoryPath = data.filePath;
 
             // Show preview
@@ -663,13 +805,17 @@ async function uploadAccessoryFile(file) {
 
             checkGenerateButton();
         } else {
+            hideUploadProgress();
             console.error('Upload failed:', data);
             const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
             alert(`Error: ${errorMsg}`);
         }
     } catch (error) {
+        hideUploadProgress();
         console.error('خطا در آپلود فایل:', error);
         alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر انتخاب کنید.');
+    } finally {
+        hideUploadProgress();
     }
 }
 
@@ -735,40 +881,49 @@ async function uploadColorVariantFiles(files) {
     }
 
     uploadedColorVariants = [];
+    showUploadProgress(`در حال آپلود ${files.length} فایل...`);
 
-    for (const file of files) {
-        const formData = new FormData();
-        formData.append('garment', file);
+    try {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('garment', file);
 
-        try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            });
+            updateUploadProgress((i / files.length) * 100, `آپلود فایل ${i + 1} از ${files.length}: ${file.name}`);
 
-            const data = await response.json();
+            try {
+                const data = await uploadFileWithProgress('/api/upload', formData, (percentage) => {
+                    const overallProgress = ((i + (percentage / 100)) / files.length) * 100;
+                    updateUploadProgress(overallProgress, `فایل ${i + 1}/${files.length}: ${file.name} (${Math.round(percentage)}%)`);
+                });
 
-            if (data.success) {
-                uploadedColorVariants.push(data.filePath);
+                if (data.success) {
+                    uploadedColorVariants.push(data.filePath);
+                }
+            } catch (error) {
+                console.error('خطا در آپلود تصویر:', error);
             }
-        } catch (error) {
-            console.error('خطا در آپلود تصویر:', error);
         }
+
+        updateUploadProgress(100, 'تمام فایل‌ها با موفقیت آپلود شدند! ✅');
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Show previews
+        colorCollectionPreviews.style.display = 'grid';
+        colorCollectionPlaceholder.style.display = 'none';
+
+        colorCollectionPreviews.innerHTML = uploadedColorVariants.map((path, index) => `
+            <div class="garment-preview-item">
+                <img src="${path}" alt="رنگ ${index + 1}">
+                <button class="remove-garment-btn" onclick="removeColorVariant(${index})">&times;</button>
+                <div class="garment-preview-label">رنگ ${index + 1}</div>
+            </div>
+        `).join('');
+
+        checkGenerateButton();
+    } finally {
+        hideUploadProgress();
     }
-
-    // Show previews
-    colorCollectionPreviews.style.display = 'grid';
-    colorCollectionPlaceholder.style.display = 'none';
-
-    colorCollectionPreviews.innerHTML = uploadedColorVariants.map((path, index) => `
-        <div class="garment-preview-item">
-            <img src="${path}" alt="رنگ ${index + 1}">
-            <button class="remove-garment-btn" onclick="removeColorVariant(${index})">&times;</button>
-            <div class="garment-preview-label">رنگ ${index + 1}</div>
-        </div>
-    `).join('');
-
-    checkGenerateButton();
 }
 
 // Remove a color variant
@@ -829,40 +984,47 @@ async function uploadFlatLayFiles(files) {
     }
 
     uploadedFlatLayProducts = [];
+    showUploadProgress(`در حال آپلود ${files.length} فایل...`);
 
-    for (const file of files) {
-        const formData = new FormData();
-        formData.append('garment', file);
+    try {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('garment', file);
 
-        try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            });
+            try {
+                const data = await uploadFileWithProgress('/api/upload', formData, (percentage) => {
+                    const overallProgress = ((i + (percentage / 100)) / files.length) * 100;
+                    updateUploadProgress(overallProgress, `فایل ${i + 1}/${files.length}: ${file.name} (${Math.round(percentage)}%)`);
+                });
 
-            const data = await response.json();
-
-            if (data.success) {
-                uploadedFlatLayProducts.push(data.filePath);
+                if (data.success) {
+                    uploadedFlatLayProducts.push(data.filePath);
+                }
+            } catch (error) {
+                console.error('خطا در آپلود تصویر:', error);
             }
-        } catch (error) {
-            console.error('خطا در آپلود تصویر:', error);
         }
+
+        updateUploadProgress(100, 'تمام فایل‌ها با موفقیت آپلود شدند! ✅');
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Show previews
+        flatLayPreviews.style.display = 'grid';
+        flatLayPlaceholder.style.display = 'none';
+
+        flatLayPreviews.innerHTML = uploadedFlatLayProducts.map((path, index) => `
+            <div class="garment-preview-item">
+                <img src="${path}" alt="محصول ${index + 1}">
+                <button class="remove-garment-btn" onclick="removeFlatLayProduct(${index})">&times;</button>
+                <div class="garment-preview-label">محصول ${index + 1}</div>
+            </div>
+        `).join('');
+
+        checkGenerateButton();
+    } finally {
+        hideUploadProgress();
     }
-
-    // Show previews
-    flatLayPreviews.style.display = 'grid';
-    flatLayPlaceholder.style.display = 'none';
-
-    flatLayPreviews.innerHTML = uploadedFlatLayProducts.map((path, index) => `
-        <div class="garment-preview-item">
-            <img src="${path}" alt="محصول ${index + 1}">
-            <button class="remove-garment-btn" onclick="removeFlatLayProduct(${index})">&times;</button>
-            <div class="garment-preview-label">محصول ${index + 1}</div>
-        </div>
-    `).join('');
-
-    checkGenerateButton();
 }
 
 // Remove a flat lay product
@@ -1475,41 +1637,49 @@ if (garmentInput) {
 
 // آپلود چند فایل
 async function uploadFiles(files) {
-    for (const file of files) {
-        const formData = new FormData();
-        formData.append('garment', file);
+    showUploadProgress(`در حال آپلود ${files.length} فایل...`);
 
-        try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            });
+    try {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('garment', file);
 
-            const data = await response.json();
+            try {
+                const data = await uploadFileWithProgress('/api/upload', formData, (percentage) => {
+                    const overallProgress = ((i + (percentage / 100)) / files.length) * 100;
+                    updateUploadProgress(overallProgress, `فایل ${i + 1}/${files.length}: ${file.name} (${Math.round(percentage)}%)`);
+                });
 
-            if (data.success) {
-                // Add to uploadedGarmentPaths array
-                uploadedGarmentPaths.push(data.filePath);
+                if (data.success) {
+                    // Add to uploadedGarmentPaths array
+                    uploadedGarmentPaths.push(data.filePath);
 
-                // Add preview thumbnail
-                addGarmentPreview(data.filePath, uploadedGarmentPaths.length - 1);
+                    // Add preview thumbnail
+                    addGarmentPreview(data.filePath, uploadedGarmentPaths.length - 1);
 
-                // Hide placeholder and show preview grid
-                uploadPlaceholder.style.display = 'none';
-                garmentPreviews.style.display = 'grid';
+                    // Hide placeholder and show preview grid
+                    uploadPlaceholder.style.display = 'none';
+                    garmentPreviews.style.display = 'grid';
 
-                checkGenerateButton();
-            } else {
-                // Show detailed error message
-                console.error('Upload failed:', data);
-                const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
-                const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
-                alert(`Error: ${errorMsg}${hintMsg}`);
+                    checkGenerateButton();
+                } else {
+                    // Show detailed error message
+                    console.error('Upload failed:', data);
+                    const errorMsg = data.details || data.error || 'خطا در آپلود فایل';
+                    const hintMsg = data.hint ? `\n\nHint: ${data.hint}` : '';
+                    alert(`Error: ${errorMsg}${hintMsg}`);
+                }
+            } catch (error) {
+                console.error('خطا در آپلود فایل:', error);
+                alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
             }
-        } catch (error) {
-            console.error('خطا در آپلود فایل:', error);
-            alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
         }
+
+        updateUploadProgress(100, 'تمام فایل‌ها با موفقیت آپلود شدند! ✅');
+        await new Promise(resolve => setTimeout(resolve, 500));
+    } finally {
+        hideUploadProgress();
     }
 }
 
