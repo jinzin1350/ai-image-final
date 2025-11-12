@@ -20,6 +20,13 @@
     console.log('✅ User is authenticated');
 })();
 
+// Initialize upload progress modal on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📤 Initializing upload progress system...');
+    createUploadProgressModal();
+    console.log('✅ Upload progress modal ready');
+});
+
 // Logout function
 function handleLogout() {
     console.log('🚪 Logging out...');
