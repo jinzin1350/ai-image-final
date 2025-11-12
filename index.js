@@ -78,6 +78,40 @@ const upload = multer({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// ============================================
+// FILENAME SANITIZER - Support Persian/Arabic/Unicode filenames
+// ============================================
+function sanitizeFilename(originalName) {
+  // Extract file extension
+  const ext = path.extname(originalName).toLowerCase();
+
+  // Get base name without extension
+  let baseName = path.basename(originalName, ext);
+
+  // If filename contains non-ASCII characters (Persian, Arabic, Chinese, etc.)
+  // encode it to make it URL-safe while preserving readability
+  if (/[^\x00-\x7F]/.test(baseName)) {
+    // Keep the Unicode filename but make it URL-safe
+    baseName = encodeURIComponent(baseName)
+      .replace(/%20/g, '-')  // Replace spaces with hyphens
+      .substring(0, 100);     // Limit length to 100 chars
+  } else {
+    // For ASCII filenames, just clean special characters
+    baseName = baseName
+      .replace(/[^a-zA-Z0-9_-]/g, '-')  // Replace special chars with hyphen
+      .replace(/-+/g, '-')               // Replace multiple hyphens with single
+      .substring(0, 100);                // Limit length
+  }
+
+  // Return: timestamp-sanitized-name.ext
+  return `${Date.now()}-${baseName}${ext}`;
+}
+
+// Example outputs:
+// "عکس من.jpg" → "1699999999999-%D8%B9%DA%A9%D8%B3-%D9%85%D9%86.jpg"
+// "my photo.png" → "1699999999999-my-photo.png"
+// "صورة جميلة.webp" → "1699999999999-%D8%B5%D9%88%D8%B1%D8%A9-%D8%AC%D9%85%D9%8A%D9%84%D8%A9.webp"
+
 // Serve attached_assets folder
 app.use('/attached_assets', express.static(path.join(__dirname, 'attached_assets')));
 
@@ -444,7 +478,7 @@ app.post('/api/admin/content/upload', authenticateAdmin, upload.single('content'
     }
 
     const { content_type, tier, category, name, description } = req.body;
-    const fileName = `admin-content-${Date.now()}-${req.file.originalname}`;
+    const fileName = `admin-content-${sanitizeFilename(req.file.originalname)}`;
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -620,7 +654,7 @@ app.post('/api/user/content/upload', upload.single('content'), async (req, res) 
     }
 
     const { content_type, visibility, category, name, description } = req.body;
-    const fileName = `user-${user.id}-${Date.now()}-${req.file.originalname}`;
+    const fileName = `user-${user.id}-${sanitizeFilename(req.file.originalname)}`;
 
     console.log(`📤 Uploading user content: ${fileName} for user ${user.email}`);
 
@@ -771,7 +805,7 @@ app.post('/api/admin/user-content/upload', authenticateAdmin, upload.single('con
     }
 
     // Upload to Supabase Storage
-    const fileName = `user-${user_id}-${Date.now()}-${req.file.originalname}`;
+    const fileName = `user-${user_id}-${sanitizeFilename(req.file.originalname)}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('admin-content')
@@ -2174,7 +2208,7 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
       });
     }
 
-    const fileName = `${Date.now()}-${req.file.originalname}`;
+    const fileName = sanitizeFilename(req.file.originalname);
     const fileBuffer = req.file.buffer;
 
     console.log(`📤 در حال آپلود فایل: ${fileName}`);
@@ -2233,7 +2267,7 @@ app.post('/api/upload-reference', upload.single('referencePhoto'), async (req, r
       });
     }
 
-    const fileName = `reference-${Date.now()}-${req.file.originalname}`;
+    const fileName = `reference-${sanitizeFilename(req.file.originalname)}`;
     const fileBuffer = req.file.buffer;
 
     console.log(`📤 در حال آپلود عکس مرجع: ${fileName}`);
@@ -2290,7 +2324,7 @@ app.post('/api/upload-style', upload.single('styleImage'), async (req, res) => {
       });
     }
 
-    const fileName = `style-${Date.now()}-${req.file.originalname}`;
+    const fileName = `style-${sanitizeFilename(req.file.originalname)}`;
     const fileBuffer = req.file.buffer;
 
     console.log(`📤 در حال آپلود عکس استایل: ${fileName}`);
@@ -2345,7 +2379,7 @@ app.post('/api/upload-content', upload.single('contentImage'), async (req, res) 
       });
     }
 
-    const fileName = `content-${Date.now()}-${req.file.originalname}`;
+    const fileName = `content-${sanitizeFilename(req.file.originalname)}`;
     const fileBuffer = req.file.buffer;
 
     console.log(`📤 در حال آپلود عکس محتوا: ${fileName}`);
