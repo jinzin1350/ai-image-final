@@ -66,8 +66,13 @@ let uploadProgressPercentage = null;
 
 // Create upload progress modal (call once on page load)
 function createUploadProgressModal() {
-    if (uploadProgressModal) return; // Already created
+    console.log('🔧 createUploadProgressModal called');
+    if (uploadProgressModal) {
+        console.log('ℹ️ Modal already exists, skipping creation');
+        return; // Already created
+    }
 
+    console.log('🏗️ Creating new modal...');
     const modal = document.createElement('div');
     modal.id = 'uploadProgressModal';
     modal.style.cssText = `
@@ -119,15 +124,28 @@ function createUploadProgressModal() {
     uploadProgressBar = document.getElementById('uploadProgressBar');
     uploadProgressText = document.getElementById('uploadProgressText');
     uploadProgressPercentage = document.getElementById('uploadProgressPercentage');
+    console.log('✅ Modal created and added to DOM');
+    console.log('✅ Modal elements:', {
+        modal: !!uploadProgressModal,
+        bar: !!uploadProgressBar,
+        text: !!uploadProgressText,
+        percentage: !!uploadProgressPercentage
+    });
 }
 
 // Show upload progress
 function showUploadProgress(message = 'در حال آپلود...') {
-    if (!uploadProgressModal) createUploadProgressModal();
+    console.log('📤 showUploadProgress called:', message);
+    if (!uploadProgressModal) {
+        console.log('⚠️ Modal not found, creating now...');
+        createUploadProgressModal();
+    }
+    console.log('✅ Showing modal...');
     uploadProgressModal.style.display = 'flex';
     uploadProgressText.textContent = message;
     uploadProgressBar.style.width = '0%';
     uploadProgressPercentage.textContent = '0%';
+    console.log('✅ Modal visible with message:', message);
 }
 
 // Update upload progress
@@ -1644,6 +1662,7 @@ if (garmentInput) {
 
 // آپلود چند فایل
 async function uploadFiles(files) {
+    console.log('🚀 uploadFiles called with', files.length, 'files');
     showUploadProgress(`در حال آپلود ${files.length} فایل...`);
 
     try {
