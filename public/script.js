@@ -46,6 +46,11 @@ let selectedCameraAngleId = 'eye-level';
 let selectedStyleId = 'professional';
 let selectedLightingId = 'studio';
 
+// Pagination variables
+let currentPage = 1;
+let currentPage2 = 1;
+const modelsPerPage = 12; // Show 12 models per page
+
 // NEW: Mode selection variables
 // Check if mode is set from the HTML page (for individual service pages)
 let currentMode = window.currentMode || 'complete-outfit'; // 'complete-outfit', 'accessories-only', 'color-collection'
@@ -349,26 +354,34 @@ async function loadModels(mode = 'complete-outfit') {
     }
 }
 
-// نمایش مدل‌های یک دسته‌بندی خاص
-function displayModelsByCategory(category) {
+// نمایش مدل‌های یک دسته‌بندی خاص با Pagination
+function displayModelsByCategory(category, page = 1) {
     const modelsGrid = document.getElementById('modelsGrid');
     if (!modelsGrid) return;
 
-    console.log('🔍 Filtering models by category:', category);
+    currentPage = page;
+    currentCategory = category;
+
+    console.log('🔍 Filtering models by category:', category, 'Page:', page);
     console.log('📋 All models count:', allModels.length);
-    console.log('📋 All model categories:', [...new Set(allModels.map(m => m.category))]);
 
     const filteredModels = allModels.filter(model => model.category === category);
 
     console.log('✅ Filtered models count:', filteredModels.length);
-    console.log('✅ Filtered models:', filteredModels.map(m => `${m.name} (${m.category})`));
 
     if (filteredModels.length === 0) {
         modelsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; padding: 40px;">هیچ مدلی در این دسته‌بندی یافت نشد</p>';
         return;
     }
 
-    modelsGrid.innerHTML = filteredModels.map(model => `
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredModels.length / modelsPerPage);
+    const startIndex = (page - 1) * modelsPerPage;
+    const endIndex = startIndex + modelsPerPage;
+    const paginatedModels = filteredModels.slice(startIndex, endIndex);
+
+    // Render models
+    modelsGrid.innerHTML = paginatedModels.map(model => `
         <div class="model-card" data-id="${model.id}">
             <div class="model-image-container">
                 <img src="${model.image}" alt="${model.name}" class="model-image">
@@ -376,18 +389,55 @@ function displayModelsByCategory(category) {
             <div class="card-title">${model.name}</div>
         </div>
     `).join('');
+
+    // Add pagination controls if needed
+    if (totalPages > 1) {
+        const paginationHTML = `
+            <div class="pagination-controls" style="grid-column: 1/-1; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; padding: 20px;">
+                <button class="pagination-btn" onclick="displayModelsByCategory('${category}', ${page - 1})" ${page === 1 ? 'disabled' : ''}
+                    style="padding: 10px 20px; border: 2px solid #667eea; background: ${page === 1 ? '#f0f0f0' : 'white'}; color: ${page === 1 ? '#999' : '#667eea'}; border-radius: 8px; cursor: ${page === 1 ? 'not-allowed' : 'pointer'}; font-weight: bold;">
+                    ← قبلی
+                </button>
+                <span style="font-weight: bold; color: #333;">صفحه ${page} از ${totalPages} (${filteredModels.length} مدل)</span>
+                <button class="pagination-btn" onclick="displayModelsByCategory('${category}', ${page + 1})" ${page === totalPages ? 'disabled' : ''}
+                    style="padding: 10px 20px; border: 2px solid #667eea; background: ${page === totalPages ? '#f0f0f0' : 'white'}; color: ${page === totalPages ? '#999' : '#667eea'}; border-radius: 8px; cursor: ${page === totalPages ? 'not-allowed' : 'pointer'}; font-weight: bold;">
+                    بعدی →
+                </button>
+            </div>
+        `;
+        modelsGrid.innerHTML += paginationHTML;
+    }
 
     // افزودن رویداد کلیک به مدل‌ها
     document.querySelectorAll('.model-card').forEach(card => {
         card.addEventListener('click', () => selectModel(card.dataset.id));
     });
+
+    // Scroll to top of models section
+    modelsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// نمایش مدل‌های یک دسته‌بندی خاص برای مدل دوم
-function displayModelsByCategory2(category) {
+// نمایش مدل‌های یک دسته‌بندی خاص برای مدل دوم با Pagination
+function displayModelsByCategory2(category, page = 1) {
+    if (!modelsGrid2) return;
+
+    currentPage2 = page;
+
     const filteredModels = allModels.filter(model => model.category === category);
 
-    modelsGrid2.innerHTML = filteredModels.map(model => `
+    if (filteredModels.length === 0) {
+        modelsGrid2.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; padding: 40px;">هیچ مدلی در این دسته‌بندی یافت نشد</p>';
+        return;
+    }
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredModels.length / modelsPerPage);
+    const startIndex = (page - 1) * modelsPerPage;
+    const endIndex = startIndex + modelsPerPage;
+    const paginatedModels = filteredModels.slice(startIndex, endIndex);
+
+    // Render models
+    modelsGrid2.innerHTML = paginatedModels.map(model => `
         <div class="model-card" data-id="${model.id}">
             <div class="model-image-container">
                 <img src="${model.image}" alt="${model.name}" class="model-image">
@@ -396,10 +446,31 @@ function displayModelsByCategory2(category) {
         </div>
     `).join('');
 
+    // Add pagination controls if needed
+    if (totalPages > 1) {
+        const paginationHTML = `
+            <div class="pagination-controls" style="grid-column: 1/-1; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; padding: 20px;">
+                <button class="pagination-btn" onclick="displayModelsByCategory2('${category}', ${page - 1})" ${page === 1 ? 'disabled' : ''}
+                    style="padding: 10px 20px; border: 2px solid #667eea; background: ${page === 1 ? '#f0f0f0' : 'white'}; color: ${page === 1 ? '#999' : '#667eea'}; border-radius: 8px; cursor: ${page === 1 ? 'not-allowed' : 'pointer'}; font-weight: bold;">
+                    ← قبلی
+                </button>
+                <span style="font-weight: bold; color: #333;">صفحه ${page} از ${totalPages} (${filteredModels.length} مدل)</span>
+                <button class="pagination-btn" onclick="displayModelsByCategory2('${category}', ${page + 1})" ${page === totalPages ? 'disabled' : ''}
+                    style="padding: 10px 20px; border: 2px solid #667eea; background: ${page === totalPages ? '#f0f0f0' : 'white'}; color: ${page === totalPages ? '#999' : '#667eea'}; border-radius: 8px; cursor: ${page === totalPages ? 'not-allowed' : 'pointer'}; font-weight: bold;">
+                    بعدی →
+                </button>
+            </div>
+        `;
+        modelsGrid2.innerHTML += paginationHTML;
+    }
+
     // افزودن رویداد کلیک به مدل‌ها
     document.querySelectorAll('#modelsGrid2 .model-card').forEach(card => {
         card.addEventListener('click', () => selectModel2(card.dataset.id));
     });
+
+    // Scroll to model 2 section
+    modelsGrid2.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // انتخاب مدل دوم
