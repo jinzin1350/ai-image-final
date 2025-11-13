@@ -283,6 +283,39 @@
             overflow: hidden;
         }
 
+        /* Remove excessive spacing before and after tables */
+        .article-body h2 + p:empty,
+        .article-body h3 + p:empty,
+        .article-body h4 + p:empty {
+            display: none;
+        }
+
+        /* Collapse ALL empty paragraphs and breaks */
+        .article-body p:empty,
+        .article-body p:blank {
+            display: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Hide paragraphs with only whitespace/nbsp */
+        .article-body p:not(:has(*)):not(:has(img)) {
+            line-height: 0;
+        }
+
+        /* Remove consecutive breaks */
+        .article-body br + br,
+        .article-body br + br + br {
+            display: none;
+        }
+
+        /* Tighter spacing before tables */
+        .article-body h2 + table,
+        .article-body h3 + table,
+        .article-body h4 + table,
+        .article-body p + table {
+            margin-top: 1rem !important;
+        }
 
         .article-body table th {
             background: #667eea;
@@ -674,6 +707,9 @@
                 const content = decodeHtmlEntities(post.content);
                 document.getElementById('articleBody').innerHTML = content;
 
+                // Clean up excessive whitespace around tables
+                cleanupTableSpacing();
+
                 // Display FAQ
                 if (post.faq_content) {
                     const faqHtml = parseFaq(post.faq_content);
@@ -752,6 +788,43 @@
         function showError() {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('errorState').style.display = 'block';
+        }
+
+        function cleanupTableSpacing() {
+            const articleBody = document.getElementById('articleBody');
+            if (!articleBody) return;
+
+            // Find all tables
+            const tables = articleBody.querySelectorAll('table');
+
+            tables.forEach(table => {
+                // Remove all previous siblings that are empty or whitespace-only
+                let prev = table.previousElementSibling;
+                while (prev) {
+                    const next = prev.previousElementSibling;
+
+                    // Check if element is empty or contains only whitespace
+                    const text = prev.textContent.trim();
+                    const isEmpty = !text || text === '' || /^[\s\u00A0]*$/.test(text);
+
+                    if (isEmpty && (prev.tagName === 'P' || prev.tagName === 'BR' || prev.tagName === 'DIV')) {
+                        prev.remove();
+                    } else {
+                        break; // Stop when we hit non-empty content
+                    }
+
+                    prev = next;
+                }
+            });
+
+            // Also remove consecutive empty paragraphs throughout
+            const paragraphs = articleBody.querySelectorAll('p');
+            paragraphs.forEach(p => {
+                const text = p.textContent.trim();
+                if (!text || text === '' || /^[\s\u00A0]*$/.test(text)) {
+                    p.remove();
+                }
+            });
         }
 
         // Load post on page load
