@@ -1442,6 +1442,10 @@ app.get('/admin/blog', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-blog.html'));
 });
 
+app.get('/admin/gallery', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-gallery.html'));
+});
+
 // Public blog page
 app.get('/blog', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'blog.html'));
