@@ -203,29 +203,32 @@
 
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 40px;
             margin-top: 40px;
         }
 
         .gallery-item {
             background: white;
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .gallery-item:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-xl);
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.2);
         }
 
         .before-after-container {
             display: flex;
             position: relative;
-            height: 300px;
+            height: 350px;
+            background: var(--bg);
         }
 
         .image-wrapper {
@@ -279,7 +282,7 @@
         }
 
         .item-info {
-            padding: 20px;
+            padding: 24px;
         }
 
         .item-header {
@@ -290,22 +293,24 @@
         }
 
         .item-title {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 700;
             color: var(--dark);
-            line-height: 1.4;
+            line-height: 1.5;
+            flex: 1;
         }
 
         .featured-icon {
             color: #fbbf24;
             flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3));
         }
 
         .item-description {
             color: var(--text-light);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 12px;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 16px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -313,13 +318,16 @@
         }
 
         .service-badge {
-            display: inline-block;
-            background: var(--gradient);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
+            border: 1.5px solid rgba(102, 126, 234, 0.2);
         }
 
         /* Loading State */
@@ -524,41 +532,65 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 1200px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .gallery-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 24px;
+                gap: 28px;
             }
 
             .hero-title {
-                font-size: 36px;
+                font-size: 40px;
             }
 
             .hero-subtitle {
                 font-size: 18px;
+            }
+
+            .filter-section {
+                margin: -30px auto 30px;
             }
         }
 
         @media (max-width: 768px) {
             .gallery-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 24px;
             }
 
             .filter-buttons {
-                flex-direction: column;
+                gap: 10px;
             }
 
             .filter-btn {
-                justify-content: center;
+                justify-content: space-between;
+                width: 100%;
+                font-size: 15px;
+                padding: 14px 20px;
             }
 
             .hero-title {
-                font-size: 28px;
+                font-size: 32px;
             }
 
             .hero-subtitle {
                 font-size: 16px;
+                padding: 0 10px;
+            }
+
+            .portfolio-hero {
+                padding: 60px 0 50px;
+            }
+
+            .filter-section {
+                margin: -25px auto 25px;
+                padding: 20px;
             }
 
             .lightbox-images {
@@ -569,22 +601,59 @@
                 width: 95%;
             }
 
+            .lightbox-info {
+                padding: 24px;
+            }
+
             .lightbox-navigation {
                 flex-direction: column;
             }
 
             .nav-actions {
-                flex-direction: column;
+                flex-wrap: wrap;
                 gap: 8px;
             }
 
             .nav-link {
-                padding: 8px 12px;
+                padding: 10px 16px;
                 font-size: 14px;
             }
 
             .before-after-container {
-                height: 200px;
+                height: 280px;
+            }
+
+            .image-label {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .before-after-container {
+                height: 240px;
+            }
+
+            .hero-title {
+                font-size: 26px;
+            }
+
+            .item-title {
+                font-size: 17px;
+            }
+
+            .item-info {
+                padding: 20px;
+            }
+
+            .filter-btn {
+                padding: 12px 18px;
+                font-size: 14px;
             }
         }
     </style>
@@ -649,32 +718,39 @@
         <div class="filter-section">
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="all">
-                    همه
+                    <span>🎨</span>
+                    همه نمونه‌کارها
                     <span class="filter-badge" id="badge-all">0</span>
                 </button>
-                <button class="filter-btn" data-filter="full_style">
+                <button class="filter-btn" data-filter="Complete Outfit">
+                    <span>👗</span>
                     استایل کامل
-                    <span class="filter-badge" id="badge-full_style">0</span>
+                    <span class="filter-badge" id="badge-Complete Outfit">0</span>
                 </button>
-                <button class="filter-btn" data-filter="accessories">
+                <button class="filter-btn" data-filter="Accessories Only">
+                    <span>👜</span>
                     اکسسوری
-                    <span class="filter-badge" id="badge-accessories">0</span>
+                    <span class="filter-badge" id="badge-Accessories Only">0</span>
                 </button>
-                <button class="filter-btn" data-filter="color_collection">
+                <button class="filter-btn" data-filter="Color Collection">
+                    <span>🌈</span>
                     کالکشن رنگی
-                    <span class="filter-badge" id="badge-color_collection">0</span>
+                    <span class="filter-badge" id="badge-Color Collection">0</span>
                 </button>
-                <button class="filter-btn" data-filter="flat_lay">
+                <button class="filter-btn" data-filter="Flat Lay">
+                    <span>📸</span>
                     فلت لی
-                    <span class="filter-badge" id="badge-flat_lay">0</span>
+                    <span class="filter-badge" id="badge-Flat Lay">0</span>
                 </button>
-                <button class="filter-btn" data-filter="scene_recreation">
+                <button class="filter-btn" data-filter="Scene Recreation">
+                    <span>🎬</span>
                     بازآفرینی صحنه
-                    <span class="filter-badge" id="badge-scene_recreation">0</span>
+                    <span class="filter-badge" id="badge-Scene Recreation">0</span>
                 </button>
-                <button class="filter-btn" data-filter="style_transfer">
+                <button class="filter-btn" data-filter="Style Transfer">
+                    <span>✨</span>
                     انتقال استایل
-                    <span class="filter-badge" id="badge-style_transfer">0</span>
+                    <span class="filter-badge" id="badge-Style Transfer">0</span>
                 </button>
             </div>
         </div>
@@ -759,12 +835,13 @@
 
         // Service type mapping
         const serviceTypeNames = {
-            'full_style': 'استایل کامل',
-            'accessories': 'اکسسوری',
-            'color_collection': 'کالکشن رنگی',
-            'flat_lay': 'فلت لی',
-            'scene_recreation': 'بازآفرینی صحنه',
-            'style_transfer': 'انتقال استایل'
+            'Complete Outfit': 'استایل کامل',
+            'Accessories Only': 'اکسسوری',
+            'Color Collection': 'کالکشن رنگی',
+            'Flat Lay': 'فلت لی',
+            'Scene Recreation': 'بازآفرینی صحنه',
+            'Style Transfer': 'انتقال استایل',
+            'Other': 'سایر'
         };
 
         // Elements
@@ -839,6 +916,17 @@
             });
         }
 
+        // Service icons mapping
+        const serviceIcons = {
+            'Complete Outfit': '👗',
+            'Accessories Only': '👜',
+            'Color Collection': '🌈',
+            'Flat Lay': '📸',
+            'Scene Recreation': '🎬',
+            'Style Transfer': '✨',
+            'Other': '🎨'
+        };
+
         // Create gallery item
         function createGalleryItem(item, index) {
             const div = document.createElement('div');
@@ -846,12 +934,15 @@
             div.onclick = () => openLightbox(index);
 
             const featuredIcon = item.is_featured ?
-                `<svg class="featured-icon" width="24" height="24" viewBox="0 0 24 24" fill="#fbbf24">
+                `<svg class="featured-icon" width="26" height="26" viewBox="0 0 24 24" fill="#fbbf24">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>` : '';
 
             const description = item.description ?
                 `<p class="item-description">${item.description}</p>` : '';
+
+            const serviceIcon = serviceIcons[item.service_type] || '🎨';
+            const serviceName = serviceTypeNames[item.service_type] || item.service_type;
 
             div.innerHTML = `
                 <div class="before-after-container">
@@ -871,7 +962,10 @@
                         ${featuredIcon}
                     </div>
                     ${description}
-                    <span class="service-badge">${serviceTypeNames[item.service_type] || item.service_type}</span>
+                    <span class="service-badge">
+                        <span>${serviceIcon}</span>
+                        ${serviceName}
+                    </span>
                 </div>
             `;
 
@@ -902,11 +996,14 @@
         function updateLightbox() {
             const item = filteredItems[currentLightboxIndex];
 
+            const serviceIcon = serviceIcons[item.service_type] || '🎨';
+            const serviceName = serviceTypeNames[item.service_type] || item.service_type;
+
             document.getElementById('lightboxBeforeImg').src = item.before_image_url;
             document.getElementById('lightboxAfterImg').src = item.after_image_url;
             document.getElementById('lightboxTitle').textContent = item.title;
             document.getElementById('lightboxDescription').textContent = item.description || 'بدون توضیحات';
-            document.getElementById('lightboxService').textContent = serviceTypeNames[item.service_type] || item.service_type;
+            document.getElementById('lightboxService').innerHTML = `<span>${serviceIcon}</span> ${serviceName}`;
             document.getElementById('lightboxFeatured').style.display = item.is_featured ? 'block' : 'none';
 
             prevBtn.disabled = currentLightboxIndex === 0;
