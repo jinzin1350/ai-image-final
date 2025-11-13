@@ -656,9 +656,14 @@
 
         async function handleBeforeImageSelect(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            console.log('🔵 handleBeforeImageSelect called:', file);
+            if (!file) {
+                console.log('⚠️ No file selected for before image');
+                return;
+            }
 
             beforeImageFile = file;
+            console.log('✅ beforeImageFile set:', beforeImageFile.name, beforeImageFile.size, 'bytes');
             const preview = document.getElementById('beforeImagePreview');
             preview.src = URL.createObjectURL(file);
             preview.classList.add('active');
@@ -671,9 +676,14 @@
 
         async function handleAfterImageSelect(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            console.log('🟢 handleAfterImageSelect called:', file);
+            if (!file) {
+                console.log('⚠️ No file selected for after image');
+                return;
+            }
 
             afterImageFile = file;
+            console.log('✅ afterImageFile set:', afterImageFile.name, afterImageFile.size, 'bytes');
             const preview = document.getElementById('afterImagePreview');
             preview.src = URL.createObjectURL(file);
             preview.classList.add('active');
@@ -685,6 +695,7 @@
         }
 
         async function uploadImage(file, type) {
+            console.log(`🌐 uploadImage called for ${type}:`, file.name, file.size, 'bytes');
             const formData = new FormData();
             formData.append('image', file);
 
@@ -700,6 +711,7 @@
                         if (e.lengthComputable) {
                             const percentComplete = (e.loaded / e.total) * 100;
                             progressFill.style.width = percentComplete + '%';
+                            console.log(`📊 Upload progress for ${type}: ${percentComplete.toFixed(1)}%`);
                         }
                     });
 
@@ -707,14 +719,17 @@
                         progressBar.classList.remove('active');
                         if (xhr.status === 200) {
                             const response = JSON.parse(xhr.responseText);
+                            console.log(`✅ Upload successful for ${type}:`, response);
                             resolve(response.url);
                         } else {
+                            console.error(`❌ Upload failed for ${type}, status:`, xhr.status, xhr.responseText);
                             reject(new Error('Upload failed'));
                         }
                     });
 
                     xhr.addEventListener('error', () => {
                         progressBar.classList.remove('active');
+                        console.error(`❌ Network error during ${type} upload`);
                         reject(new Error('Upload failed'));
                     });
 
@@ -729,10 +744,12 @@
                         xhr.setRequestHeader('admin-password', adminPassword);
                     }
 
+                    console.log(`🚀 Sending ${type} image upload request...`);
                     xhr.send(formData);
                 });
             } catch (error) {
                 progressBar.classList.remove('active');
+                console.error(`❌ Exception during ${type} upload:`, error);
                 throw error;
             }
         }
@@ -884,6 +901,13 @@
         async function saveGalleryItem(e) {
             e.preventDefault();
 
+            console.log('💾 saveGalleryItem called');
+            console.log('📋 Current state:', {
+                beforeImageFile: beforeImageFile ? beforeImageFile.name : 'null',
+                afterImageFile: afterImageFile ? afterImageFile.name : 'null',
+                currentEditId
+            });
+
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
@@ -892,16 +916,26 @@
                 let beforeImageUrl = document.getElementById('beforeImageUrl').value;
                 let afterImageUrl = document.getElementById('afterImageUrl').value;
 
+                console.log('🔍 Initial URLs from hidden inputs:', { beforeImageUrl, afterImageUrl });
+
                 // Upload new before image if selected
                 if (beforeImageFile) {
+                    console.log('📤 Uploading before image:', beforeImageFile.name);
                     showNotification('Uploading before image...', 'info');
                     beforeImageUrl = await uploadImage(beforeImageFile, 'before');
+                    console.log('✅ Before image uploaded, URL:', beforeImageUrl);
+                } else {
+                    console.log('⚠️ No beforeImageFile to upload');
                 }
 
                 // Upload new after image if selected
                 if (afterImageFile) {
+                    console.log('📤 Uploading after image:', afterImageFile.name);
                     showNotification('Uploading after image...', 'info');
                     afterImageUrl = await uploadImage(afterImageFile, 'after');
+                    console.log('✅ After image uploaded, URL:', afterImageUrl);
+                } else {
+                    console.log('⚠️ No afterImageFile to upload');
                 }
 
                 // Validate that we have both images
