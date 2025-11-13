@@ -798,11 +798,11 @@
                     <td>
                         <div class="thumbnail-container">
                             <div>
-                                <img src="${item.before_image}" alt="Before" class="thumbnail-img">
+                                <img src="${item.before_image_url}" alt="Before" class="thumbnail-img">
                                 <div class="thumbnail-label">Before</div>
                             </div>
                             <div>
-                                <img src="${item.after_image}" alt="After" class="thumbnail-img">
+                                <img src="${item.after_image_url}" alt="After" class="thumbnail-img">
                                 <div class="thumbnail-label">After</div>
                             </div>
                         </div>
@@ -864,14 +864,14 @@
                 document.getElementById('itemFeatured').checked = item.is_featured;
 
                 // Set existing image URLs
-                document.getElementById('beforeImageUrl').value = item.before_image;
-                document.getElementById('afterImageUrl').value = item.after_image;
+                document.getElementById('beforeImageUrl').value = item.before_image_url;
+                document.getElementById('afterImageUrl').value = item.after_image_url;
 
                 // Show existing images
                 const beforePreview = document.getElementById('beforeImagePreview');
                 const afterPreview = document.getElementById('afterImagePreview');
-                beforePreview.src = item.before_image;
-                afterPreview.src = item.after_image;
+                beforePreview.src = item.before_image_url;
+                afterPreview.src = item.after_image_url;
                 beforePreview.classList.add('active');
                 afterPreview.classList.add('active');
 

@@ -856,12 +856,12 @@
             div.innerHTML = `
                 <div class="before-after-container">
                     <div class="image-wrapper">
-                        <img src="${item.original_url}" alt="قبل" loading="lazy">
+                        <img src="${item.before_image_url}" alt="قبل" loading="lazy">
                         <div class="image-label">قبل</div>
                     </div>
                     <div class="divider-line"></div>
                     <div class="image-wrapper">
-                        <img src="${item.result_url}" alt="بعد" loading="lazy">
+                        <img src="${item.after_image_url}" alt="بعد" loading="lazy">
                         <div class="image-label">بعد</div>
                     </div>
                 </div>
@@ -902,8 +902,8 @@
         function updateLightbox() {
             const item = filteredItems[currentLightboxIndex];
 
-            document.getElementById('lightboxBeforeImg').src = item.original_url;
-            document.getElementById('lightboxAfterImg').src = item.result_url;
+            document.getElementById('lightboxBeforeImg').src = item.before_image_url;
+            document.getElementById('lightboxAfterImg').src = item.after_image_url;
             document.getElementById('lightboxTitle').textContent = item.title;
             document.getElementById('lightboxDescription').textContent = item.description || 'بدون توضیحات';
             document.getElementById('lightboxService').textContent = serviceTypeNames[item.service_type] || item.service_type;

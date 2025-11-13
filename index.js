@@ -6431,7 +6431,7 @@ app.post('/api/admin/blog/:id/publish', authenticateAdmin, async (req, res) => {
 app.get('/api/gallery', async (req, res) => {
   try {
     if (!supabase) {
-      return res.status(503).json({ error: 'Supabase not configured' });
+      return res.status(503).json({ success: false, error: 'Supabase not configured' });
     }
 
     const { data, error } = await supabase
@@ -6442,10 +6442,10 @@ app.get('/api/gallery', async (req, res) => {
 
     if (error) throw error;
 
-    res.json(data || []);
+    res.json({ success: true, items: data || [] });
   } catch (error) {
     console.error('Error fetching gallery:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
