@@ -719,10 +719,16 @@
                     });
 
                     xhr.open('POST', '/api/admin/gallery/upload');
-                    const token = localStorage.getItem('adminToken');
-                    if (token) {
-                        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+                    // Use same auth as other admin requests
+                    const adminEmail = sessionStorage.getItem('adminEmail');
+                    const adminPassword = sessionStorage.getItem('adminPassword');
+
+                    if (adminEmail && adminPassword) {
+                        xhr.setRequestHeader('admin-email', adminEmail);
+                        xhr.setRequestHeader('admin-password', adminPassword);
                     }
+
                     xhr.send(formData);
                 });
             } catch (error) {
