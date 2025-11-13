@@ -66,6 +66,15 @@ function renderAdminMenu(activePage) {
                     </svg>
                     <span>Blog Posts</span>
                 </a>
+                <a href="/admin/gallery" class="nav-item ${activePage === 'gallery' ? 'active' : ''}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="9" height="9" rx="1"/>
+                        <rect x="13" y="2" width="9" height="9" rx="1"/>
+                        <rect x="2" y="13" width="9" height="9" rx="1"/>
+                        <rect x="13" y="13" width="9" height="9" rx="1"/>
+                    </svg>
+                    <span>Before/After Gallery</span>
+                </a>
                 <a href="/admin/content" class="nav-item ${activePage === 'content' ? 'active' : ''}">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>

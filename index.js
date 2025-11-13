@@ -6419,6 +6419,273 @@ app.post('/api/admin/blog/:id/publish', authenticateAdmin, async (req, res) => {
   }
 });
 
+// ============================================
+// 🖼️ BEFORE/AFTER GALLERY API ENDPOINTS
+// ============================================
+
+// Public: Get all gallery items
+app.get('/api/gallery', async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Supabase not configured' });
+    }
+
+    const { data, error } = await supabase
+      .from('before_after_gallery')
+      .select('*')
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching gallery:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Get all gallery items (with more details)
+app.get('/api/admin/gallery', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase admin not configured' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('before_after_gallery')
+      .select('*')
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching gallery (admin):', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Get single gallery item
+app.get('/api/admin/gallery/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase admin not configured' });
+    }
+
+    const { id } = req.params;
+
+    const { data, error } = await supabaseAdmin
+      .from('before_after_gallery')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching gallery item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Upload image to Supabase Storage
+app.post('/api/admin/gallery/upload', authenticateAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase admin not configured' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const file = req.file;
+    const timestamp = Date.now();
+    const sanitizedName = sanitizeFilename(file.originalname);
+    const fileName = `${timestamp}-${sanitizedName}`;
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from('before-after-images')
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) throw error;
+
+    // Get public URL
+    const { data: urlData } = supabaseAdmin.storage
+      .from('before-after-images')
+      .getPublicUrl(fileName);
+
+    res.json({
+      success: true,
+      url: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Create new gallery item
+app.post('/api/admin/gallery', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase admin not configured' });
+    }
+
+    const {
+      title,
+      description,
+      before_image_url,
+      after_image_url,
+      service_type,
+      category,
+      is_featured,
+      display_order
+    } = req.body;
+
+    // Validation
+    if (!title || !before_image_url || !after_image_url) {
+      return res.status(400).json({ error: 'Title, before image, and after image are required' });
+    }
+
+    const galleryData = {
+      title,
+      description: description || null,
+      before_image_url,
+      after_image_url,
+      service_type: service_type || null,
+      category: category || null,
+      is_featured: is_featured || false,
+      display_order: display_order || 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseAdmin
+      .from('before_after_gallery')
+      .insert(galleryData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, item: data });
+  } catch (error) {
+    console.error('Error creating gallery item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Update gallery item
+app.put('/api/admin/gallery/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase admin not configured' });
+    }
+
+    const { id } = req.params;
+    const {
+      title,
+      description,
+      before_image_url,
+      after_image_url,
+      service_type,
+      category,
+      is_featured,
+      display_order
+    } = req.body;
+
+    const updateData = {
+      title,
+      description,
+      before_image_url,
+      after_image_url,
+      service_type,
+      category,
+      is_featured,
+      display_order,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseAdmin
+      .from('before_after_gallery')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, item: data });
+  } catch (error) {
+    console.error('Error updating gallery item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Delete gallery item
+app.delete('/api/admin/gallery/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase admin not configured' });
+    }
+
+    const { id } = req.params;
+
+    // Get item to delete images from storage
+    const { data: item } = await supabaseAdmin
+      .from('before_after_gallery')
+      .select('before_image_url, after_image_url')
+      .eq('id', id)
+      .single();
+
+    // Delete from database
+    const { error } = await supabaseAdmin
+      .from('before_after_gallery')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    // Optionally delete images from storage (extract filename from URL)
+    if (item) {
+      try {
+        const extractFileName = (url) => {
+          const parts = url.split('/');
+          return parts[parts.length - 1];
+        };
+
+        if (item.before_image_url) {
+          const beforeFileName = extractFileName(item.before_image_url);
+          await supabaseAdmin.storage.from('before-after-images').remove([beforeFileName]);
+        }
+
+        if (item.after_image_url) {
+          const afterFileName = extractFileName(item.after_image_url);
+          await supabaseAdmin.storage.from('before-after-images').remove([afterFileName]);
+        }
+      } catch (storageError) {
+        console.warn('Could not delete storage files:', storageError);
+        // Don't fail the request if storage deletion fails
+      }
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting gallery item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 سرور در حال اجرا است: http://0.0.0.0:${PORT}`);
   console.log(`📸 برنامه عکاسی مد با هوش مصنوعی آماده است!`);

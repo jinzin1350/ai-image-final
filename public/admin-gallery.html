@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Management - Admin Dashboard</title>
+    <link rel="stylesheet" href="/admin-style.css">
+
+    <style>
+        .gallery-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .gallery-table th,
+        .gallery-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .gallery-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .gallery-table tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.featured {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.normal {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-toggle {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-toggle:hover {
+            background: #059669;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .thumbnail-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid var(--gray-200);
+        }
+
+        .thumbnail-label {
+            font-size: 10px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray-500);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .btn-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-helper {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-400);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .image-upload-container {
+            margin-bottom: 16px;
+        }
+
+        .image-upload-box {
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .image-upload-box:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .image-upload-box.dragover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .image-preview.active {
+            display: block;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .upload-subtext {
+            color: var(--gray-400);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .thumbnail-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-nav-container" data-active-page="gallery"></div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div>
+                    <h1>🖼️ Before/After Gallery Management</h1>
+                    <p>Manage before/after gallery examples</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="loadGalleryItems()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+                <button class="btn-primary" onclick="openCreateModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    <span>➕ Add New Example</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-section">
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <div id="galleryList" style="display: none;">
+                <div class="gallery-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Title</th>
+                                <th>Service Type</th>
+                                <th>Order</th>
+                                <th>Featured</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="galleryTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <h3>No Gallery Items Yet</h3>
+                <p>Add your first before/after example to get started</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Gallery Item Editor Modal -->
+    <div id="editorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Example</h2>
+                <button class="btn-close" onclick="closeEditorModal()">&times;</button>
+            </div>
+
+            <form id="galleryForm" onsubmit="saveGalleryItem(event)">
+                <div class="form-group">
+                    <label class="form-label">Title *</label>
+                    <input type="text" id="itemTitle" class="form-input" required placeholder="Enter title (Persian supported)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="itemDescription" class="form-textarea" rows="3" placeholder="Enter description (Persian supported, optional)"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Before Image *</label>
+                        <div class="image-upload-container">
+                            <div class="image-upload-box" id="beforeUploadBox" onclick="document.getElementById('beforeImageInput').click()">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <div class="upload-text">Click to upload Before image</div>
+                                <div class="upload-subtext">PNG, JPG up to 10MB</div>
+                                <div class="progress-bar" id="beforeProgressBar">
+                                    <div class="progress-fill" id="beforeProgressFill"></div>
+                                </div>
+                            </div>
+                            <input type="file" id="beforeImageInput" accept="image/*" style="display: none;" onchange="handleBeforeImageSelect(event)">
+                            <img id="beforeImagePreview" class="image-preview" alt="Before preview">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">After Image *</label>
+                        <div class="image-upload-container">
+                            <div class="image-upload-box" id="afterUploadBox" onclick="document.getElementById('afterImageInput').click()">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <div class="upload-text">Click to upload After image</div>
+                                <div class="upload-subtext">PNG, JPG up to 10MB</div>
+                                <div class="progress-bar" id="afterProgressBar">
+                                    <div class="progress-fill" id="afterProgressFill"></div>
+                                </div>
+                            </div>
+                            <input type="file" id="afterImageInput" accept="image/*" style="display: none;" onchange="handleAfterImageSelect(event)">
+                            <img id="afterImagePreview" class="image-preview" alt="After preview">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Service Type *</label>
+                    <select id="itemServiceType" class="form-select" required>
+                        <option value="">Select Service Type</option>
+                        <option value="Complete Outfit">Complete Outfit</option>
+                        <option value="Accessories Only">Accessories Only</option>
+                        <option value="Color Collection">Color Collection</option>
+                        <option value="Flat Lay">Flat Lay</option>
+                        <option value="Scene Recreation">Scene Recreation</option>
+                        <option value="Style Transfer">Style Transfer</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <input type="text" id="itemCategory" class="form-input" placeholder="Optional category">
+                    <div class="form-helper">Optional custom category for additional organization</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Display Order</label>
+                    <input type="number" id="itemOrder" class="form-input" value="0" min="0">
+                    <div class="form-helper">Lower numbers appear first (default: 0)</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="itemFeatured">
+                        <label for="itemFeatured">Mark as Featured</label>
+                    </div>
+                </div>
+
+                <input type="hidden" id="beforeImageUrl">
+                <input type="hidden" id="afterImageUrl">
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeEditorModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveBtn">Save Example</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        let currentEditId = null;
+        let allGalleryItems = [];
+        let beforeImageFile = null;
+        let afterImageFile = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGalleryItems();
+            setupDragAndDrop();
+        });
+
+        // Setup drag and drop for image uploads
+        function setupDragAndDrop() {
+            const beforeBox = document.getElementById('beforeUploadBox');
+            const afterBox = document.getElementById('afterUploadBox');
+
+            [beforeBox, afterBox].forEach(box => {
+                box.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    box.classList.add('dragover');
+                });
+
+                box.addEventListener('dragleave', () => {
+                    box.classList.remove('dragover');
+                });
+
+                box.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    box.classList.remove('dragover');
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        if (box === beforeBox) {
+                            handleBeforeImageSelect({ target: { files: [file] } });
+                        } else {
+                            handleAfterImageSelect({ target: { files: [file] } });
+                        }
+                    }
+                });
+            });
+        }
+
+        async function handleBeforeImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            beforeImageFile = file;
+            const preview = document.getElementById('beforeImagePreview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('active');
+
+            // Update upload box text
+            const uploadBox = document.getElementById('beforeUploadBox');
+            uploadBox.querySelector('.upload-text').textContent = file.name;
+            uploadBox.querySelector('.upload-subtext').textContent = 'Click to change';
+        }
+
+        async function handleAfterImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            afterImageFile = file;
+            const preview = document.getElementById('afterImagePreview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('active');
+
+            // Update upload box text
+            const uploadBox = document.getElementById('afterUploadBox');
+            uploadBox.querySelector('.upload-text').textContent = file.name;
+            uploadBox.querySelector('.upload-subtext').textContent = 'Click to change';
+        }
+
+        async function uploadImage(file, type) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const progressBar = document.getElementById(`${type}ProgressBar`);
+            const progressFill = document.getElementById(`${type}ProgressFill`);
+            progressBar.classList.add('active');
+
+            try {
+                const xhr = new XMLHttpRequest();
+
+                return new Promise((resolve, reject) => {
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable) {
+                            const percentComplete = (e.loaded / e.total) * 100;
+                            progressFill.style.width = percentComplete + '%';
+                        }
+                    });
+
+                    xhr.addEventListener('load', () => {
+                        progressBar.classList.remove('active');
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            resolve(response.url);
+                        } else {
+                            reject(new Error('Upload failed'));
+                        }
+                    });
+
+                    xhr.addEventListener('error', () => {
+                        progressBar.classList.remove('active');
+                        reject(new Error('Upload failed'));
+                    });
+
+                    xhr.open('POST', '/api/upload-image');
+                    const token = localStorage.getItem('adminToken');
+                    if (token) {
+                        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                    }
+                    xhr.send(formData);
+                });
+            } catch (error) {
+                progressBar.classList.remove('active');
+                throw error;
+            }
+        }
+
+        async function loadGalleryItems() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('galleryList').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+
+                const response = await fetchWithAuth('/api/admin/gallery');
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    console.error('Invalid response format:', data);
+                    throw new Error('Invalid response format from server');
+                }
+
+                allGalleryItems = data;
+
+                if (data.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                } else {
+                    renderGalleryItems(data);
+                    document.getElementById('galleryList').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading gallery items:', error);
+                showNotification('Failed to load gallery items: ' + error.message, 'error');
+                document.getElementById('emptyState').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function renderGalleryItems(items) {
+            const tbody = document.getElementById('galleryTableBody');
+            tbody.innerHTML = items.map(item => `
+                <tr>
+                    <td>
+                        <div class="thumbnail-container">
+                            <div>
+                                <img src="${item.before_image}" alt="Before" class="thumbnail-img">
+                                <div class="thumbnail-label">Before</div>
+                            </div>
+                            <div>
+                                <img src="${item.after_image}" alt="After" class="thumbnail-img">
+                                <div class="thumbnail-label">After</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong>${item.title}</strong>
+                        ${item.description ? `<br><small style="color: var(--gray-500);">${item.description.substring(0, 50)}${item.description.length > 50 ? '...' : ''}</small>` : ''}
+                    </td>
+                    <td>${item.service_type || '-'}</td>
+                    <td>${item.display_order}</td>
+                    <td>
+                        <span class="badge ${item.is_featured ? 'featured' : 'normal'}">
+                            ${item.is_featured ? '⭐ Featured' : 'Normal'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn-sm btn-edit" onclick="editItem(${item.id})">Edit</button>
+                            <button class="btn-sm btn-delete" onclick="deleteItem(${item.id})">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openCreateModal() {
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Example';
+            document.getElementById('galleryForm').reset();
+
+            // Reset image previews
+            document.getElementById('beforeImagePreview').classList.remove('active');
+            document.getElementById('afterImagePreview').classList.remove('active');
+            beforeImageFile = null;
+            afterImageFile = null;
+
+            // Reset upload boxes
+            document.querySelector('#beforeUploadBox .upload-text').textContent = 'Click to upload Before image';
+            document.querySelector('#beforeUploadBox .upload-subtext').textContent = 'PNG, JPG up to 10MB';
+            document.querySelector('#afterUploadBox .upload-text').textContent = 'Click to upload After image';
+            document.querySelector('#afterUploadBox .upload-subtext').textContent = 'PNG, JPG up to 10MB';
+
+            document.getElementById('editorModal').classList.add('active');
+        }
+
+        async function editItem(id) {
+            try {
+                const response = await fetchWithAuth(`/api/admin/gallery/${id}`);
+                const item = await response.json();
+
+                currentEditId = id;
+                document.getElementById('modalTitle').textContent = 'Edit Gallery Example';
+
+                document.getElementById('itemTitle').value = item.title;
+                document.getElementById('itemDescription').value = item.description || '';
+                document.getElementById('itemServiceType').value = item.service_type || '';
+                document.getElementById('itemCategory').value = item.category || '';
+                document.getElementById('itemOrder').value = item.display_order;
+                document.getElementById('itemFeatured').checked = item.is_featured;
+
+                // Set existing image URLs
+                document.getElementById('beforeImageUrl').value = item.before_image;
+                document.getElementById('afterImageUrl').value = item.after_image;
+
+                // Show existing images
+                const beforePreview = document.getElementById('beforeImagePreview');
+                const afterPreview = document.getElementById('afterImagePreview');
+                beforePreview.src = item.before_image;
+                afterPreview.src = item.after_image;
+                beforePreview.classList.add('active');
+                afterPreview.classList.add('active');
+
+                // Update upload boxes
+                document.querySelector('#beforeUploadBox .upload-text').textContent = 'Current image loaded';
+                document.querySelector('#beforeUploadBox .upload-subtext').textContent = 'Click to change';
+                document.querySelector('#afterUploadBox .upload-text').textContent = 'Current image loaded';
+                document.querySelector('#afterUploadBox .upload-subtext').textContent = 'Click to change';
+
+                beforeImageFile = null;
+                afterImageFile = null;
+
+                document.getElementById('editorModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading gallery item:', error);
+                showNotification('Failed to load gallery item', 'error');
+            }
+        }
+
+        function closeEditorModal() {
+            document.getElementById('editorModal').classList.remove('active');
+            currentEditId = null;
+            beforeImageFile = null;
+            afterImageFile = null;
+        }
+
+        async function saveGalleryItem(e) {
+            e.preventDefault();
+
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                let beforeImageUrl = document.getElementById('beforeImageUrl').value;
+                let afterImageUrl = document.getElementById('afterImageUrl').value;
+
+                // Upload new before image if selected
+                if (beforeImageFile) {
+                    showNotification('Uploading before image...', 'info');
+                    beforeImageUrl = await uploadImage(beforeImageFile, 'before');
+                }
+
+                // Upload new after image if selected
+                if (afterImageFile) {
+                    showNotification('Uploading after image...', 'info');
+                    afterImageUrl = await uploadImage(afterImageFile, 'after');
+                }
+
+                // Validate that we have both images
+                if (!beforeImageUrl || !afterImageUrl) {
+                    throw new Error('Both before and after images are required');
+                }
+
+                const itemData = {
+                    title: document.getElementById('itemTitle').value.trim(),
+                    description: document.getElementById('itemDescription').value.trim(),
+                    before_image: beforeImageUrl,
+                    after_image: afterImageUrl,
+                    service_type: document.getElementById('itemServiceType').value,
+                    category: document.getElementById('itemCategory').value.trim(),
+                    display_order: parseInt(document.getElementById('itemOrder').value) || 0,
+                    is_featured: document.getElementById('itemFeatured').checked
+                };
+
+                const url = currentEditId
+                    ? `/api/admin/gallery/${currentEditId}`
+                    : '/api/admin/gallery';
+
+                const method = currentEditId ? 'PUT' : 'POST';
+
+                const response = await fetchWithAuth(url, {
+                    method,
+                    body: JSON.stringify(itemData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification(`Gallery item ${currentEditId ? 'updated' : 'created'} successfully`, 'success');
+                    closeEditorModal();
+                    loadGalleryItems();
+                } else {
+                    throw new Error(result.error || 'Failed to save gallery item');
+                }
+            } catch (error) {
+                console.error('Error saving gallery item:', error);
+                showNotification(error.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Example';
+            }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Are you sure you want to delete this gallery item? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/gallery/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification('Gallery item deleted successfully', 'success');
+                    loadGalleryItems();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting gallery item:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
