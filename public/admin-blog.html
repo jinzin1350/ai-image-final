@@ -212,6 +212,157 @@
             border-radius: 8px;
         }
 
+        /* Editor Tabs */
+        .editor-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .editor-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-600);
+            transition: all 0.3s;
+        }
+
+        .editor-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .editor-tab:hover {
+            color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .editor-view {
+            display: none;
+        }
+
+        .editor-view.active {
+            display: block;
+        }
+
+        #htmlEditor {
+            width: 100%;
+            height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            resize: vertical;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        #htmlPreview {
+            min-height: 400px;
+            padding: 24px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            background: white;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        /* Preview styles matching blog-post.html */
+        #htmlPreview h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #1a1a2e;
+        }
+
+        #htmlPreview h2 {
+            font-size: 1.6rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #1a1a2e;
+            font-weight: 700;
+        }
+
+        #htmlPreview h3 {
+            font-size: 1.3rem;
+            margin-top: 1.2rem;
+            margin-bottom: 0.6rem;
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        #htmlPreview p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        #htmlPreview ul, #htmlPreview ol {
+            margin-bottom: 1rem;
+            padding-right: 2rem;
+            padding-left: 0;
+        }
+
+        #htmlPreview li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        #htmlPreview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #htmlPreview table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        #htmlPreview table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: right;
+        }
+
+        #htmlPreview table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        #htmlPreview a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        #htmlPreview a:hover {
+            text-decoration: underline;
+        }
+
+        #htmlPreview .tldr {
+            background: #f0f4ff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-right: 4px solid #667eea;
+            margin: 1.5rem 0;
+        }
+
+        #htmlPreview .tldr h2 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
         .checkbox-wrapper {
             display: flex;
             align-items: center;
@@ -470,7 +621,26 @@
 
                 <div class="form-group">
                     <label class="form-label">Content *</label>
-                    <div id="editor-container"></div>
+
+                    <div class="editor-tabs">
+                        <button type="button" class="editor-tab active" data-view="wysiwyg">📝 WYSIWYG Editor</button>
+                        <button type="button" class="editor-tab" data-view="html">💻 HTML Code</button>
+                        <button type="button" class="editor-tab" data-view="preview">👁️ Preview</button>
+                    </div>
+
+                    <div class="editor-view active" id="wysiwyg-view">
+                        <div id="editor-container"></div>
+                    </div>
+
+                    <div class="editor-view" id="html-view">
+                        <textarea id="htmlEditor" placeholder="Paste your HTML code here..."></textarea>
+                    </div>
+
+                    <div class="editor-view" id="preview-view">
+                        <div id="htmlPreview">
+                            <p style="text-align: center; color: #999; padding: 40px;">Preview will appear here...</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -596,6 +766,50 @@
                     ]
                 },
                 placeholder: 'Write your blog post content here...'
+            });
+
+            // Editor tab switching
+            const editorTabs = document.querySelectorAll('.editor-tab');
+            const editorViews = document.querySelectorAll('.editor-view');
+            const htmlEditor = document.getElementById('htmlEditor');
+            const htmlPreview = document.getElementById('htmlPreview');
+
+            editorTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const viewName = tab.getAttribute('data-view');
+
+                    // Update active tab
+                    editorTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Update active view
+                    editorViews.forEach(v => v.classList.remove('active'));
+                    document.getElementById(`${viewName}-view`).classList.add('active');
+
+                    // Sync content between editors
+                    if (viewName === 'html') {
+                        // When switching to HTML view, get content from Quill
+                        htmlEditor.value = quill.root.innerHTML;
+                    } else if (viewName === 'preview') {
+                        // When switching to preview, show HTML content
+                        const htmlContent = htmlEditor.value || quill.root.innerHTML;
+                        htmlPreview.innerHTML = htmlContent;
+                    } else if (viewName === 'wysiwyg') {
+                        // When switching back to WYSIWYG, update Quill from HTML
+                        if (htmlEditor.value.trim()) {
+                            quill.root.innerHTML = htmlEditor.value;
+                        }
+                    }
+                });
+            });
+
+            // Live preview update when typing in HTML editor
+            htmlEditor.addEventListener('input', () => {
+                // Auto-update preview if it's visible
+                const previewView = document.getElementById('preview-view');
+                if (previewView.classList.contains('active')) {
+                    htmlPreview.innerHTML = htmlEditor.value;
+                }
             });
 
             loadBlogPosts();
@@ -765,6 +979,7 @@
                 // Set content in Quill
                 if (post.content) {
                     quill.root.innerHTML = post.content;
+                    document.getElementById('htmlEditor').value = post.content;
                 }
 
                 document.getElementById('editorModal').classList.add('active');
@@ -777,6 +992,17 @@
         function closeEditorModal() {
             document.getElementById('editorModal').classList.remove('active');
             currentEditId = null;
+
+            // Clear all editors
+            quill.setText('');
+            document.getElementById('htmlEditor').value = '';
+            document.getElementById('htmlPreview').innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">Preview will appear here...</p>';
+
+            // Reset to WYSIWYG tab
+            document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.editor-view').forEach(v => v.classList.remove('active'));
+            document.querySelector('.editor-tab[data-view="wysiwyg"]').classList.add('active');
+            document.getElementById('wysiwyg-view').classList.add('active');
         }
 
         async function saveBlogPost(e) {
@@ -813,7 +1039,7 @@
                     slug: document.getElementById('postSlug').value.trim(),
                     title: document.getElementById('postTitle').value.trim(),
                     excerpt: document.getElementById('postExcerpt').value.trim(),
-                    content: quill.root.innerHTML,
+                    content: document.getElementById('htmlEditor').value.trim() || quill.root.innerHTML,
                     author: document.getElementById('postAuthor').value.trim(),
                     category: document.getElementById('postCategory').value,
                     tags: currentTags,
