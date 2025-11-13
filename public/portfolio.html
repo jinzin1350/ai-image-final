@@ -725,32 +725,32 @@
                 <button class="filter-btn" data-filter="Complete Outfit">
                     <span>👗</span>
                     استایل کامل
-                    <span class="filter-badge" id="badge-Complete Outfit">0</span>
+                    <span class="filter-badge" id="badge-complete-outfit">0</span>
                 </button>
                 <button class="filter-btn" data-filter="Accessories Only">
                     <span>👜</span>
                     اکسسوری
-                    <span class="filter-badge" id="badge-Accessories Only">0</span>
+                    <span class="filter-badge" id="badge-accessories-only">0</span>
                 </button>
                 <button class="filter-btn" data-filter="Color Collection">
                     <span>🌈</span>
                     کالکشن رنگی
-                    <span class="filter-badge" id="badge-Color Collection">0</span>
+                    <span class="filter-badge" id="badge-color-collection">0</span>
                 </button>
                 <button class="filter-btn" data-filter="Flat Lay">
                     <span>📸</span>
                     فلت لی
-                    <span class="filter-badge" id="badge-Flat Lay">0</span>
+                    <span class="filter-badge" id="badge-flat-lay">0</span>
                 </button>
                 <button class="filter-btn" data-filter="Scene Recreation">
                     <span>🎬</span>
                     بازآفرینی صحنه
-                    <span class="filter-badge" id="badge-Scene Recreation">0</span>
+                    <span class="filter-badge" id="badge-scene-recreation">0</span>
                 </button>
                 <button class="filter-btn" data-filter="Style Transfer">
                     <span>✨</span>
                     انتقال استایل
-                    <span class="filter-badge" id="badge-Style Transfer">0</span>
+                    <span class="filter-badge" id="badge-style-transfer">0</span>
                 </button>
             </div>
         </div>
@@ -876,13 +876,30 @@
             }
         }
 
+        // Service type to badge ID mapping
+        const serviceToBadgeId = {
+            'Complete Outfit': 'badge-complete-outfit',
+            'Accessories Only': 'badge-accessories-only',
+            'Color Collection': 'badge-color-collection',
+            'Flat Lay': 'badge-flat-lay',
+            'Scene Recreation': 'badge-scene-recreation',
+            'Style Transfer': 'badge-style-transfer',
+            'Other': 'badge-other'
+        };
+
         // Update filter badges
         function updateFilterBadges() {
             document.getElementById('badge-all').textContent = allItems.length;
 
             Object.keys(serviceTypeNames).forEach(serviceType => {
                 const count = allItems.filter(item => item.service_type === serviceType).length;
-                document.getElementById(`badge-${serviceType}`).textContent = count;
+                const badgeId = serviceToBadgeId[serviceType];
+                if (badgeId) {
+                    const badge = document.getElementById(badgeId);
+                    if (badge) {
+                        badge.textContent = count;
+                    }
+                }
             });
         }
 
