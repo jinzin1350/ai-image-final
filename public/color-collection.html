@@ -26,6 +26,14 @@
             <section class="upload-section" id="colorCollectionUploadSection">
                 <h2>۱. آپلود تصاویر رنگ‌های مختلف</h2>
                 <p style="margin-bottom: 20px; color: #666;">تصاویر تمام رنگ‌های محصول را آپلود کنید (حداقل ۱ رنگ، حداکثر ۱۰ رنگ)</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button onclick="document.getElementById('colorCollectionInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
+                        📤 آپلود از کامپیوتر
+                    </button>
+                    <button onclick="openGalleryForGarment()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
+                        🖼️ انتخاب از گالری
+                    </button>
+                </div>
                 <div class="upload-area" id="colorCollectionUploadArea">
                     <input type="file" id="colorCollectionInput" accept="image/*" multiple hidden>
                     <div class="upload-placeholder" id="colorCollectionPlaceholder">
@@ -187,6 +195,26 @@
             <div class="loading-overlay" id="loadingOverlay" style="display: none;">
                 <div class="loading-spinner"></div>
                 <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Selection Modal -->
+    <div id="galleryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
+        <div style="max-width: 1200px; margin: 50px auto; background: white; border-radius: 16px; padding: 30px; position: relative;">
+            <button onclick="closeGalleryModal()" style="position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">✕ بستن</button>
+
+            <h2 style="margin-bottom: 10px;">🖼️ انتخاب از گالری</h2>
+            <p id="gallerySelectionInfo" style="color: #666; margin-bottom: 20px;"></p>
+
+            <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 150px)); gap: 12px; margin-top: 20px; justify-content: center;">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="confirmGallerySelection" onclick="confirmGallerySelection()" class="generate-btn" style="display: inline-block; padding: 12px 30px; margin: 0;">
+                    ✓ تأیید انتخاب
+                </button>
             </div>
         </div>
     </div>

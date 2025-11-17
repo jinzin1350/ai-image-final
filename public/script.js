@@ -2344,19 +2344,40 @@ function toggleImageSelection(imageUrl, imageCard) {
         imageCard.style.border = '3px solid transparent';
         badge.style.display = 'none';
     } else {
-        // Select
-        if (galleryMode === 'style-images' && selectedGalleryImages.length >= 3) {
-            alert('حداکثر 3 عکس می‌توانید انتخاب کنید');
-            return;
+        // Check limits based on gallery mode
+        let maxAllowed = 10;
+
+        if (galleryMode === 'style-images') {
+            maxAllowed = 3;
+        } else if (galleryMode === 'content-image' || galleryMode === 'reference-photo') {
+            maxAllowed = 1;
+        } else if (galleryMode === 'garment') {
+            // Determine max based on current service mode
+            if (currentMode === 'complete-outfit' || currentMode === 'scene-recreation') {
+                maxAllowed = 5;
+            } else if (currentMode === 'accessories-only') {
+                maxAllowed = 1;
+            } else if (currentMode === 'color-collection') {
+                maxAllowed = 10;
+            } else if (currentMode === 'flat-lay') {
+                maxAllowed = 6;
+            }
         }
-        if (galleryMode === 'content-image' && selectedGalleryImages.length >= 1) {
-            // Deselect previous selection for content image (only 1 allowed)
-            const allCards = document.querySelectorAll('#galleryGrid > div');
-            allCards.forEach(card => {
-                card.style.border = '3px solid transparent';
-                card.querySelector('.selection-badge').style.display = 'none';
-            });
-            selectedGalleryImages = [];
+
+        // Check if limit reached
+        if (selectedGalleryImages.length >= maxAllowed) {
+            if (maxAllowed === 1) {
+                // Deselect previous selection (only 1 allowed)
+                const allCards = document.querySelectorAll('#galleryGrid > div');
+                allCards.forEach(card => {
+                    card.style.border = '3px solid transparent';
+                    card.querySelector('.selection-badge').style.display = 'none';
+                });
+                selectedGalleryImages = [];
+            } else {
+                alert(`Maximum ${maxAllowed} images allowed`);
+                return;
+            }
         }
 
         selectedGalleryImages.push(imageUrl);
@@ -2418,6 +2439,42 @@ async function confirmGallerySelection() {
         if (analysisStatus) {
             analysisStatus.style.display = 'none';
         }
+    } else if (galleryMode === 'garment') {
+        // Handle garment selection for different services
+        const files = [];
+
+        // Convert image URLs to file objects (simulate upload from gallery)
+        for (const imageUrl of selectedGalleryImages) {
+            // Create a fake file object that points to the gallery image
+            uploadedGarments.push(imageUrl);
+        }
+
+        // Show previews based on current mode
+        showGarmentPreviews();
+
+    } else if (galleryMode === 'reference-photo') {
+        // Handle reference photo for scene-recreation
+        uploadedReferencePhoto = selectedGalleryImages[0];
+
+        // Show preview
+        const referencePhotoPreview = document.getElementById('referencePhotoPreview');
+        const referencePhotoImg = document.getElementById('referencePhotoImg');
+        const referencePhotoPlaceholder = document.getElementById('referencePhotoPlaceholder');
+
+        if (referencePhotoImg && referencePhotoPreview && referencePhotoPlaceholder) {
+            referencePhotoImg.src = uploadedReferencePhoto;
+            referencePhotoPreview.style.display = 'block';
+            referencePhotoPlaceholder.style.display = 'none';
+
+            // Trigger scene analysis
+            const sceneAnalysisSection = document.getElementById('sceneAnalysisSection');
+            if (sceneAnalysisSection) {
+                sceneAnalysisSection.style.display = 'block';
+            }
+
+            // Analyze the reference photo
+            await analyzeReferencePhoto(uploadedReferencePhoto);
+        }
     }
 
     checkGenerateButton();
@@ -2446,6 +2503,50 @@ function showStyleImagesPreviews() {
         previewsContainer.style.display = 'none';
         placeholder.style.display = 'flex';
     }
+}
+
+// ============================================
+// GALLERY SELECTION FOR OTHER SERVICES
+// ============================================
+
+// Open gallery for garment selection (for complete-outfit, accessories, color-collection, flat-lay)
+async function openGalleryForGarment() {
+    galleryMode = 'garment';
+    selectedGalleryImages = [];
+
+    // Set appropriate message based on current mode
+    let maxImages = 10;
+    let message = 'Select images from your gallery';
+
+    if (currentMode === 'complete-outfit') {
+        maxImages = 5;
+        message = 'Select up to 5 garment images';
+    } else if (currentMode === 'accessories-only') {
+        maxImages = 1;
+        message = 'Select one accessory image';
+    } else if (currentMode === 'color-collection') {
+        maxImages = 10;
+        message = 'Select up to 10 color variant images';
+    } else if (currentMode === 'flat-lay') {
+        maxImages = 6;
+        message = 'Select up to 6 product images';
+    } else if (currentMode === 'scene-recreation') {
+        maxImages = 5;
+        message = 'Select up to 5 garment images';
+    }
+
+    document.getElementById('gallerySelectionInfo').textContent = message;
+    await loadGalleryImages();
+    document.getElementById('galleryModal').style.display = 'block';
+}
+
+// Open gallery for reference photo (for scene-recreation)
+async function openGalleryForReferencePhoto() {
+    galleryMode = 'reference-photo';
+    selectedGalleryImages = [];
+    document.getElementById('gallerySelectionInfo').textContent = 'Select one reference photo';
+    await loadGalleryImages();
+    document.getElementById('galleryModal').style.display = 'block';
 }
 
 // ========================================
