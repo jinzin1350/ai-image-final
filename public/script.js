@@ -1949,6 +1949,7 @@ if (generateBtn) {
         // Build request body based on current mode
         let requestBody = {
             mode: currentMode, // NEW: Send current mode to API
+            shotTypeId: selectedShotTypeId,
             poseId: selectedPoseId,
             cameraAngleId: selectedCameraAngleId,
             styleId: selectedStyleId,
@@ -2089,6 +2090,7 @@ function saveToLocalStorage(imageData) {
             description: imageData.description || '',
             modelId: selectedModelId,
             backgroundId: selectedBackgroundId,
+            shotTypeId: selectedShotTypeId,
             poseId: selectedPoseId,
             cameraAngleId: selectedCameraAngleId,
             styleId: selectedStyleId,
