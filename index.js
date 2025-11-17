@@ -1762,7 +1762,17 @@ const poses = [
   { id: 'casual-lean', name: 'تکیه داده کژوال', description: 'Casual leaning pose, one hand in pocket' },
   { id: 'hands-on-hips', name: 'دست به کمر', description: 'Confident pose with hands on hips' },
   { id: 'crossed-arms', name: 'دست به سینه', description: 'Arms crossed, confident stance' },
-  { id: 'dynamic', name: 'پویا و متحرک', description: 'Dynamic, energetic pose with movement' }
+  { id: 'dynamic', name: 'پویا و متحرک', description: 'Dynamic, energetic pose with movement' },
+  { id: 'looking-back', name: 'نگاه به عقب', description: 'Looking back over shoulder, mysterious' },
+  { id: 'hands-in-pockets', name: 'دست در جیب', description: 'Both hands in pockets, casual and relaxed' },
+  { id: 'one-leg-bent', name: 'یک پا خم شده', description: 'One leg bent, weight on other leg, relaxed stance' },
+  { id: 'sitting-crossed-legs', name: 'نشسته پا روی پا', description: 'Sitting with legs crossed, elegant' },
+  { id: 'kneeling', name: 'زانو زده', description: 'Kneeling pose, artistic and unique' },
+  { id: 'jumping', name: 'در حال پرش', description: 'Jumping or leaping, energetic and fun' },
+  { id: 'leaning-wall', name: 'تکیه به دیوار', description: 'Leaning against wall, casual and cool' },
+  { id: 'hand-in-hair', name: 'دست در مو', description: 'Hand running through hair, fashion pose' },
+  { id: 'looking-down', name: 'نگاه به پایین', description: 'Looking down, contemplative and artistic' },
+  { id: 'back-to-camera', name: 'پشت به دوربین', description: 'Back turned to camera, mysterious look' }
 ];
 
 // لیست زاویه‌های دوربین
@@ -1770,7 +1780,13 @@ const cameraAngles = [
   { id: 'eye-level', name: 'هم‌سطح چشم', description: 'Camera at eye level, straight on' },
   { id: 'slightly-low', name: 'کمی از پایین', description: 'Slightly low angle, looking up' },
   { id: 'slightly-high', name: 'کمی از بالا', description: 'Slightly high angle, looking down' },
-  { id: 'three-quarter', name: 'سه‌چهارم', description: 'Three-quarter view, 45 degree angle' }
+  { id: 'three-quarter', name: 'سه‌چهارم', description: 'Three-quarter view, 45 degree angle' },
+  { id: 'low-angle', name: 'زاویه پایین (Worm\'s Eye)', description: 'Low angle looking up, powerful and dramatic' },
+  { id: 'high-angle', name: 'زاویه بالا (Bird\'s Eye)', description: 'High angle looking down, comprehensive view' },
+  { id: 'dutch-angle', name: 'زاویه مورب (Dutch Angle)', description: 'Tilted camera angle, dynamic and artistic' },
+  { id: 'over-shoulder', name: 'از پشت شانه', description: 'Over the shoulder view, natural perspective' },
+  { id: 'close-up', name: 'نمای نزدیک', description: 'Close-up shot, focus on details' },
+  { id: 'wide-angle', name: 'نمای وسیع', description: 'Wide angle shot, environmental context' }
 ];
 
 // لیست استایل‌ها و حال و هوا
@@ -1780,7 +1796,15 @@ const styles = [
   { id: 'elegant', name: 'شیک و اِلِگانت', description: 'Elegant, sophisticated, classy' },
   { id: 'sporty', name: 'اسپرت', description: 'Sporty, athletic, dynamic' },
   { id: 'trendy', name: 'مد روز', description: 'Trendy, modern, fashionable' },
-  { id: 'artistic', name: 'هنری', description: 'Artistic, creative, unique' }
+  { id: 'artistic', name: 'هنری', description: 'Artistic, creative, unique' },
+  { id: 'vintage', name: 'وینتیج کلاسیک', description: 'Vintage classic style, retro aesthetic' },
+  { id: 'minimalist', name: 'مینیمال', description: 'Minimalist, clean, simple and modern' },
+  { id: 'bohemian', name: 'بوهو (بوهمیان)', description: 'Bohemian style, free-spirited, eclectic' },
+  { id: 'streetwear', name: 'استریت‌ویر', description: 'Street style, urban, hip and cool' },
+  { id: 'luxury', name: 'لاکچری', description: 'Luxury high-end, premium, exclusive' },
+  { id: 'romantic', name: 'رمانتیک', description: 'Romantic, soft, dreamy atmosphere' },
+  { id: 'edgy', name: 'ادجی (جسورانه)', description: 'Edgy, bold, alternative fashion' },
+  { id: 'preppy', name: 'پرپی', description: 'Preppy, collegiate, polished casual' }
 ];
 
 // لیست نورپردازی
@@ -1790,7 +1814,29 @@ const lightings = [
   { id: 'golden-hour', name: 'طلایی (Golden Hour)', description: 'Golden hour, warm sunset light' },
   { id: 'dramatic', name: 'دراماتیک', description: 'Dramatic lighting, strong contrasts' },
   { id: 'soft-diffused', name: 'نرم و پخش شده', description: 'Soft diffused light, minimal shadows' },
-  { id: 'backlit', name: 'نور پشت', description: 'Backlit, rim lighting effect' }
+  { id: 'backlit', name: 'نور پشت', description: 'Backlit, rim lighting effect' },
+  { id: 'blue-hour', name: 'آبی (Blue Hour)', description: 'Blue hour twilight, cool moody atmosphere' },
+  { id: 'ring-light', name: 'رینگ لایت', description: 'Ring light, even beauty lighting' },
+  { id: 'side-light', name: 'نور از کنار', description: 'Side lighting, dimensional depth and texture' },
+  { id: 'rembrandt', name: 'رامبرانت', description: 'Rembrandt lighting, classic portrait style' },
+  { id: 'butterfly', name: 'پروانه‌ای', description: 'Butterfly lighting, glamorous beauty light' },
+  { id: 'split', name: 'نیم‌رخ', description: 'Split lighting, half face lit, dramatic' },
+  { id: 'neon', name: 'نئون شهری', description: 'Neon urban lighting, colorful modern vibe' },
+  { id: 'candlelight', name: 'نور شمع', description: 'Candlelight, warm intimate atmosphere' },
+  { id: 'overcast', name: 'ابری', description: 'Overcast diffused light, soft even illumination' }
+];
+
+// نوع فریم (Shot Type / Framing)
+const shotTypes = [
+  { id: 'full-body', name: '🧍 تمام قد (Full Body)', description: 'Full body shot from head to toe, complete view' },
+  { id: 'three-quarter', name: '⅗ سه‌چهارم (3/4 Body)', description: 'Three-quarter body shot, from head to mid-thigh' },
+  { id: 'half-body', name: '½ نیم‌تنه (Half Body)', description: 'Half body shot, from head to waist' },
+  { id: 'waist-up', name: '🎯 از کمر به بالا (Waist Up)', description: 'Waist up shot, from head to waist line' },
+  { id: 'knee-up', name: '🦵 از زانو به بالا (Knee Up)', description: 'From knee up, casual standing pose' },
+  { id: 'bust', name: '👔 سینه و شانه (Bust Shot)', description: 'Bust shot, head and shoulders plus upper chest' },
+  { id: 'head-shoulders', name: '👤 سر و گردن (Head & Shoulders)', description: 'Head and shoulders portrait, classic framing' },
+  { id: 'close-portrait', name: '📸 پرتره نزدیک (Close Portrait)', description: 'Close portrait, face and neck only' },
+  { id: 'extreme-close', name: '🔍 بسیار نزدیک (Extreme Close-up)', description: 'Extreme close-up, face details and expression' }
 ];
 
 // PHASE 1: Critical Quality Parameters
@@ -2143,6 +2189,11 @@ app.get('/api/supabase-config', (req, res) => {
 // دریافت لیست نورپردازی
 app.get('/api/lightings', (req, res) => {
   res.json(lightings);
+});
+
+// دریافت لیست نوع فریم (Shot Types)
+app.get('/api/shot-types', (req, res) => {
+  res.json(shotTypes);
 });
 
 // PHASE 1: New API endpoints for critical quality parameters

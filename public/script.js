@@ -41,6 +41,7 @@ let selectedBackgroundId = null;
 let selectedHijabType = null; // نوع حجاب انتخاب شده
 let allModels = [];
 let currentCategory = 'woman';
+let selectedShotTypeId = 'full-body';
 let selectedPoseId = 'standing-front';
 let selectedCameraAngleId = 'eye-level';
 let selectedStyleId = 'professional';
@@ -655,7 +656,33 @@ async function loadLightings() {
     }
 }
 
+// بارگذاری نوع فریم (Shot Types)
+async function loadShotTypes() {
+    const shotTypeSelect = document.getElementById('shotTypeSelect');
+    if (!shotTypeSelect) return;
+
+    try {
+        const response = await fetch('/api/shot-types');
+        const shotTypes = await response.json();
+
+        shotTypeSelect.innerHTML = shotTypes.map(shotType => `
+            <option value="${shotType.id}">${shotType.name}</option>
+        `).join('');
+
+        selectedShotTypeId = shotTypes[0]?.id || 'full-body';
+    } catch (error) {
+        console.error('خطا در بارگذاری نوع فریم:', error);
+    }
+}
+
 // Event listeners برای پارامترهای پیشرفته
+const shotTypeSelectEl = document.getElementById('shotTypeSelect');
+if (shotTypeSelectEl) {
+    shotTypeSelectEl.addEventListener('change', (e) => {
+        selectedShotTypeId = e.target.value;
+    });
+}
+
 const poseSelectEl = document.getElementById('poseSelect');
 if (poseSelectEl) {
     poseSelectEl.addEventListener('change', (e) => {
@@ -2089,6 +2116,7 @@ function saveToLocalStorage(imageData) {
 console.log('🔧 Initializing page data...');
 loadModels();
 loadBackgrounds();
+loadShotTypes();
 loadPoses();
 loadCameraAngles();
 loadStyles();
