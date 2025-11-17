@@ -2195,6 +2195,7 @@ app.get('/api/lightings', (req, res) => {
 app.get('/api/shot-types', (req, res) => {
   res.json(shotTypes);
 });
+// Trigger reload for Replit
 
 // PHASE 1: New API endpoints for critical quality parameters
 app.get('/api/color-temperatures', (req, res) => {
