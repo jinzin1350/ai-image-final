@@ -6845,6 +6845,61 @@ app.delete('/api/admin/brands/:brandId/photos/:photoId', authenticateAdmin, asyn
   }
 });
 
+// ADMIN: Upload image (base64) for brand reference photos
+app.post('/api/upload-image', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase not configured' });
+    }
+
+    const { image, filename } = req.body;
+
+    if (!image) {
+      return res.status(400).json({ error: 'No image data provided' });
+    }
+
+    // Extract base64 data and mime type
+    const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return res.status(400).json({ error: 'Invalid base64 image format' });
+    }
+
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const sanitizedName = filename ? sanitizeFilename(filename) : 'brand-photo.jpg';
+    const fileName = `brand-photos/${timestamp}-${sanitizedName}`;
+
+    // Upload to Supabase Storage in brand-photos bucket (or create one)
+    const { data, error } = await supabaseAdmin.storage
+      .from('admin-content') // Using existing bucket
+      .upload(fileName, buffer, {
+        contentType: mimeType,
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) throw error;
+
+    // Get public URL
+    const { data: urlData } = supabaseAdmin.storage
+      .from('admin-content')
+      .getPublicUrl(fileName);
+
+    res.json({
+      success: true,
+      url: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ============================================
 // 🖼️ BEFORE/AFTER GALLERY API ENDPOINTS
 // ============================================
