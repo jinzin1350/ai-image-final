@@ -1197,13 +1197,12 @@ app.post('/api/admin/sync-storage-to-db', authenticateAdmin, async (req, res) =>
 // Get all models with user information (for admin model management)
 app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
-    console.log('📋 Fetching models from content_library database...');
+    console.log('📋 Fetching models from models table...');
 
-    // Fetch from database with user information
+    // Fetch from dedicated models table
     const { data: models, error } = await supabaseAdmin
-      .from('content_library')
+      .from('models')
       .select('*')
-      .eq('content_type', 'model')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

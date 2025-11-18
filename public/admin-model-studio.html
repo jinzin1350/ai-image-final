@@ -1027,7 +1027,7 @@
                 </p>
 
                 <!-- Filter and Search -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                     <div>
                         <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس کاربر:</label>
                         <select id="filterByUser" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
@@ -1050,6 +1050,15 @@
                             <option value="plus-size">➕ سایز بزرگ</option>
                             <option value="accessory">💍 اکسسوری</option>
                             <option value="underwear">👙 لباس زیر</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس نوع سرویس:</label>
+                        <select id="filterByServiceType" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه سرویس‌ها</option>
+                            <option value="complete-outfit">👗 Complete Outfit</option>
+                            <option value="scene-recreation">🎬 Scene Recreation</option>
+                            <option value="both">🔄 هر دو</option>
                         </select>
                     </div>
                     <div>
@@ -1095,6 +1104,7 @@
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تصویر</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">نام</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسته</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">نوع سرویس</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">کاربر</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسترسی</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تاریخ</th>
@@ -1815,11 +1825,13 @@
         function filterModels() {
             const filterUser = document.getElementById('filterByUser').value;
             const filterCategory = document.getElementById('filterByCategory').value;
+            const filterServiceType = document.getElementById('filterByServiceType').value;
             const filterVisibility = document.getElementById('filterByVisibility').value;
 
             filteredModels = allModels.filter(model => {
                 if (filterUser && model.user_email !== filterUser) return false;
                 if (filterCategory && model.category !== filterCategory) return false;
+                if (filterServiceType && model.service_type !== filterServiceType) return false;
                 if (filterVisibility && model.visibility !== filterVisibility) return false;
                 return true;
             });
@@ -1850,6 +1862,12 @@
                 'teen': '🧑', 'plus-size': '➕', 'accessory': '💍', 'underwear': '👙'
             };
 
+            const serviceTypeLabels = {
+                'complete-outfit': '👗 Complete Outfit',
+                'scene-recreation': '🎬 Scene Recreation',
+                'both': '🔄 Both'
+            };
+
             tbody.innerHTML = filteredModels.map(model => `
                 <tr style="border-bottom: 1px solid #e5e7eb; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
                     <td style="padding: 12px; text-align: center;">
@@ -1864,6 +1882,11 @@
                     <td style="padding: 12px;">
                         <span style="background: #f3f4f6; padding: 4px 8px; border-radius: 6px; font-size: 13px;">
                             ${categoryEmojis[model.category] || '❓'} ${model.category}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: #ede9fe; color: #5b21b6; padding: 4px 8px; border-radius: 6px; font-size: 12px;">
+                            ${serviceTypeLabels[model.service_type] || model.service_type || 'both'}
                         </span>
                     </td>
                     <td style="padding: 12px; color: #6b7280; font-size: 14px;">
