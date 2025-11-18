@@ -511,10 +511,7 @@
             container.innerHTML = '<div class="loading-spinner"></div>';
 
             try {
-                const token = localStorage.getItem('admin_token');
-                const response = await fetch('/api/admin/brands', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetchWithAuth('/api/admin/brands');
 
                 if (!response.ok) throw new Error('Failed to load brands');
 
@@ -598,10 +595,7 @@
 
         async function editBrand(brandId) {
             try {
-                const token = localStorage.getItem('admin_token');
-                const response = await fetch(`/api/admin/brands/${brandId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetchWithAuth(`/api/admin/brands/${brandId}`);
 
                 if (!response.ok) throw new Error('Failed to load brand');
 
@@ -635,16 +629,11 @@
             }
 
             try {
-                const token = localStorage.getItem('admin_token');
                 const url = brandId ? `/api/admin/brands/${brandId}` : '/api/admin/brands';
                 const method = brandId ? 'PUT' : 'POST';
 
-                const response = await fetch(url, {
+                const response = await fetchWithAuth(url, {
                     method,
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(brandData)
                 });
 
@@ -668,10 +657,8 @@
             }
 
             try {
-                const token = localStorage.getItem('admin_token');
-                const response = await fetch(`/api/admin/brands/${brandId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetchWithAuth(`/api/admin/brands/${brandId}`, {
+                    method: 'DELETE'
                 });
 
                 if (!response.ok) throw new Error('Failed to delete brand');
@@ -702,10 +689,7 @@
             grid.innerHTML = '<div class="loading-spinner"></div>';
 
             try {
-                const token = localStorage.getItem('admin_token');
-                const response = await fetch(`/api/admin/brands/${brandId}/photos`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`);
 
                 if (!response.ok) throw new Error('Failed to load photos');
 
@@ -742,20 +726,15 @@
             if (files.length === 0) return;
 
             const brandId = document.getElementById('currentBrandId').value;
-            const token = localStorage.getItem('admin_token');
 
             for (let file of files) {
                 try {
                     // Convert to base64
                     const base64 = await fileToBase64(file);
 
-                    // Upload to server (you'll need to implement upload endpoint)
-                    const uploadResponse = await fetch('/api/upload-image', {
+                    // Upload to server
+                    const uploadResponse = await fetchWithAuth('/api/upload-image', {
                         method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
                         body: JSON.stringify({ image: base64, filename: file.name })
                     });
 
@@ -764,12 +743,8 @@
                     const { url } = await uploadResponse.json();
 
                     // Save to brand photos
-                    const saveResponse = await fetch(`/api/admin/brands/${brandId}/photos`, {
+                    const saveResponse = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`, {
                         method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
                         body: JSON.stringify({
                             image_url: url,
                             title: file.name
@@ -795,10 +770,8 @@
             }
 
             try {
-                const token = localStorage.getItem('admin_token');
-                const response = await fetch(`/api/admin/brands/${brandId}/photos/${photoId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetchWithAuth(`/api/admin/brands/${brandId}/photos/${photoId}`, {
+                    method: 'DELETE'
                 });
 
                 if (!response.ok) throw new Error('Failed to delete photo');
