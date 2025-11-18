@@ -946,6 +946,15 @@ body {
         display: block;
     }
 
+    /* Show mobile nav menu and overlay */
+    .mobile-nav {
+        display: block;
+    }
+
+    .mobile-nav-overlay {
+        display: block;
+    }
+
     /* Overlay and nav are created by JS, they handle their own display */
 
     .models-grid,
