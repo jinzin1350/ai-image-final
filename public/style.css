@@ -745,8 +745,8 @@ button,
 
 .hamburger-menu {
     display: none;
-    position: fixed;
-    top: 20px;
+    position: absolute;
+    top: 15px;
     right: 20px;
     z-index: 1001;
     background: transparent;
@@ -754,11 +754,6 @@ button,
     cursor: pointer;
     padding: 10px;
     -webkit-tap-highlight-color: transparent;
-}
-
-/* Ensure hamburger stays visible during scroll */
-body {
-    position: relative;
 }
 
 .hamburger-icon {
