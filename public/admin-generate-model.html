@@ -412,23 +412,19 @@
                                 <label class="form-label">Category</label>
                                 <select class="form-select" id="categorySelect">
                                     <option value="">Select Category</option>
-                                    <option value="woman">زن (Woman)</option>
-                                    <option value="man">مرد (Man)</option>
-                                    <option value="girl">دختر (Girl)</option>
-                                    <option value="boy">پسر (Boy)</option>
+                                    <option value="woman">👩 زن (Woman)</option>
+                                    <option value="man">👨 مرد (Man)</option>
+                                    <option value="girl">👧 دختر (Girl)</option>
+                                    <option value="boy">👦 پسر (Boy)</option>
+                                    <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                                    <option value="brand-woman">👩‍💼 زن برند (Brand Woman)</option>
+                                    <option value="brand-man">👨‍💼 مرد برند (Brand Man)</option>
+                                    <option value="brand-girl">👧‍💼 دختر برند (Brand Girl)</option>
+                                    <option value="brand-boy">👦‍💼 پسر برند (Brand Boy)</option>
+                                    <option value="brand-plus-size">➕‍💼 سایز بزرگ برند (Brand Plus Size)</option>
+                                    <option value="accessory">💍 اکسسوری (Accessory)</option>
+                                    <option value="underwear">👙 لباس زیر (Underwear)</option>
                                 </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Service Type</label>
-                                <select class="form-select" id="serviceTypeSelect">
-                                    <option value="both">🔄 Both Services</option>
-                                    <option value="complete-outfit">👗 Complete Outfit</option>
-                                    <option value="scene-recreation">🎬 Scene Recreation</option>
-                                </select>
-                                <small style="color: #6b7280; display: block; margin-top: 4px;">
-                                    💡 Select which service(s) will display this model
-                                </small>
                             </div>
 
                             <div class="form-group">
@@ -713,7 +709,6 @@
         async function saveModel() {
             const name = document.getElementById('modelName').value.trim();
             const category = document.getElementById('categorySelect').value;
-            const serviceType = document.getElementById('serviceTypeSelect').value;
             const ownerId = document.getElementById('ownerSelect').value;
             const isActive = document.getElementById('activeCheckbox').checked;
 
@@ -756,7 +751,6 @@
                         content_type: 'model',
                         visibility: isActive ? 'public' : 'private',
                         category: category,
-                        service_type: serviceType,
                         name: name,
                         description: `AI Generated Face Model: ${JSON.stringify(analysisData)}`
                     })

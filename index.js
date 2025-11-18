@@ -1021,7 +1021,6 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
         .insert([{
           name,
           category,
-          service_type: service_type || 'both',
           image_url: imageUrl,
           storage_path: imageUrl.split('/').pop(),
           owner_user_id: user_id,
@@ -1258,7 +1257,6 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
         id: model.id,
         name: model.name,
         category: model.category,
-        service_type: model.service_type,
         visibility: model.visibility,
         image_url: imageUrl,
         created_at: model.created_at,
@@ -2100,12 +2098,15 @@ app.get('/api/models', async (req, res) => {
           query = query.eq('visibility', 'public');
         }
 
-        // Filter by category for accessories mode
+        // Filter by category based on mode
         if (mode === 'accessories-only') {
           query = query.eq('category', 'accessory');
-        } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
-          // Filter by service_type: show models for this service or 'both'
-          query = query.in('service_type', [mode, 'both']);
+        } else if (mode === 'complete-outfit') {
+          // Show regular categories for complete-outfit service
+          query = query.in('category', ['woman', 'man', 'girl', 'boy', 'plus-size']);
+        } else if (mode === 'scene-recreation') {
+          // Show brand categories for scene-recreation service
+          query = query.in('category', ['brand-woman', 'brand-man', 'brand-girl', 'brand-boy', 'brand-plus-size']);
         }
 
         const { data: customModels } = await query.order('created_at', { ascending: false });
