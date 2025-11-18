@@ -1016,7 +1016,7 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
     let data, dbError;
 
     if (content_type === 'model') {
-      const result = await supabase
+      const result = await supabaseAdmin
         .from('models')
         .insert([{
           name,
@@ -1035,7 +1035,7 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
       dbError = result.error;
     } else {
       // For non-model content (garments, backgrounds, etc.), use content_library
-      const result = await supabase
+      const result = await supabaseAdmin
         .from('content_library')
         .insert([{
           content_type,
