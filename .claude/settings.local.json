@@ -10,7 +10,8 @@
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
       "Bash(cmd.exe //c \"taskkill //PID 29036 //F\")",
-      "Bash(node -c:*)"
+      "Bash(node -c:*)",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []

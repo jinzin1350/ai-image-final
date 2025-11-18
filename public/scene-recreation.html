@@ -275,6 +275,121 @@
             font-size: 16px;
             margin: 0;
         }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .brand-selection-container {
+                padding: 20px;
+            }
+
+            .brand-selection-header h2 {
+                font-size: 20px;
+            }
+
+            .brand-selection-header p {
+                font-size: 14px;
+            }
+
+            .brand-select-label {
+                font-size: 15px;
+            }
+
+            #brandSelect {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .brand-photos-header {
+                font-size: 16px;
+                padding: 15px 20px;
+            }
+
+            .brand-photos-grid-container {
+                padding: 15px;
+            }
+
+            #brandPhotosGrid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+                gap: 12px !important;
+            }
+
+            .selected-photo-preview {
+                padding: 20px;
+            }
+
+            .selected-photo-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .selected-photo-img-wrapper img {
+                max-width: 100%;
+            }
+
+            .selected-photo-header h3 {
+                font-size: 18px;
+            }
+
+            .success-message {
+                padding: 20px;
+            }
+
+            .success-icon {
+                font-size: 40px;
+            }
+
+            .success-message h3 {
+                font-size: 18px;
+            }
+
+            .success-message p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-selection-container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            .brand-selection-header h2 {
+                font-size: 18px;
+            }
+
+            .brand-select-label span:first-child {
+                font-size: 20px;
+            }
+
+            #brandPhotosGrid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+
+            .brand-photo-card {
+                border-radius: 12px;
+            }
+
+            .selected-photo-preview {
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            .selected-photo-img-wrapper img {
+                max-width: 100%;
+                max-height: 200px;
+            }
+
+            .clear-selection-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .success-message {
+                padding: 15px;
+                border-radius: 12px;
+            }
+        }
     </style>
 </head>
 <body>
