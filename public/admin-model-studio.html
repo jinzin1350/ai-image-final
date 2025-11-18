@@ -204,6 +204,20 @@
                             💡 دسته‌بندی کمک می‌کند تا مدل در بخش مناسب ذخیره شود
                         </small>
                     </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #047857;">
+                            نوع سرویس (Service Type):
+                        </label>
+                        <select id="uploadedModelServiceType" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px;">
+                            <option value="both">🔄 هر دو سرویس (Both Services)</option>
+                            <option value="complete-outfit">👗 عکاسی استایل کامل (Complete Outfit)</option>
+                            <option value="scene-recreation">🎬 الهام از عکس مرجع (Scene Recreation)</option>
+                        </select>
+                        <small style="color: #065f46; display: block; margin-top: 8px;">
+                            💡 انتخاب کنید این مدل در کدام سرویس نمایش داده شود
+                        </small>
+                    </div>
                 </div>
             </div>
 
@@ -958,6 +972,18 @@
                     </div>
 
                     <div class="form-group">
+                        <label>نوع سرویس (Service Type) *</label>
+                        <select id="saveServiceType">
+                            <option value="both">🔄 هر دو سرویس (Both Services)</option>
+                            <option value="complete-outfit">👗 عکاسی استایل کامل (Complete Outfit)</option>
+                            <option value="scene-recreation">🎬 الهام از عکس مرجع (Scene Recreation)</option>
+                        </select>
+                        <small style="color: #6b7280; display: block; margin-top: 4px;">
+                            💡 انتخاب کنید این مدل در کدام سرویس نمایش داده شود
+                        </small>
+                    </div>
+
+                    <div class="form-group">
                         <label>نمایش *</label>
                         <select id="saveVisibility">
                             <option value="private">خصوصی (فقط این کاربر)</option>
@@ -1347,8 +1373,9 @@
                     document.getElementById('previewSection').style.display = 'block';
                     document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
 
-                    // Pre-fill the category from the upload section
+                    // Pre-fill the category and service_type from the upload section
                     document.getElementById('saveCategory').value = document.getElementById('uploadedModelCategory').value;
+                    document.getElementById('saveServiceType').value = document.getElementById('uploadedModelServiceType').value;
 
                     showNotification('عکس آپلود شده آماده ذخیره است!', 'success');
                     generateBtn.disabled = false;
@@ -1676,6 +1703,7 @@
                         content_type: 'model',
                         visibility: document.getElementById('saveVisibility').value,
                         category: document.getElementById('saveCategory').value,
+                        service_type: document.getElementById('saveServiceType').value,
                         name: document.getElementById('saveName').value || 'AI Generated Model',
                         description: `AI Generated Model: ${generatedImageData.prompt}`,
                         prompt: generatedImageData.prompt

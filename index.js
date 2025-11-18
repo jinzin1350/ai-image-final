@@ -1001,7 +1001,7 @@ app.delete('/api/admin/model-prompts/:promptId', authenticateAdmin, async (req, 
 // Save generated image to user content (admin only)
 app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res) => {
   try {
-    const { imageUrl, user_id, content_type, visibility, category, name, description } = req.body;
+    const { imageUrl, user_id, content_type, visibility, category, service_type, name, description } = req.body;
 
     if (!user_id || !imageUrl) {
       return res.status(400).json({ success: false, error: 'User ID and image URL are required' });
@@ -1020,6 +1020,7 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
         tier: 'premium',
         visibility: visibility || 'private',
         category,
+        service_type: service_type || 'both',
         name,
         description,
         image_url: imageUrl,
@@ -2068,6 +2069,9 @@ app.get('/api/models', async (req, res) => {
           // Filter by category for accessories mode
           if (mode === 'accessories-only') {
             query = query.eq('category', 'accessory');
+          } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
+            // Filter by service_type: show models for this service or 'both'
+            query = query.or(`service_type.eq.${mode},service_type.eq.both`);
           }
 
           const { data: customModels } = await query.order('created_at', { ascending: false });
