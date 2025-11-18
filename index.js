@@ -2063,17 +2063,10 @@ app.get('/api/models', async (req, res) => {
   try {
     const mode = req.query.mode || 'complete-outfit';
 
-    // Start with appropriate base models based on mode
-    let allModels;
-    if (mode === 'accessories-only') {
-      // For accessories mode, ONLY include accessory models
-      allModels = [...accessoryModels];
-    } else {
-      // For other modes, use regular models (exclude accessory models)
-      allModels = [...models];
-    }
+    // Initialize empty models array - we'll fetch from database only
+    let allModels = [];
 
-    // If user is authenticated and Supabase is configured, add their custom models
+    // If user is authenticated and Supabase is configured, fetch models from database
     const authHeader = req.headers.authorization;
     if (authHeader && supabase) {
       try {
@@ -2126,7 +2119,7 @@ app.get('/api/models', async (req, res) => {
     res.json(allModels);
   } catch (error) {
     console.error('Error fetching models:', error);
-    res.json(models); // Fallback to default models
+    res.json([]); // Return empty array on error
   }
 });
 
