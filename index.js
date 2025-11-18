@@ -2087,7 +2087,7 @@ app.get('/api/models', async (req, res) => {
             query = query.eq('category', 'accessory');
           } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
             // Filter by service_type: show models for this service or 'both'
-            query = query.or(`service_type.eq.${mode},service_type.eq.both`);
+            query = query.in('service_type', [mode, 'both']);
           }
 
           const { data: customModels } = await query.order('created_at', { ascending: false });
