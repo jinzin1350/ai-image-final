@@ -1434,6 +1434,10 @@ app.get('/admin/background-studio', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-background-studio.html'));
 });
 
+app.get('/admin/brand-studio', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-brand-studio.html'));
+});
+
 app.get('/admin/generate-model', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-generate-model.html'));
 });
