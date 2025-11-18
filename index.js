@@ -1258,6 +1258,7 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
         id: model.id,
         name: model.name,
         category: model.category,
+        service_type: model.service_type,
         visibility: model.visibility,
         image_url: imageUrl,
         created_at: model.created_at,
