@@ -3,10 +3,6 @@
     'use strict';
 
     function initMobileMenu() {
-        // Find the header element
-        const header = document.querySelector('header');
-        if (!header) return;
-
         // Create hamburger button
         const hamburger = document.createElement('button');
         hamburger.className = 'hamburger-menu';
@@ -53,11 +49,8 @@
             </div>
         `;
 
-        // Add hamburger to header (so it sticks with it)
-        header.style.position = 'relative';
-        header.appendChild(hamburger);
-
-        // Add overlay and nav to body
+        // Add to DOM
+        document.body.appendChild(hamburger);
         document.body.appendChild(overlay);
         document.body.appendChild(nav);
 
