@@ -261,6 +261,14 @@
                                     <option value="russian">🇷🇺 روسی (Russian)</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>نوع سرویس (Service Type)</label>
+                                <select id="modelServiceType">
+                                    <option value="both">🔄 Both Services</option>
+                                    <option value="complete-outfit">👗 Complete Outfit</option>
+                                    <option value="scene-recreation">🎬 Scene Recreation</option>
+                                </select>
+                            </div>
                         </div>
                     </details>
 
@@ -1424,6 +1432,12 @@
                     document.getElementById('generatedImage').src = data.imageUrl;
                     document.getElementById('previewSection').style.display = 'block';
                     document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+                    // Pre-fill the service_type from the generation section
+                    const selectedServiceType = document.getElementById('modelServiceType').value;
+                    if (selectedServiceType) {
+                        document.getElementById('saveServiceType').value = selectedServiceType;
+                    }
 
                     showNotification('مدل با موفقیت تولید شد!', 'success');
                 } else {
