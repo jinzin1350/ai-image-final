@@ -3017,10 +3017,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     if (!selectedModel && modelId && modelId.startsWith('custom-') && supabase) {
       const customId = modelId.replace('custom-', '');
       const { data: customModel } = await supabase
-        .from('content_library')
+        .from('models')
         .select('*')
         .eq('id', customId)
-        .eq('content_type', 'model')
         .single();
 
       if (customModel) {
@@ -3043,10 +3042,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       if (!selectedModel2 && modelId2.startsWith('custom-') && supabase) {
         const customId2 = modelId2.replace('custom-', '');
         const { data: customModel2 } = await supabase
-          .from('content_library')
+          .from('models')
           .select('*')
           .eq('id', customId2)
-          .eq('content_type', 'model')
           .single();
 
         if (customModel2) {
