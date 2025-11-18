@@ -826,10 +826,12 @@ body {
     z-index: 999;
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .mobile-nav-overlay.active {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .mobile-nav {
@@ -940,11 +942,11 @@ body {
     }
 
     /* Show hamburger menu */
-    .hamburger-menu,
-    .mobile-nav-overlay,
-    .mobile-nav {
+    .hamburger-menu {
         display: block;
     }
+
+    /* Overlay and nav are created by JS, they handle their own display */
 
     .models-grid,
     .backgrounds-grid {
