@@ -1296,7 +1296,7 @@ app.put('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
     updateData.updated_at = new Date().toISOString();
 
     const { data: model, error } = await supabaseAdmin
-      .from('content_library')
+      .from('models')
       .update(updateData)
       .eq('id', modelId)
       .select()
@@ -1322,7 +1322,7 @@ app.delete('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => 
 
     // Get model info to find storage location
     const { data: model, error: fetchError } = await supabaseAdmin
-      .from('content_library')
+      .from('models')
       .select('*')
       .eq('id', modelId)
       .single();
@@ -1331,7 +1331,7 @@ app.delete('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => 
 
     // Delete from database
     const { error: deleteError } = await supabaseAdmin
-      .from('content_library')
+      .from('models')
       .delete()
       .eq('id', modelId);
 
@@ -1364,9 +1364,8 @@ app.delete('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => 
 app.post('/api/admin/models/make-all-public', authenticateAdmin, async (req, res) => {
   try {
     const { data: models, error } = await supabaseAdmin
-      .from('content_library')
+      .from('models')
       .update({ visibility: 'public' })
-      .eq('content_type', 'model')
       .select();
 
     if (error) throw error;
