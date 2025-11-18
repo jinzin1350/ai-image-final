@@ -2067,53 +2067,69 @@ app.get('/api/models', async (req, res) => {
     // Initialize empty models array - we'll fetch from database only
     let allModels = [];
 
-    // If user is authenticated and Supabase is configured, fetch models from database
-    const authHeader = req.headers.authorization;
-    if (authHeader && supabase) {
-      try {
-        const token = authHeader.replace('Bearer ', '');
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (error) throw error;
+    // Fetch models from database (both public and user's private models if logged in)
+    if (supabase) {
+      const authHeader = req.headers.authorization;
+      let userId = null;
 
-        if (user) {
-          // Fetch user's custom models from the dedicated models table
-          let query = supabase
-            .from('models')
-            .select('*')
-            .eq('is_active', true)
-            .or(`visibility.eq.public,owner_user_id.eq.${user.id}`);
-
-          // Filter by category for accessories mode
-          if (mode === 'accessories-only') {
-            query = query.eq('category', 'accessory');
-          } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
-            // Filter by service_type: show models for this service or 'both'
-            query = query.in('service_type', [mode, 'both']);
+      // Try to get user ID if authenticated
+      if (authHeader) {
+        try {
+          const token = authHeader.replace('Bearer ', '');
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+          if (!error && user) {
+            userId = user.id;
           }
-
-          const { data: customModels } = await query.order('created_at', { ascending: false });
-
-          if (customModels && customModels.length > 0) {
-            console.log(`✅ Found ${customModels.length} custom models for user ${user.id} (mode: ${mode})`);
-            // Transform database models to match frontend format
-            const transformedModels = customModels.map(model => ({
-              id: `custom-${model.id}`,
-              name: model.name,
-              category: model.category,
-              categoryName: model.category,
-              description: model.description || model.name,
-              image: model.image_url,
-              isCustom: true
-            }));
-
-            console.log('📋 Custom model categories:', transformedModels.map(m => m.category).join(', '));
-            allModels = [...transformedModels, ...allModels];
-          } else {
-            console.log(`ℹ️ No custom models found for user ${user.id} (mode: ${mode})`);
-          }
+        } catch (authError) {
+          console.log('Auth check failed, showing public models only');
         }
-      } catch (authError) {
-        console.log('Auth check failed, returning default models only');
+      }
+
+      try {
+        // Build query to fetch models
+        let query = supabase
+          .from('models')
+          .select('*')
+          .eq('is_active', true);
+
+        // If user is logged in, show their private models + public models
+        // If not logged in, show only public models
+        if (userId) {
+          query = query.or(`visibility.eq.public,owner_user_id.eq.${userId}`);
+        } else {
+          query = query.eq('visibility', 'public');
+        }
+
+        // Filter by category for accessories mode
+        if (mode === 'accessories-only') {
+          query = query.eq('category', 'accessory');
+        } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
+          // Filter by service_type: show models for this service or 'both'
+          query = query.in('service_type', [mode, 'both']);
+        }
+
+        const { data: customModels } = await query.order('created_at', { ascending: false });
+
+        if (customModels && customModels.length > 0) {
+          console.log(`✅ Found ${customModels.length} models (mode: ${mode}, userId: ${userId || 'public'})`);
+          // Transform database models to match frontend format
+          const transformedModels = customModels.map(model => ({
+            id: `custom-${model.id}`,
+            name: model.name,
+            category: model.category,
+            categoryName: model.category,
+            description: model.description || model.name,
+            image: model.image_url,
+            isCustom: true
+          }));
+
+          console.log('📋 Model categories:', transformedModels.map(m => m.category).join(', '));
+          allModels = [...transformedModels, ...allModels];
+        } else {
+          console.log(`ℹ️ No models found (mode: ${mode}, userId: ${userId || 'public'})`);
+        }
+      } catch (dbError) {
+        console.error('Database query failed:', dbError);
       }
     }
 
