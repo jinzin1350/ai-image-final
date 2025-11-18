@@ -5,6 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الهام از عکس مرجع - هوش مصنوعی</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Brand Selection Section Styles */
+        .brand-selection-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .brand-selection-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand-selection-header h2 {
+            font-size: 24px;
+            color: #1f2937;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .brand-selection-header p {
+            color: #6b7280;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .brand-select-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .brand-select-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            justify-content: center;
+        }
+
+        .brand-select-label span:first-child {
+            font-size: 24px;
+        }
+
+        #brandSelect {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            color: #374151;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        #brandSelect:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        #brandSelect:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .brand-photos-section {
+            margin-top: 30px;
+        }
+
+        .brand-photos-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .brand-photos-grid-container {
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .brand-photo-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f3f4f6;
+            aspect-ratio: 4/3;
+            border: 3px solid transparent;
+        }
+
+        .brand-photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .brand-photo-card.selected {
+            border-color: #10b981;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .brand-photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .brand-photo-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .brand-photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .brand-photo-card:hover .brand-photo-overlay {
+            opacity: 1;
+        }
+
+        .brand-photo-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .selected-photo-preview {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 3px solid #10b981;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 25px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .selected-photo-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .selected-photo-header h3 {
+            margin: 0;
+            color: #065f46;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .selected-photo-content {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .selected-photo-img-wrapper {
+            flex-shrink: 0;
+        }
+
+        .selected-photo-img-wrapper img {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 16px;
+            border: 3px solid #10b981;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-photo-info {
+            flex: 1;
+        }
+
+        .selected-photo-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #065f46;
+            margin: 0 0 15px 0;
+        }
+
+        .clear-selection-btn {
+            padding: 12px 24px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-selection-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            padding: 25px;
+            border-radius: 16px;
+            border-right: 6px solid #10b981;
+            text-align: center;
+            margin-top: 25px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: bounceIn 0.6s;
+        }
+
+        @keyframes bounceIn {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .success-message h3 {
+            color: #065f46;
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .success-message p {
+            color: #059669;
+            font-size: 16px;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -24,36 +295,53 @@
         <div class="main-content">
             <!-- بخش Scene Recreation - Brand Reference Photo Selection -->
             <section class="upload-section" id="sceneRecreationSection">
-                <h2>۱. انتخاب عکس مرجع از برندها</h2>
-                <p class="section-description">ابتدا یک برند را انتخاب کنید، سپس از میان عکس‌های آن برند، یک عکس مرجع انتخاب کنید</p>
+                <div class="brand-selection-container">
+                    <div class="brand-selection-header">
+                        <h2>۱. انتخاب عکس مرجع از برندها</h2>
+                        <p>ابتدا یک برند را انتخاب کنید، سپس از میان عکس‌های آن برند، یک عکس مرجع انتخاب کنید</p>
+                    </div>
 
-                <!-- Brand Selection -->
-                <div class="param-group" style="margin-bottom: 25px;">
-                    <label for="brandSelect" style="font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                        <span>🏷️</span>
-                        <span>انتخاب برند</span>
-                    </label>
-                    <select id="brandSelect" class="param-dropdown" onchange="loadBrandPhotos()" style="width: 100%; max-width: 400px; padding: 12px; font-size: 14px;">
-                        <option value="">ابتدا یک برند را انتخاب کنید...</option>
-                    </select>
+                    <!-- Brand Selection -->
+                    <div class="brand-select-wrapper">
+                        <div class="brand-select-label">
+                            <span>🏷️</span>
+                            <span>انتخاب برند</span>
+                        </div>
+                        <select id="brandSelect" onchange="loadBrandPhotos()">
+                            <option value="">ابتدا یک برند را انتخاب کنید...</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Brand Photos Grid -->
-                <div id="brandPhotosContainer" style="display: none; margin-top: 20px;">
-                    <h3 style="margin-bottom: 15px; font-size: 18px; color: #374151;">📸 عکس‌های مرجع برند</h3>
-                    <div id="brandPhotosGrid" class="backgrounds-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-                        <!-- Brand photos will be loaded here -->
+                <div id="brandPhotosContainer" class="brand-photos-section" style="display: none;">
+                    <div class="brand-photos-header">
+                        <span>📸</span>
+                        <span>عکس‌های مرجع برند</span>
+                    </div>
+                    <div class="brand-photos-grid-container">
+                        <div id="brandPhotosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+                            <!-- Brand photos will be loaded here -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- Selected Reference Photo Preview -->
-                <div id="selectedReferencePhotoPreview" style="display: none; margin-top: 25px; padding: 20px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
-                    <h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 16px;">✅ عکس مرجع انتخاب شده:</h3>
-                    <div style="display: flex; gap: 20px; align-items: center;">
-                        <img id="selectedReferencePhotoImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #10b981;">
-                        <div>
-                            <p id="selectedReferencePhotoInfo" style="margin: 0; color: #065f46; font-size: 14px;"></p>
-                            <button onclick="clearSelectedReferencePhoto()" class="remove-btn" style="margin-top: 10px;">حذف و انتخاب مجدد</button>
+                <div id="selectedReferencePhotoPreview" class="selected-photo-preview" style="display: none;">
+                    <div class="selected-photo-header">
+                        <span style="font-size: 28px;">✅</span>
+                        <h3>عکس مرجع انتخاب شده</h3>
+                    </div>
+                    <div class="selected-photo-content">
+                        <div class="selected-photo-img-wrapper">
+                            <img id="selectedReferencePhotoImg">
+                        </div>
+                        <div class="selected-photo-info">
+                            <p id="selectedReferencePhotoInfo" class="selected-photo-name"></p>
+                            <button onclick="clearSelectedReferencePhoto()" class="clear-selection-btn">
+                                <span>🗑️</span>
+                                <span>حذف و انتخاب مجدد</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -90,11 +378,11 @@
                 -->
 
                 <!-- Scene Analysis Results (hidden initially, shown after selection) -->
-                <div id="sceneAnalysisSection" style="display: none; margin-top: 30px;">
-                    <div style="background: #d4edda; padding: 20px; border-radius: 8px; border-right: 4px solid #28a745; text-align: center;">
-                        <div style="font-size: 24px; margin-bottom: 10px;">✅</div>
-                        <h3 style="color: #155724; margin-bottom: 10px; font-size: 18px;">عکس مرجع انتخاب شد!</h3>
-                        <p style="color: #155724; font-size: 15px;">می‌توانید به مراحل بعدی بروید و لباس و مدل خود را انتخاب کنید.</p>
+                <div id="sceneAnalysisSection" style="display: none;">
+                    <div class="success-message">
+                        <div class="success-icon">✅</div>
+                        <h3>عکس مرجع انتخاب شد!</h3>
+                        <p>می‌توانید به مراحل بعدی بروید و لباس و مدل خود را انتخاب کنید.</p>
                     </div>
                 </div>
             </section>
@@ -322,9 +610,13 @@
                 }
 
                 photosGrid.innerHTML = allBrandPhotos.map(photo => `
-                    <div class="background-card" onclick="selectBrandReferencePhoto('${photo.id}')" data-photo-id="${photo.id}" style="cursor: pointer; transition: all 0.2s;">
-                        <img src="${photo.image_url}" alt="${photo.title || 'Reference photo'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
-                        ${photo.title ? `<div class="background-name" style="margin-top: 8px; font-size: 14px; color: #374151;">${photo.title}</div>` : ''}
+                    <div class="brand-photo-card" onclick="selectBrandReferencePhoto('${photo.id}')" data-photo-id="${photo.id}">
+                        <img src="${photo.image_url}" alt="${photo.title || 'Reference photo'}">
+                        ${photo.title ? `
+                            <div class="brand-photo-overlay">
+                                <p class="brand-photo-title">${photo.title}</p>
+                            </div>
+                        ` : ''}
                     </div>
                 `).join('');
             } catch (error) {
@@ -341,12 +633,12 @@
             window.selectedBrandReferencePhoto = photo;
 
             // Update UI - highlight selected photo
-            document.querySelectorAll('.background-card').forEach(card => {
-                card.style.border = '2px solid #e5e7eb';
+            document.querySelectorAll('.brand-photo-card').forEach(card => {
+                card.classList.remove('selected');
             });
             const selectedCard = document.querySelector(`[data-photo-id="${photoId}"]`);
             if (selectedCard) {
-                selectedCard.style.border = '3px solid #10b981';
+                selectedCard.classList.add('selected');
             }
 
             // Show selected photo preview
@@ -378,8 +670,8 @@
             document.getElementById('sceneAnalysisSection').style.display = 'none';
 
             // Remove highlight from photos
-            document.querySelectorAll('.background-card').forEach(card => {
-                card.style.border = '2px solid #e5e7eb';
+            document.querySelectorAll('.brand-photo-card').forEach(card => {
+                card.classList.remove('selected');
             });
 
             // Update generate button state
