@@ -1851,9 +1851,13 @@ const colorTemperatures = [
 
 // عمق میدان (Depth of Field)
 const depthOfFields = [
-  { id: 'shallow', name: '🎯 کم (f/1.4-2.8)', description: 'Shallow depth of field f/1.4-f/2.8, blurred background bokeh, subject pops out, professional portrait look' },
-  { id: 'medium', name: '⚖️ متوسط (f/4-5.6)', description: 'Medium depth of field f/4-f/5.6, balanced focus, slight background blur, versatile' },
-  { id: 'deep', name: '📐 زیاد (f/8-16)', description: 'Deep depth of field f/8-f/16, everything sharp and in focus, product photography style' }
+  { id: 'ultra-shallow', name: '💫 خیلی کم (f/1.2-1.4)', description: 'Ultra shallow depth of field f/1.2-f/1.4, extreme bokeh, dreamy background blur, cinematic look' },
+  { id: 'shallow', name: '🎯 کم (f/1.8-2.8)', description: 'Shallow depth of field f/1.8-f/2.8, soft background bokeh, subject pops out, professional portrait look' },
+  { id: 'medium-shallow', name: '🌟 کم به متوسط (f/3.5-4)', description: 'Medium-shallow depth of field f/3.5-f/4, gentle background separation, natural look' },
+  { id: 'medium', name: '⚖️ متوسط (f/5.6)', description: 'Medium depth of field f/5.6, balanced focus, slight background blur, versatile for most situations' },
+  { id: 'medium-deep', name: '🔍 متوسط به زیاد (f/8)', description: 'Medium-deep depth of field f/8, good sharpness throughout, environmental context visible' },
+  { id: 'deep', name: '📐 زیاد (f/11-16)', description: 'Deep depth of field f/11-f/16, everything sharp and in focus, product photography style' },
+  { id: 'ultra-deep', name: '🌍 خیلی زیاد (f/22+)', description: 'Ultra deep depth of field f/22+, maximum sharpness, landscape photography style, tack-sharp details' }
 ];
 
 // بافت پارچه (Fabric Texture)
