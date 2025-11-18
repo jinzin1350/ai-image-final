@@ -2112,14 +2112,16 @@ app.get('/api/models', async (req, res) => {
 
         if (customModels && customModels.length > 0) {
           console.log(`✅ Found ${customModels.length} models (mode: ${mode}, userId: ${userId || 'public'})`);
+
           // Transform database models to match frontend format
+          // Use image_url directly - it's already stored as a valid URL in the database
           const transformedModels = customModels.map(model => ({
             id: `custom-${model.id}`,
             name: model.name,
             category: model.category,
             categoryName: model.category,
             description: model.description || model.name,
-            image: model.image_url,
+            image: model.image_url, // Already a valid public URL
             isCustom: true
           }));
 
