@@ -1694,22 +1694,23 @@ function checkGenerateButton() {
                   selectedBackgroundId;
 
     } else if (currentMode === 'scene-recreation') {
-        // Scene Recreation mode: need reference photo, scene analysis, garment, model, and hijab
+        // Scene Recreation mode: need brand reference photo, garment, model, and hijab
         const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
+        // Check if brand reference photo is selected (new method)
+        const hasReferencePhoto = window.selectedBrandReferencePhoto !== null && window.selectedBrandReferencePhoto !== undefined;
+
         // If 2+ people detected, require model 2 as well
         if (referencePhotoPeopleCount >= 2) {
-            isValid = uploadedReferencePhoto !== null &&
-                      sceneAnalysis !== null &&
+            isValid = hasReferencePhoto &&
                       uploadedGarmentPaths.length > 0 &&
                       uploadedGarmentPaths2.length > 0 &&
                       selectedModelId &&
                       selectedModelId2 &&
                       hijabCondition;
         } else {
-            isValid = uploadedReferencePhoto !== null &&
-                      sceneAnalysis !== null &&
+            isValid = hasReferencePhoto &&
                       uploadedGarmentPaths.length > 0 &&
                       selectedModelId &&
                       hijabCondition;
@@ -2002,8 +2003,16 @@ if (generateBtn) {
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
 
         } else if (currentMode === 'scene-recreation') {
-            // Scene Recreation mode - recreate scene from reference photo
-            requestBody.referencePhotoPath = uploadedReferencePhoto;
+            // Scene Recreation mode - recreate scene from reference photo (brand photo)
+            // Use brand reference photo instead of uploaded photo
+            if (window.selectedBrandReferencePhoto) {
+                requestBody.brandReferencePhotoUrl = window.selectedBrandReferencePhoto.image_url;
+                requestBody.brandReferencePhotoId = window.selectedBrandReferencePhoto.id;
+            } else {
+                // Fallback to uploaded reference photo (if uncommented)
+                requestBody.referencePhotoPath = uploadedReferencePhoto;
+            }
+
             requestBody.sceneAnalysis = sceneAnalysis;
             requestBody.garmentPaths = uploadedGarmentPaths;
             requestBody.modelId = selectedModelId;

@@ -22,10 +22,44 @@
         </header>
 
         <div class="main-content">
-            <!-- بخش Scene Recreation -->
+            <!-- بخش Scene Recreation - Brand Reference Photo Selection -->
             <section class="upload-section" id="sceneRecreationSection">
-                <h2>۱. آپلود عکس مرجع</h2>
-                <p class="section-description">عکسی را آپلود کنید که می‌خواهید فضا و نورپردازی آن را بازسازی کنیم</p>
+                <h2>۱. انتخاب عکس مرجع از برندها</h2>
+                <p class="section-description">ابتدا یک برند را انتخاب کنید، سپس از میان عکس‌های آن برند، یک عکس مرجع انتخاب کنید</p>
+
+                <!-- Brand Selection -->
+                <div class="param-group" style="margin-bottom: 25px;">
+                    <label for="brandSelect" style="font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <span>🏷️</span>
+                        <span>انتخاب برند</span>
+                    </label>
+                    <select id="brandSelect" class="param-dropdown" onchange="loadBrandPhotos()" style="width: 100%; max-width: 400px; padding: 12px; font-size: 14px;">
+                        <option value="">ابتدا یک برند را انتخاب کنید...</option>
+                    </select>
+                </div>
+
+                <!-- Brand Photos Grid -->
+                <div id="brandPhotosContainer" style="display: none; margin-top: 20px;">
+                    <h3 style="margin-bottom: 15px; font-size: 18px; color: #374151;">📸 عکس‌های مرجع برند</h3>
+                    <div id="brandPhotosGrid" class="backgrounds-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                        <!-- Brand photos will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Selected Reference Photo Preview -->
+                <div id="selectedReferencePhotoPreview" style="display: none; margin-top: 25px; padding: 20px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
+                    <h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 16px;">✅ عکس مرجع انتخاب شده:</h3>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <img id="selectedReferencePhotoImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #10b981;">
+                        <div>
+                            <p id="selectedReferencePhotoInfo" style="margin: 0; color: #065f46; font-size: 14px;"></p>
+                            <button onclick="clearSelectedReferencePhoto()" class="remove-btn" style="margin-top: 10px;">حذف و انتخاب مجدد</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HIDDEN: Old upload method (kept for potential revert) -->
+                <!--
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <button onclick="document.getElementById('referencePhotoInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
                         📤 آپلود از کامپیوتر
@@ -53,13 +87,14 @@
                         <button class="remove-btn" onclick="removeReferencePhoto()">حذف عکس</button>
                     </div>
                 </div>
+                -->
 
-                <!-- Scene Analysis Results -->
+                <!-- Scene Analysis Results (hidden initially, shown after selection) -->
                 <div id="sceneAnalysisSection" style="display: none; margin-top: 30px;">
                     <div style="background: #d4edda; padding: 20px; border-radius: 8px; border-right: 4px solid #28a745; text-align: center;">
                         <div style="font-size: 24px; margin-bottom: 10px;">✅</div>
-                        <h3 style="color: #155724; margin-bottom: 10px; font-size: 18px;">تحلیل کامل شد!</h3>
-                        <p style="color: #155724; font-size: 15px;">اطلاعات صحنه با موفقیت استخراج شد. می‌توانید به مراحل بعدی بروید.</p>
+                        <h3 style="color: #155724; margin-bottom: 10px; font-size: 18px;">عکس مرجع انتخاب شد!</h3>
+                        <p style="color: #155724; font-size: 15px;">می‌توانید به مراحل بعدی بروید و لباس و مدل خود را انتخاب کنید.</p>
                     </div>
                 </div>
             </section>
@@ -109,11 +144,6 @@
                         <option value="man">👨 مرد (Man)</option>
                         <option value="girl">👧 دختر (Girl)</option>
                         <option value="boy">👦 پسر (Boy)</option>
-                        <option value="child">👶 کودک (Child)</option>
-                        <option value="couple">💑 زوج (Couple)</option>
-                        <option value="group">👥 گروه (Group)</option>
-                        <option value="elderly">👴 سالمند (Elderly)</option>
-                        <option value="teen">🧑 نوجوان (Teen)</option>
                         <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
                     </select>
                 </div>
@@ -157,11 +187,6 @@
                         <option value="man">👨 مرد (Man)</option>
                         <option value="girl">👧 دختر (Girl)</option>
                         <option value="boy">👦 پسر (Boy)</option>
-                        <option value="child">👶 کودک (Child)</option>
-                        <option value="couple">💑 زوج (Couple)</option>
-                        <option value="group">👥 گروه (Group)</option>
-                        <option value="elderly">👴 سالمند (Elderly)</option>
-                        <option value="teen">🧑 نوجوان (Teen)</option>
                         <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
                     </select>
                 </div>
@@ -233,6 +258,142 @@
     <script>
         // Set the current mode for this page
         window.currentMode = 'scene-recreation';
+
+        // Brand reference photo selection variables
+        let allBrands = [];
+        let allBrandPhotos = [];
+        let selectedBrandReferencePhoto = null;
+
+        // Load brands on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBrands();
+        });
+
+        // Load all available brands
+        async function loadBrands() {
+            try {
+                const response = await fetch('/api/brands');
+                if (!response.ok) throw new Error('Failed to load brands');
+
+                allBrands = await response.json();
+                const brandSelect = document.getElementById('brandSelect');
+
+                if (allBrands.length === 0) {
+                    brandSelect.innerHTML = '<option value="">هیچ برندی موجود نیست</option>';
+                    return;
+                }
+
+                brandSelect.innerHTML = '<option value="">ابتدا یک برند را انتخاب کنید...</option>' +
+                    allBrands.map(brand => `
+                        <option value="${brand.id}">${brand.name}</option>
+                    `).join('');
+            } catch (error) {
+                console.error('Error loading brands:', error);
+                alert('خطا در بارگذاری برندها. لطفاً صفحه را رفرش کنید.');
+            }
+        }
+
+        // Load photos for selected brand
+        async function loadBrandPhotos() {
+            const brandSelect = document.getElementById('brandSelect');
+            const brandId = brandSelect.value;
+
+            const photosContainer = document.getElementById('brandPhotosContainer');
+            const photosGrid = document.getElementById('brandPhotosGrid');
+
+            if (!brandId) {
+                photosContainer.style.display = 'none';
+                return;
+            }
+
+            // Show loading
+            photosContainer.style.display = 'block';
+            photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">در حال بارگذاری...</div>';
+
+            try {
+                const response = await fetch(`/api/brands/${brandId}/photos`);
+                if (!response.ok) throw new Error('Failed to load brand photos');
+
+                allBrandPhotos = await response.json();
+
+                if (allBrandPhotos.length === 0) {
+                    photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکسی برای این برند موجود نیست</div>';
+                    return;
+                }
+
+                photosGrid.innerHTML = allBrandPhotos.map(photo => `
+                    <div class="background-card" onclick="selectBrandReferencePhoto('${photo.id}')" data-photo-id="${photo.id}" style="cursor: pointer; transition: all 0.2s;">
+                        <img src="${photo.image_url}" alt="${photo.title || 'Reference photo'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                        ${photo.title ? `<div class="background-name" style="margin-top: 8px; font-size: 14px; color: #374151;">${photo.title}</div>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading brand photos:', error);
+                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>';
+            }
+        }
+
+        // Select a brand reference photo
+        function selectBrandReferencePhoto(photoId) {
+            const photo = allBrandPhotos.find(p => p.id === photoId);
+            if (!photo) return;
+
+            selectedBrandReferencePhoto = photo;
+
+            // Update UI - highlight selected photo
+            document.querySelectorAll('.background-card').forEach(card => {
+                card.style.border = '2px solid #e5e7eb';
+            });
+            const selectedCard = document.querySelector(`[data-photo-id="${photoId}"]`);
+            if (selectedCard) {
+                selectedCard.style.border = '3px solid #10b981';
+            }
+
+            // Show selected photo preview
+            const previewSection = document.getElementById('selectedReferencePhotoPreview');
+            const previewImg = document.getElementById('selectedReferencePhotoImg');
+            const previewInfo = document.getElementById('selectedReferencePhotoInfo');
+
+            previewImg.src = photo.image_url;
+            previewInfo.textContent = photo.title || 'عکس مرجع برند';
+            previewSection.style.display = 'block';
+
+            // Show analysis section
+            const analysisSection = document.getElementById('sceneAnalysisSection');
+            analysisSection.style.display = 'block';
+
+            // Scroll to preview
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Update generate button state
+            updateGenerateButtonState();
+        }
+
+        // Clear selected reference photo
+        function clearSelectedReferencePhoto() {
+            selectedBrandReferencePhoto = null;
+
+            // Hide preview
+            document.getElementById('selectedReferencePhotoPreview').style.display = 'none';
+            document.getElementById('sceneAnalysisSection').style.display = 'none';
+
+            // Remove highlight from photos
+            document.querySelectorAll('.background-card').forEach(card => {
+                card.style.border = '2px solid #e5e7eb';
+            });
+
+            // Update generate button state
+            updateGenerateButtonState();
+        }
+
+        // Update generate button state based on selections
+        function updateGenerateButtonState() {
+            // This will be called by the main script.js
+            // The button should be enabled when:
+            // - Reference photo is selected
+            // - Garment is uploaded
+            // - Model is selected
+        }
     </script>
     <script src="script.js"></script>
 </body>

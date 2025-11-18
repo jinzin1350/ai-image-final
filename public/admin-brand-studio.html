@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مدیریت برندها | Brand Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .brand-studio-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+
+        .header-section p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .brand-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .brand-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 5px 0;
+        }
+
+        .brand-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .brand-description {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .brand-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .brand-stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .brand-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .brand-stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .brand-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .brand-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            margin: 50px auto;
+            border-radius: 15px;
+            padding: 0;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            background: #f9fafb;
+            border-radius: 0 0 15px 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-card {
+            position: relative;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            background: #f3f4f6;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .photo-card:hover .photo-card-overlay {
+            opacity: 1;
+        }
+
+        .photo-card-overlay button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f3f4f6;
+        }
+
+        .upload-area.dragging {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>پنل مدیریت</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/admin-dashboard.html">📊 داشبورد</a>
+                <a href="/admin-users.html">👥 کاربران</a>
+                <a href="/admin-content.html">📦 محتوا</a>
+                <a href="/admin-model-studio.html">🎨 تولید مدل</a>
+                <a href="/admin-background-studio.html">🖼️ تولید بک‌گراند</a>
+                <a href="/admin-brand-studio.html" class="active">🏷️ مدیریت برندها</a>
+                <a href="/admin-gallery.html">🖼️ گالری قبل/بعد</a>
+                <a href="/admin-blog.html">📝 بلاگ</a>
+                <a href="/admin-pricing.html">💰 قیمت‌گذاری</a>
+                <a href="/admin-tier-settings.html">⚙️ تنظیمات سطوح</a>
+                <a href="/admin-analytics.html">📈 آنالیتیکس</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/index.html" class="logout-btn">🏠 بازگشت به سایت</a>
+                <button onclick="handleAdminLogout()" class="logout-btn">🚪 خروج</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="brand-studio-container">
+                <div class="header-section">
+                    <h1>🏷️ مدیریت برندها و عکس‌های مرجع</h1>
+                    <p>مدیریت برندها و آپلود عکس‌های مرجع برای سرویس "الهام از عکس مرجع"</p>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="openCreateBrandModal()">
+                        ➕ افزودن برند جدید
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadBrands()">
+                        🔄 بارگذاری مجدد
+                    </button>
+                </div>
+
+                <div id="brandsContainer">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create/Edit Brand Modal -->
+    <div id="brandModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="brandModalTitle">افزودن برند جدید</h2>
+                <button class="close-modal" onclick="closeBrandModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="brandForm">
+                    <input type="hidden" id="brandId">
+
+                    <div class="form-group">
+                        <label for="brandName">نام برند *</label>
+                        <input type="text" id="brandName" required placeholder="مثال: Nike Sportswear">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="brandLogo">لوگو برند (URL)</label>
+                        <input type="url" id="brandLogo" placeholder="https://example.com/logo.png">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="brandDescription">توضیحات</label>
+                        <textarea id="brandDescription" placeholder="توضیحات کوتاه در مورد برند..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="brandIsActive" checked>
+                            برند فعال است
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBrandModal()">لغو</button>
+                <button class="btn btn-primary" onclick="saveBrand()">ذخیره برند</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Photos Modal -->
+    <div id="photosModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h2 id="photosModalTitle">مدیریت عکس‌های برند</h2>
+                <button class="close-modal" onclick="closePhotosModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentBrandId">
+
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('photoUpload').click()">
+                    <input type="file" id="photoUpload" accept="image/*" multiple hidden onchange="handlePhotoUpload(event)">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📤</div>
+                    <h3>آپلود عکس مرجع</h3>
+                    <p>کلیک کنید یا فایل‌ها را بکشید و رها کنید</p>
+                    <small style="color: #6b7280;">JPG, PNG, WEBP - حداکثر 10MB</small>
+                </div>
+
+                <div id="photosGrid" class="photos-grid">
+                    <!-- Photos will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePhotosModal()">بستن</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin-auth-check.js"></script>
+    <script>
+        let brands = [];
+        let currentBrandForPhotos = null;
+
+        // Load brands on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBrands();
+        });
+
+        async function loadBrands() {
+            const container = document.getElementById('brandsContainer');
+            container.innerHTML = '<div class="loading-spinner"></div>';
+
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch('/api/admin/brands', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load brands');
+
+                brands = await response.json();
+                displayBrands();
+            } catch (error) {
+                console.error('Error loading brands:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>خطا در بارگذاری برندها</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayBrands() {
+            const container = document.getElementById('brandsContainer');
+
+            if (brands.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏷️</div>
+                        <h3>هیچ برندی یافت نشد</h3>
+                        <p>برای شروع، یک برند جدید اضافه کنید</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="brands-grid">
+                    ${brands.map(brand => `
+                        <div class="brand-card">
+                            <div class="brand-card-header">
+                                <div>
+                                    <h3 class="brand-name">${brand.name}</h3>
+                                    <span class="brand-status ${brand.is_active ? 'status-active' : 'status-inactive'}">
+                                        ${brand.is_active ? '✓ فعال' : '✗ غیرفعال'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            ${brand.description ? `<p class="brand-description">${brand.description}</p>` : ''}
+
+                            <div class="brand-stats">
+                                <div class="brand-stat">
+                                    <div class="brand-stat-value">${brand.photo_count?.[0]?.count || 0}</div>
+                                    <div class="brand-stat-label">عکس مرجع</div>
+                                </div>
+                            </div>
+
+                            <div class="brand-actions">
+                                <button class="btn btn-primary" onclick="openPhotosModal('${brand.id}', '${brand.name}')">
+                                    📸 مدیریت عکس‌ها
+                                </button>
+                                <button class="btn btn-secondary" onclick="editBrand('${brand.id}')">
+                                    ✏️ ویرایش
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteBrand('${brand.id}', '${brand.name}')">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function openCreateBrandModal() {
+            document.getElementById('brandModalTitle').textContent = 'افزودن برند جدید';
+            document.getElementById('brandForm').reset();
+            document.getElementById('brandId').value = '';
+            document.getElementById('brandModal').style.display = 'block';
+        }
+
+        function closeBrandModal() {
+            document.getElementById('brandModal').style.display = 'none';
+        }
+
+        async function editBrand(brandId) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`/api/admin/brands/${brandId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load brand');
+
+                const brand = await response.json();
+
+                document.getElementById('brandModalTitle').textContent = 'ویرایش برند';
+                document.getElementById('brandId').value = brand.id;
+                document.getElementById('brandName').value = brand.name;
+                document.getElementById('brandLogo').value = brand.logo || '';
+                document.getElementById('brandDescription').value = brand.description || '';
+                document.getElementById('brandIsActive').checked = brand.is_active;
+                document.getElementById('brandModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading brand:', error);
+                alert('خطا در بارگذاری برند: ' + error.message);
+            }
+        }
+
+        async function saveBrand() {
+            const brandId = document.getElementById('brandId').value;
+            const brandData = {
+                name: document.getElementById('brandName').value.trim(),
+                logo: document.getElementById('brandLogo').value.trim() || null,
+                description: document.getElementById('brandDescription').value.trim() || null,
+                is_active: document.getElementById('brandIsActive').checked
+            };
+
+            if (!brandData.name) {
+                alert('نام برند الزامی است');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('admin_token');
+                const url = brandId ? `/api/admin/brands/${brandId}` : '/api/admin/brands';
+                const method = brandId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(brandData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save brand');
+                }
+
+                alert(brandId ? 'برند با موفقیت به‌روزرسانی شد' : 'برند با موفقیت ایجاد شد');
+                closeBrandModal();
+                loadBrands();
+            } catch (error) {
+                console.error('Error saving brand:', error);
+                alert('خطا در ذخیره برند: ' + error.message);
+            }
+        }
+
+        async function deleteBrand(brandId, brandName) {
+            if (!confirm(`آیا مطمئن هستید که می‌خواهید برند "${brandName}" را حذف کنید؟\n\nتمام عکس‌های مرتبط با این برند نیز حذف خواهند شد.`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`/api/admin/brands/${brandId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete brand');
+
+                alert('برند با موفقیت حذف شد');
+                loadBrands();
+            } catch (error) {
+                console.error('Error deleting brand:', error);
+                alert('خطا در حذف برند: ' + error.message);
+            }
+        }
+
+        async function openPhotosModal(brandId, brandName) {
+            currentBrandForPhotos = brandId;
+            document.getElementById('currentBrandId').value = brandId;
+            document.getElementById('photosModalTitle').textContent = `عکس‌های ${brandName}`;
+            document.getElementById('photosModal').style.display = 'block';
+            loadBrandPhotos(brandId);
+        }
+
+        function closePhotosModal() {
+            document.getElementById('photosModal').style.display = 'none';
+            currentBrandForPhotos = null;
+        }
+
+        async function loadBrandPhotos(brandId) {
+            const grid = document.getElementById('photosGrid');
+            grid.innerHTML = '<div class="loading-spinner"></div>';
+
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`/api/admin/brands/${brandId}/photos`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load photos');
+
+                const photos = await response.json();
+
+                if (photos.length === 0) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #9ca3af;">
+                            <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
+                            <p>هنوز هیچ عکسی آپلود نشده</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = photos.map(photo => `
+                    <div class="photo-card">
+                        <img src="${photo.image_url}" alt="${photo.title || 'Brand photo'}">
+                        <div class="photo-card-overlay">
+                            <button class="btn-danger" onclick="deletePhoto('${brandId}', '${photo.id}')">
+                                حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading photos:', error);
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>`;
+            }
+        }
+
+        async function handlePhotoUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            const brandId = document.getElementById('currentBrandId').value;
+            const token = localStorage.getItem('admin_token');
+
+            for (let file of files) {
+                try {
+                    // Convert to base64
+                    const base64 = await fileToBase64(file);
+
+                    // Upload to server (you'll need to implement upload endpoint)
+                    const uploadResponse = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ image: base64, filename: file.name })
+                    });
+
+                    if (!uploadResponse.ok) throw new Error('Upload failed');
+
+                    const { url } = await uploadResponse.json();
+
+                    // Save to brand photos
+                    const saveResponse = await fetch(`/api/admin/brands/${brandId}/photos`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            image_url: url,
+                            title: file.name
+                        })
+                    });
+
+                    if (!saveResponse.ok) throw new Error('Failed to save photo');
+
+                } catch (error) {
+                    console.error('Error uploading photo:', error);
+                    alert('خطا در آپلود عکس: ' + error.message);
+                }
+            }
+
+            // Reload photos
+            loadBrandPhotos(brandId);
+            event.target.value = ''; // Reset input
+        }
+
+        async function deletePhoto(brandId, photoId) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این عکس را حذف کنید؟')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`/api/admin/brands/${brandId}/photos/${photoId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete photo');
+
+                loadBrandPhotos(brandId);
+            } catch (error) {
+                console.error('Error deleting photo:', error);
+                alert('خطا در حذف عکس: ' + error.message);
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function handleAdminLogout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin-login.html';
+        }
+
+        // Drag and drop for upload area
+        const uploadArea = document.getElementById('uploadArea');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragging');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            const files = e.dataTransfer.files;
+            document.getElementById('photoUpload').files = files;
+            handlePhotoUpload({ target: { files } });
+        });
+    </script>
+</body>
+</html>

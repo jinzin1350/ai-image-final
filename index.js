@@ -2877,7 +2877,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       displayScenario,  // NEW: Display scenario (on-arm, hanging-rack, folded-stack, laid-out)
       flatLayProducts,  // NEW: For flat-lay mode (array of product paths)
       arrangement,      // NEW: Flat lay arrangement (grid, scattered, circular, diagonal)
-      referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate)
+      referencePhotoPath, // NEW: For scene-recreation mode (reference photo to analyze and recreate - OLD METHOD)
+      brandReferencePhotoUrl, // NEW: For scene-recreation mode (brand reference photo URL - NEW METHOD)
+      brandReferencePhotoId,  // NEW: Brand reference photo ID
       sceneAnalysis,    // NEW: AI analysis of the reference photo
       referencePhotoPeopleCount, // NEW: Number of people detected in reference photo
       styleImagePaths,  // NEW: For style-transfer mode (array of 1-3 style reference images)
@@ -2937,7 +2939,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً حداقل یک محصول، نوع چیدمان و پس‌زمینه را انتخاب کنید' });
       }
     } else if (mode === 'scene-recreation') {
-      if (!referencePhotoPath || !sceneAnalysis || !garments.length || !modelId) {
+      // Accept either brand reference photo URL or uploaded reference photo path
+      if ((!brandReferencePhotoUrl && !referencePhotoPath) || !garments.length || !modelId) {
         return res.status(400).json({ error: 'لطفاً عکس مرجع، لباس و مدل را انتخاب کنید' });
       }
     } else if (mode === 'style-transfer') {
@@ -3204,8 +3207,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'scene-recreation') {
-      // For scene recreation mode, load reference photo, garment, and model
-      const referencePhotoBase64 = await imageUrlToBase64(referencePhotoPath);
+      // For scene recreation mode, load reference photo (either brand URL or uploaded path), garment, and model
+      const actualReferencePhotoPath = brandReferencePhotoUrl || referencePhotoPath;
+      const referencePhotoBase64 = await imageUrlToBase64(actualReferencePhotoPath);
       garmentBase64Array = await Promise.all(
         garments.map(path => imageUrlToBase64(path))
       );
@@ -6505,6 +6509,334 @@ app.post('/api/admin/blog/:id/publish', authenticateAdmin, async (req, res) => {
     res.json({ success: true, post: data });
   } catch (error) {
     console.error('Error toggling publish status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// 🏷️ BRAND REFERENCE PHOTO SYSTEM API ENDPOINTS
+// ============================================
+
+// PUBLIC: Get all active brands (for users)
+app.get('/api/brands', async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { data, error } = await supabase
+      .from('brands')
+      .select('*')
+      .eq('is_active', true)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching brands:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUBLIC: Get all active photos for a specific brand
+app.get('/api/brands/:id/photos', async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+      .from('brand_reference_photos')
+      .select('*')
+      .eq('brand_id', id)
+      .eq('is_active', true)
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching brand photos:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Get all brands (including inactive)
+app.get('/api/admin/brands', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('brands')
+      .select(`
+        *,
+        photo_count:brand_reference_photos(count)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching brands (admin):', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Get single brand by ID
+app.get('/api/admin/brands/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+
+    const { data, error } = await supabaseAdmin
+      .from('brands')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching brand:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Create new brand
+app.post('/api/admin/brands', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { name, logo, description, is_active } = req.body;
+
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ error: 'Brand name is required' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('brands')
+      .insert([{
+        name: name.trim(),
+        logo: logo || null,
+        description: description || null,
+        is_active: is_active !== undefined ? is_active : true
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') { // Unique constraint violation
+        return res.status(409).json({ error: 'Brand with this name already exists' });
+      }
+      throw error;
+    }
+
+    res.status(201).json({ success: true, brand: data });
+  } catch (error) {
+    console.error('Error creating brand:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Update brand
+app.put('/api/admin/brands/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+    const { name, logo, description, is_active } = req.body;
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name.trim();
+    if (logo !== undefined) updateData.logo = logo;
+    if (description !== undefined) updateData.description = description;
+    if (is_active !== undefined) updateData.is_active = is_active;
+
+    const { data, error } = await supabaseAdmin
+      .from('brands')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return res.status(409).json({ error: 'Brand with this name already exists' });
+      }
+      throw error;
+    }
+
+    res.json({ success: true, brand: data });
+  } catch (error) {
+    console.error('Error updating brand:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Delete brand
+app.delete('/api/admin/brands/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+
+    // Delete brand (cascade will automatically delete associated photos)
+    const { error } = await supabaseAdmin
+      .from('brands')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.json({ success: true, message: 'Brand deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting brand:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Get all photos for a brand (including inactive)
+app.get('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+
+    const { data, error } = await supabaseAdmin
+      .from('brand_reference_photos')
+      .select('*')
+      .eq('brand_id', id)
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching brand photos (admin):', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Upload brand reference photo
+app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id: brandId } = req.params;
+    const { image_url, title, description, display_order } = req.body;
+
+    if (!image_url) {
+      return res.status(400).json({ error: 'Image URL is required' });
+    }
+
+    // Verify brand exists
+    const { data: brand, error: brandError } = await supabaseAdmin
+      .from('brands')
+      .select('id')
+      .eq('id', brandId)
+      .single();
+
+    if (brandError || !brand) {
+      return res.status(404).json({ error: 'Brand not found' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('brand_reference_photos')
+      .insert([{
+        brand_id: brandId,
+        image_url,
+        title: title || null,
+        description: description || null,
+        display_order: display_order || 0,
+        is_active: true
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.status(201).json({ success: true, photo: data });
+  } catch (error) {
+    console.error('Error uploading brand photo:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Update brand reference photo
+app.put('/api/admin/brands/:brandId/photos/:photoId', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { brandId, photoId } = req.params;
+    const { title, description, display_order, is_active } = req.body;
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (display_order !== undefined) updateData.display_order = display_order;
+    if (is_active !== undefined) updateData.is_active = is_active;
+
+    const { data, error } = await supabaseAdmin
+      .from('brand_reference_photos')
+      .update(updateData)
+      .eq('id', photoId)
+      .eq('brand_id', brandId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, photo: data });
+  } catch (error) {
+    console.error('Error updating brand photo:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Delete brand reference photo
+app.delete('/api/admin/brands/:brandId/photos/:photoId', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { brandId, photoId } = req.params;
+
+    const { error } = await supabaseAdmin
+      .from('brand_reference_photos')
+      .delete()
+      .eq('id', photoId)
+      .eq('brand_id', brandId);
+
+    if (error) throw error;
+
+    res.json({ success: true, message: 'Photo deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting brand photo:', error);
     res.status(500).json({ error: error.message });
   }
 });
