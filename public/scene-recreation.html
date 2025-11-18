@@ -262,7 +262,7 @@
         // Brand reference photo selection variables
         let allBrands = [];
         let allBrandPhotos = [];
-        let selectedBrandReferencePhoto = null;
+        window.selectedBrandReferencePhoto = null;
 
         // Load brands on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -338,7 +338,7 @@
             const photo = allBrandPhotos.find(p => p.id === photoId);
             if (!photo) return;
 
-            selectedBrandReferencePhoto = photo;
+            window.selectedBrandReferencePhoto = photo;
 
             // Update UI - highlight selected photo
             document.querySelectorAll('.background-card').forEach(card => {
@@ -371,7 +371,7 @@
 
         // Clear selected reference photo
         function clearSelectedReferencePhoto() {
-            selectedBrandReferencePhoto = null;
+            window.selectedBrandReferencePhoto = null;
 
             // Hide preview
             document.getElementById('selectedReferencePhotoPreview').style.display = 'none';
@@ -383,16 +383,17 @@
             });
 
             // Update generate button state
-            updateGenerateButtonState();
+            if (typeof checkAllConditions === 'function') {
+                checkAllConditions();
+            }
         }
 
         // Update generate button state based on selections
         function updateGenerateButtonState() {
-            // This will be called by the main script.js
-            // The button should be enabled when:
-            // - Reference photo is selected
-            // - Garment is uploaded
-            // - Model is selected
+            // Call the main validation function from script.js
+            if (typeof checkAllConditions === 'function') {
+                checkAllConditions();
+            }
         }
     </script>
     <script src="script.js"></script>
