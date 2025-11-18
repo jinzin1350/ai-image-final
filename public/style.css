@@ -756,6 +756,11 @@ button,
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Ensure hamburger stays visible during scroll */
+body {
+    position: relative;
+}
+
 .hamburger-icon {
     width: 30px;
     height: 24px;
