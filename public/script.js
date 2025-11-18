@@ -522,17 +522,17 @@ if (numberOfModelsSelectEl) {
 
     if (numModels === 2) {
         // نمایش بخش‌های مدل دوم
-        model2Section.style.display = 'block';
-        garmentUploadSection2.style.display = 'block';
-        modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+        if (model2Section) model2Section.style.display = 'block';
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'block';
+        if (modelSelectorLabel) modelSelectorLabel.textContent = 'انتخاب مدل اول:';
 
         // بارگذاری مدل‌ها برای مدل دوم
         displayModelsByCategory2('woman');
     } else {
         // مخفی کردن بخش‌های مدل دوم
-        model2Section.style.display = 'none';
-        garmentUploadSection2.style.display = 'none';
-        modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+        if (model2Section) model2Section.style.display = 'none';
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
+        if (modelSelectorLabel) modelSelectorLabel.textContent = 'انتخاب مدل اول:';
         selectedModelId2 = null;
         uploadedGarmentPaths2 = [];
     }
@@ -1245,18 +1245,18 @@ async function analyzeReferencePhoto(photoPath) {
 
             // Show Model 2 section if 2+ people detected
             if (referencePhotoPeopleCount >= 2) {
-                model2Section.style.display = 'block';
-                garmentUploadSection2.style.display = 'block';
-                modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+                if (model2Section) model2Section.style.display = 'block';
+                if (garmentUploadSection2) garmentUploadSection2.style.display = 'block';
+                if (modelSelectorLabel) modelSelectorLabel.textContent = 'انتخاب مدل اول:';
 
                 // Load models for model 2
                 displayModelsByCategory2('woman');
 
                 console.log('👥 Showing Model 2 section because reference has multiple people');
             } else {
-                model2Section.style.display = 'none';
-                garmentUploadSection2.style.display = 'none';
-                modelSelectorLabel.textContent = 'انتخاب مدل اول:';
+                if (model2Section) model2Section.style.display = 'none';
+                if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
+                if (modelSelectorLabel) modelSelectorLabel.textContent = 'انتخاب مدل اول:';
                 selectedModelId2 = null;
                 uploadedGarmentPaths2 = [];
             }
@@ -1492,13 +1492,15 @@ function switchMode(mode) {
         document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
 
         // Show/hide model 2 sections based on numberOfModelsSelect
-        const numModels = parseInt(numberOfModelsSelect.value);
-        if (numModels === 2) {
-            model2Section.style.display = 'block';
-            garmentUploadSection2.style.display = 'block';
-        } else {
-            model2Section.style.display = 'none';
-            garmentUploadSection2.style.display = 'none';
+        if (numberOfModelsSelect) {
+            const numModels = parseInt(numberOfModelsSelect.value);
+            if (numModels === 2) {
+                if (model2Section) model2Section.style.display = 'block';
+                if (garmentUploadSection2) garmentUploadSection2.style.display = 'block';
+            } else {
+                if (model2Section) model2Section.style.display = 'none';
+                if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
+            }
         }
 
     } else if (mode === 'accessories-only') {
@@ -1656,7 +1658,7 @@ function checkGenerateButton() {
         const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
-        const numModels = parseInt(numberOfModelsSelect.value);
+        const numModels = numberOfModelsSelect ? parseInt(numberOfModelsSelect.value) : 1;
 
         if (numModels === 2) {
             // For 2 models: need both models and both garments
@@ -1974,10 +1976,12 @@ if (generateBtn) {
             requestBody.hijabType = selectedHijabType;
 
             // Check if 2 models mode
-            const numModels = parseInt(numberOfModelsSelect.value);
-            if (numModels === 2) {
-                requestBody.modelId2 = selectedModelId2;
-                requestBody.garmentPaths2 = uploadedGarmentPaths2;
+            if (numberOfModelsSelect) {
+                const numModels = parseInt(numberOfModelsSelect.value);
+                if (numModels === 2) {
+                    requestBody.modelId2 = selectedModelId2;
+                    requestBody.garmentPaths2 = uploadedGarmentPaths2;
+                }
             }
 
         } else if (currentMode === 'accessories-only') {
