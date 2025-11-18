@@ -1011,29 +1011,54 @@ app.post('/api/admin/save-generated-to-user', authenticateAdmin, async (req, res
       return res.status(500).json({ success: false, error: 'Supabase not configured' });
     }
 
-    // Simply save the existing imageUrl to database with user ownership
-    // No need to re-upload - image is already in admin-content bucket
-    const { data: contentData, error: dbError } = await supabase
-      .from('content_library')
-      .insert([{
-        content_type,
-        tier: 'premium',
-        visibility: visibility || 'private',
-        category,
-        service_type: service_type || 'both',
-        name,
-        description,
-        image_url: imageUrl,
-        storage_path: imageUrl.split('/').pop(), // Extract filename from URL
-        owner_user_id: user_id,
-        is_active: true
-      }])
-      .select();
+    // If content_type is 'model', save to models table
+    // Otherwise save to content_library
+    let data, dbError;
+
+    if (content_type === 'model') {
+      const result = await supabase
+        .from('models')
+        .insert([{
+          name,
+          category,
+          service_type: service_type || 'both',
+          image_url: imageUrl,
+          storage_path: imageUrl.split('/').pop(),
+          owner_user_id: user_id,
+          visibility: visibility || 'private',
+          is_active: true,
+          description
+        }])
+        .select();
+
+      data = result.data;
+      dbError = result.error;
+    } else {
+      // For non-model content (garments, backgrounds, etc.), use content_library
+      const result = await supabase
+        .from('content_library')
+        .insert([{
+          content_type,
+          tier: 'premium',
+          visibility: visibility || 'private',
+          category,
+          name,
+          description,
+          image_url: imageUrl,
+          storage_path: imageUrl.split('/').pop(),
+          owner_user_id: user_id,
+          is_active: true
+        }])
+        .select();
+
+      data = result.data;
+      dbError = result.error;
+    }
 
     if (dbError) throw dbError;
 
-    console.log(`✅ Admin saved generated image to user ${user_id}: ${name}`);
-    res.json({ success: true, content: contentData[0] });
+    console.log(`✅ Admin saved ${content_type} to user ${user_id}: ${name}`);
+    res.json({ success: true, content: data[0] });
   } catch (error) {
     console.error('Error saving generated content to user:', error);
     res.status(500).json({ success: false, error: error.message });
@@ -2058,11 +2083,10 @@ app.get('/api/models', async (req, res) => {
         if (error) throw error;
 
         if (user) {
-          // Fetch user's custom models (private + public models from content_library)
+          // Fetch user's custom models from the dedicated models table
           let query = supabase
-            .from('content_library')
+            .from('models')
             .select('*')
-            .eq('content_type', 'model')
             .eq('is_active', true)
             .or(`visibility.eq.public,owner_user_id.eq.${user.id}`);
 
