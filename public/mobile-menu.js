@@ -122,4 +122,19 @@
     } else {
         initMobileMenu();
     }
+
+    // Add scroll effect to header
+    function handleHeaderScroll() {
+        const header = document.querySelector('header');
+        if (!header) return;
+
+        if (window.scrollY > 10) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }
+
+    window.addEventListener('scroll', handleHeaderScroll);
+    handleHeaderScroll(); // Check on load
 })();
