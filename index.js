@@ -4108,24 +4108,45 @@ Think of it as: "Book a photoshoot for the MODEL from Image 1, style it like the
       // STYLE TRANSFER MODE: Combine multiple people/outfits with lighting from content image
       const numStyleImages = selectedModel.styleImagesBase64.length;
 
-      prompt = `Create a COMBINED fashion photo that merges ${numStyleImages} ${numStyleImages === 1 ? 'person' : 'people'} from the style images into ONE photo, applying the lighting, mood, atmosphere, POSES, and EXPRESSIONS from the content/reference image.
+      prompt = `Create a COMBINED fashion photo that merges ${numStyleImages} ${numStyleImages === 1 ? 'person' : 'people'} from the style images into ONE photo, EXACTLY REPLICATING the poses, body positions, gestures, expressions, vibe, lighting, and atmosphere from the content/reference image.
+
+🎯 **YOUR ABSOLUTE #1 PRIORITY:** MATCH THE REFERENCE PHOTO EXACTLY
 
 IMAGES PROVIDED (IN ORDER):
-${selectedModel.styleImagesBase64.map((_, index) => `- Image ${index + 1}: STYLE IMAGE ${index + 1} - Person with their outfit (PRESERVE face, skin tone, and clothing EXACTLY)`).join('\n')}
-- Image ${numStyleImages + 1}: CONTENT/REFERENCE IMAGE - Use for lighting, mood, atmosphere, POSES, and EXPRESSIONS (NOT for faces, skin tones, or clothes)
+${selectedModel.styleImagesBase64.map((_, index) => `- Image ${index + 1}: STYLE IMAGE ${index + 1} - Person with outfit (USE: face, skin tone, clothing ONLY)`).join('\n')}
+- Image ${numStyleImages + 1}: **REFERENCE/CONTENT IMAGE** - This is your MASTER GUIDE for EVERYTHING except faces and clothes
 
-⚠️ CRITICAL APPROACH:
+🔴 **MOST CRITICAL INSTRUCTIONS - READ CAREFULLY:**
 
-**PRIMARY GOAL: COMBINE the people from style images**
+**1️⃣ POSE & BODY POSITION (HIGHEST PRIORITY):**
 ${numStyleImages > 1
-  ? `- Take ALL ${numStyleImages} people from the style images and place them together in ONE photo
-- Each person keeps their EXACT outfit, face, and body from their style image
-- Use the POSES, EXPRESSIONS, and INTERACTIONS from the content/reference image
-- If content image shows people holding hands, smiling, or specific gestures - recreate those poses
-- Position them naturally together matching the pose dynamics from content image`
-  : `- Take the person from the style image with their EXACT outfit, face, and body
-- Use the POSE and EXPRESSION from the content/reference image
-- If the content image shows someone smiling, laughing, or in a specific pose - match that exactly`}
+  ? `- Look at the REFERENCE image (Image ${numStyleImages + 1}) - study EXACTLY how people are positioned
+- REPLICATE the EXACT body positions, poses, and spatial relationships
+- If they're holding hands - YOUR people must hold hands in the SAME way
+- If they're standing close - YOUR people must stand EXACTLY as close
+- If they're sitting/leaning/gesturing - MATCH those exact positions
+- Copy the EXACT body language and interaction dynamics
+- Each person's pose must PRECISELY match the corresponding person in the reference
+- Match shoulder angles, head tilts, hand positions, leg positions - EVERYTHING`
+  : `- Look at the REFERENCE image (Image ${numStyleImages + 1}) - study the EXACT pose
+- REPLICATE the PRECISE body position: torso angle, shoulder position, head tilt
+- MATCH the exact arm positions, hand gestures, and leg stance
+- If sitting - sit the SAME way; if leaning - lean the SAME way
+- Copy the body angle relative to camera EXACTLY`}
+
+**2️⃣ FACIAL EXPRESSIONS & EMOTIONS:**
+- Study the EXACT facial expression in the reference image
+- REPLICATE that expression PRECISELY: smiling/serious/laughing/thoughtful
+- Match the eye direction and gaze
+- Match mouth shape, smile width, teeth visibility
+- Match eyebrow position and forehead tension
+- The FEELING must be identical to the reference
+
+**3️⃣ COMPOSITION & FRAMING:**
+- Use the EXACT camera angle from the reference image
+- Match the EXACT framing: full body/waist-up/close-up/etc.
+- Position subjects at the SAME distance from camera
+- Match the EXACT viewing angle and perspective
 
 **SECONDARY GOAL: Apply lighting/mood from content image**
 ${contentImageAnalysis ? `
@@ -4151,17 +4172,20 @@ ${contentImageAnalysis}
 ✅ EXACT garment colors - do NOT shift or change
 ✅ All garment details: stitching, pockets, seams, decorative elements
 
-**What to TAKE from content image:**
-✅ Poses and body language - match the poses, expressions, and interactions from content image
-✅ Facial expressions and emotions (smiling, serious, laughing, etc.)
-✅ Body positioning and interactions (holding hands, standing close, specific gestures)
-✅ Model vibe and energy
-✅ Lighting style (natural/artificial, soft/dramatic)
-✅ Light direction and shadows
-✅ Color temperature (warm/cool/neutral)
-✅ Time of day atmosphere
-✅ Overall mood and feel
-✅ Color grading style
+**What to COPY EXACTLY from reference/content image:**
+✅✅✅ **EXACT poses** - every body angle, limb position, gesture
+✅✅✅ **EXACT facial expressions** - smile, eyes, emotion, gaze direction
+✅✅✅ **EXACT body positioning** - distance between people, how they touch/interact
+✅✅✅ **EXACT composition** - camera angle, framing, subject distance
+✅✅ **Model vibe and energy** - relaxed/energetic/serious/playful
+✅✅ **Background environment** - indoor/outdoor, setting type, depth
+✅✅ **Camera perspective** - eye level/high/low angle, distance
+✅ **Lighting style** (natural/artificial, soft/dramatic)
+✅ **Light direction and shadows** - where light comes from, shadow length
+✅ **Color temperature** (warm golden/cool blue/neutral)
+✅ **Time of day atmosphere** - morning/midday/golden hour/night
+✅ **Overall mood and feel** - romantic/professional/casual/dramatic
+✅ **Color grading style** - warm/cool/vibrant/muted tones
 
 **What NOT to take from content image:**
 ❌ People's faces or identities
@@ -4229,28 +4253,34 @@ ${numStyleImages > 1 ? `- ❌ CRITICAL: DO NOT mix clothes between people - each
 - Add text, watermarks, or logos
 - Create obvious fake composites
 
-EXAMPLE TO CLARIFY:
+🎬 EXAMPLE TO MAKE IT CRYSTAL CLEAR:
 ${numStyleImages > 1
-  ? `IMAGES YOU RECEIVE:
-- Image 1: Woman in blue dress (style image)
-- Image 2: Man in black suit (style image)
-- Image 3: Couple holding hands and smiling at golden hour (content image)
+  ? `📸 IMAGES YOU RECEIVE:
+- Image 1: Woman in blue floral dress standing neutral, serious face (STYLE IMAGE)
+- Image 2: Man in black suit standing neutral, serious face (STYLE IMAGE)
+- Image 3: Happy couple holding hands, smiling big, walking together, golden hour sunset glow, romantic vibe (REFERENCE IMAGE)
 
-CORRECT OUTPUT:
-✅ Woman in EXACT blue dress + Man in EXACT black suit
-✅ BOTH holding hands and smiling (poses from Image 3)
-✅ With golden hour warm lighting from Image 3
-✅ All garment details preserved exactly
-✅ Faces and skin tones exactly from Images 1 and 2
-✅ But expressions and poses matching Image 3
+✅ **CORRECT OUTPUT:**
+✅ Woman in EXACT blue floral dress (from Image 1)
+✅ Man in EXACT black suit (from Image 2)
+✅ Woman's face and skin tone from Image 1, Man's face from Image 2
+✅ **BUT BOTH are holding hands EXACTLY like in Image 3**
+✅ **BOTH are smiling BIG like in Image 3** (NOT serious!)
+✅ **BOTH are walking together like in Image 3** (NOT standing still!)
+✅ Golden hour warm glow lighting from Image 3
+✅ Romantic happy vibe from Image 3
+✅ Same camera angle and framing as Image 3
+✅ All dress patterns and suit details preserved perfectly
 
-WRONG OUTPUT:
-❌ Only one person (missing someone)
-❌ Changed dress or suit colors
-❌ Using the actual people/faces from the park image
-❌ Cold lighting instead of golden hour
-❌ Simplified patterns or missing details
-❌ Not matching the holding hands pose from Image 3`
+❌ **WRONG OUTPUT:**
+❌ Only one person visible (WHERE'S THE OTHER PERSON?!)
+❌ Both standing neutral/serious (NO! They should be smiling and walking!)
+❌ Not holding hands (THEY MUST hold hands like in reference!)
+❌ Changed dress color to pink or suit to navy
+❌ Used the actual faces/people from the sunset couple photo
+❌ Cold blue lighting instead of warm golden hour
+❌ Simplified the floral pattern or removed suit details
+❌ Standing pose instead of walking together pose`
   : `IMAGES YOU RECEIVE:
 - Image 1: Woman in floral dress standing neutral (style image)
 - Image 2: Model smiling and posing with hand on hip in dramatic side lighting (content image)
