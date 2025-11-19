@@ -322,20 +322,21 @@ select:focus {
 
 /* Section hint boxes for user guidance */
 .section-hint {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
-    border-right: 4px solid #2196F3;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1a1a1a;
-    line-height: 1.7;
-    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%) !important;
+    border-right: 4px solid #2196F3 !important;
+    padding: 14px 18px !important;
+    margin-bottom: 20px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #1a1a1a !important;
+    line-height: 1.7 !important;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1) !important;
+    display: block !important;
 }
 
 .section-hint strong {
-    color: #1565C0;
-    font-weight: 600;
+    color: #1565C0 !important;
+    font-weight: 600 !important;
 }
 
 .hijab-section .section-description {
@@ -987,6 +988,51 @@ body {
 
     .garment-preview-item img {
         height: 120px;
+    }
+
+    /* Optimize upload area for mobile */
+    .upload-area {
+        min-height: 180px !important;
+    }
+
+    .upload-placeholder {
+        padding: 20px 15px !important;
+    }
+
+    .upload-icon svg {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    .upload-placeholder h3 {
+        font-size: 16px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .upload-placeholder p {
+        font-size: 13px !important;
+        margin: 4px 0 !important;
+    }
+
+    .multi-hint {
+        font-size: 12px !important;
+    }
+
+    .upload-formats {
+        margin-top: 12px !important;
+        gap: 6px !important;
+    }
+
+    .format-tag {
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+    }
+
+    /* Make section hints more compact on mobile */
+    .section-hint {
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+        margin-bottom: 15px !important;
     }
 }
 
