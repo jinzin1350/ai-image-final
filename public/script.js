@@ -1602,7 +1602,7 @@ function switchMode(mode) {
     // Reload backgrounds with mode-specific list
     loadBackgrounds(mode);
 
-    // Reload models and set appropriate category
+    // Reload models and set appropriate category based on mode
     if (mode === 'accessories-only') {
         // Set category to 'accessory' BEFORE loading models
         currentCategory = 'accessory';
@@ -1612,7 +1612,8 @@ function switchMode(mode) {
         document.querySelectorAll('.model-card').forEach(card => {
             card.classList.remove('selected');
         });
-    } else if (mode === 'complete-outfit') {
+    } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
+        // These modes need models
         loadModels(mode);
         // Reset model selection
         selectedModelId = null;
@@ -1620,8 +1621,11 @@ function switchMode(mode) {
             card.classList.remove('selected');
         });
         // Reset to default category
-        currentCategory = 'woman';
+        if (mode === 'complete-outfit') {
+            currentCategory = 'woman';
+        }
     }
+    // Note: Other modes (color-collection, flat-lay, style-transfer) don't need models
 
     // Reset background selection
     selectedBackgroundId = null;
@@ -2230,7 +2234,8 @@ function saveToLocalStorage(imageData) {
 
 // بارگذاری اولیه
 console.log('🔧 Initializing page data...');
-loadModels();
+// Don't load models here - let switchMode handle it to avoid double loading
+// loadModels(); // Commented out - moved to switchMode
 loadBackgrounds();
 loadShotTypes();
 loadPoses();
@@ -2696,9 +2701,13 @@ async function openGalleryForReferencePhoto() {
 // ========================================
 // Initialize page based on currentMode
 // ========================================
-// If we're on a service-specific page, switch to that mode
-if (window.currentMode && currentMode !== 'complete-outfit') {
+// Initialize the page with the appropriate mode
+if (window.currentMode) {
     console.log('🎯 Initializing page with mode:', currentMode);
-    // Call switchMode to show/hide appropriate sections
+    // Call switchMode to show/hide appropriate sections and load models
     switchMode(currentMode);
+} else {
+    // Default to complete-outfit mode if no mode is specified
+    console.log('🎯 Initializing page with default mode: complete-outfit');
+    switchMode('complete-outfit');
 }
