@@ -1476,13 +1476,13 @@ function switchMode(mode) {
     // Show/hide sections based on mode
     if (mode === 'complete-outfit') {
         // Complete outfit mode: show garment upload, model selection, hijab
-        garmentUploadSection.style.display = 'block';
-        accessoryUploadSection.style.display = 'none';
-        colorCollectionUploadSection.style.display = 'none';
-        displayScenarioSection.style.display = 'none';
-        flatLayUploadSection.style.display = 'none';
-        flatLayArrangementSection.style.display = 'none';
-        sceneRecreationSection.style.display = 'none';
+        if (garmentUploadSection) garmentUploadSection.style.display = 'block';
+        if (accessoryUploadSection) accessoryUploadSection.style.display = 'none';
+        if (colorCollectionUploadSection) colorCollectionUploadSection.style.display = 'none';
+        if (displayScenarioSection) displayScenarioSection.style.display = 'none';
+        if (flatLayUploadSection) flatLayUploadSection.style.display = 'none';
+        if (flatLayArrangementSection) flatLayArrangementSection.style.display = 'none';
+        if (sceneRecreationSection) sceneRecreationSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block';
         if (backgroundSection) backgroundSection.style.display = 'block';
         // Show category selector for complete outfit
@@ -1490,7 +1490,8 @@ function switchMode(mode) {
         if (categorySelector) categorySelector.style.display = 'block';
 
         // Restore original upload section text
-        document.querySelector('#garmentUploadSection h2').textContent = '۱. آپلود تصویر لباس';
+        const garmentH2 = document.querySelector('#garmentUploadSection h2');
+        if (garmentH2) garmentH2.textContent = '۱. آپلود تصویر لباس';
 
         // Show/hide model 2 sections based on numberOfModelsSelect
         if (numberOfModelsSelect) {
@@ -1524,66 +1525,66 @@ function switchMode(mode) {
 
     } else if (mode === 'color-collection') {
         // Color Collection mode: upload multiple color variants and select display scenario
-        garmentUploadSection.style.display = 'none';
-        model2Section.style.display = 'none';
-        garmentUploadSection2.style.display = 'none';
-        accessoryUploadSection.style.display = 'none';
-        colorCollectionUploadSection.style.display = 'block';
-        displayScenarioSection.style.display = 'block';
-        flatLayUploadSection.style.display = 'none';
-        flatLayArrangementSection.style.display = 'none';
-        sceneRecreationSection.style.display = 'none';
+        if (garmentUploadSection) garmentUploadSection.style.display = 'none';
+        if (model2Section) model2Section.style.display = 'none';
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
+        if (accessoryUploadSection) accessoryUploadSection.style.display = 'none';
+        if (colorCollectionUploadSection) colorCollectionUploadSection.style.display = 'block';
+        if (displayScenarioSection) displayScenarioSection.style.display = 'block';
+        if (flatLayUploadSection) flatLayUploadSection.style.display = 'none';
+        if (flatLayArrangementSection) flatLayArrangementSection.style.display = 'none';
+        if (sceneRecreationSection) sceneRecreationSection.style.display = 'none';
         if (modelSection) modelSection.style.display = 'none'; // No model needed
         if (backgroundSection) backgroundSection.style.display = 'block';
-        hijabSection.style.display = 'none'; // Hide hijab section
+        if (hijabSection) hijabSection.style.display = 'none'; // Hide hijab section
 
     } else if (mode === 'flat-lay') {
         // Flat Lay mode: upload products and select arrangement
-        garmentUploadSection.style.display = 'none';
-        accessoryUploadSection.style.display = 'none';
-        colorCollectionUploadSection.style.display = 'none';
-        displayScenarioSection.style.display = 'none';
-        flatLayUploadSection.style.display = 'block';
-        flatLayArrangementSection.style.display = 'block';
-        sceneRecreationSection.style.display = 'none';
-        model2Section.style.display = 'none';
-        garmentUploadSection2.style.display = 'none';
+        if (garmentUploadSection) garmentUploadSection.style.display = 'none';
+        if (accessoryUploadSection) accessoryUploadSection.style.display = 'none';
+        if (colorCollectionUploadSection) colorCollectionUploadSection.style.display = 'none';
+        if (displayScenarioSection) displayScenarioSection.style.display = 'none';
+        if (flatLayUploadSection) flatLayUploadSection.style.display = 'block';
+        if (flatLayArrangementSection) flatLayArrangementSection.style.display = 'block';
+        if (sceneRecreationSection) sceneRecreationSection.style.display = 'none';
+        if (model2Section) model2Section.style.display = 'none';
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
         if (modelSection) modelSection.style.display = 'none'; // No model needed
         if (backgroundSection) backgroundSection.style.display = 'block';
-        hijabSection.style.display = 'none'; // Hide hijab section
+        if (hijabSection) hijabSection.style.display = 'none'; // Hide hijab section
 
     } else if (mode === 'scene-recreation') {
         // Scene Recreation mode: upload reference photo, analyze, then select model+garment
-        garmentUploadSection.style.display = 'block'; // Still need to upload garment
-        accessoryUploadSection.style.display = 'none';
-        colorCollectionUploadSection.style.display = 'none';
-        displayScenarioSection.style.display = 'none';
-        flatLayUploadSection.style.display = 'none';
-        flatLayArrangementSection.style.display = 'none';
-        sceneRecreationSection.style.display = 'block';
-        styleTransferSection.style.display = 'none';
-        model2Section.style.display = 'none';
-        garmentUploadSection2.style.display = 'none';
+        if (garmentUploadSection) garmentUploadSection.style.display = 'block'; // Still need to upload garment
+        if (accessoryUploadSection) accessoryUploadSection.style.display = 'none';
+        if (colorCollectionUploadSection) colorCollectionUploadSection.style.display = 'none';
+        if (displayScenarioSection) displayScenarioSection.style.display = 'none';
+        if (flatLayUploadSection) flatLayUploadSection.style.display = 'none';
+        if (flatLayArrangementSection) flatLayArrangementSection.style.display = 'none';
+        if (sceneRecreationSection) sceneRecreationSection.style.display = 'block';
+        if (styleTransferSection) styleTransferSection.style.display = 'none';
+        if (model2Section) model2Section.style.display = 'none';
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
         if (modelSection) modelSection.style.display = 'block'; // Need model
         if (backgroundSection) backgroundSection.style.display = 'none'; // Background from reference photo
-        hijabSection.style.display = 'block'; // May need hijab
+        if (hijabSection) hijabSection.style.display = 'block'; // May need hijab
         const categorySelector = document.querySelector('.category-selector');
         if (categorySelector) categorySelector.style.display = 'block';
     } else if (mode === 'style-transfer') {
         // Style Transfer mode: upload style images + content image, apply lighting/mood only
-        garmentUploadSection.style.display = 'none';
-        accessoryUploadSection.style.display = 'none';
-        colorCollectionUploadSection.style.display = 'none';
-        displayScenarioSection.style.display = 'none';
-        flatLayUploadSection.style.display = 'none';
-        flatLayArrangementSection.style.display = 'none';
-        sceneRecreationSection.style.display = 'none';
-        styleTransferSection.style.display = 'block';
-        model2Section.style.display = 'none';
-        garmentUploadSection2.style.display = 'none';
+        if (garmentUploadSection) garmentUploadSection.style.display = 'none';
+        if (accessoryUploadSection) accessoryUploadSection.style.display = 'none';
+        if (colorCollectionUploadSection) colorCollectionUploadSection.style.display = 'none';
+        if (displayScenarioSection) displayScenarioSection.style.display = 'none';
+        if (flatLayUploadSection) flatLayUploadSection.style.display = 'none';
+        if (flatLayArrangementSection) flatLayArrangementSection.style.display = 'none';
+        if (sceneRecreationSection) sceneRecreationSection.style.display = 'none';
+        if (styleTransferSection) styleTransferSection.style.display = 'block';
+        if (model2Section) model2Section.style.display = 'none';
+        if (garmentUploadSection2) garmentUploadSection2.style.display = 'none';
         if (modelSection) modelSection.style.display = 'none'; // No model selection needed
         if (backgroundSection) backgroundSection.style.display = 'none'; // No background needed
-        hijabSection.style.display = 'none'; // No hijab needed
+        if (hijabSection) hijabSection.style.display = 'none'; // No hijab needed
     }
 
     // Reset selections when switching modes
