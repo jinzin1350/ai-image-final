@@ -29,14 +29,6 @@
                     💡 <strong>تصویر لباس خود را آپلود کنید.</strong> می‌توانید چند لباس همزمان انتخاب کنید (شلوار + تی‌شرت + کت و...).<br>
                     فرمت‌های مجاز: JPG، PNG، WEBP (حداکثر ۱۰ مگابایت برای هر فایل)
                 </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button onclick="document.getElementById('garmentInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
-                        📤 آپلود از کامپیوتر
-                    </button>
-                    <button onclick="openGalleryForGarment()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
-                        🖼️ انتخاب از گالری
-                    </button>
-                </div>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="garmentInput" accept="image/*" multiple hidden>
                     <div class="upload-placeholder" id="uploadPlaceholder">
@@ -58,6 +50,9 @@
                     </div>
                     <div id="garmentPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
+                <button onclick="document.getElementById('garmentInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
             </section>
 
             <!-- بخش انتخاب مدل -->
