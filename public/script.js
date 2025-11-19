@@ -1942,6 +1942,96 @@ function removeGarment(index) {
     checkGenerateButton();
 }
 
+// Reset all selections after successful generation
+function resetAllSelections() {
+    console.log('🔄 Resetting all selections...');
+
+    // Reset models
+    selectedModelId = null;
+    selectedModelId2 = null;
+    if (modelsGrid) {
+        modelsGrid.querySelectorAll('.model-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+    }
+    if (modelsGrid2) {
+        modelsGrid2.querySelectorAll('.model-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+    }
+
+    // Reset backgrounds
+    selectedBackgroundId = null;
+    if (backgroundsGrid) {
+        backgroundsGrid.querySelectorAll('.background-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+    }
+
+    // Reset uploaded garments
+    uploadedGarmentPaths = [];
+    uploadedGarmentPaths2 = [];
+    if (garmentPreviews) {
+        garmentPreviews.innerHTML = '';
+        garmentPreviews.style.display = 'none';
+    }
+    if (garmentPreviews2) {
+        garmentPreviews2.innerHTML = '';
+        garmentPreviews2.style.display = 'none';
+    }
+    if (uploadPlaceholder) uploadPlaceholder.style.display = 'block';
+    if (uploadPlaceholder2) uploadPlaceholder2.style.display = 'block';
+    if (garmentInput) garmentInput.value = '';
+    if (garmentInput2) garmentInput2.value = '';
+
+    // Reset accessories
+    uploadedAccessoryPath = null;
+    selectedAccessoryType = null;
+    if (accessoryPreview) accessoryPreview.innerHTML = '';
+    if (accessoryUploadPlaceholder) accessoryUploadPlaceholder.style.display = 'block';
+    if (accessoryInput) accessoryInput.value = '';
+    if (accessoryTypeSelect) accessoryTypeSelect.selectedIndex = 0;
+
+    // Reset color collection
+    uploadedColorVariants = [];
+    selectedDisplayScenario = null;
+    if (colorVariantsPreview) colorVariantsPreview.innerHTML = '';
+    if (colorUploadPlaceholder) colorUploadPlaceholder.style.display = 'block';
+    if (colorVariantsInput) colorVariantsInput.value = '';
+
+    // Reset flat lay
+    uploadedFlatLayProducts = [];
+    selectedArrangement = null;
+    if (flatLayPreview) flatLayPreview.innerHTML = '';
+    if (flatLayUploadPlaceholder) flatLayUploadPlaceholder.style.display = 'block';
+    if (flatLayInput) flatLayInput.value = '';
+
+    // Reset scene recreation
+    uploadedReferencePhoto = null;
+    if (window.selectedBrandReferencePhoto) window.selectedBrandReferencePhoto = null;
+    if (referencePhotoPreview) referencePhotoPreview.innerHTML = '';
+    if (referenceUploadPlaceholder) referenceUploadPlaceholder.style.display = 'block';
+    if (referencePhotoInput) referencePhotoInput.value = '';
+    if (sceneAnalysisText) sceneAnalysisText.innerHTML = '';
+
+    // Reset hijab selection
+    selectedHijabType = null;
+    if (hijabSection) {
+        hijabSection.querySelectorAll('.hijab-option-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+    }
+
+    // Reset custom location
+    const customLocationInput = document.getElementById('customLocation');
+    if (customLocationInput) customLocationInput.value = '';
+
+    // Check generate button state (should be disabled now)
+    checkGenerateButton();
+
+    console.log('✅ All selections reset');
+}
+
 // تولید تصویر
 if (generateBtn) {
     generateBtn.addEventListener('click', async () => {
@@ -2065,6 +2155,13 @@ if (generateBtn) {
             `;
             resultSection.style.display = 'block';
             resultSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Reset all selections after successful generation
+            // This prevents spam clicking and forces user to make deliberate choices
+            // Improves AI quality by preventing concurrent requests
+            setTimeout(() => {
+                resetAllSelections();
+            }, 1000); // 1 second delay so user sees the result first
         } else {
             // Show error message
             alert(`خطا: ${data.error}\n${data.details || ''}`);
