@@ -1724,7 +1724,9 @@ function checkGenerateButton() {
                   uploadedContentImage !== null;
     }
 
-    generateBtn.disabled = !isValid;
+    if (generateBtn) {
+        generateBtn.disabled = !isValid;
+    }
 }
 
 // رویدادهای آپلود فایل
