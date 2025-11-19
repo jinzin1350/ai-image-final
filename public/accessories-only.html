@@ -25,13 +25,9 @@
             <!-- بخش آپلود اکسسوری -->
             <section class="upload-section" id="accessoryUploadSection">
                 <h2>۱. آپلود تصویر اکسسوری (محصول)</h2>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button onclick="document.getElementById('accessoryInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
-                        📤 آپلود از کامپیوتر
-                    </button>
-                    <button onclick="openGalleryForGarment()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
-                        🖼️ انتخاب از گالری
-                    </button>
+                <div class="section-hint">
+                    💡 <strong>عکس محصول اکسسوری خود را آپلود کنید</strong> (کیف، عینک، ساعت، جواهرات، کفش و...).<br>
+                    سپس نوع اکسسوری را انتخاب کنید تا هوش مصنوعی بهتر آن را روی مدل قرار دهد.
                 </div>
                 <div class="upload-area" id="accessoryUploadArea">
                     <input type="file" id="accessoryInput" accept="image/*" hidden>
@@ -53,6 +49,9 @@
                     </div>
                     <div id="accessoryPreview" class="garment-previews" style="display: none;"></div>
                 </div>
+                <button onclick="document.getElementById('accessoryInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
 
                 <!-- نوع اکسسوری -->
                 <div class="param-group" style="margin-top: 20px;">
@@ -84,7 +83,10 @@
             <!-- بخش انتخاب مدل -->
             <section class="selection-section" id="modelSection">
                 <h2>۲. انتخاب مدل دست/بدن</h2>
-                <p class="section-description">مدل مناسب برای نمایش اکسسوری را انتخاب کنید</p>
+                <div class="section-hint">
+                    💡 <strong>مدل مناسب برای نمایش اکسسوری را انتخاب کنید.</strong><br>
+                    روی مدل مورد نظر کلیک کنید تا انتخاب شود. مدل‌ها بر اساس نوع اکسسوری شما مناسب هستند.
+                </div>
 
                 <div class="models-grid" id="modelsGrid">
                     <!-- مدل‌ها به صورت پویا اضافه می‌شوند -->
@@ -94,6 +96,10 @@
             <!-- بخش انتخاب پس‌زمینه -->
             <section class="selection-section" id="backgroundSection">
                 <h2>۳. انتخاب پس‌زمینه یا توصیف سفارشی</h2>
+                <div class="section-hint">
+                    💡 <strong>محل یا پس‌زمینه‌ای که می‌خواهید اکسسوری در آن نمایش داده شود را انتخاب کنید.</strong><br>
+                    می‌توانید از گزینه‌های آماده استفاده کنید یا در بخش "توصیف سفارشی محیط" محل دلخواه خود را بنویسید.
+                </div>
                 <div class="backgrounds-grid" id="backgroundsGrid">
                     <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
                 </div>
@@ -120,6 +126,10 @@
             </section>
 
             <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب اکسسوری، نوع آن، مدل و پس‌زمینه، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
             <button class="generate-btn" id="generateBtn" disabled>
                 ✨ تولید عکس حرفه‌ای
             </button>
