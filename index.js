@@ -2069,8 +2069,8 @@ app.get('/api/models', async (req, res) => {
       const authHeader = req.headers.authorization;
       let userId = null;
 
-      // Try to get user ID if authenticated
-      if (authHeader) {
+      // Try to get user ID if authenticated (skip if no auth header for speed)
+      if (authHeader && authHeader !== 'Bearer null' && authHeader !== 'Bearer undefined') {
         try {
           const token = authHeader.replace('Bearer ', '');
           const { data: { user }, error } = await supabase.auth.getUser(token);
@@ -2078,7 +2078,7 @@ app.get('/api/models', async (req, res) => {
             userId = user.id;
           }
         } catch (authError) {
-          console.log('Auth check failed, showing public models only');
+          // Silently fail - show public models only
         }
       }
 

@@ -420,9 +420,6 @@ function displayModelsByCategory(category, page = 1) {
     document.querySelectorAll('.model-card').forEach(card => {
         card.addEventListener('click', () => selectModel(card.dataset.id));
     });
-
-    // Scroll to top of models section
-    modelsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // نمایش مدل‌های یک دسته‌بندی خاص برای مدل دوم با Pagination
@@ -476,9 +473,6 @@ function displayModelsByCategory2(category, page = 1) {
     document.querySelectorAll('#modelsGrid2 .model-card').forEach(card => {
         card.addEventListener('click', () => selectModel2(card.dataset.id));
     });
-
-    // Scroll to model 2 section
-    modelsGrid2.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // انتخاب مدل دوم
