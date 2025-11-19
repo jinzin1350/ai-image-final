@@ -25,14 +25,9 @@
             <!-- بخش آپلود Flat Lay -->
             <section class="upload-section" id="flatLayUploadSection">
                 <h2>۱. آپلود تصاویر محصولات</h2>
-                <p style="margin-bottom: 20px; color: #666;">تصاویر محصولاتی که می‌خواهید در Flat Lay چیده شوند را آپلود کنید (۱ تا ۶ محصول)</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button onclick="document.getElementById('flatLayInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
-                        📤 آپلود از کامپیوتر
-                    </button>
-                    <button onclick="openGalleryForGarment()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
-                        🖼️ انتخاب از گالری
-                    </button>
+                <div class="section-hint">
+                    💡 <strong>تصاویر محصولاتی که می‌خواهید در Flat Lay چیده شوند را آپلود کنید.</strong><br>
+                    می‌توانید ۱ تا ۶ محصول را همزمان انتخاب کنید. فرمت‌های مجاز: JPG، PNG، WEBP
                 </div>
                 <div class="upload-area" id="flatLayUploadArea">
                     <input type="file" id="flatLayInput" accept="image/*" multiple hidden>
@@ -56,10 +51,17 @@
                     <div id="flatLayPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
             </section>
+                <button onclick="document.getElementById('flatLayInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
 
             <!-- بخش انتخاب چیدمان Flat Lay -->
             <section class="selection-section" id="flatLayArrangementSection">
                 <h2>۲. انتخاب نوع چیدمان</h2>
+                <div class="section-hint">
+                    💡 <strong>نحوه چیدمان محصولات را انتخاب کنید.</strong><br>
+                    می‌توانید چیدمان شبکه‌ای (منظم)، آزاد (طبیعی)، دایره‌ای یا مورب را انتخاب کنید.
+                </div>
                 <p class="section-description">نحوه چیدمان محصولات را انتخاب کنید</p>
                 <div class="scenario-grid">
                     <div class="scenario-card" data-arrangement="grid">
@@ -88,6 +90,10 @@
             <!-- بخش انتخاب پس‌زمینه -->
             <section class="selection-section" id="backgroundSection">
                 <h2>۳. انتخاب پس‌زمینه یا توصیف سفارشی</h2>
+                <div class="section-hint">
+                    💡 <strong>محل یا پس‌زمینه‌ای که می‌خواهید محصولات در آن چیده شوند را انتخاب کنید.</strong><br>
+                    می‌توانید از گزینه‌های آماده استفاده کنید یا در بخش "توصیف سفارشی محیط" محل دلخواه خود را بنویسید.
+                </div>
                 <div class="backgrounds-grid" id="backgroundsGrid">
                     <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
                 </div>
@@ -114,6 +120,10 @@
             </section>
 
             <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب محصولات، نوع چیدمان و پس‌زمینه، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
             <button class="generate-btn" id="generateBtn" disabled>
                 ✨ تولید عکس حرفه‌ای
             </button>

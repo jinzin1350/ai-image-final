@@ -413,6 +413,10 @@
                 <div class="brand-selection-container">
                     <div class="brand-selection-header">
                         <h2>۱. انتخاب عکس مرجع از برندها</h2>
+                        <div class="section-hint" style="margin: 15px 0;">
+                            💡 <strong>یک برند را انتخاب کنید و سپس از عکس‌های آن برند، یک عکس مرجع انتخاب کنید.</strong><br>
+                            هوش مصنوعی ترکیب‌بندی، نور و فضای عکس مرجع را شبیه‌سازی خواهد کرد.
+                        </div>
                         <p>ابتدا یک برند را انتخاب کنید، سپس از میان عکس‌های آن برند، یک عکس مرجع انتخاب کنید</p>
                     </div>
 
@@ -505,13 +509,9 @@
             <!-- بخش آپلود لباس -->
             <section class="upload-section" id="garmentUploadSection">
                 <h2>۲. آپلود تصویر لباس</h2>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button onclick="document.getElementById('garmentInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
-                        📤 آپلود از کامپیوتر
-                    </button>
-                    <button onclick="openGalleryForGarment()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
-                        🖼️ انتخاب از گالری
-                    </button>
+                <div class="section-hint">
+                    💡 <strong>تصویر لباس خود را آپلود کنید.</strong><br>
+                    می‌توانید چند لباس همزمان انتخاب کنید (شلوار + تی‌شرت + کت و...). فرمت‌های مجاز: JPG، PNG، WEBP
                 </div>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="garmentInput" accept="image/*" multiple hidden>
@@ -535,10 +535,17 @@
                     <div id="garmentPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
             </section>
+                <button onclick="document.getElementById('garmentInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
 
             <!-- بخش انتخاب مدل -->
             <section class="selection-section" id="modelSection">
                 <h2>۳. انتخاب مدل</h2>
+                <div class="section-hint">
+                    💡 <strong>مدل مورد نظر برای پوشیدن لباس را انتخاب کنید.</strong><br>
+                    می‌توانید دسته‌بندی را تغییر دهید و مدل دلخواه خود را انتخاب کنید.
+                </div>
 
                 <div class="category-selector">
                     <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;" id="modelSelectorLabel">انتخاب مدل اول:</label>
@@ -615,6 +622,10 @@
             </section>
 
             <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب عکس مرجع، لباس و مدل، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
             <button class="generate-btn" id="generateBtn" disabled>
                 ✨ تولید عکس حرفه‌ای
             </button>

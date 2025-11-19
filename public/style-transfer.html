@@ -25,14 +25,9 @@
             <!-- بخش Style Transfer -->
             <section class="upload-section" id="styleTransferSection">
                 <h2>۱. آپلود عکس‌های استایل (۱ تا ۳ عکس)</h2>
-                <p class="section-description">عکس‌هایی را آپلود کنید که می‌خواهید فضا، نور و حال و هوای آن‌ها را به عکس اصلی منتقل کنید</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button onclick="document.getElementById('styleImagesInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
-                        📤 آپلود از کامپیوتر
-                    </button>
-                    <button onclick="openGalleryForStyleImages()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
-                        🖼️ انتخاب از گالری
-                    </button>
+                <div class="section-hint">
+                    💡 <strong>عکس‌هایی را آپلود کنید که فضا، نور و حال و هوای آن‌ها را دوست دارید.</strong><br>
+                    هوش مصنوعی استایل این عکس‌ها را به عکس اصلی شما منتقل خواهد کرد (۱ تا ۳ عکس).
                 </div>
                 <div class="upload-area" id="styleImagesUploadArea">
                     <input type="file" id="styleImagesInput" accept="image/*" multiple hidden>
@@ -50,16 +45,16 @@
                     </div>
                     <div id="styleImagesPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
+            </section>
+                <button onclick="document.getElementById('styleImagesInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
 
+            <section class="upload-section" id="styleTransferSection2" style="margin-top: 30px;">
                 <h2 style="margin-top: 40px;">۲. آپلود عکس اصلی (محتوا)</h2>
-                <p class="section-description">عکسی که می‌خواهید استایل به آن اعمال شود (محتوا حفظ می‌شود، فقط فضا و نور تغییر می‌کند)</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button onclick="document.getElementById('contentImageInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
-                        📤 آپلود از کامپیوتر
-                    </button>
-                    <button onclick="openGalleryForContentImage()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
-                        🖼️ انتخاب از گالری
-                    </button>
+                <div class="section-hint">
+                    💡 <strong>عکس اصلی خود را آپلود کنید.</strong><br>
+                    محتوا و موضوع عکس حفظ می‌شود، فقط فضا، نور و حال و هوای آن تغییر می‌کند.
                 </div>
                 <div class="upload-area" id="contentImageUploadArea">
                     <input type="file" id="contentImageInput" accept="image/*" hidden>
@@ -87,8 +82,15 @@
                     </div>
                 </div>
             </section>
+                <button onclick="document.getElementById('contentImageInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
 
             <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب عکس‌های استایل و عکس اصلی، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
             <button class="generate-btn" id="generateBtn" disabled>
                 ✨ تولید عکس حرفه‌ای
             </button>
