@@ -2084,9 +2084,10 @@ app.get('/api/models', async (req, res) => {
 
       try {
         // Build query to fetch models
+        // Only select columns we need for better performance
         let query = supabase
           .from('models')
-          .select('*')
+          .select('id, name, category, description, image_url')
           .eq('is_active', true);
 
         // If user is logged in, show their private models + public models
@@ -2108,7 +2109,11 @@ app.get('/api/models', async (req, res) => {
           query = query.in('category', ['brand-woman', 'brand-man', 'brand-girl', 'brand-boy', 'brand-plus-size']);
         }
 
-        const { data: customModels } = await query.order('created_at', { ascending: false });
+        // Optimize: Limit results to 100 most recent models for faster loading
+        // Frontend will handle pagination client-side
+        const { data: customModels } = await query
+          .order('created_at', { ascending: false })
+          .limit(100);
 
         if (customModels && customModels.length > 0) {
           console.log(`✅ Found ${customModels.length} models (mode: ${mode}, userId: ${userId || 'public'})`);
