@@ -1613,17 +1613,21 @@ function switchMode(mode) {
             card.classList.remove('selected');
         });
     } else if (mode === 'complete-outfit' || mode === 'scene-recreation') {
+        // Reset to default category BEFORE loading models
+        if (mode === 'complete-outfit') {
+            currentCategory = 'woman';
+        } else if (mode === 'scene-recreation') {
+            currentCategory = 'brand-woman'; // Default to brand-woman for scene-recreation
+        }
+
         // These modes need models
         loadModels(mode);
+
         // Reset model selection
         selectedModelId = null;
         document.querySelectorAll('.model-card').forEach(card => {
             card.classList.remove('selected');
         });
-        // Reset to default category
-        if (mode === 'complete-outfit') {
-            currentCategory = 'woman';
-        }
     }
     // Note: Other modes (color-collection, flat-lay, style-transfer) don't need models
 
