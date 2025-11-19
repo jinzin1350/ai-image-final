@@ -194,7 +194,14 @@ async function uploadFileWithProgress(endpoint, formData, onProgress) {
                     reject(new Error('Invalid JSON response'));
                 }
             } else {
-                reject(new Error(`Upload failed with status ${xhr.status}`));
+                // Try to parse error response from server
+                try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    const errorMsg = errorResponse.error || errorResponse.details || `Upload failed with status ${xhr.status}`;
+                    reject(new Error(errorMsg));
+                } catch (e) {
+                    reject(new Error(`Upload failed with status ${xhr.status}`));
+                }
             }
         });
 
@@ -1801,7 +1808,8 @@ async function uploadFiles(files) {
                 }
             } catch (error) {
                 console.error('خطا در آپلود فایل:', error);
-                alert('خطا در آپلود فایل. لطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.');
+                const errorMessage = error.message || 'خطا در آپلود فایل';
+                alert(`خطا در آپلود فایل: ${errorMessage}\n\nلطفاً یک فایل تصویری معتبر (JPG, PNG, WEBP, AVIF) انتخاب کنید.`);
             }
         }
 
