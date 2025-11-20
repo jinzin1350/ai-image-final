@@ -6835,12 +6835,16 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
         description: description || null,
         display_order: display_order || 0,
         photo_type: photo_type || 'recreation', // Default to 'recreation'
-        is_active: true
+        is_active: true,
+        analysis_status: 'pending', // Will be analyzed by background worker
+        analysis_retry_count: 0
       }])
       .select()
       .single();
 
     if (error) throw error;
+
+    console.log(`📸 Brand photo uploaded - queued for analysis (ID: ${data.id})`);
 
     res.status(201).json({ success: true, photo: data });
   } catch (error) {
@@ -6908,6 +6912,158 @@ app.delete('/api/admin/brands/:brandId/photos/:photoId', authenticateAdmin, asyn
     res.json({ success: true, message: 'Photo deleted successfully' });
   } catch (error) {
     console.error('Error deleting brand photo:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// BACKGROUND WORKER: Process Pending Brand Photo Analyses
+// ============================================
+app.post('/api/admin/process-brand-photo-analyses', async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Supabase not configured' });
+    }
+
+    if (!genAI) {
+      return res.status(503).json({ error: 'Google AI not configured' });
+    }
+
+    // Fetch ONE pending photo (FIFO - oldest first)
+    const { data: pendingPhotos, error: fetchError } = await supabaseAdmin
+      .from('brand_reference_photos')
+      .select('*')
+      .eq('analysis_status', 'pending')
+      .order('created_at', { ascending: true })
+      .limit(1);
+
+    if (fetchError) throw fetchError;
+
+    if (!pendingPhotos || pendingPhotos.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No pending photos to analyze',
+        processed: 0
+      });
+    }
+
+    const photo = pendingPhotos[0];
+    console.log(`🔄 Processing analysis for photo ID: ${photo.id}`);
+
+    // Update status to 'analyzing'
+    await supabaseAdmin
+      .from('brand_reference_photos')
+      .update({ analysis_status: 'analyzing' })
+      .eq('id', photo.id);
+
+    try {
+      // Analyze the photo with AI
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash-exp',
+        generationConfig: {
+          temperature: 0.4,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 2048,
+        }
+      });
+
+      // Fetch image from URL
+      const imageResponse = await axios.get(photo.image_url, {
+        responseType: 'arraybuffer'
+      });
+      const imageBase64 = Buffer.from(imageResponse.data).toString('base64');
+      const mimeType = imageResponse.headers['content-type'] || 'image/jpeg';
+
+      const analysisPrompt = `Analyze this reference photo in detail for fashion AI generation.
+
+Describe:
+1. **Scene & Composition**: Overall scene, setting, background elements, lighting mood
+2. **Number of People**: How many people are in the photo? (1, 2, 3+)
+3. **Poses & Positioning**: How are people positioned? Body angles, poses, interactions
+4. **Camera Angle**: Eye-level, high angle, low angle, three-quarter view, profile, etc.
+5. **Lighting**: Natural/artificial, direction, softness, shadows, highlights
+6. **Mood & Atmosphere**: Professional, casual, elegant, energetic, calm, etc.
+7. **Key Visual Elements**: Props, accessories, notable features to recreate
+
+Provide a detailed analysis that will help AI recreate this scene accurately.`;
+
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            mimeType: mimeType,
+            data: imageBase64
+          }
+        },
+        { text: analysisPrompt }
+      ]);
+
+      const analysis = result.response.text();
+
+      // Save analysis to database
+      const { error: updateError } = await supabaseAdmin
+        .from('brand_reference_photos')
+        .update({
+          ai_analysis: analysis,
+          analysis_status: 'analyzed',
+          analyzed_at: new Date().toISOString(),
+          analysis_retry_count: 0
+        })
+        .eq('id', photo.id);
+
+      if (updateError) throw updateError;
+
+      console.log(`✅ Successfully analyzed photo ID: ${photo.id}`);
+
+      return res.json({
+        success: true,
+        message: 'Photo analyzed successfully',
+        processed: 1,
+        photoId: photo.id
+      });
+
+    } catch (analysisError) {
+      console.error(`❌ Analysis failed for photo ID ${photo.id}:`, analysisError);
+
+      // Increment retry count
+      const newRetryCount = (photo.analysis_retry_count || 0) + 1;
+      const maxRetries = 3;
+
+      if (newRetryCount >= maxRetries) {
+        // Mark as failed after 3 retries
+        await supabaseAdmin
+          .from('brand_reference_photos')
+          .update({
+            analysis_status: 'failed',
+            analysis_retry_count: newRetryCount
+          })
+          .eq('id', photo.id);
+
+        console.log(`❌ Photo ID ${photo.id} marked as FAILED after ${maxRetries} retries`);
+      } else {
+        // Reset to pending for retry
+        await supabaseAdmin
+          .from('brand_reference_photos')
+          .update({
+            analysis_status: 'pending',
+            analysis_retry_count: newRetryCount
+          })
+          .eq('id', photo.id);
+
+        console.log(`⚠️  Photo ID ${photo.id} retry ${newRetryCount}/${maxRetries}`);
+      }
+
+      return res.status(500).json({
+        success: false,
+        error: 'Analysis failed',
+        photoId: photo.id,
+        retryCount: newRetryCount,
+        willRetry: newRetryCount < maxRetries
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Error in background worker:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -7302,5 +7458,31 @@ app.listen(PORT, '0.0.0.0', async () => {
     }
   } else {
     console.log(`✅ ${models.length} مدل AI آماده استفاده است`);
+  }
+
+  // ============================================
+  // AUTOMATIC BACKGROUND WORKER SCHEDULER
+  // ============================================
+  // Process brand photo analyses every 10 seconds
+  if (supabaseAdmin && genAI) {
+    console.log('🔄 Starting automatic brand photo analysis scheduler (every 10 seconds)');
+
+    setInterval(async () => {
+      try {
+        const response = await axios.post(`http://localhost:${PORT}/api/admin/process-brand-photo-analyses`);
+
+        if (response.data.processed > 0) {
+          console.log(`✅ Background worker processed ${response.data.processed} photo(s)`);
+        }
+      } catch (error) {
+        // Silent failure - don't spam logs for "no pending photos"
+        if (error.response?.status !== 500) {
+          // Only log actual errors, not "no pending" responses
+          console.error('⚠️  Background worker error:', error.message);
+        }
+      }
+    }, 10000); // Every 10 seconds
+  } else {
+    console.log('⚠️  Background photo analysis disabled (Supabase or Gemini AI not configured)');
   }
 });

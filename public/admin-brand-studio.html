@@ -374,6 +374,48 @@
             font-weight: 600;
         }
 
+        .photo-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 10;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .status-analyzed {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-analyzing {
+            background: #3b82f6;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-failed {
+            background: #ef4444;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
         .upload-area {
             border: 3px dashed #d1d5db;
             border-radius: 16px;
@@ -842,11 +884,17 @@
             // Load both types of photos
             loadBrandPhotos(brandId, 'recreation');
             loadBrandPhotos(brandId, 'style-transfer');
+
+            // Start auto-refresh
+            startAutoRefresh(brandId);
         }
 
         function closePhotosModal() {
             document.getElementById('photosModal').style.display = 'none';
             currentBrandForPhotos = null;
+
+            // Stop auto-refresh
+            stopAutoRefresh();
         }
 
         async function loadBrandPhotos(brandId, photoType) {
@@ -871,16 +919,31 @@
                     return;
                 }
 
-                grid.innerHTML = photos.map(photo => `
-                    <div class="photo-card">
-                        <img src="${photo.image_url}" alt="${photo.title || 'Brand photo'}">
-                        <div class="photo-card-overlay">
-                            <button class="btn-danger" onclick="deletePhoto('${brandId}', '${photo.id}', '${photoType}')">
-                                حذف
-                            </button>
+                grid.innerHTML = photos.map(photo => {
+                    // Determine analysis status badge
+                    let statusBadge = '';
+                    if (photo.analysis_status === 'analyzed') {
+                        statusBadge = '<span class="status-badge status-analyzed">✓ تحلیل شده</span>';
+                    } else if (photo.analysis_status === 'analyzing') {
+                        statusBadge = '<span class="status-badge status-analyzing">🔄 در حال تحلیل...</span>';
+                    } else if (photo.analysis_status === 'failed') {
+                        statusBadge = '<span class="status-badge status-failed">✗ خطا</span>';
+                    } else {
+                        statusBadge = '<span class="status-badge status-pending">⏳ در صف تحلیل</span>';
+                    }
+
+                    return `
+                        <div class="photo-card">
+                            <img src="${photo.image_url}" alt="${photo.title || 'Brand photo'}">
+                            <div class="photo-status">${statusBadge}</div>
+                            <div class="photo-card-overlay">
+                                <button class="btn-danger" onclick="deletePhoto('${brandId}', '${photo.id}', '${photoType}')">
+                                    حذف
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch (error) {
                 console.error('Error loading photos:', error);
                 grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>`;
@@ -989,6 +1052,31 @@
         function handleAdminLogout() {
             localStorage.removeItem('admin_token');
             window.location.href = '/admin-login.html';
+        }
+
+        // Auto-refresh photos every 15 seconds to show analysis status updates
+        let autoRefreshInterval = null;
+        function startAutoRefresh(brandId) {
+            // Clear existing interval
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+
+            // Refresh every 15 seconds
+            autoRefreshInterval = setInterval(() => {
+                const currentBrandId = document.getElementById('currentBrandId').value;
+                if (currentBrandId) {
+                    loadBrandPhotos(currentBrandId, 'recreation');
+                    loadBrandPhotos(currentBrandId, 'style-transfer');
+                }
+            }, 15000); // 15 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
         }
 
         // Drag and drop for upload area

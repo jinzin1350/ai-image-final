@@ -2160,12 +2160,14 @@ if (generateBtn) {
             if (window.selectedBrandReferencePhoto) {
                 requestBody.brandReferencePhotoUrl = window.selectedBrandReferencePhoto.image_url;
                 requestBody.brandReferencePhotoId = window.selectedBrandReferencePhoto.id;
+
+                // Use pre-saved analysis from database (analyzed by background worker)
+                requestBody.sceneAnalysis = window.selectedBrandReferencePhoto.ai_analysis || sceneAnalysis;
             } else {
                 // Fallback to uploaded reference photo (if uncommented)
                 requestBody.referencePhotoPath = uploadedReferencePhoto;
+                requestBody.sceneAnalysis = sceneAnalysis;
             }
-
-            requestBody.sceneAnalysis = sceneAnalysis;
             requestBody.garmentPaths = uploadedGarmentPaths;
             requestBody.modelId = selectedModelId;
             requestBody.hijabType = selectedHijabType;
@@ -2181,7 +2183,13 @@ if (generateBtn) {
             // Style Transfer mode - apply lighting/mood from style images to content image
             requestBody.styleImagePaths = uploadedStyleImages;
             requestBody.contentImagePath = uploadedContentImage;
-            requestBody.contentImageAnalysis = contentImageAnalysis; // AI analysis of content image lighting/mood
+
+            // Use pre-saved analysis from brand content photo if available (analyzed by background worker)
+            if (window.selectedBrandContentPhoto && window.selectedBrandContentPhoto.ai_analysis) {
+                requestBody.contentImageAnalysis = window.selectedBrandContentPhoto.ai_analysis;
+            } else {
+                requestBody.contentImageAnalysis = contentImageAnalysis; // Fallback to on-demand analysis
+            }
         }
 
         console.log('🚀 Sending request:', requestBody);
