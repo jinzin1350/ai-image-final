@@ -308,6 +308,11 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       .from('user_limits')
       .select('*');
 
+    // Fetch all user_profiles data (for image_generation_model)
+    const { data: profilesData, error: profilesError } = await supabase
+      .from('user_profiles')
+      .select('id, image_generation_model, updated_at');
+
     // If user_limits table doesn't exist, still show all users with default limits
     const userLimitsMap = {};
     if (!limitsError && limitsData) {
@@ -319,11 +324,24 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       console.warn('⚠️ Could not fetch user_limits (table might not exist):', limitsError.message);
     }
 
-    // Combine auth users with their limits (or default values)
+    // Create profiles map
+    const profilesMap = {};
+    if (!profilesError && profilesData) {
+      profilesData.forEach(profile => {
+        profilesMap[profile.id] = profile;
+      });
+      console.log(`✅ Found ${profilesData.length} user profile records`);
+    } else if (profilesError) {
+      console.warn('⚠️ Could not fetch user_profiles:', profilesError.message);
+    }
+
+    // Combine auth users with their limits and profiles (or default values)
     const usersWithLimits = allUsers.map(authUser => {
       const limits = userLimitsMap[authUser.id];
+      const profile = profilesMap[authUser.id];
 
       return {
+        id: authUser.id,
         user_id: authUser.id,
         email: authUser.email,
         // New tier system fields
@@ -336,8 +354,11 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
         images_limit: limits?.images_limit || 10,
         captions_used: limits?.captions_used || 0,
         captions_limit: limits?.captions_limit || 5,
+        // Model selection
+        image_generation_model: profile?.image_generation_model || 'gemini-2-flash',
         // Additional info
         last_reset_date: limits?.last_reset_date,
+        updated_at: profile?.updated_at,
         created_at: authUser.created_at
       };
     });
@@ -441,6 +462,88 @@ app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
       error: error.message,
       code: error.code,
       hint: error.hint
+    });
+  }
+});
+
+// Update user's image generation model
+app.post('/api/admin/update-user-model', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId, model } = req.body;
+
+    if (!userId || !model) {
+      return res.status(400).json({
+        success: false,
+        error: 'userId and model are required'
+      });
+    }
+
+    // Validate model value
+    if (!['gemini-2-flash', 'nano-banana-2'].includes(model)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid model. Must be either gemini-2-flash or nano-banana-2'
+      });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({
+        success: false,
+        error: 'Supabase not configured'
+      });
+    }
+
+    console.log(`📝 Updating user ${userId} model to: ${model}`);
+
+    // Check if user_profile exists
+    const { data: existing, error: fetchError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error fetching user profile:', fetchError);
+      throw fetchError;
+    }
+
+    let result;
+
+    if (!existing) {
+      // Create new profile if doesn't exist
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .insert([{
+          id: userId,
+          image_generation_model: model,
+          updated_at: new Date().toISOString()
+        }])
+        .select();
+
+      if (error) throw error;
+      result = data;
+    } else {
+      // Update existing profile
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update({
+          image_generation_model: model,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select();
+
+      if (error) throw error;
+      result = data;
+    }
+
+    console.log(`✅ Updated user ${userId} model to ${model}`);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('❌ Error updating user model:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
