@@ -2610,19 +2610,32 @@ function closeGalleryModal() {
 
 // Confirm gallery selection
 async function confirmGallerySelection() {
+    console.log('📸 confirmGallerySelection called:', {
+        galleryMode: galleryMode,
+        selectedCount: selectedGalleryImages.length,
+        selectedImages: selectedGalleryImages
+    });
+
     if (selectedGalleryImages.length === 0) {
         alert('لطفاً حداقل یک عکس انتخاب کنید');
         return;
     }
 
     if (galleryMode === 'style-images') {
+        console.log('🎨 Style images mode - before adding:', uploadedStyleImages.length);
+
         // Add selected images to style images
         uploadedStyleImages = [...uploadedStyleImages, ...selectedGalleryImages];
+
+        console.log('🎨 After adding, before limit:', uploadedStyleImages.length);
 
         // Limit to 3 images
         if (uploadedStyleImages.length > 3) {
             uploadedStyleImages = uploadedStyleImages.slice(0, 3);
+            console.log('✂️ Limited to 3 images');
         }
+
+        console.log('🎨 Final uploadedStyleImages:', uploadedStyleImages);
 
         // Show previews
         showStyleImagesPreviews();
@@ -2698,12 +2711,21 @@ async function confirmGallerySelection() {
 
 // Show style images previews
 function showStyleImagesPreviews() {
+    console.log('🖼️ showStyleImagesPreviews called, uploadedStyleImages:', uploadedStyleImages);
+
     const previewsContainer = document.getElementById('styleImagesPreviews');
     const placeholder = document.getElementById('styleImagesPlaceholder');
+
+    console.log('📦 Preview elements:', {
+        previewsContainer: !!previewsContainer,
+        placeholder: !!placeholder,
+        uploadedCount: uploadedStyleImages.length
+    });
 
     if (uploadedStyleImages.length > 0) {
         previewsContainer.innerHTML = '';
         uploadedStyleImages.forEach((imagePath, index) => {
+            console.log(`Adding preview ${index}:`, imagePath);
             const previewDiv = document.createElement('div');
             previewDiv.className = 'garment-preview';
             previewDiv.innerHTML = `
@@ -2714,9 +2736,11 @@ function showStyleImagesPreviews() {
         });
         previewsContainer.style.display = 'grid';
         placeholder.style.display = 'none';
+        console.log('✅ Previews shown, placeholder hidden');
     } else {
         previewsContainer.style.display = 'none';
         placeholder.style.display = 'flex';
+        console.log('⚠️ No images, showing placeholder');
     }
 
     // Update generate button state
