@@ -3557,7 +3557,9 @@ Make it simple and natural - like this person is actually wearing these clothes 
           'girl': 'teenage girl (age 12-15 years old)',
           'boy': 'teenage boy (age 12-15 years old)',
           'teen': 'teenager (age 15-18 years old)',
-          'child': 'child (age 6-11 years old)'
+          'child': 'child (age 6-11 years old)',
+          'accessory': 'adult woman (30-40 years old)', // accessory default is woman
+          'accessory-man': 'adult man (30-40 years old)' // accessory for men
         };
 
         const modelDescription = modelCategoryDescriptions[selectedModel.category] || 'person';

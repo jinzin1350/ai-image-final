@@ -91,6 +91,18 @@
                         💡 انتخاب نوع اکسسوری به هوش مصنوعی کمک می‌کند تا بهتر آن را روی مدل قرار دهد
                     </p>
                 </div>
+
+                <!-- جنسیت مدل -->
+                <div class="param-group" style="margin-top: 20px;">
+                    <label for="modelGender">👤 جنسیت مدل</label>
+                    <select id="modelGender" class="param-dropdown">
+                        <option value="woman">زن</option>
+                        <option value="man">مرد</option>
+                    </select>
+                    <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                        💡 انتخاب کنید که اکسسوری روی مدل زن یا مرد نمایش داده شود
+                    </p>
+                </div>
             </section>
 
             <!-- بخش انتخاب مدل -->
@@ -189,6 +201,36 @@
     <script>
         // Set the current mode for this page
         window.currentMode = 'accessories-only';
+
+        // Add event listener for model gender change
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelGenderSelect = document.getElementById('modelGender');
+            if (modelGenderSelect) {
+                modelGenderSelect.addEventListener('change', function() {
+                    const selectedGender = this.value; // 'woman' or 'man'
+
+                    // Update category based on gender
+                    if (selectedGender === 'man') {
+                        window.currentCategory = 'accessory-man';
+                    } else {
+                        window.currentCategory = 'accessory'; // default is woman
+                    }
+
+                    console.log('🔄 Model gender changed to:', selectedGender, '| Category:', window.currentCategory);
+
+                    // Reload models with new category
+                    if (typeof displayModelsByCategory === 'function') {
+                        displayModelsByCategory(window.currentCategory);
+                    }
+
+                    // Reset model selection
+                    window.selectedModelId = null;
+                    document.querySelectorAll('.model-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                });
+            }
+        });
     </script>
     <script src="script.js"></script>
     <script src="/mobile-menu.js"></script>
