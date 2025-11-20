@@ -569,16 +569,48 @@
             <div class="modal-body">
                 <input type="hidden" id="currentBrandId">
 
-                <div class="upload-area" id="uploadArea" onclick="document.getElementById('photoUpload').click()">
-                    <input type="file" id="photoUpload" accept="image/*" multiple hidden onchange="handlePhotoUpload(event)">
-                    <span class="upload-icon">📤</span>
-                    <div class="upload-text">Upload Reference Photos</div>
-                    <div class="upload-hint">Click or drag & drop your images here</div>
-                    <small style="color: #6b7280; margin-top: 8px; display: block;">JPG, PNG, WEBP - Max 10MB per file</small>
+                <!-- Recreation Photos Section -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <span>📸</span>
+                        <span>Recreation Photos (Single Model)</span>
+                    </h3>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                        For "Scene Recreation" service - Single model photos that users will recreate
+                    </p>
+                    <div class="upload-area" id="uploadAreaRecreation" onclick="document.getElementById('photoUploadRecreation').click()">
+                        <input type="file" id="photoUploadRecreation" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'recreation')">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Upload Recreation Photos</div>
+                        <div class="upload-hint">Click or drag & drop single model images here</div>
+                        <small style="color: #6b7280; margin-top: 8px; display: block;">JPG, PNG, WEBP - Max 10MB per file</small>
+                    </div>
+
+                    <div id="photosGridRecreation" class="photos-grid">
+                        <!-- Recreation photos will be loaded here -->
+                    </div>
                 </div>
 
-                <div id="photosGrid" class="photos-grid">
-                    <!-- Photos will be loaded here -->
+                <!-- Style Transfer Photos Section -->
+                <div>
+                    <h3 style="color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <span>🎨</span>
+                        <span>Style Transfer Photos (2-Person Modeling)</span>
+                    </h3>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                        For "Style Transfer" service - Professional 2-person modeling photos used as content images
+                    </p>
+                    <div class="upload-area" id="uploadAreaStyleTransfer" onclick="document.getElementById('photoUploadStyleTransfer').click()">
+                        <input type="file" id="photoUploadStyleTransfer" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'style-transfer')">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Upload Style Transfer Photos</div>
+                        <div class="upload-hint">Click or drag & drop 2-person modeling images here</div>
+                        <small style="color: #6b7280; margin-top: 8px; display: block;">JPG, PNG, WEBP - Max 10MB per file</small>
+                    </div>
+
+                    <div id="photosGridStyleTransfer" class="photos-grid">
+                        <!-- Style transfer photos will be loaded here -->
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -777,7 +809,9 @@
             document.getElementById('currentBrandId').value = brandId;
             document.getElementById('photosModalTitle').textContent = `عکس‌های ${brandName}`;
             document.getElementById('photosModal').style.display = 'block';
-            loadBrandPhotos(brandId);
+            // Load both types of photos
+            loadBrandPhotos(brandId, 'recreation');
+            loadBrandPhotos(brandId, 'style-transfer');
         }
 
         function closePhotosModal() {
@@ -785,12 +819,13 @@
             currentBrandForPhotos = null;
         }
 
-        async function loadBrandPhotos(brandId) {
-            const grid = document.getElementById('photosGrid');
+        async function loadBrandPhotos(brandId, photoType) {
+            const gridId = photoType === 'recreation' ? 'photosGridRecreation' : 'photosGridStyleTransfer';
+            const grid = document.getElementById(gridId);
             grid.innerHTML = '<div class="loading-spinner"></div>';
 
             try {
-                const response = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`);
+                const response = await fetchWithAuth(`/api/admin/brands/${brandId}/photos?photo_type=${photoType}`);
 
                 if (!response.ok) throw new Error('Failed to load photos');
 
@@ -810,7 +845,7 @@
                     <div class="photo-card">
                         <img src="${photo.image_url}" alt="${photo.title || 'Brand photo'}">
                         <div class="photo-card-overlay">
-                            <button class="btn-danger" onclick="deletePhoto('${brandId}', '${photo.id}')">
+                            <button class="btn-danger" onclick="deletePhoto('${brandId}', '${photo.id}', '${photoType}')">
                                 حذف
                             </button>
                         </div>
@@ -822,7 +857,7 @@
             }
         }
 
-        async function handlePhotoUpload(event) {
+        async function handlePhotoUpload(event, photoType) {
             const files = event.target.files;
             if (files.length === 0) return;
 
@@ -843,12 +878,13 @@
 
                     const { url } = await uploadResponse.json();
 
-                    // Save to brand photos
+                    // Save to brand photos with photo_type
                     const saveResponse = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`, {
                         method: 'POST',
                         body: JSON.stringify({
                             image_url: url,
-                            title: file.name
+                            title: file.name,
+                            photo_type: photoType // Add photo_type
                         })
                     });
 
@@ -860,12 +896,12 @@
                 }
             }
 
-            // Reload photos
-            loadBrandPhotos(brandId);
+            // Reload photos for this type
+            loadBrandPhotos(brandId, photoType);
             event.target.value = ''; // Reset input
         }
 
-        async function deletePhoto(brandId, photoId) {
+        async function deletePhoto(brandId, photoId, photoType) {
             if (!confirm('آیا مطمئن هستید که می‌خواهید این عکس را حذف کنید؟')) {
                 return;
             }
@@ -877,7 +913,7 @@
 
                 if (!response.ok) throw new Error('Failed to delete photo');
 
-                loadBrandPhotos(brandId);
+                loadBrandPhotos(brandId, photoType);
             } catch (error) {
                 console.error('Error deleting photo:', error);
                 alert('خطا در حذف عکس: ' + error.message);

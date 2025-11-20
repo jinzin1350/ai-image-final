@@ -6593,12 +6593,20 @@ app.get('/api/brands/:id/photos', async (req, res) => {
     }
 
     const { id } = req.params;
+    const { photo_type } = req.query; // Optional filter: 'recreation' or 'style-transfer'
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('brand_reference_photos')
       .select('*')
       .eq('brand_id', id)
-      .eq('is_active', true)
+      .eq('is_active', true);
+
+    // Filter by photo_type if provided
+    if (photo_type && (photo_type === 'recreation' || photo_type === 'style-transfer')) {
+      query = query.eq('photo_type', photo_type);
+    }
+
+    const { data, error} = await query
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
@@ -6791,10 +6799,15 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
     }
 
     const { id: brandId } = req.params;
-    const { image_url, title, description, display_order } = req.body;
+    const { image_url, title, description, display_order, photo_type } = req.body;
 
     if (!image_url) {
       return res.status(400).json({ error: 'Image URL is required' });
+    }
+
+    // Validate photo_type if provided
+    if (photo_type && photo_type !== 'recreation' && photo_type !== 'style-transfer') {
+      return res.status(400).json({ error: 'Invalid photo_type. Must be "recreation" or "style-transfer"' });
     }
 
     // Verify brand exists
@@ -6816,6 +6829,7 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
         title: title || null,
         description: description || null,
         display_order: display_order || 0,
+        photo_type: photo_type || 'recreation', // Default to 'recreation'
         is_active: true
       }])
       .select()
@@ -6838,13 +6852,19 @@ app.put('/api/admin/brands/:brandId/photos/:photoId', authenticateAdmin, async (
     }
 
     const { brandId, photoId } = req.params;
-    const { title, description, display_order, is_active } = req.body;
+    const { title, description, display_order, is_active, photo_type } = req.body;
+
+    // Validate photo_type if provided
+    if (photo_type && photo_type !== 'recreation' && photo_type !== 'style-transfer') {
+      return res.status(400).json({ error: 'Invalid photo_type. Must be "recreation" or "style-transfer"' });
+    }
 
     const updateData = {};
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (display_order !== undefined) updateData.display_order = display_order;
     if (is_active !== undefined) updateData.is_active = is_active;
+    if (photo_type !== undefined) updateData.photo_type = photo_type;
 
     const { data, error } = await supabaseAdmin
       .from('brand_reference_photos')
@@ -7205,6 +7225,57 @@ app.delete('/api/admin/gallery/:id', authenticateAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting gallery item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Run database migration (admin only)
+app.post('/api/run-migration', async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ error: 'Supabase admin client not configured' });
+    }
+
+    const migrationSQL = `
+      -- Add photo_type column to brand_reference_photos table
+      DO $$
+      BEGIN
+        -- Add column if it doesn't exist
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name='brand_reference_photos' AND column_name='photo_type') THEN
+          ALTER TABLE brand_reference_photos ADD COLUMN photo_type VARCHAR(50) DEFAULT 'recreation';
+        END IF;
+
+        -- Add check constraint if it doesn't exist
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints
+                       WHERE constraint_name='brand_reference_photos_photo_type_check') THEN
+          ALTER TABLE brand_reference_photos
+          ADD CONSTRAINT brand_reference_photos_photo_type_check
+          CHECK (photo_type IN ('recreation', 'style-transfer'));
+        END IF;
+      END $$;
+
+      -- Create index if it doesn't exist
+      CREATE INDEX IF NOT EXISTS idx_brand_reference_photos_photo_type ON brand_reference_photos(photo_type);
+
+      -- Update existing photos to be 'recreation' type
+      UPDATE brand_reference_photos SET photo_type = 'recreation' WHERE photo_type IS NULL;
+    `;
+
+    const { data, error } = await supabaseAdmin.rpc('exec_sql', { sql_query: migrationSQL });
+
+    if (error) {
+      // If RPC doesn't exist, we need to run it manually
+      console.error('Migration error:', error);
+      return res.status(500).json({
+        error: 'Migration failed. Please run the SQL manually in Supabase SQL Editor',
+        sql: migrationSQL
+      });
+    }
+
+    res.json({ success: true, message: 'Migration completed successfully' });
+  } catch (error) {
+    console.error('Migration error:', error);
     res.status(500).json({ error: error.message });
   }
 });
