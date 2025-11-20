@@ -2154,10 +2154,10 @@ app.get('/api/backgrounds', async (req, res) => {
 
     // Select appropriate background list based on mode
     let baseBackgrounds;
-    if (mode === 'color-collection' || mode === 'flat-lay') {
-      baseBackgrounds = [...productBackgrounds]; // Product photography backgrounds
+    if (mode === 'color-collection' || mode === 'flat-lay' || mode === 'accessories-only') {
+      baseBackgrounds = [...productBackgrounds]; // Product photography backgrounds (clean, neutral, studio-style)
     } else {
-      baseBackgrounds = [...backgrounds]; // Regular location backgrounds
+      baseBackgrounds = [...backgrounds]; // Regular location backgrounds (streets, parks, buildings, etc.)
     }
 
     let allBackgrounds = baseBackgrounds;
