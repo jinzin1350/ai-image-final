@@ -11,7 +11,9 @@
       "Bash(taskkill:*)",
       "Bash(cmd.exe //c \"taskkill //PID 29036 //F\")",
       "Bash(node -c:*)",
-      "Bash(nul)"
+      "Bash(nul)",
+      "Bash(node -e:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
