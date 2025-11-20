@@ -42,7 +42,7 @@ let TIER_INFO = {
         icon: '🧪',
         name: 'آزمایشی',
         nameEn: 'Test Limit',
-        credits: 5,
+        credits: 0, // Will be loaded from database
         price: 0,
         color: '#3b82f6'
     },
@@ -50,24 +50,24 @@ let TIER_INFO = {
         icon: '🥉',
         name: 'برنز',
         nameEn: 'Bronze',
-        credits: 50,
-        price: 199000,
+        credits: 0, // Will be loaded from database
+        price: 0, // Will be loaded from database
         color: '#f59e0b'
     },
     'silver': {
         icon: '🥈',
         name: 'نقره‌ای',
         nameEn: 'Silver',
-        credits: 100,
-        price: 399000,
+        credits: 0, // Will be loaded from database
+        price: 0, // Will be loaded from database
         color: '#6b7280'
     },
     'gold': {
         icon: '🥇',
         name: 'طلایی',
         nameEn: 'Gold',
-        credits: 130,
-        price: 599000,
+        credits: 0, // Will be loaded from database
+        price: 0, // Will be loaded from database
         color: '#eab308'
     }
 };
