@@ -1732,10 +1732,18 @@ function checkGenerateButton() {
         // Style Transfer mode: need at least 1 style image and 1 brand content photo
         const hasContentPhoto = window.selectedBrandContentPhoto !== null && window.selectedBrandContentPhoto !== undefined;
         isValid = uploadedStyleImages.length >= 1 && hasContentPhoto;
+
+        console.log('🎨 Style Transfer Validation:', {
+            uploadedStyleImagesCount: uploadedStyleImages.length,
+            hasContentPhoto: hasContentPhoto,
+            selectedBrandContentPhoto: window.selectedBrandContentPhoto,
+            isValid: isValid
+        });
     }
 
     if (generateBtn) {
         generateBtn.disabled = !isValid;
+        console.log('🔘 Generate Button State:', { disabled: !isValid, isValid: isValid });
     }
 }
 
