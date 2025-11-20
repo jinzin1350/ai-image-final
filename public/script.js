@@ -2039,6 +2039,51 @@ function resetAllSelections() {
     const customLocationInput = document.getElementById('customLocation');
     if (customLocationInput) customLocationInput.value = '';
 
+    // Reset style transfer
+    uploadedStyleImages = [];
+    uploadedContentImage = null;
+    contentImageAnalysis = null;
+    if (window.selectedBrandContentPhoto) window.selectedBrandContentPhoto = null;
+
+    const styleImagesInput = document.getElementById('styleImagesInput');
+    const styleImagesPreviews = document.getElementById('styleImagesPreviews');
+    const styleImagesPlaceholder = document.getElementById('styleImagesPlaceholder');
+    const contentImageInput = document.getElementById('contentImageInput');
+    const contentImagePreview = document.getElementById('contentImagePreview');
+    const contentImagePlaceholder = document.getElementById('contentImagePlaceholder');
+    const selectedContentPhotoPreview = document.getElementById('selectedContentPhotoPreview');
+    const brandSelectStyleTransfer = document.getElementById('brandSelectStyleTransfer');
+    const brandContentPhotosContainer = document.getElementById('brandContentPhotosContainer');
+
+    if (styleImagesInput) styleImagesInput.value = '';
+    if (styleImagesPreviews) {
+        styleImagesPreviews.innerHTML = '';
+        styleImagesPreviews.style.display = 'none';
+    }
+    if (styleImagesPlaceholder) styleImagesPlaceholder.style.display = 'block';
+    if (contentImageInput) contentImageInput.value = '';
+    if (contentImagePreview) contentImagePreview.style.display = 'none';
+    if (contentImagePlaceholder) contentImagePlaceholder.style.display = 'block';
+    if (selectedContentPhotoPreview) selectedContentPhotoPreview.style.display = 'none';
+    if (brandSelectStyleTransfer) brandSelectStyleTransfer.selectedIndex = 0;
+    if (brandContentPhotosContainer) brandContentPhotosContainer.style.display = 'none';
+
+    // Clear selected brand content photo highlights
+    document.querySelectorAll('.brand-photo-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    // Reset scene-recreation brand photo selection UI
+    const selectedReferencePhotoPreview = document.getElementById('selectedReferencePhotoPreview');
+    const sceneAnalysisSection = document.getElementById('sceneAnalysisSection');
+    const brandSelect = document.getElementById('brandSelect');
+    const brandPhotosContainer = document.getElementById('brandPhotosContainer');
+
+    if (selectedReferencePhotoPreview) selectedReferencePhotoPreview.style.display = 'none';
+    if (sceneAnalysisSection) sceneAnalysisSection.style.display = 'none';
+    if (brandSelect) brandSelect.selectedIndex = 0;
+    if (brandPhotosContainer) brandPhotosContainer.style.display = 'none';
+
     // Check generate button state (should be disabled now)
     checkGenerateButton();
 
