@@ -50,41 +50,64 @@
                     📤 انتخاب فایل از کامپیوتر
                 </button>
 
-            <section class="upload-section" id="styleTransferSection2" style="margin-top: 30px;">
-                <h2 style="margin-top: 40px;">۲. آپلود عکس اصلی (محتوا)</h2>
+            <!-- بخش انتخاب عکس محتوا از برندها -->
+            <section class="upload-section" id="contentImageSection" style="margin-top: 30px;">
+                <h2>۲. انتخاب عکس محتوا (2-Person Brand Photo)</h2>
                 <div class="section-hint">
-                    💡 <strong>یک عکس دیگر از Recreation را به عنوان محتوای اصلی آپلود کنید.</strong><br>
-                    ترکیب استایل عکس‌های مرحله ۱ با محتوای این عکس، یک عکس مدلینگ ۲ نفره حرفه‌ای می‌سازد!
+                    💡 <strong>یک برند را انتخاب کنید و سپس یک عکس مدلینگ 2 نفره به عنوان محتوای اصلی انتخاب کنید.</strong><br>
+                    ترکیب استایل عکس‌های مرحله ۱ با این عکس، یک عکس مدلینگ ۲ نفره حرفه‌ای می‌سازد!
                 </div>
-                <div class="upload-area" id="contentImageUploadArea">
-                    <input type="file" id="contentImageInput" accept="image/*" hidden>
-                    <div class="upload-placeholder" id="contentImagePlaceholder">
-                        <div class="upload-icon">📷</div>
-                        <div class="upload-text">
-                            <p><strong>کلیک کنید یا عکس اصلی را بکشید و رها کنید</strong></p>
-                            <p class="upload-hint">این عکس حفظ می‌شود، فقط فضا و نورش تغییر می‌کند</p>
+
+                <div class="brand-selection-container" style="background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%); border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 30px;">
+                    <div class="brand-selection-header" style="text-align: center; margin-bottom: 25px;">
+                        <h3 style="font-size: 20px; color: #1f2937; margin: 0 0 10px 0; font-weight: 700;">انتخاب برند</h3>
+                        <p style="color: #6b7280; font-size: 15px; margin: 0;">ابتدا یک برند را انتخاب کنید</p>
+                    </div>
+
+                    <div class="brand-select-wrapper" style="max-width: 500px; margin: 0 auto;">
+                        <div class="brand-select-label" style="display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; color: #374151; margin-bottom: 12px; justify-content: center;">
+                            <span style="font-size: 24px;">🏷️</span>
+                            <span>انتخاب برند</span>
                         </div>
-                        <div class="supported-formats">
-                            <span class="format-tag">JPG</span>
-                            <span class="format-tag">PNG</span>
-                            <span class="format-tag">WEBP</span>
+                        <select id="brandSelectStyleTransfer" onchange="loadBrandContentPhotos()" style="width: 100%; padding: 15px 20px; font-size: 16px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; color: #374151; font-weight: 500; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <option value="">ابتدا یک برند را انتخاب کنید...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Brand Content Photos Grid -->
+                <div id="brandContentPhotosContainer" class="brand-photos-section" style="display: none; margin-top: 30px;">
+                    <div class="brand-photos-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 25px; border-radius: 16px 16px 0 0; display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 600;">
+                        <span>🎨</span>
+                        <span>عکس‌های مدلینگ ۲ نفره برند</span>
+                    </div>
+                    <div class="brand-photos-grid-container" style="background: white; padding: 25px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+                        <div id="brandContentPhotosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+                            <!-- Brand content photos will be loaded here -->
                         </div>
                     </div>
-                    <div id="contentImageAnalysisStatus" style="display: none; margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 8px; border: 1px solid #ffc107;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="spinner" style="width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #ffc107; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                            <span style="color: #856404; font-weight: 500;">🔍 در حال تحلیل عکس محتوا...</span>
-                        </div>
+                </div>
+
+                <!-- Selected Content Photo Preview -->
+                <div id="selectedContentPhotoPreview" class="selected-photo-preview" style="display: none; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 3px solid #10b981; border-radius: 20px; padding: 25px; margin-top: 25px; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);">
+                    <div class="selected-photo-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                        <span style="font-size: 28px;">✅</span>
+                        <h3 style="margin: 0; color: #065f46; font-size: 20px; font-weight: 700;">عکس محتوا انتخاب شده</h3>
                     </div>
-                    <div id="contentImagePreview" style="display: none; margin-top: 20px;">
-                        <img id="contentImageImg" style="max-width: 100%; max-height: 400px; border-radius: 8px;">
-                        <button class="remove-btn" onclick="removeContentImage()">حذف عکس</button>
+                    <div class="selected-photo-content" style="display: flex; gap: 25px; align-items: center;">
+                        <div class="selected-photo-img-wrapper" style="flex-shrink: 0;">
+                            <img id="selectedContentPhotoImg" style="max-width: 250px; max-height: 250px; border-radius: 16px; border: 3px solid #10b981; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                        </div>
+                        <div class="selected-photo-info" style="flex: 1;">
+                            <p id="selectedContentPhotoInfo" class="selected-photo-name" style="font-size: 18px; font-weight: 600; color: #065f46; margin: 0 0 15px 0;"></p>
+                            <button onclick="clearSelectedContentPhoto()" class="clear-selection-btn" style="padding: 12px 24px; background: #ef4444; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                                <span>🗑️</span>
+                                <span>حذف و انتخاب مجدد</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
-                <button onclick="document.getElementById('contentImageInput').click()" class="upload-from-computer-btn">
-                    📤 انتخاب فایل از کامپیوتر
-                </button>
 
             <!-- دکمه تولید -->
             <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
@@ -137,6 +160,161 @@
     <script>
         // Set the current mode for this page
         window.currentMode = 'style-transfer';
+
+        // Brand content photo selection variables
+        let allBrandsStyleTransfer = [];
+        let allBrandContentPhotos = [];
+        window.selectedBrandContentPhoto = null;
+
+        // Load brands on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBrandsForStyleTransfer();
+        });
+
+        // Load all available brands
+        async function loadBrandsForStyleTransfer() {
+            try {
+                const response = await fetch('/api/brands');
+                if (!response.ok) throw new Error('Failed to load brands');
+
+                allBrandsStyleTransfer = await response.json();
+                const brandSelect = document.getElementById('brandSelectStyleTransfer');
+
+                if (allBrandsStyleTransfer.length === 0) {
+                    brandSelect.innerHTML = '<option value="">هیچ برندی موجود نیست</option>';
+                    return;
+                }
+
+                brandSelect.innerHTML = '<option value="">ابتدا یک برند را انتخاب کنید...</option>' +
+                    allBrandsStyleTransfer.map(brand => `
+                        <option value="${brand.id}">${brand.name}</option>
+                    `).join('');
+            } catch (error) {
+                console.error('Error loading brands:', error);
+                alert('خطا در بارگذاری برندها. لطفاً صفحه را رفرش کنید.');
+            }
+        }
+
+        // Load content photos for selected brand (2-person photos only)
+        async function loadBrandContentPhotos() {
+            const brandSelect = document.getElementById('brandSelectStyleTransfer');
+            const brandId = brandSelect.value;
+
+            const photosContainer = document.getElementById('brandContentPhotosContainer');
+            const photosGrid = document.getElementById('brandContentPhotosGrid');
+
+            if (!brandId) {
+                photosContainer.style.display = 'none';
+                return;
+            }
+
+            // Show loading
+            photosContainer.style.display = 'block';
+            photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">در حال بارگذاری...</div>';
+
+            try {
+                // Fetch only 'style-transfer' type photos
+                const response = await fetch(`/api/brands/${brandId}/photos?photo_type=style-transfer`);
+                if (!response.ok) throw new Error('Failed to load brand content photos');
+
+                allBrandContentPhotos = await response.json();
+
+                if (allBrandContentPhotos.length === 0) {
+                    photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکس مدلینگ ۲ نفره‌ای برای این برند موجود نیست</div>';
+                    return;
+                }
+
+                photosGrid.innerHTML = allBrandContentPhotos.map(photo => `
+                    <div class="brand-photo-card" onclick="selectBrandContentPhoto('${photo.id}')" data-photo-id="${photo.id}" style="position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.3s; background: #f3f4f6; aspect-ratio: 4/3; border: 3px solid transparent;">
+                        <img src="${photo.image_url}" alt="${photo.title || 'Content photo'}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;">
+                        ${photo.title ? `
+                            <div class="brand-photo-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%); padding: 15px; opacity: 0; transition: opacity 0.3s;">
+                                <p class="brand-photo-title" style="color: white; font-size: 14px; font-weight: 600; margin: 0;">${photo.title}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+                // Add CSS for hover effects
+                const style = document.createElement('style');
+                style.textContent = `
+                    .brand-photo-card:hover {
+                        transform: translateY(-8px);
+                        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+                        border-color: #667eea !important;
+                    }
+                    .brand-photo-card:hover img {
+                        transform: scale(1.05);
+                    }
+                    .brand-photo-card:hover .brand-photo-overlay {
+                        opacity: 1;
+                    }
+                    .brand-photo-card.selected {
+                        border-color: #10b981 !important;
+                        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+                    }
+                `;
+                if (!document.getElementById('brandPhotoStyles')) {
+                    style.id = 'brandPhotoStyles';
+                    document.head.appendChild(style);
+                }
+            } catch (error) {
+                console.error('Error loading brand content photos:', error);
+                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>';
+            }
+        }
+
+        // Select a brand content photo
+        function selectBrandContentPhoto(photoId) {
+            const photo = allBrandContentPhotos.find(p => p.id === photoId);
+            if (!photo) return;
+
+            window.selectedBrandContentPhoto = photo;
+
+            // Update UI - highlight selected photo
+            document.querySelectorAll('.brand-photo-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const selectedCard = document.querySelector(`[data-photo-id="${photoId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+
+            // Show selected photo preview
+            const previewSection = document.getElementById('selectedContentPhotoPreview');
+            const previewImg = document.getElementById('selectedContentPhotoImg');
+            const previewInfo = document.getElementById('selectedContentPhotoInfo');
+
+            previewImg.src = photo.image_url;
+            previewInfo.textContent = photo.title || 'عکس محتوای برند';
+            previewSection.style.display = 'block';
+
+            // Scroll to preview
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Update generate button state
+            if (typeof checkAllConditions === 'function') {
+                checkAllConditions();
+            }
+        }
+
+        // Clear selected content photo
+        function clearSelectedContentPhoto() {
+            window.selectedBrandContentPhoto = null;
+
+            // Hide preview
+            document.getElementById('selectedContentPhotoPreview').style.display = 'none';
+
+            // Remove highlight from photos
+            document.querySelectorAll('.brand-photo-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Update generate button state
+            if (typeof checkAllConditions === 'function') {
+                checkAllConditions();
+            }
+        }
     </script>
     <script src="script.js"></script>
     <script src="/mobile-menu.js"></script>

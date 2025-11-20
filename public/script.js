@@ -1729,9 +1729,9 @@ function checkGenerateButton() {
         }
 
     } else if (currentMode === 'style-transfer') {
-        // Style Transfer mode: need at least 1 style image and 1 content image
-        isValid = uploadedStyleImages.length >= 1 &&
-                  uploadedContentImage !== null;
+        // Style Transfer mode: need at least 1 style image and 1 brand content photo
+        const hasContentPhoto = window.selectedBrandContentPhoto !== null && window.selectedBrandContentPhoto !== undefined;
+        isValid = uploadedStyleImages.length >= 1 && hasContentPhoto;
     }
 
     if (generateBtn) {
