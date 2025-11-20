@@ -486,17 +486,18 @@ app.post('/api/admin/update-user-model', authenticateAdmin, async (req, res) => 
       });
     }
 
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return res.status(500).json({
         success: false,
-        error: 'Supabase not configured'
+        error: 'Supabase Admin not configured'
       });
     }
 
     console.log(`📝 Updating user ${userId} model to: ${model}`);
 
+    // Use supabaseAdmin to bypass RLS
     // Check if user_profile exists
-    const { data: existing, error: fetchError } = await supabase
+    const { data: existing, error: fetchError } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
@@ -511,7 +512,7 @@ app.post('/api/admin/update-user-model', authenticateAdmin, async (req, res) => 
 
     if (!existing) {
       // Create new profile if doesn't exist
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('user_profiles')
         .insert([{
           id: userId,
@@ -524,7 +525,7 @@ app.post('/api/admin/update-user-model', authenticateAdmin, async (req, res) => 
       result = data;
     } else {
       // Update existing profile
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('user_profiles')
         .update({
           image_generation_model: model,
