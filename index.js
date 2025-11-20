@@ -3185,21 +3185,33 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     // ============================================
     let userGenerationModel = 'gemini-2-flash'; // Default model
 
+    console.log('🔍 Fetching user model preference for user:', req.user?.id);
+
     if (supabase && req.user?.id) {
       try {
-        const { data: userProfile } = await supabase
+        const { data: userProfile, error: profileError } = await supabase
           .from('user_profiles')
           .select('image_generation_model')
           .eq('id', req.user.id)
           .single();
 
+        console.log('📊 User profile query result:', {
+          userProfile: userProfile,
+          error: profileError,
+          hasModel: !!userProfile?.image_generation_model
+        });
+
         if (userProfile && userProfile.image_generation_model) {
           userGenerationModel = userProfile.image_generation_model;
           console.log(`🤖 User's preferred model: ${userGenerationModel}`);
+        } else {
+          console.log('⚠️ No model preference found, using default:', userGenerationModel);
         }
       } catch (modelError) {
         console.warn('⚠️ Could not fetch user model preference, using default:', modelError.message);
       }
+    } else {
+      console.log('⚠️ No supabase or user ID, using default model');
     }
 
     // Find model (check hardcoded first, then custom from database)
