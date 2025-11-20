@@ -2913,6 +2913,65 @@ async function checkAndDeductCredits(userId, mode) {
   }
 }
 
+// ============================================
+// Nano Banana 2 (Gemini 3 Pro Image Preview) Generation Function
+// ============================================
+async function generateNanoBananaImage({ prompt, contentParts, aspectRatio = '1:1', imageSize = 'large' }) {
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-3-pro-image-preview",
+      generationConfig: {
+        responseModalities: ["Image"]
+      }
+    });
+
+    // Add prompt to content parts
+    const parts = [...contentParts, { text: prompt }];
+
+    const result = await model.generateContent({
+      contents: {
+        parts: parts
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: aspectRatio, // '1:1', '16:9', '9:16', '4:3', '3:4'
+          imageSize: imageSize       // 'small', 'medium', 'large'
+        }
+      }
+    });
+
+    const response = await result.response;
+
+    let generatedImageBase64 = null;
+    let generatedText = '';
+
+    // Extract image and text from response
+    if (response.candidates && response.candidates[0]?.content?.parts) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.data) {
+          generatedImageBase64 = part.inlineData.data;
+        }
+        if (part.text) {
+          generatedText += part.text;
+        }
+      }
+    }
+
+    if (generatedImageBase64) {
+      return { imageData: generatedImageBase64 };
+    }
+
+    if (generatedText) {
+      throw new Error(`Nano Banana 2 returned text instead of image: ${generatedText}`);
+    }
+
+    throw new Error('No image generated. The model may have blocked the request due to safety filters.');
+  } catch (error) {
+    console.error('❌ Nano Banana 2 Generation Error:', error);
+    throw error;
+  }
+}
+
 // تولید عکس با Gemini 2.5 Flash
 app.post('/api/generate', authenticateUser, async (req, res) => {
   try {
@@ -3017,6 +3076,28 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     console.log(`✅ Credits deducted: ${creditCheck.message}, Remaining: ${creditCheck.remaining}`);
+
+    // ============================================
+    // GET USER'S PREFERRED IMAGE GENERATION MODEL
+    // ============================================
+    let userGenerationModel = 'gemini-2-flash'; // Default model
+
+    if (supabase && req.user?.id) {
+      try {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('image_generation_model')
+          .eq('id', req.user.id)
+          .single();
+
+        if (userProfile && userProfile.image_generation_model) {
+          userGenerationModel = userProfile.image_generation_model;
+          console.log(`🤖 User's preferred model: ${userGenerationModel}`);
+        }
+      } catch (modelError) {
+        console.warn('⚠️ Could not fetch user model preference, using default:', modelError.message);
+      }
+    }
 
     // Find model (check hardcoded first, then custom from database)
     // Search in both regular models and accessory models
@@ -4357,14 +4438,7 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
 
     console.log('🎯 Mode:', mode);
     console.log('📝 Prompt:', prompt);
-
-    // استفاده از Gemini 2.5 Flash Image برای تولید تصویر
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-image",
-      generationConfig: {
-        responseModalities: ["Image"] // Enable image generation
-      }
-    });
+    console.log('🤖 Using model:', userGenerationModel);
 
     // ========================================
     // NEW: Mode-Specific Image Loading
@@ -4556,40 +4630,60 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
       });
     }
 
-    // Add the prompt
-    contentParts.push({ text: prompt });
-
-    const result = await model.generateContent(contentParts);
-
-    const response = await result.response;
-
-    console.log('📦 Response structure:', JSON.stringify({
-      candidates: response.candidates?.length,
-      hasParts: !!response.candidates?.[0]?.content?.parts
-    }));
-
-    // Extract generated image from response
+    // ========================================
+    // GENERATE IMAGE WITH SELECTED MODEL
+    // ========================================
     let generatedImageBase64 = null;
-    let generatedText = '';
 
-    if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
-      console.error('❌ Invalid response structure:', JSON.stringify(response, null, 2));
-      throw new Error('Invalid response from Gemini API');
-    }
+    if (userGenerationModel === 'nano-banana-2') {
+      // Use Nano Banana 2 (Gemini 3 Pro Image Preview)
+      console.log('🍌 Using Nano Banana 2 for generation...');
+      const nanoBananaResult = await generateNanoBananaImage({
+        prompt: prompt,
+        contentParts: contentParts,
+        aspectRatio: aspectRatioId || '1:1',
+        imageSize: 'large'
+      });
+      generatedImageBase64 = nanoBananaResult.imageData;
+    } else {
+      // Use Gemini 2.5 Flash Image (default)
+      console.log('⚡ Using Gemini 2.5 Flash Image for generation...');
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash-image",
+        generationConfig: {
+          responseModalities: ["Image"]
+        }
+      });
 
-    for (const part of response.candidates[0].content.parts) {
-      if (part.inlineData) {
-        // This is the generated image
-        generatedImageBase64 = part.inlineData.data;
-        console.log('✅ Image generated successfully!');
-      } else if (part.text) {
-        generatedText += part.text;
+      contentParts.push({ text: prompt });
+      const result = await model.generateContent(contentParts);
+      const response = await result.response;
+
+      console.log('📦 Response structure:', JSON.stringify({
+        candidates: response.candidates?.length,
+        hasParts: !!response.candidates?.[0]?.content?.parts
+      }));
+
+      let generatedText = '';
+
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        console.error('❌ Invalid response structure:', JSON.stringify(response, null, 2));
+        throw new Error('Invalid response from Gemini API');
       }
-    }
 
-    if (!generatedImageBase64) {
-      console.error('❌ No image in response. Parts:', JSON.stringify(response.candidates[0].content.parts, null, 2));
-      throw new Error('No image was generated by Gemini. Response only contains text.');
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          generatedImageBase64 = part.inlineData.data;
+          console.log('✅ Image generated successfully!');
+        } else if (part.text) {
+          generatedText += part.text;
+        }
+      }
+
+      if (!generatedImageBase64) {
+        console.error('❌ No image in response. Parts:', JSON.stringify(response.candidates[0].content.parts, null, 2));
+        throw new Error('No image was generated by Gemini. Response only contains text.');
+      }
     }
 
     // تبدیل base64 به buffer
