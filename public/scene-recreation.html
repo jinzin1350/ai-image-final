@@ -730,7 +730,8 @@
             photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">در حال بارگذاری...</div>';
 
             try {
-                const response = await fetch(`/api/brands/${brandId}/photos`);
+                // Fetch only 'recreation' type photos (single model photos)
+                const response = await fetch(`/api/brands/${brandId}/photos?photo_type=recreation`);
                 if (!response.ok) throw new Error('Failed to load brand photos');
 
                 allBrandPhotos = await response.json();
