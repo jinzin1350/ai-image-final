@@ -6774,11 +6774,19 @@ app.get('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => {
     }
 
     const { id } = req.params;
+    const { photo_type } = req.query; // Optional filter: 'recreation' or 'style-transfer'
 
-    const { data, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('brand_reference_photos')
       .select('*')
-      .eq('brand_id', id)
+      .eq('brand_id', id);
+
+    // Filter by photo_type if provided
+    if (photo_type && (photo_type === 'recreation' || photo_type === 'style-transfer')) {
+      query = query.eq('photo_type', photo_type);
+    }
+
+    const { data, error } = await query
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
