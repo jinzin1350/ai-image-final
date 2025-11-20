@@ -2919,6 +2919,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       garmentPaths,     // New: array of garment paths
       accessoryPath,    // NEW: For accessories-only mode (product photo)
       accessoryType,    // NEW: Type of accessory (handbag, watch, etc.)
+      piercingType,     // NEW: Type of piercing (ear, nose, navel, eyebrow)
       underwearPath,    // NEW: For underwear mode (product photo)
       underwearType,    // NEW: Type of underwear (bra, panty, etc.)
       colorVariants,    // NEW: For color-collection mode (array of color variant paths)
@@ -3539,24 +3540,28 @@ Make it simple and natural - like this person is actually wearing these clothes 
       } else {
         // Fallback to default prompt
         const accessoryTypeDescriptions = {
-          'handbag': 'handbag (carried in hand or on arm)',
-          'backpack': 'backpack (worn on back)',
-          'crossbody-bag': 'crossbody bag (worn across shoulder)',
-          'clutch': 'clutch bag (held in hand)',
-          'sunglasses': 'sunglasses (worn on face)',
-          'eyeglasses': 'eyeglasses (worn on face)',
-          'watch': 'wristwatch (worn on wrist)',
-          'necklace': 'necklace (worn around neck)',
+          'ring': 'ring (worn on finger)',
           'earrings': 'earrings (worn on ears)',
           'bracelet': 'bracelet (worn on wrist)',
-          'ring': 'ring (worn on finger)',
-          'scarf': 'neck scarf (draped around neck)',
-          'hat': 'hat (worn on head)',
-          'belt': 'belt (worn around waist)',
-          'shoes': 'shoes (worn on feet)'
+          'necklace': 'necklace (worn around neck)',
+          'anklet': 'anklet (worn around ankle)',
+          'piercing': 'body piercing jewelry'
         };
 
-        const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
+        // Piercing-specific descriptions
+        const piercingLocationDescriptions = {
+          'ear': 'ear piercing (worn on ear cartilage or earlobe)',
+          'nose': 'nose piercing (nostril or septum piercing)',
+          'navel': 'navel piercing (belly button piercing)',
+          'eyebrow': 'eyebrow piercing (worn through eyebrow)'
+        };
+
+        let accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
+
+        // If piercing, use more specific description
+        if (accessoryType === 'piercing' && piercingType) {
+          accessoryDesc = piercingLocationDescriptions[piercingType] || accessoryDesc;
+        }
 
         // تعریف توصیف دقیق مدل بر اساس category
         const modelCategoryDescriptions = {
@@ -3601,9 +3606,24 @@ SCENE & ENVIRONMENT:
 
 SCENE GENERATION:
 - Generate a natural scene appropriate for ${accessoryDesc}
-- If it's jewelry (ring, bracelet, necklace, earrings): show elegant hand/neck/ear naturally displaying it
-- If it's eyewear (sunglasses, glasses): show someone wearing it naturally
-- If it's a bag/accessory: show it being held/worn in a natural, appealing way
+${accessoryType === 'piercing' && piercingType ? `
+PIERCING-SPECIFIC REQUIREMENTS:
+- Piercing Location: ${piercingType} (${piercingLocationDescriptions[piercingType]})
+- Show a close-up beauty shot focused on the ${piercingType} area
+- The piercing jewelry should look NATURALLY INSERTED through the skin (not sitting on top)
+- Show realistic skin texture around the piercing site
+- Professional piercing studio quality - clean, precise, well-healed appearance
+- The piercing should be the focal point with sharp focus
+- Camera angle: Close-up macro shot showing the ${piercingType} and surrounding area
+- Lighting: Soft, flattering light that highlights the jewelry and skin texture
+- Background: Softly blurred to emphasize the piercing
+${piercingType === 'ear' ? '- Show the ear profile or front view with the piercing clearly visible on the earlobe or cartilage\n- Include part of the face/hair for context but keep focus on the ear piercing' : ''}
+${piercingType === 'nose' ? '- Show a profile or 3/4 view of the face with clear focus on the nose piercing\n- The piercing should appear naturally through the nostril or septum\n- Show part of the face for context but emphasize the nose area' : ''}
+${piercingType === 'navel' ? '- Show the midriff/belly area with the piercing at the navel\n- Professional fitness/beauty photography style\n- The piercing should hang naturally from the navel\n- Show toned, natural skin texture' : ''}
+${piercingType === 'eyebrow' ? '- Show the face with focus on the eyebrow area\n- The piercing should appear naturally through the eyebrow\n- Include the eye and upper face for context\n- Professional beauty shot composition' : ''}
+` : `- If it's jewelry (ring, bracelet, necklace, earrings, anklet): show elegant hand/wrist/neck/ankle naturally displaying it
+- Create elegant hand poses for rings/bracelets, graceful neck angles for necklaces
+- Show skin texture and natural positioning`}
 - The ${accessoryType} should be the STAR - clearly visible and beautifully displayed
 - Create a complete, natural, photorealistic scene
 - The model MUST be a ${modelDescription} - NOT an adult if child/teen category
@@ -3616,16 +3636,25 @@ KEY REQUIREMENTS:
 5. Natural skin texture and realistic lighting
 6. Appropriate body-part/model positioning for the accessory type
 7. CRITICAL: Model must be ${modelDescription} with age-appropriate features and proportions
-8. CRITICAL DETAIL ATTENTION FOR ACCESSORIES:
-   - Preserve ALL material details: leather grain, metal finish, fabric weave
-   - Show exact stitching patterns, seam lines, and thread color
-   - Accurately render hardware: buckles, zippers, clasps, chains with proper metallic texture
-   - Maintain brand logos, embossing, or embroidery exactly as shown
-   - Display material quality: leather sheen, fabric texture, metal polish
-   - Show wear patterns, edge finishing, and piping details
-   - Render precise color matching and any color blocking/patterns
-   - Maintain exact proportions and shape of the accessory
-   - Show surface details: perforations, quilting, studs, or decorative elements
+8. CRITICAL DETAIL ATTENTION FOR ${accessoryType.toUpperCase()}:
+${accessoryType === 'piercing' ? `   - The piercing MUST look naturally inserted through the skin, not placed on top
+   - Show realistic skin interaction: slight indentation where jewelry passes through
+   - Render the jewelry's metallic finish accurately (surgical steel, gold, titanium)
+   - Show gem details if present: cut, clarity, color, setting style
+   - Display proper piercing angle and depth
+   - Clean, well-healed appearance with natural skin tone around piercing site
+   - No redness, swelling, or unrealistic perfection - aim for healed, professional look
+   - The jewelry should have weight and dimension, not look flat
+   - Show threading, ball closures, or decorative ends accurately
+   - Maintain exact jewelry shape: hoop, stud, barbell, captive bead ring, etc.` :
+`   - Preserve ALL material details: metal finish, gemstone cuts, chain links
+   - Show exact design patterns, engravings, and decorative elements
+   - Accurately render hardware: clasps, settings, posts, backs with proper metallic texture
+   - Maintain brand logos, hallmarks, or signatures exactly as shown
+   - Display material quality: gold/silver sheen, gemstone brilliance, polish level
+   - Render precise color matching and any gemstone colors/patterns
+   - Maintain exact proportions and shape of the jewelry piece
+   - Show surface details: filigree, texture, stone settings, prong details`}
 
 DO NOT:
 - Make unrealistic or artificial composites
@@ -3633,9 +3662,14 @@ DO NOT:
 - Make the ${accessoryType} look pasted on or fake
 - Change the ${accessoryType}'s design, color, or details from the reference image
 - Over-smooth skin or create plastic-looking results
-- Simplify or omit fine details like stitching, hardware, or brand elements
+- Simplify or omit fine details${accessoryType === 'piercing' ? ' like threading, closures, or gem settings' : ' like stitching, hardware, or brand elements'}
 - Alter material texture or finish quality
 - Ignore small decorative elements or design details
+${accessoryType === 'piercing' && piercingType ? `- Do NOT make the piercing look like it's sitting ON the skin surface - it must go THROUGH the skin
+- Do NOT show the piercing floating or detached from the ${piercingType}
+- Do NOT create overly inflamed, infected, or freshly-done appearance
+- Do NOT make the jewelry look flat or 2D - it should have dimension and depth
+- Do NOT place the piercing in the wrong anatomical location for ${piercingType}` : ''}
 - CRITICAL: Do NOT generate an adult model if the selected category is child/teen/girl/boy - the age MUST match the category
 
 Generate a beautiful, natural product photography shot that looks like a real professional photo shoot - perfect for e-commerce or Instagram.`;
