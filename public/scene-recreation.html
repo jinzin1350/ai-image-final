@@ -535,9 +535,14 @@
                     <div id="garmentPreviews" class="garment-previews" style="display: none;"></div>
                 </div>
             </section>
-                <button onclick="document.getElementById('garmentInput').click()" class="upload-from-computer-btn">
-                    📤 انتخاب فایل از کامپیوتر
-                </button>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button onclick="document.getElementById('garmentInput').click()" class="upload-from-computer-btn" style="flex: 1;">
+                        📤 انتخاب از کامپیوتر
+                    </button>
+                    <button onclick="openGalleryForGarment()" class="upload-from-computer-btn" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        🖼️ انتخاب از گالری
+                    </button>
+                </div>
 
             <!-- بخش انتخاب مدل -->
             <section class="selection-section" id="modelSection">
