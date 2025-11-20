@@ -320,8 +320,8 @@
             previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
             // Update generate button state
-            if (typeof checkAllConditions === 'function') {
-                checkAllConditions();
+            if (typeof checkGenerateButton === 'function') {
+                checkGenerateButton();
             }
         }
 
@@ -338,8 +338,8 @@
             });
 
             // Update generate button state
-            if (typeof checkAllConditions === 'function') {
-                checkAllConditions();
+            if (typeof checkGenerateButton === 'function') {
+                checkGenerateButton();
             }
         }
     </script>
