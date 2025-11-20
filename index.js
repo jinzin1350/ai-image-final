@@ -3187,9 +3187,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     console.log('🔍 Fetching user model preference for user:', req.user?.id);
 
-    if (supabase && req.user?.id) {
+    if (supabaseAdmin && req.user?.id) {
       try {
-        const { data: userProfile, error: profileError } = await supabase
+        const { data: userProfile, error: profileError } = await supabaseAdmin
           .from('user_profiles')
           .select('image_generation_model')
           .eq('id', req.user.id)
@@ -3211,7 +3211,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         console.warn('⚠️ Could not fetch user model preference, using default:', modelError.message);
       }
     } else {
-      console.log('⚠️ No supabase or user ID, using default model');
+      console.log('⚠️ No supabaseAdmin or user ID, using default model');
     }
 
     // Find model (check hardcoded first, then custom from database)
