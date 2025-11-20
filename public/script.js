@@ -2710,6 +2710,9 @@ function showStyleImagesPreviews() {
         previewsContainer.style.display = 'none';
         placeholder.style.display = 'flex';
     }
+
+    // Update generate button state
+    checkGenerateButton();
 }
 
 // ============================================

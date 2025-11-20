@@ -3030,24 +3030,18 @@ async function generateNanoBananaImage({ prompt, contentParts, aspectRatio = '1:
     const model = genAI.getGenerativeModel({
       model: "gemini-3-pro-image-preview",
       generationConfig: {
-        responseModalities: ["Image"]
-      }
-    });
-
-    // Add prompt to content parts
-    const parts = [...contentParts, { text: prompt }];
-
-    const result = await model.generateContent({
-      contents: {
-        parts: parts
-      },
-      config: {
+        responseModalities: ["Image"],
         imageConfig: {
           aspectRatio: aspectRatio, // '1:1', '16:9', '9:16', '4:3', '3:4'
           imageSize: imageSize       // 'small', 'medium', 'large'
         }
       }
     });
+
+    // Add prompt to content parts
+    const parts = [...contentParts, { text: prompt }];
+
+    const result = await model.generateContent(parts);
 
     const response = await result.response;
 
