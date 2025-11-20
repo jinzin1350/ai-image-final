@@ -230,7 +230,7 @@
                 }
 
                 photosGrid.innerHTML = allBrandContentPhotos.map(photo => `
-                    <div class="brand-photo-card" onclick="selectBrandContentPhoto('${photo.id}')" data-photo-id="${photo.id}" style="position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.3s; background: #f3f4f6; aspect-ratio: 4/3; border: 3px solid transparent;">
+                    <div class="brand-photo-card" onclick="selectBrandContentPhoto('${photo.id}')" data-photo-id="${photo.id}" style="position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.3s; background: #f3f4f6; aspect-ratio: 3/4; border: 3px solid transparent;">
                         <img src="${photo.image_url}" alt="${photo.title || 'Content photo'}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;">
                         ${photo.title ? `
                             <div class="brand-photo-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%); padding: 15px; opacity: 0; transition: opacity 0.3s;">
