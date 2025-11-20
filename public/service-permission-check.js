@@ -84,6 +84,8 @@ async function loadPricingData() {
                 if (TIER_INFO[item.tier]) {
                     TIER_INFO[item.tier].price = item.price;
                     TIER_INFO[item.tier].credits = item.credits;
+                    TIER_INFO[item.tier].discount_percentage = item.discount_percentage || 0;
+                    TIER_INFO[item.tier].discount_active = item.discount_active || false;
                 }
             });
         }
@@ -300,9 +302,30 @@ function showUpgradeModal(accessInfo, serviceKey) {
                         padding: 16px;
                         backdrop-filter: blur(10px);
                     ">
-                        <div style="font-size: 36px; font-weight: 800; margin-bottom: 4px;">
-                            ${suggestedTierInfo.price.toLocaleString('fa-IR')}
-                        </div>
+                        ${suggestedTierInfo.discount_active && suggestedTierInfo.discount_percentage > 0 ? `
+                            <div style="
+                                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                color: white;
+                                padding: 6px 14px;
+                                border-radius: 12px;
+                                font-size: 13px;
+                                font-weight: 800;
+                                margin-bottom: 12px;
+                                display: inline-block;
+                            ">
+                                ${suggestedTierInfo.discount_percentage}% تخفیف 🔥
+                            </div>
+                            <div style="font-size: 24px; font-weight: 600; color: rgba(255,255,255,0.6); text-decoration: line-through; margin-bottom: 8px;">
+                                ${suggestedTierInfo.price.toLocaleString('fa-IR')}
+                            </div>
+                            <div style="font-size: 36px; font-weight: 800; margin-bottom: 4px;">
+                                ${Math.round(suggestedTierInfo.price - (suggestedTierInfo.price * suggestedTierInfo.discount_percentage / 100)).toLocaleString('fa-IR')}
+                            </div>
+                        ` : `
+                            <div style="font-size: 36px; font-weight: 800; margin-bottom: 4px;">
+                                ${suggestedTierInfo.price.toLocaleString('fa-IR')}
+                            </div>
+                        `}
                         <div style="font-size: 14px; opacity: 0.9;">
                             تومان / ماهانه
                         </div>
