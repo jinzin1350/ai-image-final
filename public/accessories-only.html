@@ -56,32 +56,17 @@
                 <!-- نوع اکسسوری -->
                 <div class="param-group" style="margin-top: 20px;">
                     <label for="accessoryType">🏷️ نوع اکسسوری</label>
-                    <select id="accessoryType" class="param-dropdown" onchange="handleAccessoryTypeChange()">
+                    <select id="accessoryType" class="param-dropdown">
                         <option value="">انتخاب کنید...</option>
                         <option value="ring">انگشتر</option>
                         <option value="earrings">گوشواره</option>
                         <option value="bracelet">دستبند</option>
                         <option value="necklace">گردنبند</option>
                         <option value="anklet">پابند</option>
-                        <option value="piercing">پیرسینگ</option>
+                        <option value="watch">ساعت</option>
                     </select>
                     <p style="font-size: 12px; color: #666; margin-top: 8px;">
                         💡 انتخاب نوع اکسسوری به هوش مصنوعی کمک می‌کند تا بهتر آن را روی مدل قرار دهد
-                    </p>
-                </div>
-
-                <!-- نوع پیرسینگ (فقط وقتی پیرسینگ انتخاب شود نمایش داده می‌شود) -->
-                <div class="param-group" id="piercingTypeGroup" style="margin-top: 20px; display: none;">
-                    <label for="piercingType">📍 محل پیرسینگ</label>
-                    <select id="piercingType" class="param-dropdown">
-                        <option value="">انتخاب کنید...</option>
-                        <option value="ear">گوش</option>
-                        <option value="nose">بینی</option>
-                        <option value="navel">ناف</option>
-                        <option value="eyebrow">ابرو</option>
-                    </select>
-                    <p style="font-size: 12px; color: #666; margin-top: 8px;">
-                        💡 محل قرارگیری پیرسینگ را مشخص کنید
                     </p>
                 </div>
             </section>
@@ -182,27 +167,6 @@
     <script>
         // Set the current mode for this page
         window.currentMode = 'accessories-only';
-
-        // Handle accessory type change to show/hide piercing submenu
-        function handleAccessoryTypeChange() {
-            const accessoryType = document.getElementById('accessoryType').value;
-            const piercingTypeGroup = document.getElementById('piercingTypeGroup');
-            const piercingTypeSelect = document.getElementById('piercingType');
-
-            if (accessoryType === 'piercing') {
-                // Show piercing submenu
-                piercingTypeGroup.style.display = 'block';
-            } else {
-                // Hide piercing submenu and reset selection
-                piercingTypeGroup.style.display = 'none';
-                piercingTypeSelect.selectedIndex = 0;
-            }
-
-            // Trigger validation check if the function exists
-            if (typeof checkGenerateButton === 'function') {
-                checkGenerateButton();
-            }
-        }
     </script>
     <script src="script.js"></script>
     <script src="/mobile-menu.js"></script>
