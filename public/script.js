@@ -2294,7 +2294,7 @@ function saveToLocalStorage(imageData) {
 console.log('🔧 Initializing page data...');
 // Don't load models here - let switchMode handle it to avoid double loading
 // loadModels(); // Commented out - moved to switchMode
-loadBackgrounds();
+loadBackgrounds(window.currentMode || 'complete-outfit'); // Use current mode
 loadShotTypes();
 loadPoses();
 loadCameraAngles();
