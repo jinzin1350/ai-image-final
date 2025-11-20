@@ -309,7 +309,8 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
       .select('*');
 
     // Fetch all user_profiles data (for image_generation_model)
-    const { data: profilesData, error: profilesError } = await supabase
+    // Use supabaseAdmin to bypass RLS and read all profiles
+    const { data: profilesData, error: profilesError } = await supabaseAdmin
       .from('user_profiles')
       .select('id, image_generation_model, updated_at');
 
