@@ -2117,6 +2117,9 @@ app.get('/api/backgrounds', async (req, res) => {
     let baseBackgrounds;
     if (mode === 'color-collection' || mode === 'flat-lay') {
       baseBackgrounds = [...productBackgrounds]; // Product photography backgrounds
+    } else if (mode === 'accessories-only') {
+      // For accessories, only show studio backgrounds (not location backgrounds)
+      baseBackgrounds = backgrounds.filter(bg => bg.id.startsWith('studio-'));
     } else {
       baseBackgrounds = [...backgrounds]; // Regular location backgrounds
     }
