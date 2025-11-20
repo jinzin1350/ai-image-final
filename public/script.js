@@ -2190,7 +2190,13 @@ if (generateBtn) {
         } else if (currentMode === 'style-transfer') {
             // Style Transfer mode - apply lighting/mood from style images to content image
             requestBody.styleImagePaths = uploadedStyleImages;
-            requestBody.contentImagePath = uploadedContentImage;
+
+            // Use brand content photo if selected, otherwise use uploaded content image
+            if (window.selectedBrandContentPhoto && window.selectedBrandContentPhoto.image_url) {
+                requestBody.contentImagePath = window.selectedBrandContentPhoto.image_url;
+            } else {
+                requestBody.contentImagePath = uploadedContentImage;
+            }
 
             // Use pre-saved analysis from brand content photo if available (analyzed by background worker)
             if (window.selectedBrandContentPhoto && window.selectedBrandContentPhoto.ai_analysis) {
