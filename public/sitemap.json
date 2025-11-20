@@ -1,0 +1,265 @@
+{
+  "site": {
+    "name": "Fusion AI Studio",
+    "domain": "fusionaiteam.com",
+    "description": "AI-powered fashion photography platform for e-commerce. Professional product photos without physical studio. Supports hijab models, accessories, flat lay, and style transfer.",
+    "languages": ["fa", "en"],
+    "services": [
+      "AI Fashion Photography",
+      "Virtual Model Photography",
+      "Product Photography",
+      "E-commerce Photography",
+      "Brand Photography",
+      "Scene Recreation",
+      "Style Transfer"
+    ],
+    "target_audience": [
+      "Fashion brands",
+      "E-commerce businesses",
+      "Online stores",
+      "Fashion designers",
+      "Marketing agencies",
+      "Social media content creators"
+    ],
+    "key_features": [
+      "Hijab-friendly AI models",
+      "6 specialized photography services",
+      "Background customization",
+      "Brand reference photos",
+      "Automatic AI analysis",
+      "Gallery management",
+      "Multi-tier pricing"
+    ]
+  },
+  "pages": [
+    {
+      "path": "/",
+      "title": "Fusion AI Studio - AI Fashion Photography",
+      "description": "Professional AI-powered fashion photography for e-commerce. Generate studio-quality product photos instantly.",
+      "keywords": ["AI photography", "fashion photography", "e-commerce photos", "virtual photography", "product photos"],
+      "category": "homepage",
+      "priority": "critical",
+      "use_cases": [
+        "Generate professional product photos without physical studio",
+        "Create diverse model photography with hijab support",
+        "Recreate brand scenes with your products",
+        "Apply artistic styles to product images"
+      ]
+    },
+    {
+      "path": "/services.html",
+      "title": "AI Photography Services",
+      "description": "6 specialized AI photography services: Complete Outfit, Scene Recreation, Style Transfer, Accessories, Color Collection, and Flat Lay.",
+      "category": "services-overview",
+      "priority": "high"
+    },
+    {
+      "path": "/complete-outfit.html",
+      "title": "Complete Outfit Photography",
+      "description": "AI model wearing your garments. Choose model category (woman, man, girl, boy, teen, child), hijab options, backgrounds, and professional photography parameters.",
+      "service_type": "model_photography",
+      "features": [
+        "Multi-model support (1-2 models)",
+        "Hijab/no-hijab options",
+        "Age-specific models (child to adult)",
+        "Custom backgrounds",
+        "Professional lighting & angles"
+      ],
+      "priority": "high",
+      "target_use": "Fashion brands, clothing stores, online boutiques"
+    },
+    {
+      "path": "/scene-recreation.html",
+      "title": "Scene Recreation Service",
+      "description": "Recreate brand reference photos with your products. Upload a reference scene, AI analyzes it, and recreates it with your garments.",
+      "service_type": "scene_recreation",
+      "features": [
+        "Brand reference photo library",
+        "Automatic scene analysis",
+        "Multi-person scene support",
+        "Pose & lighting matching"
+      ],
+      "priority": "high",
+      "target_use": "Brand consistency, lookbook creation, campaign matching"
+    },
+    {
+      "path": "/style-transfer.html",
+      "title": "Style Transfer Photography",
+      "description": "Apply artistic styles and moods from reference images to your product photos. Create unique, stylized product photography.",
+      "service_type": "style_transfer",
+      "features": [
+        "Multiple style references (1-3 images)",
+        "Brand content photo library",
+        "Mood & lighting transfer",
+        "Artistic effects"
+      ],
+      "priority": "high",
+      "target_use": "Creative campaigns, artistic product photos, unique branding"
+    },
+    {
+      "path": "/accessories-only.html",
+      "title": "Accessories Photography",
+      "description": "Professional photography for jewelry and accessories: rings, earrings, bracelets, necklaces, anklets, watches.",
+      "service_type": "accessories",
+      "supported_items": [
+        "Rings",
+        "Earrings",
+        "Bracelets",
+        "Necklaces",
+        "Anklets",
+        "Watches"
+      ],
+      "priority": "high",
+      "target_use": "Jewelry stores, accessory brands, fashion accessories"
+    },
+    {
+      "path": "/color-collection.html",
+      "title": "Color Collection Display",
+      "description": "Showcase multiple color variants of your products. Display scenarios: on-arm, hanging rack, folded stack, laid out.",
+      "service_type": "color_collection",
+      "display_options": [
+        "On arm display",
+        "Hanging rack",
+        "Folded stack",
+        "Laid out flat"
+      ],
+      "priority": "medium",
+      "target_use": "Multi-color product listings, variant showcases"
+    },
+    {
+      "path": "/flat-lay.html",
+      "title": "Flat Lay Photography",
+      "description": "Overhead product photography with multiple items. Arrangements: grid, scattered, circular, diagonal.",
+      "service_type": "flat_lay",
+      "arrangements": ["Grid", "Scattered", "Circular", "Diagonal"],
+      "priority": "medium",
+      "target_use": "Instagram content, product collections, lifestyle shots"
+    },
+    {
+      "path": "/pricing.html",
+      "title": "Pricing Plans",
+      "description": "Flexible pricing tiers for AI photography services. Free tier available. Plans include: Free, Basic, Pro, Enterprise.",
+      "category": "pricing",
+      "priority": "high",
+      "features": [
+        "Free tier with limited credits",
+        "Pay-as-you-go options",
+        "Subscription plans",
+        "Enterprise custom solutions"
+      ]
+    },
+    {
+      "path": "/gallery.html",
+      "title": "User Gallery",
+      "description": "Browse and manage your generated AI photos. Filter by service type, download, share, or delete.",
+      "category": "user_features",
+      "priority": "medium"
+    },
+    {
+      "path": "/portfolio.html",
+      "title": "Portfolio Showcase",
+      "description": "Example gallery showcasing AI-generated fashion photography. See what's possible with Fusion AI.",
+      "category": "showcase",
+      "priority": "high",
+      "target_audience": ["Potential customers", "Designers", "Marketing teams"]
+    },
+    {
+      "path": "/blog.html",
+      "title": "Blog & Resources",
+      "description": "Fashion photography tips, AI photography guides, e-commerce best practices, and platform updates.",
+      "category": "content",
+      "priority": "medium"
+    },
+    {
+      "path": "/about.html",
+      "title": "About Fusion AI",
+      "description": "Learn about our AI fashion photography platform, mission, and team.",
+      "category": "company",
+      "priority": "medium"
+    },
+    {
+      "path": "/contact.html",
+      "title": "Contact Us",
+      "description": "Get in touch with Fusion AI support team. Sales inquiries, technical support, partnerships.",
+      "category": "support",
+      "priority": "medium"
+    },
+    {
+      "path": "/help.html",
+      "title": "Help Center",
+      "description": "Tutorials, guides, and help documentation for using Fusion AI photography services.",
+      "category": "support",
+      "priority": "medium"
+    },
+    {
+      "path": "/faq.html",
+      "title": "Frequently Asked Questions",
+      "description": "Common questions about AI fashion photography, pricing, features, and technical details.",
+      "category": "support",
+      "priority": "medium"
+    },
+    {
+      "path": "/api-docs.html",
+      "title": "API Documentation",
+      "description": "Developer documentation for Fusion AI API. Integrate AI photography into your platform.",
+      "category": "developers",
+      "priority": "low"
+    }
+  ],
+  "technologies": {
+    "ai_models": ["Google Gemini 2.0 Flash", "Gemini 2.5 Flash"],
+    "backend": ["Node.js", "Express", "Supabase"],
+    "frontend": ["HTML5", "CSS3", "JavaScript"],
+    "features": [
+      "Background AI analysis system",
+      "Automatic photo processing",
+      "Brand reference library",
+      "Multi-tier user system",
+      "Real-time status tracking"
+    ]
+  },
+  "api_endpoints": {
+    "base_url": "https://fusionaiteam.com",
+    "public_endpoints": [
+      "GET /api/brands",
+      "GET /api/brands/:id/photos",
+      "POST /api/generate",
+      "GET /api/gallery",
+      "GET /api/pricing"
+    ]
+  },
+  "seo_keywords": [
+    "AI fashion photography",
+    "virtual model photography",
+    "e-commerce product photos",
+    "AI product photography",
+    "fashion photography AI",
+    "online product photography",
+    "virtual photography studio",
+    "hijab model photography",
+    "AI model photography",
+    "fashion photography automation",
+    "برنامه عکاسی هوش مصنوعی",
+    "عکاسی محصول آنلاین",
+    "عکاسی مد ایران",
+    "مدل مجازی"
+  ],
+  "social_proof": {
+    "use_cases": [
+      "Fashion brands generate 100+ product photos daily",
+      "E-commerce stores create consistent brand photography",
+      "Marketing agencies produce campaign visuals instantly",
+      "Small businesses get professional photos without studio costs"
+    ]
+  },
+  "competitive_advantages": [
+    "Hijab-friendly AI models (unique in market)",
+    "Persian/Farsi interface",
+    "6 specialized photography services",
+    "Background analysis caching for speed",
+    "Brand reference photo system",
+    "Flexible pricing with free tier"
+  ],
+  "last_updated": "2025-01-20",
+  "sitemap_version": "1.0"
+}
