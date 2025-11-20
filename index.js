@@ -4737,6 +4737,7 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
     // GENERATE IMAGE WITH SELECTED MODEL
     // ========================================
     let generatedImageBase64 = null;
+    let generatedText = '';
 
     if (userGenerationModel === 'nano-banana-2') {
       // Use Nano Banana 2 (Gemini 3 Pro Image Preview)
@@ -4766,8 +4767,6 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
         candidates: response.candidates?.length,
         hasParts: !!response.candidates?.[0]?.content?.parts
       }));
-
-      let generatedText = '';
 
       if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
         console.error('❌ Invalid response structure:', JSON.stringify(response, null, 2));
