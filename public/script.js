@@ -951,6 +951,14 @@ if (accessoryTypeSelect) {
     });
 }
 
+// Piercing type selection
+const piercingTypeSelect = document.getElementById('piercingType');
+if (piercingTypeSelect) {
+    piercingTypeSelect.addEventListener('change', (e) => {
+        checkGenerateButton();
+    });
+}
+
 
 // انتخاب مدل
 function selectModel(modelId) {
@@ -1688,8 +1696,17 @@ function checkGenerateButton() {
 
     } else if (currentMode === 'accessories-only') {
         // Accessories mode: need accessory product photo, accessory type, model, and background
+        let accessoryTypeValid = selectedAccessoryType !== null;
+
+        // If piercing is selected, also require piercing type
+        if (selectedAccessoryType === 'piercing') {
+            const piercingTypeSelect = document.getElementById('piercingType');
+            const selectedPiercingType = piercingTypeSelect ? piercingTypeSelect.value : '';
+            accessoryTypeValid = accessoryTypeValid && selectedPiercingType !== '';
+        }
+
         isValid = uploadedAccessoryPath !== null &&
-                  selectedAccessoryType !== null &&
+                  accessoryTypeValid &&
                   selectedModelId &&
                   selectedBackgroundId;
 
@@ -2005,6 +2022,12 @@ function resetAllSelections() {
     if (accessoryInput) accessoryInput.value = '';
     if (accessoryTypeSelect) accessoryTypeSelect.selectedIndex = 0;
 
+    // Reset piercing submenu
+    const piercingTypeGroup = document.getElementById('piercingTypeGroup');
+    const piercingTypeSelect = document.getElementById('piercingType');
+    if (piercingTypeGroup) piercingTypeGroup.style.display = 'none';
+    if (piercingTypeSelect) piercingTypeSelect.selectedIndex = 0;
+
     // Reset color collection
     uploadedColorVariants = [];
     selectedDisplayScenario = null;
@@ -2139,6 +2162,12 @@ if (generateBtn) {
             requestBody.modelId = selectedModelId;
             requestBody.backgroundId = selectedBackgroundId;
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+
+            // If piercing is selected, include the piercing type
+            if (selectedAccessoryType === 'piercing') {
+                const piercingTypeSelect = document.getElementById('piercingType');
+                requestBody.piercingType = piercingTypeSelect ? piercingTypeSelect.value : '';
+            }
 
         } else if (currentMode === 'color-collection') {
             // Color Collection mode - multiple color variants display
