@@ -6348,16 +6348,23 @@ app.post('/api/admin/generate-face-model', authenticateAdmin, async (req, res) =
     const expr = analysisData.expression || {};
     const photo = analysisData.photographyDetails || {};
 
-    const prompt = `STYLE-INSPIRED MODEL GENERATION: Create a NEW professional fashion model portrait inspired by the reference image's style, but with a DIFFERENT FACE to avoid copyright issues.
+    const prompt = `🎯 FACE-ONLY PORTRAIT GENERATION: Create a professional HEADSHOT/PORTRAIT showing ONLY THE FACE (head and shoulders) of a NEW fashion model inspired by the reference image's style.
+
+⚠️ CRITICAL FRAMING REQUIREMENT:
+- Generate ONLY A CLOSE-UP PORTRAIT/HEADSHOT
+- Show ONLY: Face, head, neck, and upper shoulders
+- DO NOT show: Full body, torso, arms, waist, legs, or below shoulders
+- Framing: Portrait/headshot style (like a professional profile photo or passport photo but with fashion photography quality)
+- Crop: Tight crop on face, showing from top of head to just below shoulders
 
 COPY THESE TECHNICAL ELEMENTS FROM REFERENCE IMAGE:
-- Same pose and body position
-- Same camera angle and framing
-- Same lighting setup and direction
+- Same head angle and facial pose
+- Same camera angle (but zoomed in to face only)
+- Same lighting setup and direction on face
 - Same background style
 - Same photography quality and resolution
 - Same color grading and mood
-- Same clothing style and aesthetic
+- Similar expression and vibe
 
 IMPORTANT - CREATE A NEW FACE (NOT A COPY):
 Generate a SIMILAR but DISTINCTLY DIFFERENT face. Use the analysis below as inspiration, but introduce subtle variations:
@@ -6391,29 +6398,30 @@ SKIN:
 - Texture: ${Array.isArray(skin.texture) ? skin.texture.join(', ') : skin.texture}
 - Complexion: ${skin.complexion}
 
-BODY:
-- Build: ${Array.isArray(body.build) ? body.build[0] : body.build}
-- Height: ${body.height}
-
-EXPRESSION & POSE:
+EXPRESSION & HEAD POSE:
 - Mood: ${expr.mood}
-- Pose: ${Array.isArray(expr.pose) ? expr.pose.join(', ') : expr.pose}
 - Head angle: ${expr.headAngle}
+- Facial expression: ${Array.isArray(expr.pose) ? expr.pose.join(', ') : expr.pose}
 
-PHOTOGRAPHY SETUP:
-- Camera angle: ${photo.cameraAngle}
-- Shot type: ${photo.shotType}
+PHOTOGRAPHY SETUP (PORTRAIT/HEADSHOT):
+- Camera angle: ${photo.cameraAngle} (zoomed to face only)
+- Shot type: CLOSE-UP PORTRAIT/HEADSHOT (face and shoulders only, NOT full body)
 - Lighting: ${photo.lighting}
 - Background: ${photo.background}
 - Quality: ${photo.imageQuality}
 
 TECHNICAL REQUIREMENTS:
-Professional fashion photography, 8K ultra high resolution, extremely detailed facial features,
-sharp focus, crisp details, magazine quality, commercial photography standard,
-perfect skin texture, natural beauty, photorealistic rendering, studio-grade lighting setup,
-color-graded, professional retouching, fashion magazine cover quality
+Professional fashion portrait photography, 8K ultra high resolution, extremely detailed facial features,
+sharp focus on face, crisp details, magazine quality headshot, commercial photography standard,
+perfect skin texture, natural beauty, photorealistic rendering, studio-grade portrait lighting,
+color-graded, professional retouching, fashion magazine portrait quality,
+PORTRAIT FRAMING: Show only face, head, neck, and upper shoulders (NO full body, NO torso, NO below shoulders)
 
-REMEMBER: Create a NEW model that looks INSPIRED BY but NOT IDENTICAL TO the reference. The face must be clearly a different person while maintaining the same professional photography style.`;
+REMEMBER:
+1. Generate ONLY A FACE PORTRAIT/HEADSHOT (not full body!)
+2. Create a NEW model that looks INSPIRED BY but NOT IDENTICAL TO the reference
+3. The face must be clearly a different person while maintaining professional photography style
+4. Frame it as a tight portrait showing only the face and shoulders`;
 
     console.log('🎨 Generating face model with prompt:', prompt);
 
