@@ -5058,9 +5058,10 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     console.log(`📊 generated_images count: ${generatedCount}`);
 
+    // For admin, join with users table to get user email
     let generatedDataQuery = supabase
       .from('generated_images')
-      .select('*')
+      .select(isAdmin ? 'id, generated_image_url, created_at, user_id, prompt, style, model_type, users!generated_images_user_id_fkey(email)' : '*')
       .order('created_at', { ascending: false });
 
     if (!isAdmin) {
@@ -5072,11 +5073,12 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     console.log(`📊 generated_images actual data rows: ${(generatedImages || []).length}`);
 
-    // Add source tag to generated images
+    // Add source tag to generated images and extract user email for admin
     const taggedGeneratedImages = (generatedImages || []).map(img => ({
       ...img,
       generated_image_url: img.generated_image_url,
-      image_source: 'generated_images'
+      image_source: 'generated_images',
+      user_email: isAdmin && img.users ? img.users.email : null
     }));
 
     allImages = [...taggedGeneratedImages];

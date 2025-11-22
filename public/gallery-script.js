@@ -10,6 +10,7 @@ let currentPage = 1;
 let itemsPerPage = 30;
 let totalPages = 0;
 let totalCount = 0;
+let isUserAdmin = false;
 
 // Fetch Supabase config from server
 async function initSupabase() {
@@ -131,16 +132,17 @@ async function loadImages() {
         allImages = result.images || [];
         totalCount = result.totalCount || 0;
         totalPages = result.totalPages || 0;
+        isUserAdmin = result.isAdmin || false;
 
         // Show admin badge if user is admin
         if (result.isAdmin) {
             console.log('👑 Admin mode - showing all user images');
-            const header = document.querySelector('header h1');
+            const header = document.querySelector('.hero-title');
             if (header && !header.querySelector('.admin-badge')) {
                 const badge = document.createElement('span');
                 badge.className = 'admin-badge';
                 badge.textContent = '👑 Admin';
-                badge.style.cssText = 'background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-right: 10px; font-weight: bold;';
+                badge.style.cssText = 'background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 6px 16px; border-radius: 20px; font-size: 14px; margin-right: 10px; font-weight: bold; display: inline-block;';
                 header.appendChild(badge);
             }
         }
@@ -203,6 +205,11 @@ function renderGallery() {
     galleryGrid.innerHTML = allImages.map((image, index) => `
         <div class="gallery-item" onclick="openModal(${index})" style="animation: fadeInUp 0.5s ease ${index * 0.05}s backwards;">
             <img src="${image.generated_image_url}" alt="تصویر ${index + 1}" class="gallery-item-image" loading="lazy">
+            ${isUserAdmin && image.user_email ? `
+                <div style="position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; z-index: 2; backdrop-filter: blur(8px);">
+                    👤 ${image.user_email}
+                </div>
+            ` : ''}
             <div class="gallery-item-overlay">
                 <div class="overlay-top">
                     <div class="view-details-btn">
@@ -265,6 +272,12 @@ function openModal(index) {
     modalDate.textContent = formatDate(currentImage.created_at);
 
     modalInfo.innerHTML = `
+        ${isUserAdmin && currentImage.user_email ? `
+            <div class="info-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 12px; margin-bottom: 12px;">
+                <span class="info-label" style="color: #fff; font-weight: 600;">👤 کاربر:</span>
+                <span class="info-value" style="color: #fff; font-weight: 600;">${currentImage.user_email}</span>
+            </div>
+        ` : ''}
         <div class="info-item">
             <span class="info-label">مدل:</span>
             <span class="info-value">${currentImage.model_id || 'نامشخص'}</span>
