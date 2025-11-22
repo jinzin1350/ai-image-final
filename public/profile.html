@@ -218,47 +218,6 @@
             color: #6b7280;
         }
 
-        .tier-comparison {
-            background: #f9fafb;
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 24px;
-        }
-
-        .tier-comparison-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 16px;
-        }
-
-        .tier-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .tier-table th,
-        .tier-table td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .tier-table th {
-            font-weight: 600;
-            color: #4b5563;
-            font-size: 14px;
-        }
-
-        .tier-table td {
-            font-size: 15px;
-            color: #1f2937;
-        }
-
-        .tier-table tr.current {
-            background: rgba(102, 126, 234, 0.1);
-        }
-
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -372,32 +331,6 @@
     </div>
 
     <script>
-        // Store pricing data globally
-        let pricingData = {};
-
-        // Load pricing data from API
-        async function loadPricingData() {
-            try {
-                const response = await fetch('/api/pricing');
-                const data = await response.json();
-                if (data.success) {
-                    // Convert array to object for easy lookup
-                    data.pricing.forEach(p => {
-                        pricingData[p.tier] = p;
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading pricing:', error);
-            }
-        }
-
-        // Format price in Tomans
-        function formatPrice(rials) {
-            if (rials === 0) return 'رایگان';
-            const tomans = Math.floor(rials / 10);
-            return tomans.toLocaleString('fa-IR') + ' تومان';
-        }
-
         async function loadProfile() {
             const token = localStorage.getItem('supabase_token');
             if (!token) {
@@ -406,11 +339,6 @@
             }
 
             try {
-                // Load pricing data first if not loaded
-                if (Object.keys(pricingData).length === 0) {
-                    await loadPricingData();
-                }
-
                 const response = await fetch('/api/user/usage', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -540,50 +468,6 @@
                         <strong>💡 هزینه سرویس‌ها:</strong><br>
                         • سرویس‌های استاندارد (Flat Lay، کاتالوگ، محصول لوکس، مدلینگ): <strong>1 اعتبار</strong><br>
                         • سرویس‌های پریمیوم (انتقال استایل، تِم برندها): <strong>2 اعتبار</strong>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>
-                        </svg>
-                        مقایسه پلن‌ها
-                    </div>
-
-                    <div class="tier-comparison">
-                        <div class="tier-comparison-title">مقایسه پلن‌های مختلف</div>
-                        <table class="tier-table">
-                            <thead>
-                                <tr>
-                                    <th>پلن</th>
-                                    <th>اعتبار ماهانه</th>
-                                    <th>قیمت ماهانه</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ${tier === 'testlimit' ? 'class="current"' : ''}>
-                                    <td><strong>🧪 تست</strong></td>
-                                    <td>${pricingData.testlimit?.credits || 5} اعتبار</td>
-                                    <td>${formatPrice(pricingData.testlimit?.price || 0)}</td>
-                                </tr>
-                                <tr ${tier === 'bronze' ? 'class="current"' : ''}>
-                                    <td><strong>🥉 برنزی</strong></td>
-                                    <td>${pricingData.bronze?.credits || 100} اعتبار</td>
-                                    <td>${formatPrice(pricingData.bronze?.price || 0)}</td>
-                                </tr>
-                                <tr ${tier === 'silver' ? 'class="current"' : ''}>
-                                    <td><strong>⭐ نقره‌ای</strong></td>
-                                    <td>${pricingData.silver?.credits || 130} اعتبار</td>
-                                    <td>${formatPrice(pricingData.silver?.price || 0)}</td>
-                                </tr>
-                                <tr ${tier === 'gold' ? 'class="current"' : ''}>
-                                    <td><strong>👑 طلایی</strong></td>
-                                    <td>${pricingData.gold?.credits || 171} اعتبار</td>
-                                    <td>${formatPrice(pricingData.gold?.price || 0)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             `;
