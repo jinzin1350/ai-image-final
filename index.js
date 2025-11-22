@@ -5058,10 +5058,9 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     console.log(`📊 generated_images count: ${generatedCount}`);
 
-    // For admin, join with users table to get user email
     let generatedDataQuery = supabase
       .from('generated_images')
-      .select(isAdmin ? 'id, generated_image_url, created_at, user_id, prompt, style, model_type, users!generated_images_user_id_fkey(email)' : '*')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (!isAdmin) {
@@ -5073,12 +5072,30 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     console.log(`📊 generated_images actual data rows: ${(generatedImages || []).length}`);
 
-    // Add source tag to generated images and extract user email for admin
+    // For admin, fetch user emails
+    let userEmailMap = {};
+    if (isAdmin && generatedImages && generatedImages.length > 0) {
+      const userIds = [...new Set(generatedImages.map(img => img.user_id).filter(Boolean))];
+      if (userIds.length > 0) {
+        const { data: users, error: usersError } = await supabase
+          .from('users')
+          .select('id, email')
+          .in('id', userIds);
+
+        if (!usersError && users) {
+          users.forEach(user => {
+            userEmailMap[user.id] = user.email;
+          });
+        }
+      }
+    }
+
+    // Add source tag to generated images and add user email for admin
     const taggedGeneratedImages = (generatedImages || []).map(img => ({
       ...img,
       generated_image_url: img.generated_image_url,
       image_source: 'generated_images',
-      user_email: isAdmin && img.users ? img.users.email : null
+      user_email: isAdmin && img.user_id ? userEmailMap[img.user_id] : null
     }));
 
     allImages = [...taggedGeneratedImages];
