@@ -642,6 +642,26 @@
                     <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
                         For "Scene Recreation" service - Single model photos that users will recreate
                     </p>
+
+                    <!-- Gender Category Selector for Recreation -->
+                    <div style="margin-bottom: 15px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 10px;">👤 Gender Category:</label>
+                        <div style="display: flex; gap: 20px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="genderCategoryRecreation" value="woman" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👗 Woman</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="genderCategoryRecreation" value="man" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👔 Man</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="genderCategoryRecreation" value="child" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👶 Child</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="upload-area" id="uploadAreaRecreation" onclick="document.getElementById('photoUploadRecreation').click()">
                         <input type="file" id="photoUploadRecreation" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'recreation')">
                         <span class="upload-icon">📤</span>
@@ -679,6 +699,26 @@
                     <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
                         For "Style Transfer" service - Professional 2-person modeling photos used as content images
                     </p>
+
+                    <!-- Gender Category Selector for Style Transfer -->
+                    <div style="margin-bottom: 15px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 10px;">👤 Gender Category:</label>
+                        <div style="display: flex; gap: 20px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="genderCategoryStyleTransfer" value="woman" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👗 Woman</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="genderCategoryStyleTransfer" value="man" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👔 Man</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="genderCategoryStyleTransfer" value="child" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👶 Child</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="upload-area" id="uploadAreaStyleTransfer" onclick="document.getElementById('photoUploadStyleTransfer').click()">
                         <input type="file" id="photoUploadStyleTransfer" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'style-transfer')">
                         <span class="upload-icon">📤</span>
@@ -980,6 +1020,10 @@
             const totalFiles = files.length;
             let uploadedCount = 0;
 
+            // Get selected gender category
+            const genderRadioName = photoType === 'recreation' ? 'genderCategoryRecreation' : 'genderCategoryStyleTransfer';
+            const selectedGender = document.querySelector(`input[name="${genderRadioName}"]:checked`)?.value || 'woman';
+
             // Determine which progress elements to use
             const progressId = photoType === 'recreation' ? 'uploadProgressRecreation' : 'uploadProgressStyleTransfer';
             const progressBar = document.getElementById(progressId.replace('Progress', 'ProgressBar'));
@@ -1006,13 +1050,14 @@
 
                     const { url } = await uploadResponse.json();
 
-                    // Save to brand photos with photo_type
+                    // Save to brand photos with photo_type and gender_category
                     const saveResponse = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`, {
                         method: 'POST',
                         body: JSON.stringify({
                             image_url: url,
                             title: file.name,
-                            photo_type: photoType // Add photo_type
+                            photo_type: photoType,
+                            gender_category: selectedGender
                         })
                     });
 

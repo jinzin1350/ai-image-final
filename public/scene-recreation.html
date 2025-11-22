@@ -452,6 +452,28 @@
                             <option value="">ابتدا یک برند را انتخاب کنید...</option>
                         </select>
                     </div>
+
+                    <!-- Gender Category Selector -->
+                    <div id="genderCategorySelector" style="display: none; margin-top: 25px; padding: 20px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <label style="display: block; font-weight: 600; color: #374151; font-size: 16px; margin-bottom: 8px;">👤 انتخاب جنسیت مدل</label>
+                            <p style="color: #6b7280; font-size: 14px; margin: 0;" id="photoCountDisplay">عکس‌های موجود را مشاهده کنید</p>
+                        </div>
+                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px; background: white; border: 2px solid #e5e7eb; border-radius: 10px; transition: all 0.2s;">
+                                <input type="radio" name="genderCategory" value="woman" checked onchange="loadBrandPhotos()" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👗 زن</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px; background: white; border: 2px solid #e5e7eb; border-radius: 10px; transition: all 0.2s;">
+                                <input type="radio" name="genderCategory" value="man" onchange="loadBrandPhotos()" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👔 مرد</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px; background: white; border: 2px solid #e5e7eb; border-radius: 10px; transition: all 0.2s;">
+                                <input type="radio" name="genderCategory" value="child" onchange="loadBrandPhotos()" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👶 کودک</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Brand Photos Grid -->
@@ -739,27 +761,44 @@
             const brandSelect = document.getElementById('brandSelect');
             const brandId = brandSelect.value;
 
+            const genderSelector = document.getElementById('genderCategorySelector');
             const photosContainer = document.getElementById('brandPhotosContainer');
             const photosGrid = document.getElementById('brandPhotosGrid');
 
             if (!brandId) {
+                genderSelector.style.display = 'none';
                 photosContainer.style.display = 'none';
                 return;
             }
+
+            // Show gender selector
+            genderSelector.style.display = 'block';
+
+            // Get selected gender
+            const selectedGender = document.querySelector('input[name="genderCategory"]:checked')?.value || 'woman';
 
             // Show loading
             photosContainer.style.display = 'block';
             photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">در حال بارگذاری...</div>';
 
             try {
-                // Fetch only 'recreation' type photos (single model photos)
-                const response = await fetch(`/api/brands/${brandId}/photos?photo_type=recreation`);
+                // Fetch only 'recreation' type photos filtered by gender
+                const response = await fetch(`/api/brands/${brandId}/photos?photo_type=recreation&gender=${selectedGender}`);
                 if (!response.ok) throw new Error('Failed to load brand photos');
 
                 allBrandPhotos = await response.json();
 
+                // Update photo count display
+                const photoCountDisplay = document.getElementById('photoCountDisplay');
+                const genderLabels = {
+                    'woman': 'model zan',
+                    'man': 'model mard',
+                    'child': 'model kodak'
+                };
+                photoCountDisplay.textContent = `(${allBrandPhotos.length} ${genderLabels[selectedGender]})`;
+
                 if (allBrandPhotos.length === 0) {
-                    photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکسی برای این برند موجود نیست</div>';
+                    photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکسی برای این دسته‌بندی موجود نیست</div>';
                     return;
                 }
 

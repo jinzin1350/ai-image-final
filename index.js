@@ -6811,7 +6811,7 @@ app.get('/api/brands/:id/photos', async (req, res) => {
     }
 
     const { id } = req.params;
-    const { photo_type } = req.query; // Optional filter: 'recreation' or 'style-transfer'
+    const { photo_type, gender } = req.query; // Optional filters
 
     let query = supabase
       .from('brand_reference_photos')
@@ -6822,6 +6822,11 @@ app.get('/api/brands/:id/photos', async (req, res) => {
     // Filter by photo_type if provided
     if (photo_type && (photo_type === 'recreation' || photo_type === 'style-transfer')) {
       query = query.eq('photo_type', photo_type);
+    }
+
+    // Filter by gender_category if provided
+    if (gender && ['woman', 'man', 'child'].includes(gender)) {
+      query = query.eq('gender_category', gender);
     }
 
     const { data, error} = await query
@@ -7025,7 +7030,7 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
     }
 
     const { id: brandId } = req.params;
-    const { image_url, title, description, display_order, photo_type } = req.body;
+    const { image_url, title, description, display_order, photo_type, gender_category } = req.body;
 
     if (!image_url) {
       return res.status(400).json({ error: 'Image URL is required' });
@@ -7034,6 +7039,11 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
     // Validate photo_type if provided
     if (photo_type && photo_type !== 'recreation' && photo_type !== 'style-transfer') {
       return res.status(400).json({ error: 'Invalid photo_type. Must be "recreation" or "style-transfer"' });
+    }
+
+    // Validate gender_category if provided
+    if (gender_category && !['woman', 'man', 'child'].includes(gender_category)) {
+      return res.status(400).json({ error: 'Invalid gender_category. Must be "woman", "man", or "child"' });
     }
 
     // Verify brand exists
@@ -7056,6 +7066,7 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
         description: description || null,
         display_order: display_order || 0,
         photo_type: photo_type || 'recreation', // Default to 'recreation'
+        gender_category: gender_category || 'woman', // Default to 'woman'
         is_active: true,
         analysis_status: 'pending', // Will be analyzed by background worker
         analysis_retry_count: 0
