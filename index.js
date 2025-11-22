@@ -2413,7 +2413,7 @@ app.get('/api/motion-elements', (req, res) => {
 });
 
 // آپلود عکس لباس به Supabase Storage
-app.post('/api/upload', upload.single('garment'), async (req, res) => {
+app.post('/api/upload', authenticateUser, upload.single('garment'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'لطفاً یک عکس آپلود کنید' });
@@ -2459,7 +2459,7 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
 
     // ذخیره در content_library برای نمایش در گالری
     try {
-      const userId = req.session?.user?.id || null;
+      const userId = req.user?.id || null;
 
       const { error: dbError } = await supabase
         .from('content_library')
@@ -2499,7 +2499,7 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
 });
 
 // آپلود عکس مرجع برای Scene Recreation mode
-app.post('/api/upload-reference', upload.single('referencePhoto'), async (req, res) => {
+app.post('/api/upload-reference', authenticateUser, upload.single('referencePhoto'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'لطفاً یک عکس مرجع آپلود کنید' });
