@@ -2457,6 +2457,33 @@ app.post('/api/upload', upload.single('garment'), async (req, res) => {
 
     console.log(`✅ آپلود موفق: ${urlData.publicUrl}`);
 
+    // ذخیره در content_library برای نمایش در گالری
+    try {
+      const userId = req.session?.user?.id || null;
+
+      const { error: dbError } = await supabase
+        .from('content_library')
+        .insert({
+          content_type: 'garment',
+          name: fileName.replace(/\.[^/.]+$/, ''),
+          category: 'garment',
+          visibility: 'private',
+          image_url: urlData.publicUrl,
+          storage_bucket: 'garments',
+          storage_filename: fileName,
+          owner_user_id: userId,
+          is_active: true
+        });
+
+      if (dbError) {
+        console.warn('⚠️ خطا در ذخیره در content_library:', dbError);
+      } else {
+        console.log('✅ فایل در content_library ذخیره شد');
+      }
+    } catch (dbError) {
+      console.warn('⚠️ خطا در ذخیره در پایگاه داده:', dbError);
+    }
+
     res.json({
       success: true,
       filePath: urlData.publicUrl,
@@ -5072,30 +5099,20 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
 
     console.log(`📊 generated_images actual data rows: ${(generatedImages || []).length}`);
 
-    // For admin, fetch user emails
+    // Build initial user email map for admin (will be completed after fetching content_library)
     let userEmailMap = {};
-    if (isAdmin && generatedImages && generatedImages.length > 0) {
-      const userIds = [...new Set(generatedImages.map(img => img.user_id).filter(Boolean))];
-      if (userIds.length > 0) {
-        const { data: users, error: usersError } = await supabase
-          .from('users')
-          .select('id, email')
-          .in('id', userIds);
+    let allUserIds = [];
 
-        if (!usersError && users) {
-          users.forEach(user => {
-            userEmailMap[user.id] = user.email;
-          });
-        }
-      }
+    if (isAdmin && generatedImages && generatedImages.length > 0) {
+      const generatedUserIds = generatedImages.map(img => img.user_id).filter(Boolean);
+      allUserIds = [...allUserIds, ...generatedUserIds];
     }
 
-    // Add source tag to generated images and add user email for admin
+    // Add source tag to generated images
     const taggedGeneratedImages = (generatedImages || []).map(img => ({
       ...img,
       generated_image_url: img.generated_image_url,
-      image_source: 'generated_images',
-      user_email: isAdmin && img.user_id ? userEmailMap[img.user_id] : null
+      image_source: 'generated_images'
     }));
 
     allImages = [...taggedGeneratedImages];
@@ -5136,6 +5153,12 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
         } else {
           console.log(`📊 content_library actual data rows: ${(contentLibrary || []).length}`);
 
+          // Collect user IDs from content_library for admin
+          if (isAdmin && contentLibrary && contentLibrary.length > 0) {
+            const contentUserIds = contentLibrary.map(item => item.owner_user_id).filter(Boolean);
+            allUserIds = [...allUserIds, ...contentUserIds];
+          }
+
           // Normalize content_library to match generated_images structure
           const normalizedContent = (contentLibrary || []).map(item => ({
             id: item.id,
@@ -5154,6 +5177,28 @@ app.get('/api/user/gallery', authenticateUser, async (req, res) => {
           console.log(`✅ Added ${normalizedContent.length} items from content_library`);
         }
       }
+    }
+
+    // Fetch user emails for admin (after collecting all user IDs)
+    if (isAdmin && allUserIds.length > 0) {
+      const uniqueUserIds = [...new Set(allUserIds)];
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id, email')
+        .in('id', uniqueUserIds);
+
+      if (!usersError && users) {
+        users.forEach(user => {
+          userEmailMap[user.id] = user.email;
+        });
+        console.log(`👥 Fetched emails for ${users.length} users`);
+      }
+
+      // Add user_email to all images
+      allImages = allImages.map(img => ({
+        ...img,
+        user_email: img.user_id ? userEmailMap[img.user_id] : null
+      }));
     }
 
     // Sort all images by created_at
