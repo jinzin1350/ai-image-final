@@ -537,11 +537,18 @@
                 const response = await fetch('/api/brands');
                 if (!response.ok) throw new Error('Failed to load brands');
 
-                allBrands = await response.json();
+                const brands = await response.json();
+
+                // Filter brands that have 'accessories' service type
+                allBrands = brands.filter(brand => {
+                    const serviceTypes = brand.service_types || [];
+                    return serviceTypes.includes('accessories');
+                });
+
                 const brandSelect = document.getElementById('brandSelect');
 
                 if (allBrands.length === 0) {
-                    brandSelect.innerHTML = '<option value="">هیچ برندی موجود نیست</option>';
+                    brandSelect.innerHTML = '<option value="">هیچ برندی برای این سرویس موجود نیست</option>';
                     return;
                 }
 

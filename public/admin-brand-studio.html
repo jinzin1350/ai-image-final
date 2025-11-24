@@ -609,6 +609,33 @@
                     </div>
 
                     <div class="form-group">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #374151;">
+                            📋 Service Types (Select one or more):
+                        </label>
+                        <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                            Choose which services this brand will be available for
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 12px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px; background: white; border-radius: 6px; transition: all 0.2s;">
+                                <input type="checkbox" id="serviceRecreation" class="service-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">🎬 Scene Recreation (Single Model)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px; background: white; border-radius: 6px; transition: all 0.2s;">
+                                <input type="checkbox" id="serviceStyleTransfer" class="service-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">🎨 Style Transfer (2-Person Modeling)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px; background: white; border-radius: 6px; transition: all 0.2s;">
+                                <input type="checkbox" id="serviceAccessories" class="service-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">👜 Accessories</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px; background: white; border-radius: 6px; transition: all 0.2s;">
+                                <input type="checkbox" id="serviceFlatLay" class="service-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">📸 Flat-Lay</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label>
                             <input type="checkbox" id="brandIsActive" checked>
                             برند فعال است
@@ -929,6 +956,13 @@
             document.getElementById('brandModalTitle').textContent = 'افزودن برند جدید';
             document.getElementById('brandForm').reset();
             document.getElementById('brandId').value = '';
+
+            // Reset service type checkboxes
+            document.getElementById('serviceRecreation').checked = false;
+            document.getElementById('serviceStyleTransfer').checked = false;
+            document.getElementById('serviceAccessories').checked = false;
+            document.getElementById('serviceFlatLay').checked = false;
+
             document.getElementById('brandModal').style.display = 'block';
         }
 
@@ -950,6 +984,14 @@
                 document.getElementById('brandLogo').value = brand.logo || '';
                 document.getElementById('brandDescription').value = brand.description || '';
                 document.getElementById('brandIsActive').checked = brand.is_active;
+
+                // Set service type checkboxes
+                const serviceTypes = brand.service_types || [];
+                document.getElementById('serviceRecreation').checked = serviceTypes.includes('recreation');
+                document.getElementById('serviceStyleTransfer').checked = serviceTypes.includes('style-transfer');
+                document.getElementById('serviceAccessories').checked = serviceTypes.includes('accessories');
+                document.getElementById('serviceFlatLay').checked = serviceTypes.includes('flat-lay');
+
                 document.getElementById('brandModal').style.display = 'block';
             } catch (error) {
                 console.error('Error loading brand:', error);
@@ -959,15 +1001,29 @@
 
         async function saveBrand() {
             const brandId = document.getElementById('brandId').value;
+
+            // Collect selected service types
+            const serviceTypes = [];
+            if (document.getElementById('serviceRecreation').checked) serviceTypes.push('recreation');
+            if (document.getElementById('serviceStyleTransfer').checked) serviceTypes.push('style-transfer');
+            if (document.getElementById('serviceAccessories').checked) serviceTypes.push('accessories');
+            if (document.getElementById('serviceFlatLay').checked) serviceTypes.push('flat-lay');
+
             const brandData = {
                 name: document.getElementById('brandName').value.trim(),
                 logo: document.getElementById('brandLogo').value.trim() || null,
                 description: document.getElementById('brandDescription').value.trim() || null,
-                is_active: document.getElementById('brandIsActive').checked
+                is_active: document.getElementById('brandIsActive').checked,
+                service_types: serviceTypes
             };
 
             if (!brandData.name) {
                 alert('نام برند الزامی است');
+                return;
+            }
+
+            if (serviceTypes.length === 0) {
+                alert('لطفاً حداقل یک نوع سرویس را انتخاب کنید');
                 return;
             }
 

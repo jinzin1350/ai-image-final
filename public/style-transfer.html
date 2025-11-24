@@ -226,11 +226,18 @@
                 const response = await fetch('/api/brands');
                 if (!response.ok) throw new Error('Failed to load brands');
 
-                allBrandsStyleTransfer = await response.json();
+                const brands = await response.json();
+
+                // Filter brands that have 'style-transfer' service type
+                allBrandsStyleTransfer = brands.filter(brand => {
+                    const serviceTypes = brand.service_types || [];
+                    return serviceTypes.includes('style-transfer');
+                });
+
                 const brandSelect = document.getElementById('brandSelectStyleTransfer');
 
                 if (allBrandsStyleTransfer.length === 0) {
-                    brandSelect.innerHTML = '<option value="">هیچ برندی موجود نیست</option>';
+                    brandSelect.innerHTML = '<option value="">هیچ برندی برای این سرویس موجود نیست</option>';
                     return;
                 }
 
