@@ -823,6 +823,37 @@
                         For "Accessories" service - Professional accessories product photos (bags, shoes, watches, jewelry)
                     </p>
 
+                    <!-- Accessory Type Selector -->
+                    <div style="margin-bottom: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #86efac;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 10px;">💍 Accessory Type:</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="accessoryType" value="ring" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">💍 انگشتر (Ring)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="accessoryType" value="earrings" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">📿 گوشواره (Earrings)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="accessoryType" value="bracelet" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">📿 دستبند (Bracelet)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="accessoryType" value="necklace" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">📿 گردنبند (Necklace)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="accessoryType" value="anklet" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">📿 پابند (Anklet)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="accessoryType" value="watch" style="width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-weight: 500; color: #1f2937;">⌚ ساعت (Watch)</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="upload-area" id="uploadAreaAccessories" onclick="document.getElementById('photoUploadAccessories').click()">
                         <input type="file" id="photoUploadAccessories" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'accessories')">
                         <span class="upload-icon">📤</span>
@@ -1190,10 +1221,26 @@
                         statusBadge = '<span class="status-badge status-pending">⏳ در صف تحلیل</span>';
                     }
 
+                    // Determine accessory type badge for accessories photos
+                    let accessoryTypeBadge = '';
+                    if (photoType === 'accessories' && photo.accessory_type) {
+                        const accessoryTypeLabels = {
+                            'ring': '💍 انگشتر',
+                            'earrings': '📿 گوشواره',
+                            'bracelet': '📿 دستبند',
+                            'necklace': '📿 گردنبند',
+                            'anklet': '📿 پابند',
+                            'watch': '⌚ ساعت'
+                        };
+                        const label = accessoryTypeLabels[photo.accessory_type] || photo.accessory_type;
+                        accessoryTypeBadge = `<span class="status-badge" style="background: #d1fae5; color: #065f46; position: absolute; top: 50px; left: 10px;">${label}</span>`;
+                    }
+
                     return `
                         <div class="photo-card">
                             <img src="${photo.image_url}" alt="${photo.title || 'Brand photo'}">
                             <div class="photo-status">${statusBadge}</div>
+                            ${accessoryTypeBadge}
                             <div class="photo-card-overlay">
                                 <button class="btn-danger" onclick="deletePhoto('${brandId}', '${photo.id}', '${photoType}')">
                                     حذف
@@ -1221,6 +1268,12 @@
             if (photoType === 'recreation' || photoType === 'style-transfer') {
                 const genderRadioName = photoType === 'recreation' ? 'genderCategoryRecreation' : 'genderCategoryStyleTransfer';
                 selectedGender = document.querySelector(`input[name="${genderRadioName}"]:checked`)?.value || 'woman';
+            }
+
+            // Get selected accessory type (only for accessories)
+            let selectedAccessoryType = null;
+            if (photoType === 'accessories') {
+                selectedAccessoryType = document.querySelector('input[name="accessoryType"]:checked')?.value || 'ring';
             }
 
             // Determine which progress elements to use
@@ -1268,6 +1321,11 @@
                     // Only add gender_category for recreation and style-transfer
                     if (selectedGender) {
                         photoData.gender_category = selectedGender;
+                    }
+
+                    // Only add accessory_type for accessories
+                    if (selectedAccessoryType) {
+                        photoData.accessory_type = selectedAccessoryType;
                     }
 
                     const saveResponse = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`, {

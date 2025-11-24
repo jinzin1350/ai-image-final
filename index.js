@@ -7096,20 +7096,25 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
     }
 
     const { id: brandId } = req.params;
-    const { image_url, title, description, display_order, photo_type, gender_category } = req.body;
+    const { image_url, title, description, display_order, photo_type, gender_category, accessory_type } = req.body;
 
     if (!image_url) {
       return res.status(400).json({ error: 'Image URL is required' });
     }
 
     // Validate photo_type if provided
-    if (photo_type && photo_type !== 'recreation' && photo_type !== 'style-transfer') {
-      return res.status(400).json({ error: 'Invalid photo_type. Must be "recreation" or "style-transfer"' });
+    if (photo_type && !['recreation', 'style-transfer', 'accessories', 'flat-lay'].includes(photo_type)) {
+      return res.status(400).json({ error: 'Invalid photo_type. Must be "recreation", "style-transfer", "accessories", or "flat-lay"' });
     }
 
     // Validate gender_category if provided
     if (gender_category && !['woman', 'man', 'child'].includes(gender_category)) {
       return res.status(400).json({ error: 'Invalid gender_category. Must be "woman", "man", or "child"' });
+    }
+
+    // Validate accessory_type if provided
+    if (accessory_type && !['ring', 'earrings', 'bracelet', 'necklace', 'anklet', 'watch'].includes(accessory_type)) {
+      return res.status(400).json({ error: 'Invalid accessory_type. Must be "ring", "earrings", "bracelet", "necklace", "anklet", or "watch"' });
     }
 
     // Verify brand exists
@@ -7123,20 +7128,27 @@ app.post('/api/admin/brands/:id/photos', authenticateAdmin, async (req, res) => 
       return res.status(404).json({ error: 'Brand not found' });
     }
 
+    const photoData = {
+      brand_id: brandId,
+      image_url,
+      title: title || null,
+      description: description || null,
+      display_order: display_order || 0,
+      photo_type: photo_type || 'recreation', // Default to 'recreation'
+      gender_category: gender_category || 'woman', // Default to 'woman'
+      is_active: true,
+      analysis_status: 'pending', // Will be analyzed by background worker
+      analysis_retry_count: 0
+    };
+
+    // Add accessory_type only if provided
+    if (accessory_type) {
+      photoData.accessory_type = accessory_type;
+    }
+
     const { data, error } = await supabaseAdmin
       .from('brand_reference_photos')
-      .insert([{
-        brand_id: brandId,
-        image_url,
-        title: title || null,
-        description: description || null,
-        display_order: display_order || 0,
-        photo_type: photo_type || 'recreation', // Default to 'recreation'
-        gender_category: gender_category || 'woman', // Default to 'woman'
-        is_active: true,
-        analysis_status: 'pending', // Will be analyzed by background worker
-        analysis_retry_count: 0
-      }])
+      .insert([photoData])
       .select()
       .single();
 
