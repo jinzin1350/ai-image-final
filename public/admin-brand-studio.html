@@ -205,6 +205,45 @@
             margin-top: 2px;
         }
 
+        .brand-service-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .service-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .service-type-badge.recreation {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .service-type-badge.style-transfer {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .service-type-badge.accessories {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .service-type-badge.flat-lay {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .brand-actions {
             display: flex;
             gap: 8px;
@@ -926,6 +965,20 @@
 
                             <div class="brand-card-body">
                                 ${brand.description ? `<p class="brand-description">${brand.description}</p>` : ''}
+
+                                ${brand.service_types && brand.service_types.length > 0 ? `
+                                    <div class="brand-service-types">
+                                        ${brand.service_types.map(type => {
+                                            const labels = {
+                                                'recreation': '🎬 الهام از عکس مرجع',
+                                                'style-transfer': '🎨 انتقال استایل',
+                                                'accessories': '💍 اکسسوری',
+                                                'flat-lay': '📐 فلت لی'
+                                            };
+                                            return `<span class="service-type-badge ${type}">${labels[type] || type}</span>`;
+                                        }).join('')}
+                                    </div>
+                                ` : '<p style="font-size: 13px; color: #ef4444; margin-bottom: 15px;">⚠️ No service types selected</p>'}
 
                                 <div class="brand-stats">
                                     <div class="brand-stat">

@@ -539,11 +539,23 @@
 
                 const brands = await response.json();
 
+                // DEBUG: Log all brands received from API
+                console.log('🔍 ALL BRANDS from API:', brands);
+                console.log('🔍 Total brands count:', brands.length);
+
                 // Filter brands that have 'accessories' service type
                 allBrands = brands.filter(brand => {
                     const serviceTypes = brand.service_types || [];
-                    return serviceTypes.includes('accessories');
+                    const hasAccessories = serviceTypes.includes('accessories');
+
+                    // DEBUG: Log each brand's service types
+                    console.log(`🔍 Brand: ${brand.name} | Active: ${brand.is_active} | Service Types:`, serviceTypes, '| Has Accessories:', hasAccessories);
+
+                    return hasAccessories;
                 });
+
+                console.log('🔍 FILTERED BRANDS (with accessories):', allBrands);
+                console.log('🔍 Filtered brands count:', allBrands.length);
 
                 const brandSelect = document.getElementById('brandSelect');
 
