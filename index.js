@@ -6961,7 +6961,7 @@ app.post('/api/admin/brands', authenticateAdmin, async (req, res) => {
       return res.status(503).json({ error: 'Database not configured' });
     }
 
-    const { name, logo, description, is_active } = req.body;
+    const { name, logo, description, is_active, service_types } = req.body;
 
     if (!name || name.trim() === '') {
       return res.status(400).json({ error: 'Brand name is required' });
@@ -6973,7 +6973,8 @@ app.post('/api/admin/brands', authenticateAdmin, async (req, res) => {
         name: name.trim(),
         logo: logo || null,
         description: description || null,
-        is_active: is_active !== undefined ? is_active : true
+        is_active: is_active !== undefined ? is_active : true,
+        service_types: service_types || []
       }])
       .select()
       .single();
@@ -7000,13 +7001,14 @@ app.put('/api/admin/brands/:id', authenticateAdmin, async (req, res) => {
     }
 
     const { id } = req.params;
-    const { name, logo, description, is_active } = req.body;
+    const { name, logo, description, is_active, service_types } = req.body;
 
     const updateData = {};
     if (name !== undefined) updateData.name = name.trim();
     if (logo !== undefined) updateData.logo = logo;
     if (description !== undefined) updateData.description = description;
     if (is_active !== undefined) updateData.is_active = is_active;
+    if (service_types !== undefined) updateData.service_types = service_types;
 
     const { data, error } = await supabaseAdmin
       .from('brands')
