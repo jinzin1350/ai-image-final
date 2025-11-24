@@ -9,7 +9,10 @@
 ALTER TABLE brand_reference_photos
 ADD COLUMN IF NOT EXISTS accessory_type TEXT;
 
--- Add check constraint to ensure valid accessory types
+-- Drop existing constraint if it exists, then add it
+ALTER TABLE brand_reference_photos
+DROP CONSTRAINT IF EXISTS valid_accessory_type;
+
 ALTER TABLE brand_reference_photos
 ADD CONSTRAINT valid_accessory_type
 CHECK (
