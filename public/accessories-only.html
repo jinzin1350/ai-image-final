@@ -324,6 +324,23 @@
                             <option value="">ابتدا یک برند را انتخاب کنید...</option>
                         </select>
                     </div>
+
+                    <!-- Accessory Type Filter (shown after brand selection) -->
+                    <div id="accessoryTypeFilterContainer" class="brand-select-wrapper" style="display: none; margin-top: 20px;">
+                        <div class="brand-select-label">
+                            <span>💍</span>
+                            <span>انتخاب نوع اکسسوری</span>
+                        </div>
+                        <select id="accessoryTypeFilter" onchange="filterBrandPhotosByAccessoryType()">
+                            <option value="">همه انواع اکسسوری</option>
+                            <option value="ring">💍 انگشتر (Ring)</option>
+                            <option value="earrings">📿 گوشواره (Earrings)</option>
+                            <option value="bracelet">📿 دستبند (Bracelet)</option>
+                            <option value="necklace">📿 گردنبند (Necklace)</option>
+                            <option value="anklet">📿 پابند (Anklet)</option>
+                            <option value="watch">⌚ ساعت (Watch)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Brand Photos Grid -->
@@ -581,11 +598,20 @@
 
             const photosContainer = document.getElementById('brandPhotosContainer');
             const photosGrid = document.getElementById('brandPhotosGrid');
+            const accessoryTypeFilterContainer = document.getElementById('accessoryTypeFilterContainer');
+            const accessoryTypeFilter = document.getElementById('accessoryTypeFilter');
 
             if (!brandId) {
                 photosContainer.style.display = 'none';
+                accessoryTypeFilterContainer.style.display = 'none';
                 return;
             }
+
+            // Show accessory type filter
+            accessoryTypeFilterContainer.style.display = 'block';
+
+            // Reset filter to "all"
+            accessoryTypeFilter.value = '';
 
             // Show loading
             photosContainer.style.display = 'block';
@@ -603,7 +629,39 @@
                     return;
                 }
 
-                photosGrid.innerHTML = allBrandPhotos.map(photo => `
+                // Display all photos initially
+                displayFilteredPhotos(allBrandPhotos);
+
+            } catch (error) {
+                console.error('Error loading brand photos:', error);
+                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>';
+            }
+        }
+
+        // Filter photos by accessory type
+        function filterBrandPhotosByAccessoryType() {
+            const selectedType = document.getElementById('accessoryTypeFilter').value;
+
+            let filteredPhotos = allBrandPhotos;
+
+            // Filter by accessory type if selected
+            if (selectedType) {
+                filteredPhotos = allBrandPhotos.filter(photo => photo.accessory_type === selectedType);
+            }
+
+            displayFilteredPhotos(filteredPhotos);
+        }
+
+        // Display filtered photos
+        function displayFilteredPhotos(photos) {
+            const photosGrid = document.getElementById('brandPhotosGrid');
+
+            if (photos.length === 0) {
+                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکسی با این فیلتر یافت نشد</div>';
+                return;
+            }
+
+            photosGrid.innerHTML = photos.map(photo => `
                     <div class="brand-photo-card" onclick="selectBrandReferencePhoto('${photo.id}')" data-photo-id="${photo.id}">
                         <img src="${photo.image_url}" alt="${photo.title || 'Reference photo'}">
                         ${photo.title ? `
@@ -613,10 +671,6 @@
                         ` : ''}
                     </div>
                 `).join('');
-            } catch (error) {
-                console.error('Error loading brand photos:', error);
-                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>';
-            }
         }
 
         // Select a brand reference photo
