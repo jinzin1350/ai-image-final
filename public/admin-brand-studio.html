@@ -746,6 +746,82 @@
                         <!-- Style transfer photos will be loaded here -->
                     </div>
                 </div>
+
+                <!-- Accessories Photos Section -->
+                <div>
+                    <h3 style="color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <span>👜</span>
+                        <span>Accessories Photos</span>
+                    </h3>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                        For "Accessories" service - Professional accessories product photos (bags, shoes, watches, jewelry)
+                    </p>
+
+                    <div class="upload-area" id="uploadAreaAccessories" onclick="document.getElementById('photoUploadAccessories').click()">
+                        <input type="file" id="photoUploadAccessories" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'accessories')">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Upload Accessories Photos</div>
+                        <div class="upload-hint">Click or drag & drop accessory product images here</div>
+                        <small style="color: #6b7280; margin-top: 8px; display: block;">JPG, PNG, WEBP - Max 10MB per file</small>
+                    </div>
+
+                    <button onclick="document.getElementById('photoUploadAccessories').click(); event.stopPropagation();" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        📤 Choose Files from Computer
+                    </button>
+
+                    <!-- Upload Progress for Accessories -->
+                    <div id="uploadProgressAccessories" style="display: none; margin-top: 15px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div class="loading-spinner" style="width: 20px; height: 20px; border: 3px solid #fde68a; border-top-color: #f59e0b;"></div>
+                            <span id="uploadProgressTextAccessories" style="color: #92400e; font-weight: 600;">Uploading photos...</span>
+                        </div>
+                        <div style="background: #fde68a; height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div id="uploadProgressBarAccessories" style="background: linear-gradient(90deg, #f59e0b, #d97706); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+
+                    <div id="photosGridAccessories" class="photos-grid">
+                        <!-- Accessories photos will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Flat-Lay Photos Section -->
+                <div>
+                    <h3 style="color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <span>📸</span>
+                        <span>Flat-Lay Photos</span>
+                    </h3>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">
+                        For "Flat-Lay" service - Professional overhead flat-lay product arrangement photos
+                    </p>
+
+                    <div class="upload-area" id="uploadAreaFlatLay" onclick="document.getElementById('photoUploadFlatLay').click()">
+                        <input type="file" id="photoUploadFlatLay" accept="image/*" multiple hidden onchange="handlePhotoUpload(event, 'flat-lay')">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Upload Flat-Lay Photos</div>
+                        <div class="upload-hint">Click or drag & drop flat-lay arrangement images here</div>
+                        <small style="color: #6b7280; margin-top: 8px; display: block;">JPG, PNG, WEBP - Max 10MB per file</small>
+                    </div>
+
+                    <button onclick="document.getElementById('photoUploadFlatLay').click(); event.stopPropagation();" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        📤 Choose Files from Computer
+                    </button>
+
+                    <!-- Upload Progress for Flat-Lay -->
+                    <div id="uploadProgressFlatLay" style="display: none; margin-top: 15px; padding: 15px; background: #dbeafe; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div class="loading-spinner" style="width: 20px; height: 20px; border: 3px solid #bfdbfe; border-top-color: #3b82f6;"></div>
+                            <span id="uploadProgressTextFlatLay" style="color: #1e40af; font-weight: 600;">Uploading photos...</span>
+                        </div>
+                        <div style="background: #bfdbfe; height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div id="uploadProgressBarFlatLay" style="background: linear-gradient(90deg, #3b82f6, #2563eb); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+
+                    <div id="photosGridFlatLay" class="photos-grid">
+                        <!-- Flat-lay photos will be loaded here -->
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closePhotosModal()">بستن</button>
@@ -943,9 +1019,11 @@
             document.getElementById('currentBrandId').value = brandId;
             document.getElementById('photosModalTitle').textContent = `عکس‌های ${brandName}`;
             document.getElementById('photosModal').style.display = 'block';
-            // Load both types of photos
+            // Load all types of photos
             loadBrandPhotos(brandId, 'recreation');
             loadBrandPhotos(brandId, 'style-transfer');
+            loadBrandPhotos(brandId, 'accessories');
+            loadBrandPhotos(brandId, 'flat-lay');
 
             // Start auto-refresh
             startAutoRefresh(brandId);
@@ -960,7 +1038,16 @@
         }
 
         async function loadBrandPhotos(brandId, photoType) {
-            const gridId = photoType === 'recreation' ? 'photosGridRecreation' : 'photosGridStyleTransfer';
+            let gridId;
+            if (photoType === 'recreation') {
+                gridId = 'photosGridRecreation';
+            } else if (photoType === 'style-transfer') {
+                gridId = 'photosGridStyleTransfer';
+            } else if (photoType === 'accessories') {
+                gridId = 'photosGridAccessories';
+            } else if (photoType === 'flat-lay') {
+                gridId = 'photosGridFlatLay';
+            }
             const grid = document.getElementById(gridId);
             grid.innerHTML = '<div class="loading-spinner"></div>';
 
@@ -1020,12 +1107,24 @@
             const totalFiles = files.length;
             let uploadedCount = 0;
 
-            // Get selected gender category
-            const genderRadioName = photoType === 'recreation' ? 'genderCategoryRecreation' : 'genderCategoryStyleTransfer';
-            const selectedGender = document.querySelector(`input[name="${genderRadioName}"]:checked`)?.value || 'woman';
+            // Get selected gender category (only for recreation and style-transfer)
+            let selectedGender = null;
+            if (photoType === 'recreation' || photoType === 'style-transfer') {
+                const genderRadioName = photoType === 'recreation' ? 'genderCategoryRecreation' : 'genderCategoryStyleTransfer';
+                selectedGender = document.querySelector(`input[name="${genderRadioName}"]:checked`)?.value || 'woman';
+            }
 
             // Determine which progress elements to use
-            const progressId = photoType === 'recreation' ? 'uploadProgressRecreation' : 'uploadProgressStyleTransfer';
+            let progressId;
+            if (photoType === 'recreation') {
+                progressId = 'uploadProgressRecreation';
+            } else if (photoType === 'style-transfer') {
+                progressId = 'uploadProgressStyleTransfer';
+            } else if (photoType === 'accessories') {
+                progressId = 'uploadProgressAccessories';
+            } else if (photoType === 'flat-lay') {
+                progressId = 'uploadProgressFlatLay';
+            }
             const progressBar = document.getElementById(progressId.replace('Progress', 'ProgressBar'));
             const progressText = document.getElementById(progressId.replace('Progress', 'ProgressText'));
             const progressContainer = document.getElementById(progressId);
@@ -1050,15 +1149,21 @@
 
                     const { url } = await uploadResponse.json();
 
-                    // Save to brand photos with photo_type and gender_category
+                    // Save to brand photos with photo_type and gender_category (if applicable)
+                    const photoData = {
+                        image_url: url,
+                        title: file.name,
+                        photo_type: photoType
+                    };
+
+                    // Only add gender_category for recreation and style-transfer
+                    if (selectedGender) {
+                        photoData.gender_category = selectedGender;
+                    }
+
                     const saveResponse = await fetchWithAuth(`/api/admin/brands/${brandId}/photos`, {
                         method: 'POST',
-                        body: JSON.stringify({
-                            image_url: url,
-                            title: file.name,
-                            photo_type: photoType,
-                            gender_category: selectedGender
-                        })
+                        body: JSON.stringify(photoData)
                     });
 
                     if (!saveResponse.ok) throw new Error('Failed to save photo');
@@ -1135,6 +1240,8 @@
                 if (currentBrandId) {
                     loadBrandPhotos(currentBrandId, 'recreation');
                     loadBrandPhotos(currentBrandId, 'style-transfer');
+                    loadBrandPhotos(currentBrandId, 'accessories');
+                    loadBrandPhotos(currentBrandId, 'flat-lay');
                 }
             }, 15000); // 15 seconds
         }
