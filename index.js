@@ -3369,16 +3369,14 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     const selectedMotion = motionElements.find(me => me.id === motionElementId) || motionElements[0]; // static
 
     // Validate model and background based on mode
-    if (mode === 'color-collection' || mode === 'flat-lay') {
-      // These modes don't need a model, only background
+    if (mode === 'color-collection') {
+      // Color collection doesn't need a model, only background
       if (!selectedBackground) {
         return res.status(400).json({ error: 'پس‌زمینه نامعتبر است' });
       }
-    } else if (mode === 'scene-recreation' || mode === 'accessories-only') {
-      // Scene recreation and accessories-only need model but not background (uses reference photo environment)
-      if (!selectedModel) {
-        return res.status(400).json({ error: 'مدل نامعتبر است' });
-      }
+    } else if (mode === 'scene-recreation' || mode === 'accessories-only' || mode === 'flat-lay') {
+      // Scene recreation, accessories-only, and flat-lay use brand reference photo (no model/background needed)
+      // Validation already done earlier - just need brand reference photo
     } else if (mode === 'style-transfer') {
       // Style transfer doesn't need model or background (uses style images for people and content image for environment)
       // Validation already done earlier - just need style images and content image
