@@ -429,16 +429,16 @@
 
                 <!-- Model Category Selection -->
                 <div style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-                    <button onclick="selectModelCategory('woman-brand')" id="categoryBtnWoman" class="category-btn active" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    <button onclick="selectModelCategory('brand-woman')" id="categoryBtnWoman" class="category-btn active" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                         👗 زن برند
                     </button>
-                    <button onclick="selectModelCategory('man-brand')" id="categoryBtnMan" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    <button onclick="selectModelCategory('brand-man')" id="categoryBtnMan" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                         👔 مرد برند
                     </button>
-                    <button onclick="selectModelCategory('boy-brand')" id="categoryBtnBoy" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    <button onclick="selectModelCategory('brand-boy')" id="categoryBtnBoy" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                         👦 پسر برند
                     </button>
-                    <button onclick="selectModelCategory('girl-brand')" id="categoryBtnGirl" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    <button onclick="selectModelCategory('brand-girl')" id="categoryBtnGirl" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
                         👧 دختر برند
                     </button>
                 </div>
@@ -512,7 +512,7 @@
         window.currentMode = 'accessories-only';
 
         // Set default category
-        window.currentCategory = 'woman-brand';
+        window.currentCategory = 'brand-woman';
 
         // Select model category
         function selectModelCategory(category) {
@@ -527,7 +527,15 @@
                 btn.style.color = '#374151';
             });
 
-            const activeBtn = document.getElementById('categoryBtn' + category.split('-')[0].charAt(0).toUpperCase() + category.split('-')[0].slice(1));
+            // Map category to button ID
+            const categoryToBtn = {
+                'brand-woman': 'categoryBtnWoman',
+                'brand-man': 'categoryBtnMan',
+                'brand-boy': 'categoryBtnBoy',
+                'brand-girl': 'categoryBtnGirl'
+            };
+
+            const activeBtn = document.getElementById(categoryToBtn[category]);
             if (activeBtn) {
                 activeBtn.style.border = '3px solid #667eea';
                 activeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
@@ -548,9 +556,9 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Load default category (woman-brand)
+            // Load default category (brand-woman)
             if (typeof displayModelsByCategory === 'function') {
-                displayModelsByCategory('woman-brand');
+                displayModelsByCategory('brand-woman');
             }
         });
 
