@@ -1593,6 +1593,13 @@ app.get('/blog/:slug', (req, res) => {
 });
 
 // لیست مدل‌ها - تعریف model prompts برای تولید تصویر
+/*
+ * DEPRECATED: These hardcoded model arrays are no longer used
+ * All models are now loaded from the database via /api/models endpoint
+ * Kept here only for reference - can be safely deleted in future
+ */
+
+/* DEPRECATED - No longer used
 const modelPrompts = [
   // زنان (35 ساله)
   {
@@ -1762,8 +1769,9 @@ const modelPrompts = [
     prompt: 'IMPORTANT: Create a TEENAGE BOY (age 13-15 years old) - NOT an adult man. A professional fashion portrait of a young teenage boy exactly 13-15 years old with YOUTHFUL TEENAGE FEATURES: rounder face, softer young features, teenage body proportions, innocent boyish expression, age-appropriate appearance. He must clearly look like a young teenager, NOT an adult. Modern casual style, friendly appearance, standing in neutral pose facing camera, full body shot, white studio background, professional studio lighting, high resolution, photorealistic, suitable for virtual try-on. The face and body must match the age range 13-15 years old.'
   }
 ];
+*/
 
-// لیست مدل‌های پیش‌فرض (fallback) - تا زمانی که مدل‌های AI تولید شوند
+/* DEPRECATED - No longer used
 const fallbackModels = [
   // زنان
   { id: 'woman-1', name: 'مدل ۱', category: 'woman', categoryName: 'زن', description: 'زن 35 ساله', image: 'https://trrjixlshamhuhlcevtx.supabase.co/storage/v1/object/public/admin-content/40.jpeg?w=400&h=600&fit=crop' },
@@ -1793,8 +1801,9 @@ const fallbackModels = [
   { id: 'boy-4', name: 'مدل ۴', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1542178243-bc20204b769f?w=400&h=600&fit=crop' },
   { id: 'boy-5', name: 'مدل ۵', category: 'boy', categoryName: 'پسر', description: 'پسر 13-15 ساله', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop' }
 ];
+*/
 
-// Accessory models (hand/arm models for accessory photography)
+/* DEPRECATED - No longer used
 const accessoryModels = [
   // Female hand/arm models
   { id: 'hand-woman-1', name: 'دست زن ۱', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و بازوی زن برای عکاسی اکسسوری', image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400&h=600&fit=crop' },
@@ -1810,9 +1819,11 @@ const accessoryModels = [
   { id: 'hand-man-4', name: 'دست مرد ۴', category: 'accessory', categoryName: 'اکسسوری', description: 'دست مرد با پوست روشن', image: 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=400&h=600&fit=crop' },
   { id: 'hand-man-5', name: 'دست مرد ۵', category: 'accessory', categoryName: 'اکسسوری', description: 'دست و بازوی مرد قوی', image: 'https://images.unsplash.com/photo-1594576722512-582bcd46fba4?w=400&h=600&fit=crop' }
 ];
+*/
 
-// لیست مدل‌ها با URL‌های تولید شده (در ابتدا از fallback استفاده می‌شود)
-let models = [...fallbackModels];
+// لیست مدل‌ها با URL‌های تولید شده
+// Models are now loaded from database via /api/models endpoint
+let models = [];
 
 // لیست پس‌زمینه‌ها - 20 موقعیت واقعی و متنوع
 const backgrounds = [
@@ -3242,9 +3253,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     }
 
     // Find model (check hardcoded first, then custom from database)
-    // Search in both regular models and accessory models
+    // Find the selected model from models loaded from database
     let selectedModel = modelId ?
-      (models.find(m => m.id === modelId) || accessoryModels.find(m => m.id === modelId))
+      models.find(m => m.id === modelId)
       : null;
 
     // If not found in hardcoded models and ID starts with 'custom-', fetch from database
@@ -3270,7 +3281,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     // Find model 2 if provided (for 2-model mode)
     let selectedModel2 = null;
     if (modelId2) {
-      selectedModel2 = models.find(m => m.id === modelId2) || accessoryModels.find(m => m.id === modelId2);
+      selectedModel2 = models.find(m => m.id === modelId2);
 
       // If not found in hardcoded models and ID starts with 'custom-', fetch from database
       if (!selectedModel2 && modelId2.startsWith('custom-') && supabase) {
