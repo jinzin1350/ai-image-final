@@ -2142,12 +2142,14 @@ if (generateBtn) {
             }
 
         } else if (currentMode === 'accessories-only') {
-            // Accessories mode - accessory product photography
+            // Accessories mode - accessory product photography with brand reference style
             requestBody.accessoryPath = uploadedAccessoryPath;
-            requestBody.accessoryType = selectedAccessoryType;
             requestBody.modelId = selectedModelId;
-            requestBody.backgroundId = selectedBackgroundId;
-            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+
+            // Send brand reference photo data (similar to scene-recreation)
+            if (window.selectedBrandReferencePhoto) {
+                requestBody.brandReferencePhotoId = window.selectedBrandReferencePhoto.id;
+            }
 
         } else if (currentMode === 'color-collection') {
             // Color Collection mode - multiple color variants display
