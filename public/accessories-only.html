@@ -16,16 +16,6 @@
     <title>عکاسی اکسسوری محصول - هوش مصنوعی</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Category Button Styles */
-        .category-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .category-btn:active {
-            transform: translateY(0);
-        }
-
         /* Brand Selection Section Styles */
         .brand-selection-container {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
@@ -427,20 +417,15 @@
                     مدل‌های مختلف برای زن، مرد، پسر و دختر در دسترس است.
                 </div>
 
-                <!-- Model Category Selection -->
-                <div style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-                    <button onclick="selectModelCategory('brand-woman')" id="categoryBtnWoman" class="category-btn active" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                        👗 زن برند
-                    </button>
-                    <button onclick="selectModelCategory('brand-man')" id="categoryBtnMan" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                        👔 مرد برند
-                    </button>
-                    <button onclick="selectModelCategory('brand-boy')" id="categoryBtnBoy" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                        👦 پسر برند
-                    </button>
-                    <button onclick="selectModelCategory('brand-girl')" id="categoryBtnGirl" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                        👧 دختر برند
-                    </button>
+                <!-- Model Category Dropdown -->
+                <div class="param-group" style="margin-bottom: 20px;">
+                    <label for="modelCategorySelect">👥 دسته‌بندی مدل</label>
+                    <select id="modelCategorySelect" class="param-dropdown" onchange="selectModelCategory(this.value)">
+                        <option value="brand-woman">👗 زن برند</option>
+                        <option value="brand-man">👔 مرد برند</option>
+                        <option value="brand-boy">👦 پسر برند</option>
+                        <option value="brand-girl">👧 دختر برند</option>
+                    </select>
                 </div>
 
                 <div class="models-grid" id="modelsGrid">
@@ -448,20 +433,9 @@
                 </div>
             </section>
 
-            <!-- بخش انتخاب پس‌زمینه -->
-            <section class="selection-section" id="backgroundSection">
-                <h2>۴. انتخاب پس‌زمینه</h2>
-                <div class="section-hint">
-                    💡 <strong>پس‌زمینه‌ای که می‌خواهید اکسسوری در آن نمایش داده شود را انتخاب کنید.</strong>
-                </div>
-                <div class="backgrounds-grid" id="backgroundsGrid">
-                    <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
-                </div>
-            </section>
-
             <!-- دکمه تولید -->
             <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
-                💡 <strong>پس از انتخاب اکسسوری، نوع آن، مدل و پس‌زمینه، روی دکمه زیر کلیک کنید.</strong><br>
+                💡 <strong>پس از انتخاب اکسسوری و مدل، روی دکمه زیر کلیک کنید.</strong><br>
                 تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
             </div>
             <button class="generate-btn" id="generateBtn" disabled>
@@ -519,28 +493,6 @@
             window.currentCategory = category;
 
             console.log('🔄 Model category changed to:', category);
-
-            // Update button styles
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.style.border = '3px solid #e5e7eb';
-                btn.style.background = 'white';
-                btn.style.color = '#374151';
-            });
-
-            // Map category to button ID
-            const categoryToBtn = {
-                'brand-woman': 'categoryBtnWoman',
-                'brand-man': 'categoryBtnMan',
-                'brand-boy': 'categoryBtnBoy',
-                'brand-girl': 'categoryBtnGirl'
-            };
-
-            const activeBtn = document.getElementById(categoryToBtn[category]);
-            if (activeBtn) {
-                activeBtn.style.border = '3px solid #667eea';
-                activeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                activeBtn.style.color = 'white';
-            }
 
             // Reload models with new category
             if (typeof displayModelsByCategory === 'function') {
