@@ -3414,16 +3414,17 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     } else if (mode === 'accessories-only') {
       // For accessories mode, load ONLY accessory product image (not model image)
-      // AI will generate the scene naturally from text prompt
+      // Similar to scene-recreation, uses brand reference photo environment
       garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
-      modelBase64 = null; // NEW: Don't send model image - let AI generate naturally
+      modelBase64 = null; // Don't send model image - let AI generate naturally
 
-      garmentDescription = `the ${accessoryType} accessory from the image`;
+      garmentDescription = `the accessory jewelry from the image`;
+      // Use custom location if provided, otherwise use simple studio description
       locationDescription = customLocation && customLocation.trim() !== ''
         ? customLocation.trim()
-        : `${selectedBackground.name} - ${selectedBackground.description}`;
+        : 'professional jewelry photography studio with soft lighting';
 
-      // NEW: Check if this model has custom prompts
+      // Check if this model has custom prompts
       let customPrompt = null;
       if (selectedModel.id.startsWith('custom-') && supabase) {
         const modelDbId = selectedModel.id.replace('custom-', '');
