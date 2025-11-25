@@ -3323,12 +3323,13 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       }
     }
 
-    // Fetch brand reference photo AI analysis for accessories-only and flat-lay modes
+    // Fetch brand reference photo AI analysis AND image for accessories-only and flat-lay modes
     let brandReferenceAnalysis = null;
+    let brandReferencePhotoUrl = null;
     if ((mode === 'accessories-only' || mode === 'flat-lay') && brandReferencePhotoId && supabase) {
       const { data: brandPhoto, error: photoError } = await supabase
         .from('brand_reference_photos')
-        .select('ai_analysis')
+        .select('ai_analysis, image_url')
         .eq('id', brandReferencePhotoId)
         .single();
 
@@ -3337,12 +3338,13 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'عکس مرجع برند یافت نشد' });
       }
 
-      if (!brandPhoto || !brandPhoto.ai_analysis) {
-        return res.status(400).json({ error: 'تحلیل هوش مصنوعی برای عکس مرجع برند یافت نشد' });
+      if (!brandPhoto || !brandPhoto.ai_analysis || !brandPhoto.image_url) {
+        return res.status(400).json({ error: 'تحلیل هوش مصنوعی یا تصویر برای عکس مرجع برند یافت نشد' });
       }
 
       brandReferenceAnalysis = brandPhoto.ai_analysis;
-      console.log(`✅ Loaded brand reference photo AI analysis for ${mode} mode`);
+      brandReferencePhotoUrl = brandPhoto.image_url;
+      console.log(`✅ Loaded brand reference photo AI analysis and image for ${mode} mode`);
     }
 
     const selectedPose = poses.find(p => p.id === poseId) || poses[0];
@@ -3433,13 +3435,17 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'accessories-only') {
-      // For accessories mode, load BOTH model image AND accessory product image
-      // Similar to scene-recreation: Model photo + Product photo + Brand reference AI analysis
+      // For accessories mode, load model, accessory, AND brand reference photo
+      // Similar to scene-recreation: Model photo + Product photo + Brand reference photo
       modelBase64 = await imageUrlToBase64(selectedModel.image);
       garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
+      const brandReferencePhotoBase64 = await imageUrlToBase64(brandReferencePhotoUrl);
+
+      // Store for contentParts later
+      selectedModel.brandReferencePhotoBase64 = brandReferencePhotoBase64;
 
       garmentDescription = `the accessory jewelry from the image`;
-      // No locationDescription needed - using brand reference AI analysis
+      // No locationDescription needed - using brand reference photo
 
       // Check if this model has custom prompts
       let customPrompt = null;
@@ -3486,14 +3492,19 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'flat-lay') {
-      // For flat lay mode, load ALL product images (no model needed)
+      // For flat lay mode, load ALL product images AND brand reference photo
       garmentBase64Array = await Promise.all(
         flatLayProducts.map(path => imageUrlToBase64(path))
       );
       modelBase64 = null; // No model needed for flat lay photography
+      const brandReferencePhotoBase64 = await imageUrlToBase64(brandReferencePhotoUrl);
+
+      // Store for contentParts later
+      if (!selectedModel) selectedModel = {}; // Create object if doesn't exist
+      selectedModel.brandReferencePhotoBase64 = brandReferencePhotoBase64;
 
       garmentDescription = `${flatLayProducts.length} product(s) for flat lay arrangement`;
-      // No locationDescription needed - using brand reference AI analysis
+      // No locationDescription needed - using brand reference photo
 
     } else if (mode === 'scene-recreation') {
       // For scene recreation mode, load reference photo (either brand URL or uploaded path), garment, and model
@@ -3786,21 +3797,23 @@ Make it simple and natural - like this person is actually wearing these clothes 
 IMAGES PROVIDED (IN ORDER):
 - Image 1: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)
 - Image 2: ACCESSORY/JEWELRY - The product to wear/display
+- Image 3: BRAND REFERENCE PHOTO - Study this for style inspiration (do NOT copy the person)
 
 ⚠️ CRITICAL APPROACH:
 
-**PRIMARY GOAL: Photograph the MODEL from the model image**
+**PRIMARY GOAL: Photograph the MODEL from Image 1**
 - The person in the final photo MUST be the MODEL from Image 1
 - Use their EXACT face, facial features, body type, skin tone, and hair
 - This is the most important requirement - the MODEL must be recognizable as the person from Image 1
 
-**SECONDARY GOAL: Create a SIMILAR style inspired by the brand reference**
-- The brand reference photo has been analyzed by AI (see analysis below)
+**SECONDARY GOAL: Create EXACT same style as the brand reference (Image 3)**
+- Study Image 3 (brand reference photo) carefully
 - Copy the general TYPE of location (e.g., if it's studio, shoot in studio; if outdoor, shoot outdoor)
-- Match the STYLE of lighting (e.g., soft lighting, dramatic, natural light)
-- Recreate the MOOD and atmosphere (e.g., elegant, casual, professional)
-- Use a SIMILAR pose and hand/body positioning for the accessory
-- Match the general composition style and camera angle
+- Match the EXACT STYLE of lighting (e.g., soft lighting, dramatic, natural light)
+- Recreate the EXACT MOOD and atmosphere (e.g., elegant, casual, professional)
+- Use the EXACT same pose and hand/body positioning for the accessory
+- Match the EXACT composition style and camera angle
+- The AI analysis below provides additional details about Image 3
 
 **What to copy from brand reference analysis:**
 ✅ **EXACT FRAMING** (MOST CRITICAL - if only hand visible, show ONLY hand; if only neck, show ONLY neck)
@@ -4126,11 +4139,12 @@ Generate a professional e-commerce product photo perfect for showcasing the comp
 
 IMAGES PROVIDED:
 ${flatLayProducts.map((_, index) => `- Image ${index + 1}: Product ${index + 1} to photograph`).join('\n')}
+- Image ${flatLayProducts.length + 1}: BRAND REFERENCE PHOTO - Study this carefully for style inspiration
 
 ⚠️ CRITICAL APPROACH:
 
-**STEP 1: Study the brand reference analysis below**
-The brand reference photo has been analyzed by AI. Read it carefully to understand:
+**STEP 1: Study Image ${flatLayProducts.length + 1} (brand reference photo) carefully**
+Look at the actual brand reference photo (Image ${flatLayProducts.length + 1}) and observe:
 - How products are arranged (grid, scattered, circle, diagonal, etc.)
 - Camera angle (overhead 90° or slightly angled)
 - Background surface type (marble, wood, fabric, plain white, etc.)
@@ -4760,8 +4774,7 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
 
     } else if (mode === 'accessories-only') {
       // Accessories mode: Similar to scene-recreation
-      // Send MODEL first (most important), then ACCESSORY
-      // Use brand reference photo AI analysis for style guidance
+      // Send MODEL first (most important), then ACCESSORY, then BRAND REFERENCE
       contentParts.push({ text: "⭐ MODEL IMAGE - This is the person to photograph (use their EXACT face and body):" });
       contentParts.push({
         inlineData: {
@@ -4774,6 +4787,14 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
       contentParts.push({
         inlineData: {
           data: garmentBase64Array[0],
+          mimeType: 'image/jpeg'
+        }
+      });
+
+      contentParts.push({ text: `BRAND REFERENCE PHOTO - Study this for style, lighting, framing, and mood (do NOT copy the person):` });
+      contentParts.push({
+        inlineData: {
+          data: selectedModel.brandReferencePhotoBase64,
           mimeType: 'image/jpeg'
         }
       });
@@ -4811,7 +4832,7 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
       // NOTE: No model image needed - AI generates the display scenario naturally
 
     } else if (mode === 'flat-lay') {
-      // Flat Lay mode: Load ALL product images
+      // Flat Lay mode: Load ALL product images, then BRAND REFERENCE
       garmentBase64Array.forEach((productBase64, index) => {
         contentParts.push({ text: `PRODUCT ${index + 1} IMAGE:` });
         contentParts.push({
@@ -4822,7 +4843,13 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
         });
       });
 
-      // NOTE: No model needed - AI generates overhead flat lay composition naturally
+      contentParts.push({ text: `BRAND REFERENCE PHOTO - Study this for arrangement, camera angle, background, lighting, and mood:` });
+      contentParts.push({
+        inlineData: {
+          data: selectedModel.brandReferencePhotoBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
 
     } else if (mode === 'scene-recreation') {
       // Scene Recreation mode: MODEL(S) FIRST (most important), then garments, then reference
