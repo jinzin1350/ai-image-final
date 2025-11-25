@@ -1701,10 +1701,10 @@ function checkGenerateButton() {
                   selectedBackgroundId;
 
     } else if (currentMode === 'flat-lay') {
-        // Flat Lay mode: need at least 1 product, arrangement, and background
+        // Flat Lay mode: need at least 1 product and brand reference photo
+        const hasReferencePhoto = window.selectedBrandReferencePhoto !== null && window.selectedBrandReferencePhoto !== undefined;
         isValid = uploadedFlatLayProducts.length >= 1 &&
-                  selectedArrangement !== null &&
-                  selectedBackgroundId;
+                  hasReferencePhoto;
 
     } else if (currentMode === 'scene-recreation') {
         // Scene Recreation mode: need brand reference photo, garment, model, and hijab
