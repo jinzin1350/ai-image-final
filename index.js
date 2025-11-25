@@ -3352,8 +3352,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       if (!selectedBackground) {
         return res.status(400).json({ error: 'پس‌زمینه نامعتبر است' });
       }
-    } else if (mode === 'scene-recreation') {
-      // Scene recreation needs model but not background (uses reference photo environment)
+    } else if (mode === 'scene-recreation' || mode === 'accessories-only') {
+      // Scene recreation and accessories-only need model but not background (uses reference photo environment)
       if (!selectedModel) {
         return res.status(400).json({ error: 'مدل نامعتبر است' });
       }
