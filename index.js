@@ -3439,6 +3439,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
 
       garmentDescription = `the accessory jewelry from the image`;
+      // No locationDescription needed - using brand reference AI analysis
 
       // Check if this model has custom prompts
       let customPrompt = null;
@@ -3492,9 +3493,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       modelBase64 = null; // No model needed for flat lay photography
 
       garmentDescription = `${flatLayProducts.length} product(s) for flat lay arrangement`;
-      locationDescription = customLocation && customLocation.trim() !== ''
-        ? customLocation.trim()
-        : `${selectedBackground.name} - ${selectedBackground.description}`;
+      // No locationDescription needed - using brand reference AI analysis
 
     } else if (mode === 'scene-recreation') {
       // For scene recreation mode, load reference photo (either brand URL or uploaded path), garment, and model
