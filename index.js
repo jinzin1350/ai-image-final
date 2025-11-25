@@ -2274,11 +2274,12 @@ app.get('/api/backgrounds', async (req, res) => {
 
     // Select appropriate background list based on mode
     let baseBackgrounds;
-    if (mode === 'color-collection' || mode === 'flat-lay') {
-      baseBackgrounds = [...productBackgrounds]; // Product photography backgrounds
-    } else if (mode === 'accessories-only') {
-      // For accessories, only show studio backgrounds (not location backgrounds)
-      baseBackgrounds = backgrounds.filter(bg => bg.id.startsWith('studio-'));
+    if (mode === 'flat-lay' || mode === 'accessories-only') {
+      // These modes use brand reference photos, no background selection needed
+      baseBackgrounds = [];
+    } else if (mode === 'color-collection') {
+      // Color collection still uses backgrounds
+      baseBackgrounds = [...productBackgrounds];
     } else {
       baseBackgrounds = [...backgrounds]; // Regular location backgrounds
     }
