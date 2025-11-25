@@ -3164,8 +3164,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
       }
     } else if (mode === 'accessories-only') {
-      if (!accessoryPath || !accessoryType || !modelId || !backgroundId) {
-        return res.status(400).json({ error: 'لطفاً تصویر اکسسوری، نوع آن، مدل و پس‌زمینه را انتخاب کنید' });
+      if (!accessoryPath || !modelId) {
+        return res.status(400).json({ error: 'لطفاً تصویر اکسسوری و مدل را انتخاب کنید' });
       }
     } else if (mode === 'underwear') {
       if (!underwearPath || !underwearType || !modelId || !backgroundId) {
