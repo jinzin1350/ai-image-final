@@ -4122,138 +4122,94 @@ Generate a professional e-commerce product photo perfect for showcasing the comp
     } else if (mode === 'flat-lay') {
       // FLAT LAY MODE: Overhead product photography INSPIRED BY Brand Reference Photo
 
-      prompt = `Create a professional flat lay product photography image INSPIRED BY the style, lighting, arrangement, and mood of the brand reference photo.
+      prompt = `Create a professional flat lay product photography image showing the products, INSPIRED BY the brand reference photo's style.
 
 IMAGES PROVIDED:
-${flatLayProducts.map((_, index) => `- Image ${index + 1}: Product ${index + 1}`).join('\n')}
-
-TOTAL: ${flatLayProducts.length} product(s)
+${flatLayProducts.map((_, index) => `- Image ${index + 1}: Product ${index + 1} to photograph`).join('\n')}
 
 ⚠️ CRITICAL APPROACH:
 
-**PRIMARY GOAL: Use the EXACT products from the images**
-- The products in the final photo MUST be the products from the provided images
-- Use EXACT product details, colors, and features from each image
-- This is the most important requirement - products must match the images exactly
+**STEP 1: Study the brand reference analysis below**
+The brand reference photo has been analyzed by AI. Read it carefully to understand:
+- How products are arranged (grid, scattered, circle, diagonal, etc.)
+- Camera angle (overhead 90° or slightly angled)
+- Background surface type (marble, wood, fabric, plain white, etc.)
+- Lighting style (soft natural, bright studio, dramatic shadows, etc.)
+- Spacing between products (tight/dense or spacious/minimal)
+- Overall mood (minimalist, abundant, editorial, lifestyle, etc.)
 
-**SECONDARY GOAL: Create a SIMILAR flat lay style inspired by the brand reference**
-- The brand reference photo has been analyzed by AI (see analysis below)
-- Copy the general ARRANGEMENT TYPE (grid, scattered, circular, diagonal, etc.)
-- Match the STYLE of composition and product placement
-- Recreate the MOOD and atmosphere (minimalist, abundant, artistic, etc.)
-- Use a SIMILAR camera angle (directly overhead vs slightly angled)
-- Match the general spacing and density of products
-- Copy the lighting style and background type
-
-**What to copy from brand reference analysis:**
-✅ **EXACT ARRANGEMENT PATTERN** (how products are positioned - grid, circle, scattered, etc.)
-✅ **EXACT SPACING** (tight/dense vs spacious/minimal)
-✅ **CAMERA ANGLE** (perfectly overhead 90° vs slightly angled)
-✅ Number of products visible (if reference shows 3 products, show your 3 products similarly)
-✅ Background type (marble, wood, fabric, plain color, etc.)
-✅ Lighting style (soft/dramatic, natural/studio)
-✅ Mood and atmosphere (minimal, editorial, lifestyle, catalog)
-✅ Product orientation (all straight vs rotated angles)
-✅ Color palette and overall vibe
-
-**What NOT to copy from brand reference:**
-❌ The exact specific products (use YOUR products, not theirs)
-❌ Every tiny detail of the background texture
-❌ Brand logos or text from the reference
-
-⚠️ **CRITICAL FRAMING AND ARRANGEMENT RULE:**
-The final photo's arrangement pattern and composition MUST MATCH the brand reference photo exactly. If brand reference arranges products in a circle, arrange YOUR products in a circle. If brand reference has scattered random placement, use scattered random placement for YOUR products. The arrangement is NOT optional - it must match perfectly.
-
-TASK DESCRIPTION:
-Create a NEW professional flat lay photo showing the PRODUCTS from the provided images, arranged and photographed in the same style and composition as the brand reference. The key is: SAME PRODUCTS + SAME ARRANGEMENT STYLE + SIMILAR BACKGROUND/LIGHTING.
+**STEP 2: Photograph YOUR products using that EXACT style**
+- Take the products from Images 1-${flatLayProducts.length}
+- Arrange them EXACTLY like the brand reference (same pattern, same spacing)
+- Use EXACTLY the same camera angle as the reference
+- Use a SIMILAR background surface type
+- Use SIMILAR lighting style
+- Create the SAME mood and atmosphere
 
 AI ANALYSIS OF BRAND REFERENCE PHOTO:
 ${brandReferenceAnalysis}
 
-CAMERA PERSPECTIVE:
-- Match the camera angle from the brand reference (usually perfectly overhead 90° for flat lay)
-- Camera parallel to or slightly angled to the flat surface
-- Products laid flat on the surface below
-- Professional top-down product photography
+CRITICAL REQUIREMENTS:
+
+1. **Product Accuracy (MOST CRITICAL)**:
+   - Use the EXACT products from Images 1-${flatLayProducts.length}
+   - Keep EXACT colors, designs, textures, and details
+   - Show ALL product features: logos, labels, stitching, hardware
+   - Do NOT substitute with different products
+   - Do NOT simplify or blur product details
+
+2. **Arrangement Pattern (MUST MATCH EXACTLY)**:
+   - Copy the EXACT arrangement from brand reference:
+     * If reference = grid → arrange YOUR products in same grid pattern
+     * If reference = scattered → scatter YOUR products similarly
+     * If reference = circle → arrange YOUR products in circle
+     * If reference = diagonal line → arrange YOUR products diagonally
+   - Match the EXACT spacing (if reference has 10cm gaps, use ~10cm gaps)
+   - Match the EXACT density (if reference is minimal/spacious, be minimal/spacious)
+
+3. **Camera Angle (MUST MATCH EXACTLY)**:
+   - If reference = perfectly overhead 90° → shoot perfectly overhead
+   - If reference = slightly angled → use similar angle
+   - Products should lay flat on the surface (not standing up)
+
+4. **Background & Surface**:
+   - If reference uses white marble → use white marble-like surface
+   - If reference uses wood → use wood-like surface
+   - If reference uses plain white → use plain white surface
+   - If reference uses fabric/textile → use similar fabric surface
+   - Match the surface texture and color tone
+
+5. **Lighting (MUST MATCH STYLE)**:
+   - If reference = soft natural light → use soft natural lighting
+   - If reference = bright studio → use bright even studio lighting
+   - If reference = dramatic shadows → create dramatic shadows
+   - Match shadow intensity and direction
+
+6. **Mood & Atmosphere**:
+   - If reference = minimalist clean → create minimalist clean look
+   - If reference = abundant/full → show abundance
+   - If reference = editorial artistic → create artistic composition
+   - Match the overall feeling and vibe
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
-- Aspect Ratio: ${selectedAspectRatio.description}
-
-KEY REQUIREMENTS:
-1. **Use the EXACT Products (MOST IMPORTANT)**:
-   - The products in the final photo MUST be from the provided images
-   - Use their EXACT colors, designs, and features
-   - Do NOT substitute with different products
-
-2. **Match the Arrangement Pattern**:
-   - If reference arranges in grid → arrange YOUR products in grid
-   - If reference scatters randomly → scatter YOUR products randomly
-   - If reference arranges in circle → arrange YOUR products in circle
-   - If reference has diagonal line → arrange YOUR products in diagonal line
-   - Match the spacing (tight vs spacious) from reference
-
-3. **Match Camera Angle and Framing**:
-   - If reference is perfectly overhead (90°) → shoot perfectly overhead
-   - If reference is slightly angled → use similar angle
-   - Match how much of the surface/background is visible
-
-4. **Product Details (CRITICAL)**:
-   - Preserve ALL product details: textures, materials, colors, patterns
-   - Show exact product features: logos, stitching, hardware, labels
-   - Maintain accurate colors and textures
-   - Render realistic shadows beneath each product
-   - Display any text, branding clearly
-   - Natural material appearance (leather, fabric, metal, etc.)
-   - Show product construction details crisply
-
-5. **Photographic Quality**:
-   - Clean, sharp focus on all products throughout
-   - Even, consistent lighting matching reference style
-   - Professional flat lay composition
-   - Suitable for e-commerce/editorial use
+- Sharp focus on all products
+- Natural realistic shadows under products
+- Professional e-commerce quality
 
 DO NOT:
-- ❌ CRITICAL: DO NOT use different products - use the EXACT products from provided images
-- ❌ CRITICAL: DO NOT change the arrangement pattern from brand reference
-- ❌ CRITICAL: DO NOT change spacing/density if reference is minimal/spacious
-- Change the camera angle style from reference
-- Alter the lighting mood from reference
-- Use a different background type than reference (if ref uses marble, use marble-like)
-- Tilt the camera if reference is perfectly overhead
-- Make products stand up if they should lay flat
-- Create unrealistic shadows or lighting
-- Over-smooth or lose product details
-- Add text, watermarks, or graphics not on original products
-- Make products look fake or digitally pasted
+- ❌ Use different products (MUST use products from Images 1-${flatLayProducts.length})
+- ❌ Change arrangement pattern (MUST match reference exactly)
+- ❌ Change spacing/density (MUST match reference)
+- ❌ Change camera angle (MUST match reference)
+- ❌ Use wrong background type (MUST match reference style)
+- ❌ Change lighting mood (MUST match reference)
+- ❌ Make products stand up if they should be flat
+- ❌ Simplify or blur product details
+- ❌ Add text/watermarks not on original products
+- ❌ Make products look fake or pasted
 
-EXAMPLE TO CLARIFY THE APPROACH:
-IMAGES PROVIDED:
-- Image 1: A red leather wallet
-- Image 2: A blue phone case
-- Image 3: A silver keychain
-
-BRAND REFERENCE ANALYSIS SAYS:
-"Three products arranged in perfect triangle formation on white marble surface, overhead 90° angle, minimalist spacing with 15cm between products, soft natural lighting, clean modern aesthetic"
-
-CORRECT OUTPUT:
-✅ The red wallet, blue phone case, and silver keychain from the images
-✅ Arranged in triangle formation (matching reference pattern)
-✅ On white marble-like surface (matching reference)
-✅ Overhead 90° angle (matching reference)
-✅ Minimalist spacing ~15cm apart (matching reference density)
-✅ Soft natural lighting (matching reference)
-✅ Clean modern look (matching reference mood)
-
-WRONG OUTPUTS:
-❌ Different products than provided in images
-❌ Arranged in a line (reference was triangle)
-❌ Tight clustered spacing (reference was spacious/minimal)
-❌ On wood background (reference was marble)
-❌ Angled camera (reference was straight overhead)
-❌ Dramatic shadows (reference was soft natural)
-
-Generate a professional flat lay photograph that showcases the PRODUCTS from the provided images, arranged in the inspiring compositional style learned from the brand reference analysis.`;
+Generate a photorealistic professional flat lay that looks EXACTLY like it was shot for the same brand as the reference photo - same arrangement, same angle, same lighting, same mood - but featuring YOUR products from the provided images.`;
 
       /* OLD CODE - keeping variations for potential future use
       const flatLayVariations = {
