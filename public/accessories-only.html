@@ -16,6 +16,16 @@
     <title>عکاسی اکسسوری محصول - هوش مصنوعی</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Category Button Styles */
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-btn:active {
+            transform: translateY(0);
+        }
+
         /* Brand Selection Section Styles */
         .brand-selection-container {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
@@ -407,43 +417,30 @@
                 <button onclick="document.getElementById('accessoryInput').click()" class="upload-from-computer-btn">
                     📤 انتخاب فایل از کامپیوتر
                 </button>
-
-                <!-- نوع اکسسوری -->
-                <div class="param-group" style="margin-top: 20px;">
-                    <label for="accessoryType">🏷️ نوع اکسسوری</label>
-                    <select id="accessoryType" class="param-dropdown">
-                        <option value="">انتخاب کنید...</option>
-                        <option value="ring">انگشتر</option>
-                        <option value="earrings">گوشواره</option>
-                        <option value="bracelet">دستبند</option>
-                        <option value="necklace">گردنبند</option>
-                        <option value="anklet">پابند</option>
-                        <option value="watch">ساعت</option>
-                    </select>
-                    <p style="font-size: 12px; color: #666; margin-top: 8px;">
-                        💡 انتخاب نوع اکسسوری به هوش مصنوعی کمک می‌کند تا بهتر آن را روی مدل قرار دهد
-                    </p>
-                </div>
-
-                <!-- جنسیت مدل -->
-                <div class="param-group" style="margin-top: 20px;">
-                    <label for="modelGender">👤 جنسیت مدل</label>
-                    <select id="modelGender" class="param-dropdown">
-                        <option value="woman">زن</option>
-                        <option value="man">مرد</option>
-                    </select>
-                    <p style="font-size: 12px; color: #666; margin-top: 8px;">
-                        💡 انتخاب کنید که اکسسوری روی مدل زن یا مرد نمایش داده شود
-                    </p>
-                </div>
             </section>
 
             <!-- بخش انتخاب مدل -->
             <section class="selection-section" id="modelSection">
                 <h2>۳. انتخاب مدل دست/بدن</h2>
                 <div class="section-hint">
-                    💡 <strong>مدل مناسب برای نمایش اکسسوری را انتخاب کنید.</strong><br>
-                    روی مدل مورد نظر کلیک کنید تا انتخاب شود. مدل‌ها بر اساس نوع اکسسوری شما مناسب هستند.
+                    💡 <strong>ابتدا دسته‌بندی مدل را انتخاب کنید، سپس مدل مورد نظر را انتخاب کنید.</strong><br>
+                    مدل‌های مختلف برای زن، مرد، پسر و دختر در دسترس است.
+                </div>
+
+                <!-- Model Category Selection -->
+                <div style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                    <button onclick="selectModelCategory('woman-brand')" id="categoryBtnWoman" class="category-btn active" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        👗 زن برند
+                    </button>
+                    <button onclick="selectModelCategory('man-brand')" id="categoryBtnMan" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        👔 مرد برند
+                    </button>
+                    <button onclick="selectModelCategory('boy-brand')" id="categoryBtnBoy" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        👦 پسر برند
+                    </button>
+                    <button onclick="selectModelCategory('girl-brand')" id="categoryBtnGirl" class="category-btn" style="flex: 1; min-width: 140px; padding: 15px 25px; border: 3px solid #e5e7eb; background: white; color: #374151; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        👧 دختر برند
+                    </button>
                 </div>
 
                 <div class="models-grid" id="modelsGrid">
@@ -514,33 +511,46 @@
         // Set the current mode for this page
         window.currentMode = 'accessories-only';
 
-        // Add event listener for model gender change
+        // Set default category
+        window.currentCategory = 'woman-brand';
+
+        // Select model category
+        function selectModelCategory(category) {
+            window.currentCategory = category;
+
+            console.log('🔄 Model category changed to:', category);
+
+            // Update button styles
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.style.border = '3px solid #e5e7eb';
+                btn.style.background = 'white';
+                btn.style.color = '#374151';
+            });
+
+            const activeBtn = document.getElementById('categoryBtn' + category.split('-')[0].charAt(0).toUpperCase() + category.split('-')[0].slice(1));
+            if (activeBtn) {
+                activeBtn.style.border = '3px solid #667eea';
+                activeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                activeBtn.style.color = 'white';
+            }
+
+            // Reload models with new category
+            if (typeof displayModelsByCategory === 'function') {
+                displayModelsByCategory(category);
+            }
+
+            // Reset model selection
+            window.selectedModelId = null;
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const modelGenderSelect = document.getElementById('modelGender');
-            if (modelGenderSelect) {
-                modelGenderSelect.addEventListener('change', function() {
-                    const selectedGender = this.value; // 'woman' or 'man'
-
-                    // Update category based on gender
-                    if (selectedGender === 'man') {
-                        window.currentCategory = 'accessory-man';
-                    } else {
-                        window.currentCategory = 'accessory'; // default is woman
-                    }
-
-                    console.log('🔄 Model gender changed to:', selectedGender, '| Category:', window.currentCategory);
-
-                    // Reload models with new category
-                    if (typeof displayModelsByCategory === 'function') {
-                        displayModelsByCategory(window.currentCategory);
-                    }
-
-                    // Reset model selection
-                    window.selectedModelId = null;
-                    document.querySelectorAll('.model-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                });
+            // Load default category (woman-brand)
+            if (typeof displayModelsByCategory === 'function') {
+                displayModelsByCategory('woman-brand');
             }
         });
 
