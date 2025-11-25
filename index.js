@@ -3325,7 +3325,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // Fetch brand reference photo AI analysis AND image for accessories-only and flat-lay modes
     let brandReferenceAnalysis = null;
-    let brandReferencePhotoUrl = null;
+    let brandPhotoImageUrl = null;
     if ((mode === 'accessories-only' || mode === 'flat-lay') && brandReferencePhotoId && supabase) {
       const { data: brandPhoto, error: photoError } = await supabase
         .from('brand_reference_photos')
@@ -3343,7 +3343,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       }
 
       brandReferenceAnalysis = brandPhoto.ai_analysis;
-      brandReferencePhotoUrl = brandPhoto.image_url;
+      brandPhotoImageUrl = brandPhoto.image_url;
       console.log(`✅ Loaded brand reference photo AI analysis and image for ${mode} mode`);
     }
 
@@ -3439,7 +3439,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       // Similar to scene-recreation: Model photo + Product photo + Brand reference photo
       modelBase64 = await imageUrlToBase64(selectedModel.image);
       garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
-      const brandReferencePhotoBase64 = await imageUrlToBase64(brandReferencePhotoUrl);
+      const brandReferencePhotoBase64 = await imageUrlToBase64(brandPhotoImageUrl);
 
       // Store for contentParts later
       selectedModel.brandReferencePhotoBase64 = brandReferencePhotoBase64;
@@ -3497,7 +3497,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         flatLayProducts.map(path => imageUrlToBase64(path))
       );
       modelBase64 = null; // No model needed for flat lay photography
-      const brandReferencePhotoBase64 = await imageUrlToBase64(brandReferencePhotoUrl);
+      const brandReferencePhotoBase64 = await imageUrlToBase64(brandPhotoImageUrl);
 
       // Store for contentParts later
       if (!selectedModel) selectedModel = {}; // Create object if doesn't exist
