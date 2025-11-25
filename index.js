@@ -3806,17 +3806,23 @@ IMAGES PROVIDED (IN ORDER):
 - Match the general composition style and camera angle
 
 **What to copy from brand reference analysis:**
+✅ **EXACT FRAMING** (MOST CRITICAL - if only hand visible, show ONLY hand; if only neck, show ONLY neck)
+✅ **EXACT CROP** (close-up vs medium vs full body - must match reference exactly)
+✅ **Which body parts are visible** (hand only, hand+wrist, neck+collarbone, ear area, full body, etc.)
 ✅ Type of location (studio/outdoor, minimalist/detailed background)
 ✅ Lighting style (natural/artificial, soft/dramatic)
 ✅ Mood and atmosphere (elegant, modern, classic, bold)
 ✅ General pose and hand/body positioning for accessory display
-✅ Camera angle type (close-up, medium shot, etc.)
+✅ Camera angle type and distance
 ✅ Color palette and overall vibe
 
 **What NOT to copy from brand reference:**
 ❌ The exact specific location (create a similar type of place, not the identical spot)
 ❌ The person's face or identity from the reference
 ❌ Every tiny detail of the background
+
+⚠️ **CRITICAL FRAMING RULE:**
+The final photo's framing (what body parts are visible) MUST EXACTLY MATCH the brand reference photo's framing. If brand reference is a close-up of hand only, DO NOT show the face or body - show ONLY the hand. If brand reference shows full body, show full body. The crop and framing is NOT optional - it must match perfectly.
 
 TASK DESCRIPTION:
 Create a NEW professional product photography photo of the MODEL from Image 1, wearing/displaying the ACCESSORY from Image 2, photographed in a similar style and mood as the brand reference. The key is: SAME MODEL + SAME ACCESSORY + SIMILAR (not identical) SCENE/STYLE.
@@ -3843,11 +3849,16 @@ KEY REQUIREMENTS:
    - If reference has minimalist background → use minimalist background for MODEL
    - Copy the FEEL and VIBE, not the exact pixels
 
-3. **Pose and Composition Guidance**:
-   - If reference has hand/wrist pose for jewelry → position MODEL's hand/wrist in similar pose
-   - Use a similar camera angle and framing style
-   - Match the general composition approach
-   - But the face MUST be the MODEL from Image 1
+3. **Framing and Composition (CRITICAL - EXACT MATCH)**:
+   - ⚠️ MATCH THE EXACT FRAMING from the brand reference photo
+   - If reference shows ONLY hand/wrist → show ONLY the MODEL's hand/wrist (NO face, NO body)
+   - If reference shows ONLY neck/collarbone → show ONLY the MODEL's neck/collarbone (NO face)
+   - If reference shows close-up of ear → show ONLY the MODEL's ear area (NO full face)
+   - If reference shows full body → show the MODEL's full body
+   - If reference shows upper body portrait → show the MODEL's upper body portrait
+   - Copy the EXACT camera distance, angle, and body parts visible in frame
+   - Match the exact crop and framing - don't show more or less of the body than the reference
+   - The face should ONLY be visible if the reference photo shows the face
 
 4. **Accessory Integration**:
    - Display the ACCESSORY/JEWELRY from Image 2 on the MODEL
@@ -3894,21 +3905,25 @@ IMAGE ORDER YOU RECEIVE:
 - Image 2: ACCESSORY - A gold necklace with diamond pendant
 
 BRAND REFERENCE ANALYSIS SAYS:
-"Elegant studio setting with soft natural window light, minimalist white background, model's hand gracefully touching neck area, close-up composition focusing on neck and collarbone, romantic and sophisticated mood"
+"Close-up shot showing only hand and wrist, elegant studio setting with soft natural window light, minimalist white background, graceful hand pose, romantic and sophisticated mood"
 
 CORRECT OUTPUT:
-✅ The woman from Image 1 (her EXACT face, dark hair, olive skin, facial features)
-✅ Wearing the gold diamond necklace from Image 2
+✅ ONLY the MODEL's hand/wrist visible (matching reference framing - NO face, NO full body)
+✅ The woman's hand from Image 1 (her EXACT skin tone and hand from the model)
+✅ Wearing the gold diamond bracelet from Image 2
 ✅ Photographed in AN elegant studio setting with soft lighting (similar to reference style)
-✅ Hand gracefully touching neck area (similar pose to reference)
-✅ Close-up composition on neck/collarbone (similar framing to reference)
+✅ Graceful hand pose (similar pose to reference)
+✅ Close-up composition showing ONLY hand/wrist (EXACT framing match to reference)
 ✅ Romantic sophisticated mood (similar atmosphere to reference)
 
 WRONG OUTPUTS:
-❌ A different person from the brand reference wearing the necklace
+❌ Showing the woman's full body or face (reference only showed hand)
+❌ Showing upper body or portrait (reference only showed hand/wrist)
+❌ A different person from the brand reference wearing the bracelet
 ❌ The woman in harsh outdoor lighting (reference was soft studio)
 ❌ The woman in busy cluttered background (reference was minimalist)
-❌ Stiff unnatural pose (reference was graceful and natural)
+❌ Stiff unnatural hand pose (reference was graceful and natural)
+❌ Wide shot showing full body when reference was close-up of hand only
 
 Generate a beautiful, professional product photography image that showcases the MODEL from Image 1 wearing the ACCESSORY from Image 2, in the inspiring style learned from the brand reference analysis.`;
       }
