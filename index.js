@@ -4157,6 +4157,8 @@ ${flatLayProducts.map((_, index) => `- Image ${index + 1}: Product ${index + 1} 
 
 **STEP 1: Study Image ${flatLayProducts.length + 1} (brand reference photo) carefully**
 Look at the actual brand reference photo (Image ${flatLayProducts.length + 1}) and observe:
+- HOW MANY ITEMS are in the reference photo (count them: shirt, pants, accessories, etc.)
+- WHAT TYPES of items are shown (clothing, jewelry, glasses, shoes, bags, etc.)
 - How products are arranged (grid, scattered, circle, diagonal, etc.)
 - Camera angle (overhead 90° or slightly angled)
 - Background surface type (marble, wood, fabric, plain white, etc.)
@@ -4164,9 +4166,23 @@ Look at the actual brand reference photo (Image ${flatLayProducts.length + 1}) a
 - Spacing between products (tight/dense or spacious/minimal)
 - Overall mood (minimalist, abundant, editorial, lifestyle, etc.)
 
-**STEP 2: Photograph YOUR products using that EXACT style**
-- Take the products from Images 1-${flatLayProducts.length}
-- Arrange them EXACTLY like the brand reference (same pattern, same spacing)
+**STEP 2: Create a COMPLETE COMPOSITION matching the reference**
+🔥 **CRITICAL COMPOSITION RULE** 🔥
+- Count total items in brand reference photo (Image ${flatLayProducts.length + 1})
+- You uploaded ${flatLayProducts.length} product(s) in Images 1-${flatLayProducts.length}
+- If reference has MORE items than you uploaded:
+  ✅ Place your uploaded products prominently in the composition
+  ✅ GENERATE/SIMULATE additional complementary items to match the reference's total item count
+  ✅ Match the TYPES of items from reference (if reference has glasses → generate similar glasses, if reference has shirt → generate similar shirt, etc.)
+  ✅ Example: Reference has 5 items (shirt+pants+cardigan+2 glasses+socks), you uploaded 1 jacket → Final image should show: Your jacket + 4 simulated complementary items (pants, cardigan-like item, 2 glasses, socks) = 5 total items
+  ✅ The simulated items should be SIMILAR IN STYLE to what's in the reference (don't copy exactly, but match the category and aesthetic)
+
+- If reference has SAME or FEWER items than you uploaded:
+  ✅ Use all your uploaded products
+  ✅ Arrange them like the reference
+
+**STEP 3: Apply the EXACT style from reference**
+- Arrange all items (uploaded + simulated) EXACTLY like the brand reference (same pattern, same spacing)
 - Use EXACTLY the same camera angle as the reference
 - Use a SIMILAR background surface type
 - Use SIMILAR lighting style
@@ -4178,20 +4194,20 @@ ${brandReferenceAnalysis}
 CRITICAL REQUIREMENTS:
 
 1. **Product Accuracy (MOST CRITICAL)**:
-   - Use the EXACT products from Images 1-${flatLayProducts.length}
-   - Keep EXACT colors, designs, textures, and details
-   - Show ALL product features: logos, labels, stitching, hardware
-   - Do NOT substitute with different products
-   - Do NOT simplify or blur product details
+   - **For UPLOADED products (Images 1-${flatLayProducts.length})**: Use EXACT products with precise colors, designs, textures, and details - show ALL features (logos, labels, stitching, hardware)
+   - **For SIMULATED/GENERATED items** (if needed to match reference item count): Generate realistic complementary products that match the style and category of items in the reference photo
+   - Do NOT substitute uploaded products with different ones
+   - Do NOT simplify or blur any product details
 
 2. **Arrangement Pattern (MUST MATCH EXACTLY)**:
    - Copy the EXACT arrangement from brand reference:
-     * If reference = grid → arrange YOUR products in same grid pattern
-     * If reference = scattered → scatter YOUR products similarly
-     * If reference = circle → arrange YOUR products in circle
-     * If reference = diagonal line → arrange YOUR products diagonally
+     * If reference = grid → arrange ALL items (uploaded + simulated) in same grid pattern
+     * If reference = scattered → scatter ALL items similarly
+     * If reference = circle → arrange ALL items in circle
+     * If reference = diagonal line → arrange ALL items diagonally
    - Match the EXACT spacing (if reference has 10cm gaps, use ~10cm gaps)
    - Match the EXACT density (if reference is minimal/spacious, be minimal/spacious)
+   - Ensure total number of items matches reference photo's item count
 
 3. **Camera Angle (MUST MATCH EXACTLY)**:
    - If reference = perfectly overhead 90° → shoot perfectly overhead
@@ -4224,7 +4240,8 @@ TECHNICAL SPECS:
 - Professional e-commerce quality
 
 DO NOT:
-- ❌ Use different products (MUST use products from Images 1-${flatLayProducts.length})
+- ❌ Substitute or change uploaded products (Images 1-${flatLayProducts.length} MUST appear exactly as provided)
+- ❌ Show fewer items than the reference photo (generate complementary items if needed)
 - ❌ Change arrangement pattern (MUST match reference exactly)
 - ❌ Change spacing/density (MUST match reference)
 - ❌ Change camera angle (MUST match reference)
@@ -4235,7 +4252,7 @@ DO NOT:
 - ❌ Add text/watermarks not on original products
 - ❌ Make products look fake or pasted
 
-Generate a photorealistic professional flat lay that looks EXACTLY like it was shot for the same brand as the reference photo - same arrangement, same angle, same lighting, same mood - but featuring YOUR products from the provided images.`;
+Generate a photorealistic professional flat lay that looks EXACTLY like it was shot for the same brand as the reference photo - same arrangement, same angle, same lighting, same mood, SAME NUMBER OF ITEMS - featuring your uploaded products prominently plus any simulated complementary items needed to match the reference's composition.`;
 
       /* OLD CODE - keeping variations for potential future use
       const flatLayVariations = {
