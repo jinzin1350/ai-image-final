@@ -555,8 +555,13 @@
         }
 
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load default category (brand-woman)
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load models first for accessories-only mode
+            if (typeof loadModels === 'function') {
+                await loadModels('accessories-only');
+            }
+
+            // Then load default category (brand-woman)
             if (typeof displayModelsByCategory === 'function') {
                 displayModelsByCategory('brand-woman');
             }

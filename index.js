@@ -2209,7 +2209,7 @@ app.get('/api/models', async (req, res) => {
 
         // Filter by category based on mode
         if (mode === 'accessories-only') {
-          query = query.in('category', ['accessory', 'accessory-man']);
+          query = query.in('category', ['brand-woman', 'brand-man', 'brand-girl', 'brand-boy']);
         } else if (mode === 'complete-outfit') {
           // Show regular categories for complete-outfit service
           query = query.in('category', ['woman', 'man', 'girl', 'boy', 'plus-size']);
