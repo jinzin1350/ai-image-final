@@ -1690,11 +1690,9 @@ function checkGenerateButton() {
         }
 
     } else if (currentMode === 'accessories-only') {
-        // Accessories mode: need accessory product photo, accessory type, model, and background
+        // Accessories mode: need accessory product photo and model (similar to scene-recreation)
         isValid = uploadedAccessoryPath !== null &&
-                  selectedAccessoryType !== null &&
-                  selectedModelId &&
-                  selectedBackgroundId;
+                  selectedModelId;
 
     } else if (currentMode === 'color-collection') {
         // Color Collection mode: need at least 1 color variant, display scenario, and background
