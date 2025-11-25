@@ -3766,38 +3766,33 @@ Make it simple and natural - like this person is actually wearing these clothes 
         console.log('✅ Using custom prompt for accessory model');
       } else {
         // Fallback to default prompt
-        const accessoryTypeDescriptions = {
-          'ring': 'ring (worn on finger)',
-          'earrings': 'earrings (worn on ears)',
-          'bracelet': 'bracelet (worn on wrist)',
-          'necklace': 'necklace (worn around neck)',
-          'anklet': 'anklet (worn around ankle)',
-          'watch': 'wristwatch (worn on wrist)'
-        };
-
-        const accessoryDesc = accessoryTypeDescriptions[accessoryType] || accessoryType;
+        // Use generic "jewelry/accessory" since we don't have specific type
+        const accessoryDesc = 'jewelry accessory';
+        const accessoryTypeGeneric = 'jewelry';
 
         // تعریف توصیف دقیق مدل بر اساس category
         const modelCategoryDescriptions = {
+          'brand-woman': 'adult woman (25-35 years old)',
+          'brand-man': 'adult man (25-35 years old)',
+          'brand-girl': 'teenage girl (age 13-17 years old)',
+          'brand-boy': 'teenage boy (age 13-17 years old)',
           'woman': 'adult woman (30-40 years old)',
           'man': 'adult man (30-40 years old)',
           'girl': 'teenage girl (age 12-15 years old)',
           'boy': 'teenage boy (age 12-15 years old)',
           'teen': 'teenager (age 15-18 years old)',
-          'child': 'child (age 6-11 years old)',
-          'accessory': 'adult woman (30-40 years old)', // accessory default is woman
-          'accessory-man': 'adult man (30-40 years old)' // accessory for men
+          'child': 'child (age 6-11 years old)'
         };
 
         const modelDescription = modelCategoryDescriptions[selectedModel.category] || 'person';
 
-        prompt = `Create a professional product photography image of this ${accessoryType} being worn/displayed naturally.
+        prompt = `Create a professional product photography image of this ${accessoryTypeGeneric} being worn/displayed naturally.
 
 IMAGE PROVIDED:
-- ${accessoryType.toUpperCase()} product photo
+- JEWELRY/ACCESSORY product photo
 
 TASK:
-Generate a complete professional product photography scene showing this exact ${accessoryType} from the image being worn/displayed naturally by a ${modelDescription} in an e-commerce style photo.
+Generate a complete professional product photography scene showing this exact ${accessoryTypeGeneric} from the image being worn/displayed naturally by a ${modelDescription} in an e-commerce style photo.
 
 IMPORTANT MODEL REQUIREMENTS:
 - The person in the photo MUST be a ${modelDescription}
@@ -3822,42 +3817,36 @@ SCENE & ENVIRONMENT:
 
 SCENE GENERATION:
 - Generate a natural scene appropriate for ${accessoryDesc}
-- If it's jewelry (ring, bracelet, necklace, earrings, anklet): show elegant hand/wrist/neck/ankle naturally displaying it
-- If it's a watch: show it worn on wrist with elegant hand pose, visible watch face showing time
-- Create elegant hand poses for rings/bracelets/watches, graceful neck angles for necklaces
+- Show elegant hand/wrist/neck/ankle naturally displaying the jewelry
+- Create elegant hand poses, graceful angles
 - Show skin texture and natural positioning
-- The ${accessoryType} should be the STAR - clearly visible and beautifully displayed
+- The ${accessoryTypeGeneric} should be the STAR - clearly visible and beautifully displayed
 - Create a complete, natural, photorealistic scene
 - The model MUST be a ${modelDescription} - NOT an adult if child/teen category
 
 KEY REQUIREMENTS:
-1. Use the EXACT ${accessoryType} from the provided image - keep all details, colors, and design accurate
+1. Use the EXACT ${accessoryTypeGeneric} from the provided image - keep all details, colors, and design accurate
 2. Generate a natural, realistic scene (not a composite or paste-on effect)
 3. Professional e-commerce product photography quality
-4. Clean, sharp focus on the ${accessoryType}
+4. Clean, sharp focus on the ${accessoryTypeGeneric}
 5. Natural skin texture and realistic lighting
 6. Appropriate body-part/model positioning for the accessory type
 7. CRITICAL: Model must be ${modelDescription} with age-appropriate features and proportions
-8. CRITICAL DETAIL ATTENTION FOR ${accessoryType.toUpperCase()}:
+8. CRITICAL DETAIL ATTENTION FOR JEWELRY:
    - Preserve ALL material details: metal finish, gemstone cuts, chain links
    - Show exact design patterns, engravings, and decorative elements
    - Accurately render hardware: clasps, settings, posts, backs with proper metallic texture
    - Maintain brand logos, hallmarks, or signatures exactly as shown
    - Display material quality: gold/silver sheen, gemstone brilliance, polish level
    - Render precise color matching and any gemstone colors/patterns
-   - Maintain exact proportions and shape of the ${accessoryType}
+   - Maintain exact proportions and shape of the jewelry
    - Show surface details: filigree, texture, stone settings, prong details
-${accessoryType === 'watch' ? `   - Show the watch face clearly with visible time display
-   - Render watch hands, numbers/markers, and any complications accurately
-   - Display watch case finish and bezel details
-   - Show watch band/strap texture and clasp mechanism
-   - Maintain proper watch proportions and size on wrist` : ''}
 
 DO NOT:
 - Make unrealistic or artificial composites
 - Add text, watermarks, or logos (unless they exist on the original product)
-- Make the ${accessoryType} look pasted on or fake
-- Change the ${accessoryType}'s design, color, or details from the reference image
+- Make the ${accessoryTypeGeneric} look pasted on or fake
+- Change the jewelry's design, color, or details from the reference image
 - Over-smooth skin or create plastic-looking results
 - Simplify or omit fine details like hardware, gem settings, or brand elements
 - Alter material texture or finish quality
