@@ -2159,11 +2159,13 @@ if (generateBtn) {
             requestBody.customLocation = document.getElementById('customLocation')?.value || '';
 
         } else if (currentMode === 'flat-lay') {
-            // Flat Lay mode - overhead product photography
+            // Flat Lay mode - overhead product photography with brand reference style
             requestBody.flatLayProducts = uploadedFlatLayProducts;
-            requestBody.arrangement = selectedArrangement;
-            requestBody.backgroundId = selectedBackgroundId;
-            requestBody.customLocation = document.getElementById('customLocation')?.value || '';
+
+            // Send brand reference photo data (similar to accessories-only)
+            if (window.selectedBrandReferencePhoto) {
+                requestBody.brandReferencePhotoId = window.selectedBrandReferencePhoto.id;
+            }
 
         } else if (currentMode === 'scene-recreation') {
             // Scene Recreation mode - recreate scene from reference photo (brand photo)

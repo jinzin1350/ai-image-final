@@ -3176,8 +3176,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً حداقل یک رنگ، نوع نمایش و پس‌زمینه را انتخاب کنید' });
       }
     } else if (mode === 'flat-lay') {
-      if (!flatLayProducts || !flatLayProducts.length || !arrangement || !backgroundId) {
-        return res.status(400).json({ error: 'لطفاً حداقل یک محصول، نوع چیدمان و پس‌زمینه را انتخاب کنید' });
+      if (!flatLayProducts || !flatLayProducts.length || !brandReferencePhotoId) {
+        return res.status(400).json({ error: 'لطفاً حداقل یک محصول و عکس مرجع برند را انتخاب کنید' });
       }
     } else if (mode === 'scene-recreation') {
       // Accept either brand reference photo URL or uploaded reference photo path
@@ -3323,9 +3323,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       }
     }
 
-    // Fetch brand reference photo AI analysis for accessories-only mode
+    // Fetch brand reference photo AI analysis for accessories-only and flat-lay modes
     let brandReferenceAnalysis = null;
-    if (mode === 'accessories-only' && brandReferencePhotoId && supabase) {
+    if ((mode === 'accessories-only' || mode === 'flat-lay') && brandReferencePhotoId && supabase) {
       const { data: brandPhoto, error: photoError } = await supabase
         .from('brand_reference_photos')
         .select('ai_analysis')
@@ -3342,7 +3342,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       }
 
       brandReferenceAnalysis = brandPhoto.ai_analysis;
-      console.log('✅ Loaded brand reference photo AI analysis');
+      console.log(`✅ Loaded brand reference photo AI analysis for ${mode} mode`);
     }
 
     const selectedPose = poses.find(p => p.id === poseId) || poses[0];
@@ -4123,8 +4123,142 @@ DO NOT:
 Generate a professional e-commerce product photo perfect for showcasing the complete color collection - like in online stores or catalogs.`;
 
     } else if (mode === 'flat-lay') {
-      // FLAT LAY MODE: Overhead product photography with 10 variations per arrangement
+      // FLAT LAY MODE: Overhead product photography INSPIRED BY Brand Reference Photo
 
+      prompt = `Create a professional flat lay product photography image INSPIRED BY the style, lighting, arrangement, and mood of the brand reference photo.
+
+IMAGES PROVIDED:
+${flatLayProducts.map((_, index) => `- Image ${index + 1}: Product ${index + 1}`).join('\n')}
+
+TOTAL: ${flatLayProducts.length} product(s)
+
+⚠️ CRITICAL APPROACH:
+
+**PRIMARY GOAL: Use the EXACT products from the images**
+- The products in the final photo MUST be the products from the provided images
+- Use EXACT product details, colors, and features from each image
+- This is the most important requirement - products must match the images exactly
+
+**SECONDARY GOAL: Create a SIMILAR flat lay style inspired by the brand reference**
+- The brand reference photo has been analyzed by AI (see analysis below)
+- Copy the general ARRANGEMENT TYPE (grid, scattered, circular, diagonal, etc.)
+- Match the STYLE of composition and product placement
+- Recreate the MOOD and atmosphere (minimalist, abundant, artistic, etc.)
+- Use a SIMILAR camera angle (directly overhead vs slightly angled)
+- Match the general spacing and density of products
+- Copy the lighting style and background type
+
+**What to copy from brand reference analysis:**
+✅ **EXACT ARRANGEMENT PATTERN** (how products are positioned - grid, circle, scattered, etc.)
+✅ **EXACT SPACING** (tight/dense vs spacious/minimal)
+✅ **CAMERA ANGLE** (perfectly overhead 90° vs slightly angled)
+✅ Number of products visible (if reference shows 3 products, show your 3 products similarly)
+✅ Background type (marble, wood, fabric, plain color, etc.)
+✅ Lighting style (soft/dramatic, natural/studio)
+✅ Mood and atmosphere (minimal, editorial, lifestyle, catalog)
+✅ Product orientation (all straight vs rotated angles)
+✅ Color palette and overall vibe
+
+**What NOT to copy from brand reference:**
+❌ The exact specific products (use YOUR products, not theirs)
+❌ Every tiny detail of the background texture
+❌ Brand logos or text from the reference
+
+⚠️ **CRITICAL FRAMING AND ARRANGEMENT RULE:**
+The final photo's arrangement pattern and composition MUST MATCH the brand reference photo exactly. If brand reference arranges products in a circle, arrange YOUR products in a circle. If brand reference has scattered random placement, use scattered random placement for YOUR products. The arrangement is NOT optional - it must match perfectly.
+
+TASK DESCRIPTION:
+Create a NEW professional flat lay photo showing the PRODUCTS from the provided images, arranged and photographed in the same style and composition as the brand reference. The key is: SAME PRODUCTS + SAME ARRANGEMENT STYLE + SIMILAR BACKGROUND/LIGHTING.
+
+AI ANALYSIS OF BRAND REFERENCE PHOTO:
+${brandReferenceAnalysis}
+
+CAMERA PERSPECTIVE:
+- Match the camera angle from the brand reference (usually perfectly overhead 90° for flat lay)
+- Camera parallel to or slightly angled to the flat surface
+- Products laid flat on the surface below
+- Professional top-down product photography
+
+TECHNICAL SPECS:
+- Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
+- Aspect Ratio: ${selectedAspectRatio.description}
+
+KEY REQUIREMENTS:
+1. **Use the EXACT Products (MOST IMPORTANT)**:
+   - The products in the final photo MUST be from the provided images
+   - Use their EXACT colors, designs, and features
+   - Do NOT substitute with different products
+
+2. **Match the Arrangement Pattern**:
+   - If reference arranges in grid → arrange YOUR products in grid
+   - If reference scatters randomly → scatter YOUR products randomly
+   - If reference arranges in circle → arrange YOUR products in circle
+   - If reference has diagonal line → arrange YOUR products in diagonal line
+   - Match the spacing (tight vs spacious) from reference
+
+3. **Match Camera Angle and Framing**:
+   - If reference is perfectly overhead (90°) → shoot perfectly overhead
+   - If reference is slightly angled → use similar angle
+   - Match how much of the surface/background is visible
+
+4. **Product Details (CRITICAL)**:
+   - Preserve ALL product details: textures, materials, colors, patterns
+   - Show exact product features: logos, stitching, hardware, labels
+   - Maintain accurate colors and textures
+   - Render realistic shadows beneath each product
+   - Display any text, branding clearly
+   - Natural material appearance (leather, fabric, metal, etc.)
+   - Show product construction details crisply
+
+5. **Photographic Quality**:
+   - Clean, sharp focus on all products throughout
+   - Even, consistent lighting matching reference style
+   - Professional flat lay composition
+   - Suitable for e-commerce/editorial use
+
+DO NOT:
+- ❌ CRITICAL: DO NOT use different products - use the EXACT products from provided images
+- ❌ CRITICAL: DO NOT change the arrangement pattern from brand reference
+- ❌ CRITICAL: DO NOT change spacing/density if reference is minimal/spacious
+- Change the camera angle style from reference
+- Alter the lighting mood from reference
+- Use a different background type than reference (if ref uses marble, use marble-like)
+- Tilt the camera if reference is perfectly overhead
+- Make products stand up if they should lay flat
+- Create unrealistic shadows or lighting
+- Over-smooth or lose product details
+- Add text, watermarks, or graphics not on original products
+- Make products look fake or digitally pasted
+
+EXAMPLE TO CLARIFY THE APPROACH:
+IMAGES PROVIDED:
+- Image 1: A red leather wallet
+- Image 2: A blue phone case
+- Image 3: A silver keychain
+
+BRAND REFERENCE ANALYSIS SAYS:
+"Three products arranged in perfect triangle formation on white marble surface, overhead 90° angle, minimalist spacing with 15cm between products, soft natural lighting, clean modern aesthetic"
+
+CORRECT OUTPUT:
+✅ The red wallet, blue phone case, and silver keychain from the images
+✅ Arranged in triangle formation (matching reference pattern)
+✅ On white marble-like surface (matching reference)
+✅ Overhead 90° angle (matching reference)
+✅ Minimalist spacing ~15cm apart (matching reference density)
+✅ Soft natural lighting (matching reference)
+✅ Clean modern look (matching reference mood)
+
+WRONG OUTPUTS:
+❌ Different products than provided in images
+❌ Arranged in a line (reference was triangle)
+❌ Tight clustered spacing (reference was spacious/minimal)
+❌ On wood background (reference was marble)
+❌ Angled camera (reference was straight overhead)
+❌ Dramatic shadows (reference was soft natural)
+
+Generate a professional flat lay photograph that showcases the PRODUCTS from the provided images, arranged in the inspiring compositional style learned from the brand reference analysis.`;
+
+      /* OLD CODE - keeping variations for potential future use
       const flatLayVariations = {
         'grid': [
           { name: 'in a tight 2×2 grid', details: 'Compact 2×2 grid arrangement with minimal spacing between products, centered composition, symmetrical and orderly', positioning: 'Arrange in 2 rows and 2 columns with 2cm gaps, perfectly aligned' },
@@ -4242,6 +4376,8 @@ DO NOT:
 - Use dramatic angles or perspectives
 
 Generate a professional flat lay photograph perfect for e-commerce product listings, social media, or catalog use - clean, organized, and beautifully composed.`;
+      */
+      // END OF OLD CODE - Now using brand reference photo approach instead
 
     } else if (mode === 'scene-recreation') {
       // SCENE RECREATION MODE: Create inspired photo using reference as style guide
