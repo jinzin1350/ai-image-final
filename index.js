@@ -3164,8 +3164,8 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         return res.status(400).json({ error: 'لطفاً تمام فیلدها را پر کنید' });
       }
     } else if (mode === 'accessories-only') {
-      if (!accessoryPath || !modelId) {
-        return res.status(400).json({ error: 'لطفاً تصویر اکسسوری و مدل را انتخاب کنید' });
+      if (!accessoryPath || !modelId || !brandReferencePhotoId) {
+        return res.status(400).json({ error: 'لطفاً تصویر اکسسوری، مدل و عکس مرجع برند را انتخاب کنید' });
       }
     } else if (mode === 'underwear') {
       if (!underwearPath || !underwearType || !modelId || !backgroundId) {
@@ -3323,6 +3323,28 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       }
     }
 
+    // Fetch brand reference photo AI analysis for accessories-only mode
+    let brandReferenceAnalysis = null;
+    if (mode === 'accessories-only' && brandReferencePhotoId && supabase) {
+      const { data: brandPhoto, error: photoError } = await supabase
+        .from('brand_reference_photos')
+        .select('ai_analysis')
+        .eq('id', brandReferencePhotoId)
+        .single();
+
+      if (photoError) {
+        console.error('❌ Error fetching brand reference photo:', photoError);
+        return res.status(400).json({ error: 'عکس مرجع برند یافت نشد' });
+      }
+
+      if (!brandPhoto || !brandPhoto.ai_analysis) {
+        return res.status(400).json({ error: 'تحلیل هوش مصنوعی برای عکس مرجع برند یافت نشد' });
+      }
+
+      brandReferenceAnalysis = brandPhoto.ai_analysis;
+      console.log('✅ Loaded brand reference photo AI analysis');
+    }
+
     const selectedPose = poses.find(p => p.id === poseId) || poses[0];
     const selectedCameraAngle = cameraAngles.find(c => c.id === cameraAngleId) || cameraAngles[0];
     const selectedStyle = styles.find(s => s.id === styleId) || styles[0];
@@ -3413,16 +3435,12 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
         : `${selectedBackground.name} - ${selectedBackground.description}`;
 
     } else if (mode === 'accessories-only') {
-      // For accessories mode, load ONLY accessory product image (not model image)
-      // Similar to scene-recreation, uses brand reference photo environment
+      // For accessories mode, load BOTH model image AND accessory product image
+      // Similar to scene-recreation: Model photo + Product photo + Brand reference AI analysis
+      modelBase64 = await imageUrlToBase64(selectedModel.image);
       garmentBase64Array = [await imageUrlToBase64(accessoryPath)];
-      modelBase64 = null; // Don't send model image - let AI generate naturally
 
       garmentDescription = `the accessory jewelry from the image`;
-      // Use custom location if provided, otherwise use simple studio description
-      locationDescription = customLocation && customLocation.trim() !== ''
-        ? customLocation.trim()
-        : 'professional jewelry photography studio with soft lighting';
 
       // Check if this model has custom prompts
       let customPrompt = null;
@@ -3758,82 +3776,86 @@ DO NOT:
 Make it simple and natural - like this person is actually wearing these clothes in a real professional photo shoot.`;
 
     } else if (mode === 'accessories-only') {
-      // ACCESSORIES MODE: Product Photography for Accessory
+      // ACCESSORIES MODE: Product Photography INSPIRED BY Brand Reference Photo
 
       // NEW: Use custom prompt if available
       if (selectedModel.customPrompt) {
         prompt = selectedModel.customPrompt;
         console.log('✅ Using custom prompt for accessory model');
       } else {
-        // Fallback to default prompt
-        // Use generic "jewelry/accessory" since we don't have specific type
-        const accessoryDesc = 'jewelry accessory';
-        const accessoryTypeGeneric = 'jewelry';
+        // Fallback to default prompt - similar to scene-recreation approach
+        prompt = `Create a photorealistic product photography image showing the MODEL wearing/displaying the ACCESSORY, INSPIRED BY the style, lighting, and mood of the brand reference photo.
 
-        // تعریف توصیف دقیق مدل بر اساس category
-        const modelCategoryDescriptions = {
-          'brand-woman': 'adult woman (25-35 years old)',
-          'brand-man': 'adult man (25-35 years old)',
-          'brand-girl': 'teenage girl (age 13-17 years old)',
-          'brand-boy': 'teenage boy (age 13-17 years old)',
-          'woman': 'adult woman (30-40 years old)',
-          'man': 'adult man (30-40 years old)',
-          'girl': 'teenage girl (age 12-15 years old)',
-          'boy': 'teenage boy (age 12-15 years old)',
-          'teen': 'teenager (age 15-18 years old)',
-          'child': 'child (age 6-11 years old)'
-        };
+IMAGES PROVIDED (IN ORDER):
+- Image 1: ⭐ MODEL - This is the person to photograph (use their EXACT face and body)
+- Image 2: ACCESSORY/JEWELRY - The product to wear/display
 
-        const modelDescription = modelCategoryDescriptions[selectedModel.category] || 'person';
+⚠️ CRITICAL APPROACH:
 
-        prompt = `Create a professional product photography image of this ${accessoryTypeGeneric} being worn/displayed naturally.
+**PRIMARY GOAL: Photograph the MODEL from the model image**
+- The person in the final photo MUST be the MODEL from Image 1
+- Use their EXACT face, facial features, body type, skin tone, and hair
+- This is the most important requirement - the MODEL must be recognizable as the person from Image 1
 
-IMAGE PROVIDED:
-- JEWELRY/ACCESSORY product photo
+**SECONDARY GOAL: Create a SIMILAR style inspired by the brand reference**
+- The brand reference photo has been analyzed by AI (see analysis below)
+- Copy the general TYPE of location (e.g., if it's studio, shoot in studio; if outdoor, shoot outdoor)
+- Match the STYLE of lighting (e.g., soft lighting, dramatic, natural light)
+- Recreate the MOOD and atmosphere (e.g., elegant, casual, professional)
+- Use a SIMILAR pose and hand/body positioning for the accessory
+- Match the general composition style and camera angle
 
-TASK:
-Generate a complete professional product photography scene showing this exact ${accessoryTypeGeneric} from the image being worn/displayed naturally by a ${modelDescription} in an e-commerce style photo.
+**What to copy from brand reference analysis:**
+✅ Type of location (studio/outdoor, minimalist/detailed background)
+✅ Lighting style (natural/artificial, soft/dramatic)
+✅ Mood and atmosphere (elegant, modern, classic, bold)
+✅ General pose and hand/body positioning for accessory display
+✅ Camera angle type (close-up, medium shot, etc.)
+✅ Color palette and overall vibe
 
-IMPORTANT MODEL REQUIREMENTS:
-- The person in the photo MUST be a ${modelDescription}
-- Face and body proportions should match this age/category exactly
-- Natural, age-appropriate appearance and styling
-- Professional fashion model pose suitable for this age group
+**What NOT to copy from brand reference:**
+❌ The exact specific location (create a similar type of place, not the identical spot)
+❌ The person's face or identity from the reference
+❌ Every tiny detail of the background
+
+TASK DESCRIPTION:
+Create a NEW professional product photography photo of the MODEL from Image 1, wearing/displaying the ACCESSORY from Image 2, photographed in a similar style and mood as the brand reference. The key is: SAME MODEL + SAME ACCESSORY + SIMILAR (not identical) SCENE/STYLE.
+
+AI ANALYSIS OF BRAND REFERENCE PHOTO:
+${brandReferenceAnalysis}
 
 TECHNICAL SPECS:
 - Resolution: ${selectedAspectRatio.width}x${selectedAspectRatio.height} pixels
 - Aspect Ratio: ${selectedAspectRatio.description}
-- Lighting: ${selectedLighting.description}
-- Background Blur: ${selectedBgBlur.description}
-- Depth of Field: ${selectedDoF.description}
-- Color Temperature: ${selectedColorTemp.description}
-- Shadow Quality: ${selectedShadow.description}
-
-SCENE & ENVIRONMENT:
-- Location/Background: ${locationDescription}
-- Style: ${selectedStyle.description}
-- Camera Angle: ${selectedCameraAngle.description}
-- Mood: Professional product photography for e-commerce/Instagram
-
-SCENE GENERATION:
-- Generate a natural scene appropriate for ${accessoryDesc}
-- Show elegant hand/wrist/neck/ankle naturally displaying the jewelry
-- Create elegant hand poses, graceful angles
-- Show skin texture and natural positioning
-- The ${accessoryTypeGeneric} should be the STAR - clearly visible and beautifully displayed
-- Create a complete, natural, photorealistic scene
-- The model MUST be a ${modelDescription} - NOT an adult if child/teen category
 
 KEY REQUIREMENTS:
-1. Use the EXACT ${accessoryTypeGeneric} from the provided image - keep all details, colors, and design accurate
-2. Generate a natural, realistic scene (not a composite or paste-on effect)
-3. Professional e-commerce product photography quality
-4. Clean, sharp focus on the ${accessoryTypeGeneric}
-5. Natural skin texture and realistic lighting
-6. Appropriate body-part/model positioning for the accessory type
-7. CRITICAL: Model must be ${modelDescription} with age-appropriate features and proportions
-8. CRITICAL DETAIL ATTENTION FOR JEWELRY:
-   - Preserve ALL material details: metal finish, gemstone cuts, chain links
+1. **The MODEL is the Star (MOST IMPORTANT)**:
+   - The person in the final photo MUST be the MODEL from Image 1
+   - Use their EXACT face - every facial feature must match Image 1
+   - Use their EXACT body type, skin tone, and hair from Image 1
+   - The MODEL must be clearly recognizable as the person from Image 1
+   - DO NOT use or blend the face/body from the brand reference photo
+
+2. **Create a SIMILAR Scene (Inspired, Not Identical)**:
+   - If reference shows elegant studio → shoot MODEL in a similar elegant studio setting
+   - If reference shows outdoor natural light → shoot MODEL with outdoor natural-style lighting
+   - If reference has soft romantic lighting → create soft romantic lighting for MODEL
+   - If reference has minimalist background → use minimalist background for MODEL
+   - Copy the FEEL and VIBE, not the exact pixels
+
+3. **Pose and Composition Guidance**:
+   - If reference has hand/wrist pose for jewelry → position MODEL's hand/wrist in similar pose
+   - Use a similar camera angle and framing style
+   - Match the general composition approach
+   - But the face MUST be the MODEL from Image 1
+
+4. **Accessory Integration**:
+   - Display the ACCESSORY/JEWELRY from Image 2 on the MODEL
+   - Accessory should be positioned naturally (on hand, wrist, neck, ear, etc.)
+
+   ⚠️ **CRITICAL - EXACT ACCESSORY DETAIL PRESERVATION:**
+   - Use EXACT colors from accessory image - do NOT change or shift colors
+   - Preserve ALL material details: metal finish (gold, silver, rose gold), gemstone cuts, chain links
    - Show exact design patterns, engravings, and decorative elements
    - Accurately render hardware: clasps, settings, posts, backs with proper metallic texture
    - Maintain brand logos, hallmarks, or signatures exactly as shown
@@ -3842,18 +3864,53 @@ KEY REQUIREMENTS:
    - Maintain exact proportions and shape of the jewelry
    - Show surface details: filigree, texture, stone settings, prong details
 
-DO NOT:
-- Make unrealistic or artificial composites
-- Add text, watermarks, or logos (unless they exist on the original product)
-- Make the ${accessoryTypeGeneric} look pasted on or fake
-- Change the jewelry's design, color, or details from the reference image
-- Over-smooth skin or create plastic-looking results
-- Simplify or omit fine details like hardware, gem settings, or brand elements
-- Alter material texture or finish quality
-- Ignore small decorative elements or design details
-- CRITICAL: Do NOT generate an adult model if the selected category is child/teen/girl/boy - the age MUST match the category
+5. **Photographic Quality**:
+   - Natural skin texture (no plastic smoothing)
+   - Clean, sharp focus on both MODEL and ACCESSORY
+   - Realistic lighting and shadows matching the brand reference style
+   - Professional product photography quality
+   - Make it look like a real photo taken for a professional brand campaign
 
-Generate a beautiful, natural product photography shot that looks like a real professional photo shoot - perfect for e-commerce or Instagram.`;
+DO NOT:
+- ❌ CRITICAL: DO NOT use the face or body from any person in the brand reference photo
+- ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference
+- ❌ The person must be the MODEL from Image 1 (FIRST image), not anyone from the brand reference photo
+- Change the scene, location, or environment style from the brand reference
+- Alter the lighting mood or atmosphere from the brand reference
+- Change the camera angle or composition style from the brand reference
+- Make the model look different from Image 1
+- Create obvious fake composites or artificial effects
+- Add text, watermarks, or logos (unless they exist on the original product)
+- ❌ CRITICAL: DO NOT change accessory colors - keep EXACT colors from accessory image
+- ❌ CRITICAL: DO NOT simplify or blur jewelry details - preserve all fine details
+- ❌ CRITICAL: DO NOT alter material texture, metal finish, or gemstone appearance
+- Simplify or omit fine details like hardware, gem settings, or brand elements
+- Over-smooth skin or create plastic-looking results
+- Make the accessory look pasted on or fake
+
+EXAMPLE TO CLARIFY THE APPROACH:
+IMAGE ORDER YOU RECEIVE:
+- Image 1: MODEL - A woman with dark hair, olive skin, specific facial features
+- Image 2: ACCESSORY - A gold necklace with diamond pendant
+
+BRAND REFERENCE ANALYSIS SAYS:
+"Elegant studio setting with soft natural window light, minimalist white background, model's hand gracefully touching neck area, close-up composition focusing on neck and collarbone, romantic and sophisticated mood"
+
+CORRECT OUTPUT:
+✅ The woman from Image 1 (her EXACT face, dark hair, olive skin, facial features)
+✅ Wearing the gold diamond necklace from Image 2
+✅ Photographed in AN elegant studio setting with soft lighting (similar to reference style)
+✅ Hand gracefully touching neck area (similar pose to reference)
+✅ Close-up composition on neck/collarbone (similar framing to reference)
+✅ Romantic sophisticated mood (similar atmosphere to reference)
+
+WRONG OUTPUTS:
+❌ A different person from the brand reference wearing the necklace
+❌ The woman in harsh outdoor lighting (reference was soft studio)
+❌ The woman in busy cluttered background (reference was minimalist)
+❌ Stiff unnatural pose (reference was graceful and natural)
+
+Generate a beautiful, professional product photography image that showcases the MODEL from Image 1 wearing the ACCESSORY from Image 2, in the inspiring style learned from the brand reference analysis.`;
       }
 
     } else if (mode === 'underwear') {
@@ -4598,19 +4655,24 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
       });
 
     } else if (mode === 'accessories-only') {
-      // NEW: Accessories mode - ONLY send accessory image, NO model image
-      // AI generates the scene naturally from text prompt
-      contentParts.push({ text: `ACCESSORY PRODUCT IMAGE:` });
+      // Accessories mode: Similar to scene-recreation
+      // Send MODEL first (most important), then ACCESSORY
+      // Use brand reference photo AI analysis for style guidance
+      contentParts.push({ text: "⭐ MODEL IMAGE - This is the person to photograph (use their EXACT face and body):" });
+      contentParts.push({
+        inlineData: {
+          data: modelBase64,
+          mimeType: 'image/jpeg'
+        }
+      });
+
+      contentParts.push({ text: `ACCESSORY/JEWELRY PRODUCT IMAGE - The product to wear/display:` });
       contentParts.push({
         inlineData: {
           data: garmentBase64Array[0],
           mimeType: 'image/jpeg'
         }
       });
-
-      // NOTE: We intentionally DO NOT send model image
-      // The custom prompt describes the scene/hand/body-part
-      // AI generates everything naturally
 
     } else if (mode === 'underwear') {
       // Underwear mode: Load underwear product image + model image
