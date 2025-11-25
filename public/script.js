@@ -960,17 +960,20 @@ function selectModel(modelId) {
     });
 
     // نمایش بخش انتخاب حجاب فقط برای دسته‌های مناسب
-    const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
-    if (shouldShowHijab) {
-        hijabSection.style.display = 'block';
-        // ریست کردن انتخاب قبلی حجاب
-        selectedHijabType = null;
-        document.querySelectorAll('.hijab-option-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-    } else {
-        hijabSection.style.display = 'none';
-        selectedHijabType = null;
+    // Check if hijabSection exists first (not available on all pages)
+    if (hijabSection) {
+        const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+        if (shouldShowHijab) {
+            hijabSection.style.display = 'block';
+            // ریست کردن انتخاب قبلی حجاب
+            selectedHijabType = null;
+            document.querySelectorAll('.hijab-option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        } else {
+            hijabSection.style.display = 'none';
+            selectedHijabType = null;
+        }
     }
 
     checkGenerateButton();
