@@ -13,7 +13,8 @@
       "Bash(node -c:*)",
       "Bash(nul)",
       "Bash(node -e:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(tasklist:*)"
     ],
     "deny": [],
     "ask": []

@@ -436,7 +436,7 @@ USING (bucket_id = 'before-after-images');
 
 COMMENT ON COLUMN user_limits.tier IS 'User tier: bronze (50), silver (100), gold (130)';
 COMMENT ON COLUMN user_limits.credits_limit IS 'Total credits per month';
-COMMENT ON COLUMN user_limits.credits_used IS 'Credits used. Standard: 1, Premium: 2';
+COMMENT ON COLUMN user_limits.credits_used IS 'Credits used. All services: 1 credit per generation';
 COMMENT ON TABLE product_generations IS 'Tracks caption and description generation per product';
 COMMENT ON TABLE before_after_gallery IS 'Stores before/after image pairs for portfolio page';
 

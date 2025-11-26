@@ -131,7 +131,7 @@ WITH CHECK (true);
 COMMENT ON TABLE user_limits IS 'User subscription tiers and usage limits';
 COMMENT ON COLUMN user_limits.tier IS 'User tier: testlimit (5), bronze (100), silver (130), gold (171)';
 COMMENT ON COLUMN user_limits.credits_limit IS 'Total credits per month based on tier';
-COMMENT ON COLUMN user_limits.credits_used IS 'Credits used this period. Standard service: 1 credit, Premium service: 2 credits';
+COMMENT ON COLUMN user_limits.credits_used IS 'Credits used this period. All services: 1 credit per generation';
 
 -- ============================================
 -- PART 2: PRODUCT GENERATIONS TABLE

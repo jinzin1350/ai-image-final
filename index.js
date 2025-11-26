@@ -2922,12 +2922,11 @@ function loadSavedModels() {
 
 /**
  * Get credit cost for a service mode
- * Standard services: 1 credit
- * Premium services: 2 credits
+ * All services: 1 credit (unified pricing)
  */
 function getServiceCreditCost(mode) {
-  const premiumServices = ['style-transfer', 'scene-recreation'];
-  return premiumServices.includes(mode) ? 2 : 1;
+  // All services now cost 1 credit
+  return 1;
 }
 
 /**

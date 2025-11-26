@@ -95,7 +95,7 @@ WITH CHECK (true);
 -- Add comments
 COMMENT ON COLUMN user_limits.tier IS 'User tier: testlimit (5), bronze (100), silver (130), gold (171)';
 COMMENT ON COLUMN user_limits.credits_limit IS 'Total credits per month';
-COMMENT ON COLUMN user_limits.credits_used IS 'Credits used. Standard: 1, Premium: 2';
+COMMENT ON COLUMN user_limits.credits_used IS 'Credits used. All services: 1 credit per generation';
 
 -- ============================================
 -- PART 2: PRODUCT GENERATIONS TABLE

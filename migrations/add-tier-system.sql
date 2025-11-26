@@ -81,7 +81,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ============================================
 COMMENT ON COLUMN user_limits.tier IS 'User tier: bronze (50 credits), silver (100 credits), gold (130 credits)';
 COMMENT ON COLUMN user_limits.credits_limit IS 'Total credits available per billing cycle';
-COMMENT ON COLUMN user_limits.credits_used IS 'Credits consumed this cycle. Standard services: 1 credit, Premium services: 2 credits';
+COMMENT ON COLUMN user_limits.credits_used IS 'Credits consumed this cycle. All services: 1 credit per generation';
 COMMENT ON TABLE product_generations IS 'Tracks caption and description generation per product to enforce one-time-per-product limit';
 
 -- ============================================
@@ -92,7 +92,6 @@ COMMENT ON TABLE product_generations IS 'Tracks caption and description generati
 -- Gold: 130 credits/month
 --
 -- Service costs:
--- - Standard (Flat Lay, Catalog, Product Luxury, Professional Modeling): 1 credit
--- - Premium (Style Transfer, Brand Theme): 2 credits
+-- - All services (Complete Outfit, Accessories, Flat Lay, Scene Recreation, Style Transfer, Color Collection): 1 credit per generation
 -- - Caption generation: Free (but only once per product)
 -- - Description generation: Free (but only once per product)
