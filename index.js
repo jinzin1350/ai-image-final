@@ -3693,8 +3693,13 @@ CRITICAL 2-MODEL REQUIREMENTS:
 - Maintain professional composition with both models
 - Each model wears THEIR OWN garment - do NOT mix them up`;
 
-        prompt = `Create a photorealistic fashion photo showing TWO MODELS, each wearing different garments.
+        prompt = `Create a photorealistic fashion photo showing TWO MODELS, each wearing different garments.${hijabDescription ? `
 
+⚠️⚠️⚠️ MOST IMPORTANT - READ THIS FIRST ⚠️⚠️⚠️
+HIJAB REQUIREMENT: ${hijabDescription}
+This MUST be applied to the female model(s) in the photo.
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+` : ''}
 IMAGES PROVIDED:
 - Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment for Model 1
 - Image ${garments.length + 1}: Model 1 (person)
@@ -3704,8 +3709,13 @@ IMAGES PROVIDED:
 TASK:
 Show BOTH models together, each wearing their respective garments. Model 1 wears ${garmentDescription}, Model 2 wears ${garment2Description}. Make it look like a real professional photograph with two people.${ageSpecificInstructions}${twoModelInstructions}`;
       } else {
-        prompt = `Create a photorealistic fashion photo showing the model wearing the garment.
+        prompt = `Create a photorealistic fashion photo showing the model wearing the garment.${hijabDescription ? `
 
+⚠️⚠️⚠️ MOST IMPORTANT - READ THIS FIRST ⚠️⚠️⚠️
+HIJAB REQUIREMENT: ${hijabDescription}
+This MUST be applied to the model in the photo.
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+` : ''}
 IMAGES PROVIDED:
 - Image ${garments.length === 1 ? '1' : `1-${garments.length}`}: Garment/clothing to wear
 - Image ${garments.length + 1}: Model (person)
@@ -4487,8 +4497,13 @@ ${hasTwoModels
 ❌ Every tiny detail of the background
 ❌ The exact clothing from the reference
 
-TASK DESCRIPTION:
-${hasTwoModels
+TASK DESCRIPTION:${hijabDescription ? `
+⚠️⚠️⚠️ MOST IMPORTANT - READ THIS FIRST ⚠️⚠️⚠️
+HIJAB REQUIREMENT: ${hijabDescription}
+DO NOT copy hijab style from reference photo. IGNORE reference photo's hijab. ONLY follow this requirement.
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+` : ''}${hasTwoModels
   ? `Create a NEW professional fashion photo of TWO MODELS: MODEL 1 from Image 1 wearing GARMENT 1, and MODEL 2 from Image ${garments.length + 2} wearing GARMENT 2, photographed in a similar style and mood as the reference photo. The key is: BOTH MODELS (separately) + THEIR GARMENTS + SIMILAR (not identical) SCENE/STYLE.`
   : `Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.`}${multiPersonInstruction}
 
