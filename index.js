@@ -1363,6 +1363,7 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
         name: model.name,
         category: model.category,
         visibility: model.visibility,
+        tier_requirement: model.tier_requirement || 'bronze',
         image_url: imageUrl,
         created_at: model.created_at,
         user_id: model.owner_user_id,
@@ -1385,11 +1386,11 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   }
 });
 
-// Update a model (name, category, visibility, owner)
+// Update a model (name, category, visibility, tier_requirement, owner)
 app.put('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
   try {
     const { modelId } = req.params;
-    const { name, category, visibility, user_id } = req.body;
+    const { name, category, visibility, tier_requirement, user_id } = req.body;
 
     console.log(`📝 Updating model ID: ${modelId}`);
 
@@ -1397,6 +1398,7 @@ app.put('/api/admin/models/:modelId', authenticateAdmin, async (req, res) => {
     if (name !== undefined) updateData.name = name;
     if (category !== undefined) updateData.category = category;
     if (visibility !== undefined) updateData.visibility = visibility;
+    if (tier_requirement !== undefined) updateData.tier_requirement = tier_requirement;
     if (user_id !== undefined) updateData.owner_user_id = user_id === '' ? null : user_id;
     updateData.updated_at = new Date().toISOString();
 
@@ -2188,14 +2190,26 @@ app.get('/api/models', async (req, res) => {
     if (supabase) {
       const authHeader = req.headers.authorization;
       let userId = null;
+      let userTier = null;
 
-      // Try to get user ID if authenticated (skip if no auth header for speed)
+      // Try to get user ID and tier if authenticated (skip if no auth header for speed)
       if (authHeader && authHeader !== 'Bearer null' && authHeader !== 'Bearer undefined') {
         try {
           const token = authHeader.replace('Bearer ', '');
           const { data: { user }, error } = await supabase.auth.getUser(token);
           if (!error && user) {
             userId = user.id;
+
+            // Get user's tier for hierarchical filtering
+            const { data: limits } = await supabase
+              .from('user_limits')
+              .select('tier')
+              .eq('user_id', userId)
+              .single();
+
+            if (limits) {
+              userTier = limits.tier;
+            }
           }
         } catch (authError) {
           // Silently fail - show public models only
@@ -2207,7 +2221,7 @@ app.get('/api/models', async (req, res) => {
         // Only select columns we need for better performance
         let query = supabase
           .from('models')
-          .select('id, name, category, description, image_url')
+          .select('id, name, category, description, image_url, tier_requirement')
           .eq('is_active', true);
 
         // If user is logged in, show their private models + public models
@@ -2236,11 +2250,33 @@ app.get('/api/models', async (req, res) => {
           .limit(100);
 
         if (customModels && customModels.length > 0) {
-          console.log(`✅ Found ${customModels.length} models (mode: ${mode}, userId: ${userId || 'public'})`);
+          console.log(`✅ Found ${customModels.length} models (mode: ${mode}, userId: ${userId || 'public'}, tier: ${userTier || 'none'})`);
+
+          // Filter models by tier hierarchy
+          // testlimit and gold: see all tiers
+          // silver: see silver + bronze
+          // bronze: see bronze only
+          // no tier/public: see bronze only
+          const allowedTiers = [];
+          if (userTier === 'testlimit' || userTier === 'gold') {
+            allowedTiers.push('bronze', 'silver', 'gold', 'testlimit');
+          } else if (userTier === 'silver') {
+            allowedTiers.push('bronze', 'silver');
+          } else {
+            // bronze or no tier
+            allowedTiers.push('bronze');
+          }
+
+          const filteredModels = customModels.filter(model => {
+            const modelTier = model.tier_requirement || 'bronze';
+            return allowedTiers.includes(modelTier);
+          });
+
+          console.log(`🔒 Tier filtering: ${customModels.length} models → ${filteredModels.length} accessible (user tier: ${userTier || 'none'}, allowed: ${allowedTiers.join(', ')})`);
 
           // Transform database models to match frontend format
           // Use image_url directly - it's already stored as a valid URL in the database
-          const transformedModels = customModels.map(model => ({
+          const transformedModels = filteredModels.map(model => ({
             id: `custom-${model.id}`,
             name: model.name,
             category: model.category,

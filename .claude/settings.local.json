@@ -14,7 +14,8 @@
       "Bash(nul)",
       "Bash(node -e:*)",
       "Bash(git restore:*)",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "Bash(psql:*)"
     ],
     "deny": [],
     "ask": []

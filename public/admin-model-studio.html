@@ -1155,6 +1155,7 @@
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسته</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">کاربر</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسترسی</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">سطح</th>
                                     <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تاریخ</th>
                                     <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151;">عملیات</th>
                                 </tr>
@@ -1287,6 +1288,22 @@
                     <option value="private">🔒 خصوصی (فقط مالک)</option>
                     <option value="premium">⭐ پریمیوم (کاربران پریمیوم)</option>
                 </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    حداقل سطح اشتراک مورد نیاز
+                </label>
+                <select id="bulkEditTierRequirement" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                    <option value="bronze">🥉 برنز (فقط برنز)</option>
+                    <option value="silver">🥈 نقره (نقره + برنز)</option>
+                    <option value="gold">🥇 طلا (همه سطوح)</option>
+                    <option value="testlimit">🧪 تست (همه سطوح)</option>
+                </select>
+                <small style="color: #6b7280; font-size: 12px; display: block; margin-top: 5px;">
+                    💡 دسترسی سلسله مراتبی: برنز فقط برنز، نقره برنز+نقره، طلا و تست همه را می‌بینند
+                </small>
             </div>
 
             <div style="margin-bottom: 20px;">
@@ -1939,6 +1956,26 @@
                             ${model.visibility === 'public' ? '🌍 عمومی' : '🔒 خصوصی'}
                         </span>
                     </td>
+                    <td style="padding: 12px;">
+                        <span style="background: ${
+                            model.tier_requirement === 'gold' ? '#fef08a' :
+                            model.tier_requirement === 'silver' ? '#e5e7eb' :
+                            model.tier_requirement === 'testlimit' ? '#fef3c7' :
+                            '#fed7aa'
+                        }; color: ${
+                            model.tier_requirement === 'gold' ? '#854d0e' :
+                            model.tier_requirement === 'silver' ? '#374151' :
+                            model.tier_requirement === 'testlimit' ? '#92400e' :
+                            '#9a3412'
+                        }; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                            ${
+                                model.tier_requirement === 'gold' ? '🥇 طلا' :
+                                model.tier_requirement === 'silver' ? '🥈 نقره' :
+                                model.tier_requirement === 'testlimit' ? '🧪 تست' :
+                                '🥉 برنز'
+                            }
+                        </span>
+                    </td>
                     <td style="padding: 12px; color: #9ca3af; font-size: 13px;">
                         ${new Date(model.created_at).toLocaleDateString('fa-IR')}
                     </td>
@@ -2189,10 +2226,11 @@
         async function saveBulkEdit() {
             const category = document.getElementById('bulkEditCategory').value;
             const visibility = document.getElementById('bulkEditVisibility').value;
+            const tierRequirement = document.getElementById('bulkEditTierRequirement').value;
             const userId = document.getElementById('bulkEditUser').value;
 
             // Check if at least one field is changed
-            if (!category && !visibility && !userId) {
+            if (!category && !visibility && !tierRequirement && !userId) {
                 showNotification('لطفاً حداقل یک فیلد را تغییر دهید', 'warning');
                 return;
             }
@@ -2209,6 +2247,7 @@
                         const updates = {};
                         if (category) updates.category = category;
                         if (visibility) updates.visibility = visibility;
+                        if (tierRequirement) updates.tier_requirement = tierRequirement;
                         if (userId) updates.user_id = userId || null;
 
                         const response = await fetchWithAuth(`/api/admin/models/${model.id}`, {
