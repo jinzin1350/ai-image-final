@@ -426,6 +426,94 @@
             background-clip: text;
         }
 
+        .discount-code-section {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #22c55e;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .discount-code-section h3 {
+            color: #16a34a;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .discount-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .discount-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #86efac;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .discount-input:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        }
+
+        .apply-discount-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Vazirmatn', sans-serif;
+            white-space: nowrap;
+        }
+
+        .apply-discount-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .apply-discount-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .discount-message {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .discount-message.success {
+            background: #dcfce7;
+            color: #16a34a;
+            display: block;
+        }
+
+        .discount-message.error {
+            background: #fee2e2;
+            color: #dc2626;
+            display: block;
+        }
+
         @media (max-width: 640px) {
             body {
                 padding: 20px 16px;
@@ -447,6 +535,14 @@
 
             .contact-methods {
                 grid-template-columns: 1fr;
+            }
+
+            .discount-input-group {
+                flex-direction: column;
+            }
+
+            .apply-discount-btn {
+                width: 100%;
             }
         }
     </style>
@@ -486,6 +582,24 @@
                     <span class="price-label">مبلغ قابل پرداخت:</span>
                     <span class="price-value" id="planPrice"></span>
                 </div>
+            </div>
+
+            <!-- Discount Code Section -->
+            <div class="discount-code-section" id="discountCodeSection" style="display: none;">
+                <h3>🎁 کد تخفیف دارید؟</h3>
+                <div class="discount-input-group">
+                    <input
+                        type="text"
+                        id="discountCodeInput"
+                        class="discount-input"
+                        placeholder="کد تخفیف را وارد کنید"
+                        maxlength="20"
+                    />
+                    <button class="apply-discount-btn" onclick="applyDiscountCode()">
+                        اعمال
+                    </button>
+                </div>
+                <div class="discount-message" id="discountMessage"></div>
             </div>
 
             <!-- Notice Box -->
@@ -666,6 +780,10 @@
             'gold': 'پلن طلایی'
         };
 
+        // Store current plan data
+        let currentPlanData = null;
+        let appliedDiscountCode = null;
+
         // Load plan details from database
         async function loadPlanDetails() {
             if (!plan) return;
@@ -678,26 +796,127 @@
                     const selectedPlan = data.pricing.find(p => p.tier === plan);
 
                     if (selectedPlan) {
+                        currentPlanData = selectedPlan;
+
                         // Show selected plan box
                         const planBox = document.getElementById('selectedPlanBox');
                         const planIcon = document.getElementById('planIcon');
                         const planName = document.getElementById('planName');
                         const planDetailsText = document.getElementById('planDetails');
-                        const planPrice = document.getElementById('planPrice');
 
                         planBox.style.display = 'block';
                         planIcon.textContent = planIcons[plan] || '💎';
                         planName.textContent = planNames[plan] || selectedPlan.tier;
                         planDetailsText.textContent = `${selectedPlan.credits.toLocaleString('fa-IR')} اعتبار ماهانه`;
-                        // Convert price to Rial (multiply by 10)
-                        const priceInRial = selectedPlan.price * 10;
-                        planPrice.textContent = `${priceInRial.toLocaleString('fa-IR')} ریال`;
+
+                        // Show discount code section
+                        document.getElementById('discountCodeSection').style.display = 'block';
+
+                        // Update price display
+                        updatePriceDisplay();
                     }
                 }
             } catch (error) {
                 console.error('Error loading plan details:', error);
             }
         }
+
+        // Update price display based on current discounts
+        function updatePriceDisplay() {
+            if (!currentPlanData) return;
+
+            const planPrice = document.getElementById('planPrice');
+
+            // Calculate base discounted price if tier discount is active
+            const hasTierDiscount = currentPlanData.discount_active && currentPlanData.discount_percentage > 0;
+            const originalPrice = currentPlanData.price;
+            let finalPrice = originalPrice;
+
+            if (hasTierDiscount) {
+                finalPrice = originalPrice - (originalPrice * currentPlanData.discount_percentage / 100);
+            }
+
+            // Apply additional discount code if present
+            if (appliedDiscountCode) {
+                finalPrice = finalPrice - (finalPrice * appliedDiscountCode.percentage / 100);
+            }
+
+            // Convert price to Rial (multiply by 10)
+            const priceInRial = Math.round(finalPrice) * 10;
+            planPrice.textContent = `${priceInRial.toLocaleString('fa-IR')} ریال`;
+        }
+
+        // Validate and apply discount code
+        async function applyDiscountCode() {
+            const input = document.getElementById('discountCodeInput');
+            const messageDiv = document.getElementById('discountMessage');
+            const applyBtn = document.querySelector('.apply-discount-btn');
+            const code = input.value.trim().toUpperCase();
+
+            if (!code) {
+                showDiscountMessage('لطفاً کد تخفیف را وارد کنید', 'error');
+                return;
+            }
+
+            // Disable button during validation
+            applyBtn.disabled = true;
+            applyBtn.textContent = 'در حال بررسی...';
+
+            try {
+                // TODO: Replace with actual API call when backend is ready
+                // const response = await fetch(`/api/discount-codes/validate`, {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ code, tier: plan })
+                // });
+                // const data = await response.json();
+
+                // Temporary: Simulate API response with hardcoded codes
+                const validCodes = {
+                    'WELCOME10': { percentage: 10, description: '10% تخفیف خوش‌آمدگویی' },
+                    'SAVE20': { percentage: 20, description: '20% تخفیف ویژه' },
+                    'VIP30': { percentage: 30, description: '30% تخفیف VIP' }
+                };
+
+                await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+
+                if (validCodes[code]) {
+                    appliedDiscountCode = validCodes[code];
+                    updatePriceDisplay();
+                    showDiscountMessage(`✓ ${validCodes[code].description} اعمال شد!`, 'success');
+                    input.disabled = true;
+                    applyBtn.textContent = 'اعمال شد ✓';
+                } else {
+                    showDiscountMessage('کد تخفیف نامعتبر است', 'error');
+                    applyBtn.disabled = false;
+                    applyBtn.textContent = 'اعمال';
+                }
+            } catch (error) {
+                console.error('Error validating discount code:', error);
+                showDiscountMessage('خطا در بررسی کد تخفیف. دوباره تلاش کنید', 'error');
+                applyBtn.disabled = false;
+                applyBtn.textContent = 'اعمال';
+            }
+        }
+
+        // Show discount message
+        function showDiscountMessage(message, type) {
+            const messageDiv = document.getElementById('discountMessage');
+            messageDiv.textContent = message;
+            messageDiv.className = `discount-message ${type}`;
+        }
+
+        // Allow Enter key to apply discount
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('discountCodeInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        applyDiscountCode();
+                    }
+                });
+            }
+        });
 
         // Load plan details on page load
         loadPlanDetails();
