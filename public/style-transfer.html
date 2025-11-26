@@ -44,20 +44,41 @@
         </header>
 
         <div class="main-content">
-            <!-- بخش Style Transfer -->
-            <section class="upload-section" id="styleTransferSection">
-                <h2>۱. آپلود عکس‌های استایل (۱ تا ۳ عکس)</h2>
-                <div class="section-hint">
-                    💡 <strong>عکس‌هایی که در مرحله Recreation ساختید را آپلود کنید (۱ تا ۳ عکس).</strong><br>
-                    هوش مصنوعی از ترکیب این عکس‌ها، عکس‌های مدلینگ ۲ نفره شبیه برندهای بزرگ دنیا می‌سازد!
+            <!-- توضیحات کامل -->
+            <section class="upload-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #3b82f6; border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+                <h2 style="color: #1e40af; margin-top: 0;">📖 راهنمای استفاده از Style Transfer</h2>
+                <div style="background: white; padding: 20px; border-radius: 12px; line-height: 1.8;">
+                    <p style="font-size: 16px; color: #374151; margin: 0 0 15px 0;"><strong>این سرویس چه کاری انجام می‌دهد؟</strong></p>
+                    <p style="color: #6b7280; margin: 0 0 20px 0;">عکس‌های مدلینگ تک‌نفره شما را ترکیب می‌کند و یک عکس مدلینگ ۲ نفره حرفه‌ای با نور و ترکیب‌بندی برندهای بزرگ می‌سازد!</p>
+
+                    <p style="font-size: 16px; color: #374151; margin: 20px 0 10px 0;"><strong>مراحل کار:</strong></p>
+                    <ol style="color: #6b7280; padding-right: 25px;">
+                        <li><strong>مدل اول:</strong> عکس مدل اول خود را آپلود کنید (عکسی که در مرحله Recreation ساخته‌اید)</li>
+                        <li><strong>مدل دوم:</strong> عکس مدل دوم خود را آپلود کنید (عکس دیگری از Recreation)</li>
+                        <li><strong>عکس مرجع برند:</strong> یک عکس مدلینگ ۲ نفره از برندهای معتبر انتخاب کنید</li>
+                        <li><strong>نتیجه:</strong> هوش مصنوعی دو مدل شما را با نور و ترکیب‌بندی عکس برند ترکیب می‌کند!</li>
+                    </ol>
+
+                    <div style="background: #fef3c7; border-right: 4px solid #f59e0b; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <p style="margin: 0; color: #92400e;"><strong>⚠️ نکته مهم:</strong> حتماً عکس‌های مدل اول و دوم را در بخش‌های جداگانه آپلود کنید تا هوش مصنوعی بتواند آنها را تشخیص دهد.</p>
+                    </div>
                 </div>
-                <div class="upload-area" id="styleImagesUploadArea">
-                    <input type="file" id="styleImagesInput" accept="image/*" multiple hidden>
-                    <div class="upload-placeholder" id="styleImagesPlaceholder">
-                        <div class="upload-icon">🎨</div>
+            </section>
+
+            <!-- بخش آپلود مدل اول -->
+            <section class="upload-section" id="styleImage1Section">
+                <h2>۱. آپلود عکس مدل اول</h2>
+                <div class="section-hint">
+                    👤 <strong>عکس مدل اول را انتخاب کنید</strong><br>
+                    این عکس باید از مرحله Recreation باشد - یک عکس مدلینگ تک‌نفره حرفه‌ای
+                </div>
+                <div class="upload-area" id="styleImage1UploadArea">
+                    <input type="file" id="styleImage1Input" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="styleImage1Placeholder">
+                        <div class="upload-icon">👤</div>
                         <div class="upload-text">
-                            <p><strong>کلیک کنید یا عکس‌های استایل را بکشید و رها کنید</strong></p>
-                            <p class="upload-hint">۱ تا ۳ عکس با فضا و نوری که دوست دارید</p>
+                            <p><strong>کلیک کنید یا عکس مدل اول را بکشید و رها کنید</strong></p>
+                            <p class="upload-hint">فقط یک عکس - مدل اول شما</p>
                         </div>
                         <div class="supported-formats">
                             <span class="format-tag">JPG</span>
@@ -65,24 +86,57 @@
                             <span class="format-tag">WEBP</span>
                         </div>
                     </div>
-                    <div id="styleImagesPreviews" class="garment-previews" style="display: none;"></div>
+                    <div id="styleImage1Preview" class="garment-previews" style="display: none;"></div>
                 </div>
-            </section>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button onclick="document.getElementById('styleImagesInput').click()" class="upload-from-computer-btn" style="flex: 1;">
+                    <button onclick="document.getElementById('styleImage1Input').click()" class="upload-from-computer-btn" style="flex: 1;">
                         📤 انتخاب از کامپیوتر
                     </button>
-                    <button onclick="openGalleryForStyleImages()" class="upload-from-computer-btn" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <button onclick="openGalleryForStyleImage(1)" class="upload-from-computer-btn" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                         🖼️ انتخاب از گالری
                     </button>
                 </div>
+            </section>
+
+            <!-- بخش آپلود مدل دوم -->
+            <section class="upload-section" id="styleImage2Section">
+                <h2>۲. آپلود عکس مدل دوم</h2>
+                <div class="section-hint">
+                    👥 <strong>عکس مدل دوم را انتخاب کنید</strong><br>
+                    این عکس هم باید از مرحله Recreation باشد - یک عکس مدلینگ تک‌نفره حرفه‌ای دیگر
+                </div>
+                <div class="upload-area" id="styleImage2UploadArea">
+                    <input type="file" id="styleImage2Input" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="styleImage2Placeholder">
+                        <div class="upload-icon">👥</div>
+                        <div class="upload-text">
+                            <p><strong>کلیک کنید یا عکس مدل دوم را بکشید و رها کنید</strong></p>
+                            <p class="upload-hint">فقط یک عکس - مدل دوم شما</p>
+                        </div>
+                        <div class="supported-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="styleImage2Preview" class="garment-previews" style="display: none;"></div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button onclick="document.getElementById('styleImage2Input').click()" class="upload-from-computer-btn" style="flex: 1;">
+                        📤 انتخاب از کامپیوتر
+                    </button>
+                    <button onclick="openGalleryForStyleImage(2)" class="upload-from-computer-btn" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        🖼️ انتخاب از گالری
+                    </button>
+                </div>
+            </section>
 
             <!-- بخش انتخاب عکس محتوا از برندها -->
             <section class="upload-section" id="contentImageSection" style="margin-top: 30px;">
-                <h2>۲. انتخاب عکس محتوا (2-Person Brand Photo)</h2>
+                <h2>۳. انتخاب عکس مرجع برند (2-Person Brand Photo)</h2>
                 <div class="section-hint">
-                    💡 <strong>یک برند را انتخاب کنید و سپس یک عکس مدلینگ 2 نفره به عنوان محتوای اصلی انتخاب کنید.</strong><br>
-                    ترکیب استایل عکس‌های مرحله ۱ با این عکس، یک عکس مدلینگ ۲ نفره حرفه‌ای می‌سازد!
+                    🎨 <strong>یک برند را انتخاب کنید و سپس یک عکس مدلینگ ۲ نفره به عنوان مرجع انتخاب کنید.</strong><br>
+                    هوش مصنوعی نور، ترکیب‌بندی و حال و هوای این عکس را روی دو مدل شما اعمال می‌کند!
                 </div>
 
                 <div class="brand-selection-container" style="background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%); border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 30px;">

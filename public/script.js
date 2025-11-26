@@ -1289,7 +1289,52 @@ function removeReferencePhoto() {
 // Style Transfer Functions
 // ========================================
 
-// Upload multiple style images (1-3)
+// Upload individual style image (NEW: separate uploads for each model)
+async function uploadStyleImage(file, imageNumber) {
+    const formData = new FormData();
+    formData.append('styleImage', file);
+
+    try {
+        const response = await fetch('/api/upload-style', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Store in the correct position (1-indexed)
+            uploadedStyleImages[imageNumber - 1] = data.filePath;
+
+            // Show preview for this specific image
+            const previewDiv = document.getElementById(`styleImage${imageNumber}Preview`);
+            const placeholderDiv = document.getElementById(`styleImage${imageNumber}Placeholder`);
+
+            if (previewDiv && placeholderDiv) {
+                previewDiv.style.display = 'grid';
+                placeholderDiv.style.display = 'none';
+
+                previewDiv.innerHTML = `
+                    <div class="garment-preview-item">
+                        <img src="${data.filePath}" alt="مدل ${imageNumber}">
+                        <button class="remove-garment-btn" onclick="removeStyleImage(${imageNumber})">&times;</button>
+                        <div class="garment-preview-label">مدل ${imageNumber}</div>
+                    </div>
+                `;
+            }
+
+            console.log(`✅ مدل ${imageNumber} آپلود شد`);
+            checkGenerateButton();
+        } else {
+            alert(`خطا در آپلود مدل ${imageNumber}: ` + data.error);
+        }
+    } catch (error) {
+        console.error(`خطا در آپلود مدل ${imageNumber}:`, error);
+        alert(`خطا در آپلود مدل ${imageNumber}`);
+    }
+}
+
+// OLD function - kept for backward compatibility but not used
 async function uploadStyleImages(files) {
     // Limit to 3 files
     if (files.length > 3) {
@@ -1319,44 +1364,38 @@ async function uploadStyleImages(files) {
         }
     }
 
-    // Show previews
-    const styleImagesPreviews = document.getElementById('styleImagesPreviews');
-    const styleImagesPlaceholder = document.getElementById('styleImagesPlaceholder');
-
-    styleImagesPreviews.style.display = 'grid';
-    styleImagesPlaceholder.style.display = 'none';
-
-    styleImagesPreviews.innerHTML = uploadedStyleImages.map((path, index) => `
-        <div class="garment-preview-item">
-            <img src="${path}" alt="عکس استایل ${index + 1}">
-            <button class="remove-garment-btn" onclick="removeStyleImage(${index})">&times;</button>
-            <div class="garment-preview-label">استایل ${index + 1}</div>
-        </div>
-    `).join('');
-
     checkGenerateButton();
 }
 
-// Remove a style image
-function removeStyleImage(index) {
-    uploadedStyleImages.splice(index, 1);
-    const styleImagesPreviews = document.getElementById('styleImagesPreviews');
-    const styleImagesPlaceholder = document.getElementById('styleImagesPlaceholder');
+// Remove a style image (NEW: for individual uploads)
+function removeStyleImage(imageNumber) {
+    // Remove from array (imageNumber is 1-indexed)
+    uploadedStyleImages[imageNumber - 1] = null;
 
-    if (uploadedStyleImages.length === 0) {
-        styleImagesPreviews.style.display = 'none';
-        styleImagesPlaceholder.style.display = 'flex';
-    } else {
-        styleImagesPreviews.innerHTML = uploadedStyleImages.map((path, idx) => `
-            <div class="garment-preview-item">
-                <img src="${path}" alt="عکس استایل ${idx + 1}">
-                <button class="remove-garment-btn" onclick="removeStyleImage(${idx})">&times;</button>
-                <div class="garment-preview-label">استایل ${idx + 1}</div>
-            </div>
-        `).join('');
+    // Hide preview and show placeholder
+    const previewDiv = document.getElementById(`styleImage${imageNumber}Preview`);
+    const placeholderDiv = document.getElementById(`styleImage${imageNumber}Placeholder`);
+
+    if (previewDiv && placeholderDiv) {
+        previewDiv.style.display = 'none';
+        previewDiv.innerHTML = '';
+        placeholderDiv.style.display = 'flex';
     }
 
+    console.log(`🗑️ مدل ${imageNumber} حذف شد`);
     checkGenerateButton();
+}
+
+// Gallery selection for individual style images
+function openGalleryForStyleImage(imageNumber) {
+    window.currentGallerySelection = {
+        type: 'style-image',
+        imageNumber: imageNumber
+    };
+
+    document.getElementById('gallerySelectionInfo').textContent = `انتخاب عکس برای مدل ${imageNumber}`;
+    loadGalleryImages();
+    document.getElementById('galleryModal').style.display = 'block';
 }
 
 // Upload content image
@@ -1730,12 +1769,18 @@ function checkGenerateButton() {
         }
 
     } else if (currentMode === 'style-transfer') {
-        // Style Transfer mode: need at least 1 style image and 1 brand content photo
+        // Style Transfer mode: need EXACTLY 2 style images (both models) and 1 brand content photo
         const hasContentPhoto = window.selectedBrandContentPhoto !== null && window.selectedBrandContentPhoto !== undefined;
-        isValid = uploadedStyleImages.length >= 1 && hasContentPhoto;
+
+        // Check that both style image slots have valid images (not null/undefined)
+        const hasModel1 = uploadedStyleImages[0] && uploadedStyleImages[0] !== null;
+        const hasModel2 = uploadedStyleImages[1] && uploadedStyleImages[1] !== null;
+
+        isValid = hasModel1 && hasModel2 && hasContentPhoto;
 
         console.log('🎨 Style Transfer Validation:', {
-            uploadedStyleImagesCount: uploadedStyleImages.length,
+            hasModel1: hasModel1,
+            hasModel2: hasModel2,
             hasContentPhoto: hasContentPhoto,
             selectedBrandContentPhoto: window.selectedBrandContentPhoto,
             isValid: isValid
@@ -2094,7 +2139,28 @@ function resetAllSelections() {
     const brandSelectStyleTransfer = document.getElementById('brandSelectStyleTransfer');
     const brandContentPhotosContainer = document.getElementById('brandContentPhotosContainer');
 
-    // Reset style transfer inputs
+    // Reset individual style image inputs (NEW)
+    resetFileInput('styleImage1Input', null);
+    resetFileInput('styleImage2Input', null);
+
+    const styleImage1Preview = document.getElementById('styleImage1Preview');
+    const styleImage1Placeholder = document.getElementById('styleImage1Placeholder');
+    const styleImage2Preview = document.getElementById('styleImage2Preview');
+    const styleImage2Placeholder = document.getElementById('styleImage2Placeholder');
+
+    if (styleImage1Preview && styleImage1Placeholder) {
+        styleImage1Preview.innerHTML = '';
+        styleImage1Preview.style.display = 'none';
+        styleImage1Placeholder.style.display = 'flex';
+    }
+
+    if (styleImage2Preview && styleImage2Placeholder) {
+        styleImage2Preview.innerHTML = '';
+        styleImage2Preview.style.display = 'none';
+        styleImage2Placeholder.style.display = 'flex';
+    }
+
+    // Reset OLD style transfer inputs (for backward compatibility)
     resetFileInput('styleImagesInput', null);
     if (styleImagesPreviews) {
         styleImagesPreviews.innerHTML = '';
@@ -2494,6 +2560,28 @@ if (styleImagesInput) {
     });
 }
 
+// NEW: Event listeners for individual style image uploads
+const styleImage1Input = document.getElementById('styleImage1Input');
+const styleImage2Input = document.getElementById('styleImage2Input');
+
+if (styleImage1Input) {
+    styleImage1Input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            uploadStyleImage(file, 1);
+        }
+    });
+}
+
+if (styleImage2Input) {
+    styleImage2Input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            uploadStyleImage(file, 2);
+        }
+    });
+}
+
 if (contentImageUploadArea && contentImageInput) {
     contentImageUploadArea.addEventListener('click', () => {
         contentImageInput.click();
@@ -2664,7 +2752,38 @@ async function confirmGallerySelection() {
         return;
     }
 
-    if (galleryMode === 'style-images') {
+    // NEW: Handle individual style image selection
+    if (window.currentGallerySelection && window.currentGallerySelection.type === 'style-image') {
+        const imageNumber = window.currentGallerySelection.imageNumber;
+        const selectedImage = selectedGalleryImages[0];
+
+        if (selectedImage) {
+            // Store in the correct position
+            uploadedStyleImages[imageNumber - 1] = selectedImage;
+
+            // Show preview
+            const previewDiv = document.getElementById(`styleImage${imageNumber}Preview`);
+            const placeholderDiv = document.getElementById(`styleImage${imageNumber}Placeholder`);
+
+            if (previewDiv && placeholderDiv) {
+                previewDiv.style.display = 'grid';
+                placeholderDiv.style.display = 'none';
+
+                previewDiv.innerHTML = `
+                    <div class="garment-preview-item">
+                        <img src="${selectedImage}" alt="مدل ${imageNumber}">
+                        <button class="remove-garment-btn" onclick="removeStyleImage(${imageNumber})">&times;</button>
+                        <div class="garment-preview-label">مدل ${imageNumber}</div>
+                    </div>
+                `;
+            }
+
+            console.log(`✅ مدل ${imageNumber} از گالری انتخاب شد`);
+        }
+
+        window.currentGallerySelection = null;
+
+    } else if (galleryMode === 'style-images') {
         console.log('🎨 Style images mode - before adding:', uploadedStyleImages.length);
 
         // Add selected images to style images
