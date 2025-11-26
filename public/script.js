@@ -981,7 +981,7 @@ function selectModel(modelId) {
     // نمایش بخش انتخاب حجاب فقط برای دسته‌های مناسب
     // Check if hijabSection exists first (not available on all pages)
     if (hijabSection) {
-        const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+        const shouldShowHijab = ['woman', 'girl', 'teen', 'brand-woman', 'brand-girl'].includes(currentCategory);
         if (shouldShowHijab) {
             hijabSection.style.display = 'block';
             // ریست کردن انتخاب قبلی حجاب
