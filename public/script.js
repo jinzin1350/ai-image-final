@@ -420,6 +420,15 @@ function displayModelsByCategory(category, page = 1) {
     document.querySelectorAll('.model-card').forEach(card => {
         card.addEventListener('click', () => selectModel(card.dataset.id));
     });
+
+    // Show/hide hijab section based on category
+    if (hijabSection) {
+        if (category === 'brand-woman') {
+            hijabSection.style.display = 'block';
+        } else {
+            hijabSection.style.display = 'none';
+        }
+    }
 }
 
 // نمایش مدل‌های یک دسته‌بندی خاص برای مدل دوم با Pagination
@@ -500,6 +509,16 @@ if (categorySelectEl) {
         currentCategory = e.target.value;
         selectedModelId = null; // پاک کردن انتخاب قبلی
         displayModelsByCategory(currentCategory);
+
+        // Show hijab section if brand-woman category is selected
+        if (hijabSection) {
+            if (currentCategory === 'brand-woman') {
+                hijabSection.style.display = 'block';
+            } else {
+                hijabSection.style.display = 'none';
+            }
+        }
+
         checkGenerateButton();
     });
 }

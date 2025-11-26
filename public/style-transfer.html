@@ -170,6 +170,31 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- Hijab Section for Style Transfer -->
+                    <div class="hijab-section" id="hijabSectionStyleTransfer" style="display: none; margin-top: 25px; padding: 20px; background: #fef3c7; border-radius: 12px; border: 2px solid #f59e0b;">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <label style="display: block; font-weight: 600; color: #92400e; font-size: 16px; margin-bottom: 8px;">🧕 انتخاب نوع حجاب</label>
+                            <p style="color: #78350f; font-size: 14px; margin: 0;">نوع حجاب مورد نظر خود را انتخاب کنید</p>
+                        </div>
+                        <div class="hijab-options-grid">
+                            <div class="hijab-option-card" data-hijab-type="full">
+                                <div class="hijab-icon">🧕</div>
+                                <div class="hijab-title">حجاب کامل</div>
+                                <div class="hijab-description">پوشش کامل و محکم - بدون نمایش مو</div>
+                            </div>
+                            <div class="hijab-option-card" data-hijab-type="relaxed">
+                                <div class="hijab-icon">👩‍🦰</div>
+                                <div class="hijab-title">حجاب راحت</div>
+                                <div class="hijab-description">حجاب شل و مدرن - ممکن است کمی مو پیدا باشد</div>
+                            </div>
+                            <div class="hijab-option-card" data-hijab-type="no-hijab">
+                                <div class="hijab-icon">💁‍♀️</div>
+                                <div class="hijab-title">بی حجاب</div>
+                                <div class="hijab-description">بدون پوشش سر - موها کاملاً باز</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Brand Content Photos Grid -->
@@ -311,6 +336,8 @@
             if (!brandId) {
                 genderSelector.style.display = 'none';
                 photosContainer.style.display = 'none';
+                const hijabSection = document.getElementById('hijabSectionStyleTransfer');
+                if (hijabSection) hijabSection.style.display = 'none';
                 return;
             }
 
@@ -319,6 +346,16 @@
 
             // Get selected gender
             const selectedGender = document.querySelector('input[name="genderCategoryStyleTransfer"]:checked')?.value || 'woman';
+
+            // Show/hide hijab section based on gender
+            const hijabSection = document.getElementById('hijabSectionStyleTransfer');
+            if (hijabSection) {
+                if (selectedGender === 'woman') {
+                    hijabSection.style.display = 'block';
+                } else {
+                    hijabSection.style.display = 'none';
+                }
+            }
 
             // Show loading
             photosContainer.style.display = 'block';
