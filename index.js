@@ -4536,7 +4536,12 @@ ${hasTwoModels
   ? `   - Dress MODEL 1 in ${garmentDescription}
    - Dress MODEL 2 in ${selectedModel.garmentPaths2.length === 1 ? 'the garment from their garment image' : `ALL ${selectedModel.garmentPaths2.length} garments (combine them on Model 2)`}
    - Each model wears THEIR OWN garment - do NOT mix them up`
-  : `   - Dress the MODEL in ${garmentDescription}`}${hijabDescription ? `\n\n5. ⚠️ **CRITICAL - HIJAB REQUIREMENT**: ${hijabDescription}` : ''}
+  : `   - Dress the MODEL in ${garmentDescription}`}${hijabDescription ? `\n\n5. ⚠️ **CRITICAL - HIJAB REQUIREMENT**:
+   ${hijabDescription}
+   ❌ DO NOT copy or follow the hijab style from the reference photo - ONLY follow the requirement above.
+   - If reference has NO hijab but requirement says hijab → ADD the specified hijab to the MODEL
+   - If reference HAS hijab but requirement says NO hijab → REMOVE hijab from the MODEL and show hair
+   - The hijab requirement OVERRIDES whatever is in the reference photo` : ''}
    - Garment${hasTwoModels ? 's' : ''} should fit naturally with realistic wrinkles and fabric draping
 
    ⚠️ **CRITICAL - EXACT COLOR & DETAIL PRESERVATION:**
@@ -4560,7 +4565,7 @@ ${hasTwoModels
 
 DO NOT:
 - ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo (Image ${hasTwoModels ? garments.length + selectedModel.garment2Base64Array.length + 3 : garments.length + 2})
-- ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference
+- ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference${hijabDescription ? `\n- ❌ CRITICAL: DO NOT copy the hijab/head covering style from the reference photo - ONLY use the specified hijab requirement above. If reference has no hijab but user selected hijab, ADD hijab. If reference has hijab but user selected no hijab, REMOVE hijab.` : ''}
 ${hasTwoModels
   ? `- ❌ CRITICAL: DO NOT duplicate Model 1 twice - use BOTH Model 1 AND Model 2 as two DIFFERENT people
 - ❌ The TWO people must be MODEL 1 from Image 1 and MODEL 2 from Image ${garments.length + 2}, not anyone from the reference photo`
