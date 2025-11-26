@@ -1964,6 +1964,23 @@ function removeGarment(index) {
     checkGenerateButton();
 }
 
+// Helper function to reset file input properly
+// This ensures the change event fires even when selecting the same file
+function resetFileInput(inputId, eventHandler) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        // Clone the input to reset it completely
+        const newInput = input.cloneNode(true);
+        newInput.value = ''; // Clear the value
+        input.parentNode.replaceChild(newInput, input);
+
+        // Re-attach event listener if provided
+        if (eventHandler) {
+            newInput.addEventListener('change', eventHandler);
+        }
+    }
+}
+
 // Reset all selections after successful generation
 function resetAllSelections() {
     console.log('🔄 Resetting all selections...');
@@ -2003,15 +2020,28 @@ function resetAllSelections() {
     }
     if (uploadPlaceholder) uploadPlaceholder.style.display = 'block';
     if (uploadPlaceholder2) uploadPlaceholder2.style.display = 'block';
-    if (garmentInput) garmentInput.value = '';
-    if (garmentInput2) garmentInput2.value = '';
+
+    // Reset file inputs by cloning to ensure change event fires even with same file
+    resetFileInput('garmentInput', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadFiles(files);
+        }
+    });
+
+    resetFileInput('garmentInput2', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            uploadFiles2(files);
+        }
+    });
 
     // Reset accessories
     uploadedAccessoryPath = null;
     selectedAccessoryType = null;
     if (accessoryPreview) accessoryPreview.innerHTML = '';
     if (accessoryUploadPlaceholder) accessoryUploadPlaceholder.style.display = 'block';
-    if (accessoryInput) accessoryInput.value = '';
+    resetFileInput('accessoryInput', null);
     if (accessoryTypeSelect) accessoryTypeSelect.selectedIndex = 0;
 
     // Reset color collection
@@ -2019,21 +2049,21 @@ function resetAllSelections() {
     selectedDisplayScenario = null;
     if (colorVariantsPreview) colorVariantsPreview.innerHTML = '';
     if (colorUploadPlaceholder) colorUploadPlaceholder.style.display = 'block';
-    if (colorVariantsInput) colorVariantsInput.value = '';
+    resetFileInput('colorVariantsInput', null);
 
     // Reset flat lay
     uploadedFlatLayProducts = [];
     selectedArrangement = null;
     if (flatLayPreview) flatLayPreview.innerHTML = '';
     if (flatLayUploadPlaceholder) flatLayUploadPlaceholder.style.display = 'block';
-    if (flatLayInput) flatLayInput.value = '';
+    resetFileInput('flatLayInput', null);
 
     // Reset scene recreation
     uploadedReferencePhoto = null;
     if (window.selectedBrandReferencePhoto) window.selectedBrandReferencePhoto = null;
     if (referencePhotoPreview) referencePhotoPreview.innerHTML = '';
     if (referenceUploadPlaceholder) referenceUploadPlaceholder.style.display = 'block';
-    if (referencePhotoInput) referencePhotoInput.value = '';
+    resetFileInput('referencePhotoInput', null);
     if (sceneAnalysisText) sceneAnalysisText.innerHTML = '';
 
     // Reset hijab selection
@@ -2064,13 +2094,15 @@ function resetAllSelections() {
     const brandSelectStyleTransfer = document.getElementById('brandSelectStyleTransfer');
     const brandContentPhotosContainer = document.getElementById('brandContentPhotosContainer');
 
-    if (styleImagesInput) styleImagesInput.value = '';
+    // Reset style transfer inputs
+    resetFileInput('styleImagesInput', null);
     if (styleImagesPreviews) {
         styleImagesPreviews.innerHTML = '';
         styleImagesPreviews.style.display = 'none';
     }
     if (styleImagesPlaceholder) styleImagesPlaceholder.style.display = 'block';
-    if (contentImageInput) contentImageInput.value = '';
+
+    resetFileInput('contentImageInput', null);
     if (contentImagePreview) contentImagePreview.style.display = 'none';
     if (contentImagePlaceholder) contentImagePlaceholder.style.display = 'block';
     if (selectedContentPhotoPreview) selectedContentPhotoPreview.style.display = 'none';
