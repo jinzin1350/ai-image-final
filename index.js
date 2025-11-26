@@ -3604,9 +3604,9 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // تعریف نوع حجاب
     const hijabDescriptions = {
-      'full': 'Full traditional hijab: headscarf tightly wrapped and secured, completely covering all hair and neck, modest conservative Islamic style, no hair visible at all, professional formal hijab style',
-      'relaxed': 'Relaxed modern hijab: headscarf worn loosely and casually in a modern style, still covering the head but more relaxed, may show a small amount of hair at the front edges or sides, draped freely, trendy casual hijab look',
-      'no-hijab': 'No hijab - hair completely visible and uncovered, no head covering'
+      'full': 'CRITICAL: Full traditional hijab - headscarf MUST completely cover all hair, neck, and ears. Tightly wrapped and secured. NO hair visible whatsoever. Conservative modest Islamic style with professional formal appearance.',
+      'relaxed': 'CRITICAL: Relaxed modern hijab - headscarf MUST be worn covering most of the head in a loose, casual modern style. The hijab should still cover the hair but draped more freely and trendy. Small amounts of hair may show at the front hairline or sides, but head is still mostly covered. NOT completely without hijab.',
+      'no-hijab': 'CRITICAL: NO hijab at all - hair MUST be completely visible, uncovered, and freely shown. No head covering or scarf of any kind.'
     };
 
     const hijabDescription = hijabType && hijabDescriptions[hijabType]
@@ -3744,17 +3744,13 @@ FRAMING & COMPOSITION:
 KEY REQUIREMENTS:
 1. Keep model's face, body, and pose EXACTLY the same - only change the clothes
 2. Garment should fit naturally with realistic wrinkles and fabric draping
-3. Natural skin texture (no plastic smoothing or artificial effects)
-4. ⚠️ CRITICAL - EXACT COLOR PRESERVATION:
+3. Natural skin texture (no plastic smoothing or artificial effects)${hijabDescription ? `\n4. ⚠️ CRITICAL - HIJAB REQUIREMENT: ${hijabDescription}\n5` : '\n4'}. ⚠️ CRITICAL - EXACT COLOR PRESERVATION:
    - Use the EXACT colors from the garment image - do NOT change or shift colors
    - If garment is blue denim, keep it EXACTLY that shade of blue
    - If garment is black, keep it pure black - NOT dark gray or navy
    - If garment is white, keep it pure white - NOT cream or off-white
    - Match color intensity and saturation EXACTLY as shown in garment image
-   - Preserve color variations in fabric (fading, distressing, wash effects)
-5. Realistic fabric physics, wrinkles, and natural shadows
-6. Clean, sharp focus on the model and clothing
-7. ⚠️ CRITICAL DETAIL ATTENTION - FABRIC & HARDWARE:
+   - Preserve color variations in fabric (fading, distressing, wash effects)${hijabDescription ? '\n6' : '\n5'}. Realistic fabric physics, wrinkles, and natural shadows${hijabDescription ? '\n7' : '\n6'}. Clean, sharp focus on the model and clothing${hijabDescription ? '\n8' : '\n7'}. ⚠️ CRITICAL DETAIL ATTENTION - FABRIC & HARDWARE:
 
    **FABRIC PATTERNS & PRINTS (MOST CRITICAL):**
    - ⚠️ If garment has printed design (flowers, graphics, text, logos): preserve EXACTLY as shown
@@ -3806,7 +3802,7 @@ KEY REQUIREMENTS:
    - Show material quality indicators (sheen for silk, matte for cotton, worn texture for denim)
    - Render collar details, cuff details, and hem stitching precisely
    - Maintain any decorative elements (embroidery, prints, patches, logos, labels)
-   - Show fabric weight through natural draping and wrinkle patterns${hijabDescription ? `\n8. IMPORTANT: Apply the specified hijab style correctly: ${hijabDescription}` : ''}
+   - Show fabric weight through natural draping and wrinkle patterns
 
 DO NOT:
 - Change the model's face, body type, or overall appearance
@@ -4540,7 +4536,7 @@ ${hasTwoModels
   ? `   - Dress MODEL 1 in ${garmentDescription}
    - Dress MODEL 2 in ${selectedModel.garmentPaths2.length === 1 ? 'the garment from their garment image' : `ALL ${selectedModel.garmentPaths2.length} garments (combine them on Model 2)`}
    - Each model wears THEIR OWN garment - do NOT mix them up`
-  : `   - Dress the MODEL in ${garmentDescription}`}
+  : `   - Dress the MODEL in ${garmentDescription}`}${hijabDescription ? `\n\n5. ⚠️ **CRITICAL - HIJAB REQUIREMENT**: ${hijabDescription}` : ''}
    - Garment${hasTwoModels ? 's' : ''} should fit naturally with realistic wrinkles and fabric draping
 
    ⚠️ **CRITICAL - EXACT COLOR & DETAIL PRESERVATION:**

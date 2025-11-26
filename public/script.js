@@ -2326,6 +2326,9 @@ if (generateBtn) {
             } else {
                 requestBody.contentImageAnalysis = contentImageAnalysis; // Fallback to on-demand analysis
             }
+
+            // Add hijab type for style transfer
+            requestBody.hijabType = selectedHijabType;
         }
 
         console.log('🚀 Sending request:', requestBody);
