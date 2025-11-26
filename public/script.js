@@ -1705,6 +1705,7 @@ function switchMode(mode) {
 // انتخاب نوع حجاب
 function selectHijabType(hijabType) {
     selectedHijabType = hijabType;
+    console.log('🧕 Hijab type selected:', hijabType);
     document.querySelectorAll('.hijab-option-card').forEach(card => {
         card.classList.toggle('selected', card.dataset.hijabType === hijabType);
     });
@@ -1726,7 +1727,7 @@ function checkGenerateButton() {
 
     if (currentMode === 'complete-outfit') {
         // Complete outfit: need garment, model, background, and hijab (if applicable)
-        const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+        const shouldShowHijab = ['woman', 'girl', 'teen', 'brand-woman', 'brand-girl'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
         const numModels = numberOfModelsSelect ? parseInt(numberOfModelsSelect.value) : 1;
@@ -1766,7 +1767,7 @@ function checkGenerateButton() {
 
     } else if (currentMode === 'scene-recreation') {
         // Scene Recreation mode: need brand reference photo, garment, model, and hijab
-        const shouldShowHijab = ['woman', 'girl', 'teen'].includes(currentCategory);
+        const shouldShowHijab = ['woman', 'girl', 'teen', 'brand-woman', 'brand-girl'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
         // Check if brand reference photo is selected (new method)
