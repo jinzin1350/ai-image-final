@@ -719,14 +719,18 @@
                 if (post.key_points) {
                     const points = post.key_points.split('\n').filter(p => p.trim());
                     if (points.length > 0) {
-                        const listHtml = points.map(point => `<li>${point.trim()}</li>`).join('');
+                        const listHtml = points.map(point => {
+                            const cleanPoint = point.trim().replace(/^\d+\.\s*/, ''); // Remove leading numbers
+                            return `<li>${escapeHtml(cleanPoint)}</li>`;
+                        }).join('');
                         document.getElementById('keyPointsList').innerHTML = listHtml;
                         document.getElementById('articleKeyPoints').style.display = 'block';
                     }
                 }
 
-                // Display main content (decode HTML entities if needed)
-                const content = decodeHtmlEntities(post.content);
+                // Display main content (decode HTML entities if needed and format)
+                let content = decodeHtmlEntities(post.content);
+                content = formatContentToHTML(content);
                 document.getElementById('articleBody').innerHTML = content;
 
                 // Clean up excessive whitespace around tables
@@ -801,6 +805,49 @@
             const textarea = document.createElement('textarea');
             textarea.innerHTML = text;
             return textarea.value;
+        }
+
+        function formatContentToHTML(content) {
+            // If content already has HTML tags, return as is
+            if (content.includes('<p>') || content.includes('<h2>') || content.includes('<div>')) {
+                return content;
+            }
+
+            // Split content by double line breaks to get paragraphs
+            const paragraphs = content.split('\n\n').filter(p => p.trim());
+
+            let html = '';
+
+            for (let para of paragraphs) {
+                para = para.trim();
+
+                // Check if it's a heading (ends with ? or : or has specific patterns)
+                if (para.match(/^[\u0600-\u06FF\s]+[؟?:]$/)) {
+                    // It's a question/heading
+                    html += `<h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 24px; font-weight: 700; color: #1f2937;">${para}</h2>`;
+                } else if (para.match(/^(چرا|چگونه|چه|کجا|کیفیت|نمونه|سوالات)/)) {
+                    // Starts with question words - make it a heading
+                    html += `<h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 24px; font-weight: 700; color: #1f2937;">${para}</h2>`;
+                } else if (para.includes('\n')) {
+                    // Has line breaks - might be a list
+                    const lines = para.split('\n').filter(l => l.trim());
+                    if (lines.length > 1) {
+                        html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                        lines.forEach(line => {
+                            line = line.trim().replace(/^[-•]\s*/, '');
+                            html += `<li style="margin-bottom: 8px; line-height: 1.8;">${line}</li>`;
+                        });
+                        html += '</ul>';
+                    } else {
+                        html += `<p style="margin-bottom: 20px; line-height: 1.8; color: #374151;">${para}</p>`;
+                    }
+                } else {
+                    // Regular paragraph
+                    html += `<p style="margin-bottom: 20px; line-height: 1.8; color: #374151;">${para}</p>`;
+                }
+            }
+
+            return html;
         }
 
         function formatDate(dateString) {
