@@ -743,9 +743,14 @@
                     }
                 }
 
-                // Display main content (decode HTML entities if needed and format)
-                let content = decodeHtmlEntities(post.content);
-                content = formatContentToHTML(content);
+                // Display main content
+                let content = post.content || '';
+
+                // If content doesn't have HTML tags, format it
+                if (!content.includes('<p>') && !content.includes('<h')) {
+                    content = formatPlainTextToHTML(content);
+                }
+
                 document.getElementById('articleBody').innerHTML = content;
 
                 // Clean up excessive whitespace around tables
@@ -822,79 +827,54 @@
             return textarea.value;
         }
 
-        function formatContentToHTML(content) {
-            // If content already has HTML tags, return as is
-            if (content.includes('<p>') || content.includes('<h2>') || content.includes('<div>')) {
-                return content;
-            }
+        function formatPlainTextToHTML(text) {
+            if (!text) return '';
 
-            // Split by single line breaks
-            const lines = content.split('\n').map(l => l.trim()).filter(l => l);
-
+            // Split into lines
+            const lines = text.split('\n');
             let html = '';
-            let currentList = [];
             let inList = false;
 
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
+            for (let line of lines) {
+                line = line.trim();
 
-                // Check if it's a heading (ends with ? or : or ؟)
-                if (line.match(/[؟?:]$/)) {
-                    // Close any open list
-                    if (inList && currentList.length > 0) {
-                        html += '<ul>';
-                        currentList.forEach(item => {
-                            html += `<li>${item}</li>`;
-                        });
+                // Skip empty lines
+                if (!line) {
+                    if (inList) {
                         html += '</ul>';
-                        currentList = [];
                         inList = false;
                     }
+                    continue;
+                }
 
+                // Detect headings - lines ending with ? or : or ؟
+                if (line.endsWith('؟') || line.endsWith('?') || line.endsWith(':')) {
+                    if (inList) {
+                        html += '</ul>';
+                        inList = false;
+                    }
                     html += `<h2>${line}</h2>`;
                 }
-                // Check if it's a list item (contains : at the end after text)
-                else if (line.includes(':') && !line.endsWith('؟') && !line.endsWith('?')) {
-                    // This might be a list item title
-                    // Close previous list if needed
-                    if (!inList && currentList.length > 0) {
+                // Detect list items - lines that contain a : in middle (like "Title: description")
+                else if (line.includes(':') && line.indexOf(':') > 0 && line.indexOf(':') < line.length - 1) {
+                    if (!inList) {
                         html += '<ul>';
-                        currentList.forEach(item => {
-                            html += `<li>${item}</li>`;
-                        });
-                        html += '</ul>';
-                        currentList = [];
+                        inList = true;
                     }
-
-                    currentList.push(line);
-                    inList = true;
+                    html += `<li>${line}</li>`;
                 }
                 // Regular paragraph
                 else {
-                    // Close any open list
-                    if (inList && currentList.length > 0) {
-                        html += '<ul>';
-                        currentList.forEach(item => {
-                            html += `<li>${item}</li>`;
-                        });
+                    if (inList) {
                         html += '</ul>';
-                        currentList = [];
                         inList = false;
                     }
-
-                    // Only add paragraph if it's not empty
-                    if (line.length > 0) {
-                        html += `<p>${line}</p>`;
-                    }
+                    html += `<p>${line}</p>`;
                 }
             }
 
-            // Close any remaining list
-            if (currentList.length > 0) {
-                html += '<ul>';
-                currentList.forEach(item => {
-                    html += `<li>${item}</li>`;
-                });
+            // Close list if still open
+            if (inList) {
                 html += '</ul>';
             }
 
