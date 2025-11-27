@@ -828,7 +828,7 @@
                 return content;
             }
 
-            // Split by single line breaks first
+            // Split by single line breaks
             const lines = content.split('\n').map(l => l.trim()).filter(l => l);
 
             let html = '';
@@ -838,28 +838,29 @@
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
 
-                // Check if it's a heading (ends with ? or :)
+                // Check if it's a heading (ends with ? or : or ؟)
                 if (line.match(/[؟?:]$/)) {
                     // Close any open list
                     if (inList && currentList.length > 0) {
-                        html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                        html += '<ul>';
                         currentList.forEach(item => {
-                            html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                            html += `<li>${item}</li>`;
                         });
                         html += '</ul>';
                         currentList = [];
                         inList = false;
                     }
 
-                    html += `<h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 22px; font-weight: 700; color: #1f2937; line-height: 1.4;">${line}</h2>`;
+                    html += `<h2>${line}</h2>`;
                 }
-                // Check if it's a list item (starts with special patterns)
-                else if (line.match(/^(عکاسی|استفاده|تنظیمات|ویرایش|چگونه|آیا|کیفیت)/)) {
+                // Check if it's a list item (contains : at the end after text)
+                else if (line.includes(':') && !line.endsWith('؟') && !line.endsWith('?')) {
+                    // This might be a list item title
                     // Close previous list if needed
                     if (!inList && currentList.length > 0) {
-                        html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                        html += '<ul>';
                         currentList.forEach(item => {
-                            html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                            html += `<li>${item}</li>`;
                         });
                         html += '</ul>';
                         currentList = [];
@@ -872,24 +873,27 @@
                 else {
                     // Close any open list
                     if (inList && currentList.length > 0) {
-                        html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                        html += '<ul>';
                         currentList.forEach(item => {
-                            html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                            html += `<li>${item}</li>`;
                         });
                         html += '</ul>';
                         currentList = [];
                         inList = false;
                     }
 
-                    html += `<p style="margin-bottom: 20px; line-height: 1.8; color: #374151; text-align: justify;">${line}</p>`;
+                    // Only add paragraph if it's not empty
+                    if (line.length > 0) {
+                        html += `<p>${line}</p>`;
+                    }
                 }
             }
 
             // Close any remaining list
             if (currentList.length > 0) {
-                html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                html += '<ul>';
                 currentList.forEach(item => {
-                    html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                    html += `<li>${item}</li>`;
                 });
                 html += '</ul>';
             }
