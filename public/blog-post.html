@@ -746,11 +746,7 @@
                 // Display main content
                 let content = post.content || '';
 
-                // If content doesn't have HTML tags, format it
-                if (!content.includes('<p>') && !content.includes('<h')) {
-                    content = formatPlainTextToHTML(content);
-                }
-
+                // Clean up and display content
                 document.getElementById('articleBody').innerHTML = content;
 
                 // Clean up excessive whitespace around tables
