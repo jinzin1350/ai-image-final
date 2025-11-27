@@ -520,8 +520,21 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Featured Image URL</label>
-                    <input type="url" id="postImage" class="form-input" placeholder="https://example.com/image.jpg">
+                    <label class="form-label">Featured Image</label>
+                    <input type="url" id="postImage" class="form-input" placeholder="https://example.com/image.jpg or upload below">
+                    <div class="form-helper">Enter image URL or upload an image</div>
+
+                    <div style="margin-top: 12px;">
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                        <button type="button" class="btn-sm btn-edit" onclick="document.getElementById('imageUpload').click()">
+                            📤 Upload Image
+                        </button>
+                        <span id="uploadStatus" style="margin-left: 12px; font-size: 13px;"></span>
+                    </div>
+
+                    <div id="imagePreview" style="margin-top: 12px; display: none;">
+                        <img id="previewImg" style="max-width: 100%; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -694,7 +707,6 @@
 
                 // Ensure data is an array
                 if (!Array.isArray(data)) {
-                    console.error('Invalid response format:', data);
                     throw new Error('Invalid response format from server');
                 }
 
@@ -707,10 +719,9 @@
                     document.getElementById('blogList').style.display = 'block';
                 }
             } catch (error) {
-                console.error('Error loading blog posts:', error);
                 const errorMsg = error.message.includes('blog_posts')
                     ? 'Database table not found. Please run database/blog_schema.sql in Supabase first!'
-                    : 'Failed to load blog posts: ' + error.message;
+                    : 'Failed to load blog posts';
                 showNotification(errorMsg, 'error');
                 document.getElementById('emptyState').style.display = 'block';
             } finally {
@@ -754,6 +765,11 @@
             quill.setContents([]);
             currentTags = [];
             renderTags();
+
+            // Clear image preview
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('uploadStatus').textContent = '';
+
             document.getElementById('editorModal').classList.add('active');
         }
 
@@ -771,6 +787,14 @@
                 document.getElementById('postCategory').value = post.category || '';
                 document.getElementById('postAuthor').value = post.author;
                 document.getElementById('postImage').value = post.featured_image || '';
+
+                // Show image preview if exists
+                if (post.featured_image) {
+                    const previewImg = document.getElementById('previewImg');
+                    previewImg.src = post.featured_image;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+
                 document.getElementById('metaTitle').value = post.meta_title || '';
                 document.getElementById('metaDescription').value = post.meta_description || '';
                 document.getElementById('seoKeywords').value = post.seo_keywords || '';
@@ -791,7 +815,6 @@
 
                 document.getElementById('editorModal').classList.add('active');
             } catch (error) {
-                console.error('Error loading post:', error);
                 showNotification('Failed to load post', 'error');
             }
         }
@@ -819,7 +842,7 @@
                         articleSchemaObj = JSON.parse(articleSchemaText);
                     }
                 } catch (e) {
-                    console.warn('Invalid Article Schema JSON:', e);
+                    // Invalid JSON - will be ignored
                 }
 
                 try {
@@ -828,7 +851,7 @@
                         faqSchemaObj = JSON.parse(faqSchemaText);
                     }
                 } catch (e) {
-                    console.warn('Invalid FAQ Schema JSON:', e);
+                    // Invalid JSON - will be ignored
                 }
 
                 const postData = {
@@ -872,8 +895,7 @@
                     throw new Error(result.error || 'Failed to save post');
                 }
             } catch (error) {
-                console.error('Error saving post:', error);
-                showNotification(error.message, 'error');
+                showNotification('Failed to save post', 'error');
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Save Post';
@@ -896,8 +918,7 @@
                     throw new Error(result.error);
                 }
             } catch (error) {
-                console.error('Error toggling publish:', error);
-                showNotification(error.message, 'error');
+                showNotification('Failed to update publish status', 'error');
             }
         }
 
@@ -920,8 +941,62 @@
                     throw new Error(result.error);
                 }
             } catch (error) {
-                console.error('Error deleting post:', error);
-                showNotification(error.message, 'error');
+                showNotification('Failed to delete post', 'error');
+            }
+        }
+
+        // Handle image upload for blog posts
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show loading status
+            const statusElement = document.getElementById('uploadStatus');
+            statusElement.textContent = 'Uploading...';
+            statusElement.style.color = '#667eea';
+
+            try {
+                // Create FormData
+                const formData = new FormData();
+                formData.append('image', file);
+
+                // Upload blog image
+                const response = await fetchWithAuth('/api/admin/blog/upload-image', {
+                    method: 'POST',
+                    body: formData
+                    // Don't set headers - let browser handle Content-Type for FormData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload failed');
+                }
+
+                const result = await response.json();
+
+                if (result.success && result.url) {
+                    // Set the URL in the input field
+                    document.getElementById('postImage').value = result.url;
+
+                    // Show preview
+                    const previewImg = document.getElementById('previewImg');
+                    previewImg.src = result.url;
+                    document.getElementById('imagePreview').style.display = 'block';
+
+                    // Show success status
+                    statusElement.textContent = '✓ Image uploaded successfully!';
+                    statusElement.style.color = '#10b981';
+
+                    // Clear status after 3 seconds
+                    setTimeout(() => {
+                        statusElement.textContent = '';
+                    }, 3000);
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                statusElement.textContent = '✗ Upload failed';
+                statusElement.style.color = '#ef4444';
             }
         }
 

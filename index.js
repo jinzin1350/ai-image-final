@@ -6835,8 +6835,7 @@ app.get('/api/blog', async (req, res) => {
 
     res.json(data || []);
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to load blog posts' });
   }
 });
 
@@ -6853,14 +6852,12 @@ app.get('/api/blog/:slug', async (req, res) => {
       .single();
 
     if (error) {
-      console.error('Error fetching blog post:', error);
       return res.status(404).json({ error: 'Blog post not found' });
     }
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching blog post:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to load blog post' });
   }
 });
 
@@ -6876,8 +6873,7 @@ app.get('/api/admin/blog', authenticateAdmin, async (req, res) => {
 
     res.json(data || []);
   } catch (error) {
-    console.error('Error fetching admin blog posts:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to load blog posts' });
   }
 });
 
@@ -6896,7 +6892,6 @@ app.get('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error('Error fetching blog post:', error);
     res.status(404).json({ error: 'Blog post not found' });
   }
 });
@@ -6973,8 +6968,7 @@ app.post('/api/admin/blog', authenticateAdmin, async (req, res) => {
 
     res.json({ success: true, post: data });
   } catch (error) {
-    console.error('Error creating blog post:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to create blog post' });
   }
 });
 
@@ -7055,8 +7049,7 @@ app.put('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
 
     res.json({ success: true, post: data });
   } catch (error) {
-    console.error('Error updating blog post:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to update blog post' });
   }
 });
 
@@ -7074,8 +7067,47 @@ app.delete('/api/admin/blog/:id', authenticateAdmin, async (req, res) => {
 
     res.json({ success: true, message: 'Blog post deleted successfully' });
   } catch (error) {
-    console.error('Error deleting blog post:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to delete blog post' });
+  }
+});
+
+// Upload blog image (admin)
+app.post('/api/admin/blog/upload-image', authenticateAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    }
+
+    const fileName = `blog-${Date.now()}-${sanitizeFilename(req.file.originalname)}`;
+
+    // Upload to Supabase Storage in blog-images bucket
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('blog-images')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('blog-images')
+      .getPublicUrl(fileName);
+
+    res.json({
+      success: true,
+      url: urlData.publicUrl,
+      fileName: fileName
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to upload image' });
   }
 });
 

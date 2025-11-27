@@ -301,7 +301,6 @@
                     document.getElementById('blogGrid').style.display = 'grid';
                 }
             } catch (error) {
-                console.error('Error loading blog posts:', error);
                 document.getElementById('loading').innerHTML = 'Failed to load blog posts. Please try again later.';
             }
         }
@@ -341,26 +340,32 @@
                 <a href="/blog/${post.slug}" class="blog-card">
                     <div class="blog-image">
                         ${post.featured_image
-                            ? `<img src="${post.featured_image}" alt="${post.title}">`
+                            ? `<img src="${post.featured_image}" alt="${escapeHtml(post.title)}" onerror="this.parentElement.innerHTML='📄'">`
                             : '📄'
                         }
                     </div>
                     <div class="blog-content">
                         <div class="blog-meta">
-                            ${post.category ? `<span class="blog-category">${post.category}</span>` : ''}
+                            ${post.category ? `<span class="blog-category">${escapeHtml(post.category)}</span>` : ''}
                             <span>📅 ${formatDate(post.published_at)}</span>
                         </div>
-                        <h2 class="blog-title">${post.title}</h2>
-                        <p class="blog-excerpt">${post.excerpt || 'Click to read more...'}</p>
+                        <h2 class="blog-title">${escapeHtml(post.title)}</h2>
+                        <p class="blog-excerpt">${escapeHtml(post.excerpt || 'Click to read more...')}</p>
                         <div class="blog-footer">
                             <div class="blog-author">
-                                <span>✍️ ${post.author}</span>
+                                <span>✍️ ${escapeHtml(post.author)}</span>
                             </div>
                             <span class="read-more">Read More →</span>
                         </div>
                     </div>
                 </a>
             `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function formatDate(dateString) {

@@ -26,9 +26,16 @@ async function fetchWithAuth(url, options = {}) {
     const headers = {
         'admin-email': adminEmail,
         'admin-password': adminPassword,
-        'Content-Type': 'application/json',
         ...options.headers
     };
+
+    // Only set Content-Type if not explicitly overridden and not FormData
+    if (!options.headers || !options.headers.hasOwnProperty('Content-Type')) {
+        // Check if body is FormData - if so, don't set Content-Type
+        if (!(options.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+        }
+    }
 
     const response = await fetch(url, {
         ...options,

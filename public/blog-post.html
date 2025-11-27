@@ -691,13 +691,13 @@
                 // Display meta information
                 const metaHtml = [];
                 if (post.category) {
-                    metaHtml.push(`<span class="category-badge">${post.category}</span>`);
+                    metaHtml.push(`<span class="category-badge">${escapeHtml(post.category)}</span>`);
                 }
                 if (post.published_at) {
                     metaHtml.push(`<span class="meta-item">📅 ${formatDate(post.published_at)}</span>`);
                 }
                 if (post.author) {
-                    metaHtml.push(`<span class="meta-item">✍️ ${post.author}</span>`);
+                    metaHtml.push(`<span class="meta-item">✍️ ${escapeHtml(post.author)}</span>`);
                 }
                 document.getElementById('articleMeta').innerHTML = metaHtml.join('');
 
@@ -743,7 +743,7 @@
 
                 // Display tags
                 if (post.tags && post.tags.length > 0) {
-                    const tagsHtml = post.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                    const tagsHtml = post.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
                     document.getElementById('tagsList').innerHTML = tagsHtml;
                     document.getElementById('tagsSection').style.display = 'block';
                 }
@@ -753,7 +753,6 @@
                 document.getElementById('articleContent').style.display = 'block';
 
             } catch (error) {
-                console.error('Error loading blog post:', error);
                 showError();
             }
         }
@@ -786,10 +785,16 @@
 
             return faqItems.map(item => `
                 <div class="faq-item">
-                    <div class="faq-question">Q: ${item.question}</div>
-                    <div class="faq-answer">A: ${item.answer}</div>
+                    <div class="faq-question">Q: ${escapeHtml(item.question)}</div>
+                    <div class="faq-answer">A: ${escapeHtml(item.answer)}</div>
                 </div>
             `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function decodeHtmlEntities(text) {
