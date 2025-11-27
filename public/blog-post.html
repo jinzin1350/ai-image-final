@@ -686,6 +686,21 @@
                     img.src = post.featured_image;
                     img.alt = post.title;
                     img.style.display = 'block';
+
+                    // Add error handler for broken images
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        const container = this.parentElement;
+                        if (container) {
+                            container.innerHTML = '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center; border-radius: 12px; font-size: 48px;">📸</div>';
+                        }
+                    };
+                } else {
+                    // No featured image - show placeholder
+                    const imgContainer = document.getElementById('featuredImage').parentElement;
+                    if (imgContainer) {
+                        imgContainer.innerHTML = '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center; border-radius: 12px; font-size: 48px;">📝</div>';
+                    }
                 }
 
                 // Display meta information
@@ -813,38 +828,70 @@
                 return content;
             }
 
-            // Split content by double line breaks to get paragraphs
-            const paragraphs = content.split('\n\n').filter(p => p.trim());
+            // Split by single line breaks first
+            const lines = content.split('\n').map(l => l.trim()).filter(l => l);
 
             let html = '';
+            let currentList = [];
+            let inList = false;
 
-            for (let para of paragraphs) {
-                para = para.trim();
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
 
-                // Check if it's a heading (ends with ? or : or has specific patterns)
-                if (para.match(/^[\u0600-\u06FF\s]+[؟?:]$/)) {
-                    // It's a question/heading
-                    html += `<h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 24px; font-weight: 700; color: #1f2937;">${para}</h2>`;
-                } else if (para.match(/^(چرا|چگونه|چه|کجا|کیفیت|نمونه|سوالات)/)) {
-                    // Starts with question words - make it a heading
-                    html += `<h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 24px; font-weight: 700; color: #1f2937;">${para}</h2>`;
-                } else if (para.includes('\n')) {
-                    // Has line breaks - might be a list
-                    const lines = para.split('\n').filter(l => l.trim());
-                    if (lines.length > 1) {
+                // Check if it's a heading (ends with ? or :)
+                if (line.match(/[؟?:]$/)) {
+                    // Close any open list
+                    if (inList && currentList.length > 0) {
                         html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
-                        lines.forEach(line => {
-                            line = line.trim().replace(/^[-•]\s*/, '');
-                            html += `<li style="margin-bottom: 8px; line-height: 1.8;">${line}</li>`;
+                        currentList.forEach(item => {
+                            html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
                         });
                         html += '</ul>';
-                    } else {
-                        html += `<p style="margin-bottom: 20px; line-height: 1.8; color: #374151;">${para}</p>`;
+                        currentList = [];
+                        inList = false;
                     }
-                } else {
-                    // Regular paragraph
-                    html += `<p style="margin-bottom: 20px; line-height: 1.8; color: #374151;">${para}</p>`;
+
+                    html += `<h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 22px; font-weight: 700; color: #1f2937; line-height: 1.4;">${line}</h2>`;
                 }
+                // Check if it's a list item (starts with special patterns)
+                else if (line.match(/^(عکاسی|استفاده|تنظیمات|ویرایش|چگونه|آیا|کیفیت)/)) {
+                    // Close previous list if needed
+                    if (!inList && currentList.length > 0) {
+                        html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                        currentList.forEach(item => {
+                            html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                        });
+                        html += '</ul>';
+                        currentList = [];
+                    }
+
+                    currentList.push(line);
+                    inList = true;
+                }
+                // Regular paragraph
+                else {
+                    // Close any open list
+                    if (inList && currentList.length > 0) {
+                        html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                        currentList.forEach(item => {
+                            html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                        });
+                        html += '</ul>';
+                        currentList = [];
+                        inList = false;
+                    }
+
+                    html += `<p style="margin-bottom: 20px; line-height: 1.8; color: #374151; text-align: justify;">${line}</p>`;
+                }
+            }
+
+            // Close any remaining list
+            if (currentList.length > 0) {
+                html += '<ul style="margin: 20px 0; padding-right: 24px; list-style: disc;">';
+                currentList.forEach(item => {
+                    html += `<li style="margin-bottom: 8px; line-height: 1.8; color: #374151;">${item}</li>`;
+                });
+                html += '</ul>';
             }
 
             return html;
