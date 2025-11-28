@@ -16,9 +16,7 @@
     <title>Blog Management - Admin Dashboard</title>
     <link rel="stylesheet" href="/admin-style.css">
 
-    <!-- Quill Rich Text Editor -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <!-- Raw HTML Editor - No external dependencies needed -->
 
     <style>
         .blog-table {
@@ -215,11 +213,51 @@
             min-height: 100px;
         }
 
-        #editor-container {
-            height: 400px;
-            background: white;
+        #contentEditor {
+            min-height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 12px;
             border: 1px solid var(--gray-300);
             border-radius: 8px;
+            resize: vertical;
+        }
+
+        .preview-container {
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9fafb;
+            margin-top: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .preview-container.show {
+            display: block;
+        }
+
+        .editor-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-preview {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preview:hover {
+            background: #5568d3;
         }
 
         .checkbox-wrapper {
@@ -491,8 +529,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Content *</label>
-                    <div id="editor-container"></div>
+                    <label class="form-label">Content * (HTML)</label>
+                    <div class="form-helper">Paste your HTML content directly here. Use Preview to see how it will look.</div>
+                    <textarea id="contentEditor" class="form-textarea" required placeholder="<h2>Your heading</h2><p>Your content...</p>"></textarea>
+                    <div class="editor-actions">
+                        <button type="button" class="btn-preview" onclick="togglePreview()">👁️ Preview</button>
+                        <button type="button" class="btn-preview" onclick="clearEditor()" style="background: #ef4444;">🗑️ Clear</button>
+                    </div>
+                    <div id="contentPreview" class="preview-container"></div>
                 </div>
 
                 <div class="form-group">
@@ -609,33 +653,36 @@
     <script src="/admin-menu.js"></script>
     <script src="/admin-common.js"></script>
     <script>
-        let quill;
         let currentEditId = null;
         let allPosts = [];
         let currentTags = [];
 
-        // Initialize Quill editor
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-            quill = new Quill('#editor-container', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        ['blockquote', 'code-block'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'script': 'sub'}, { 'script': 'super' }],
-                        [{ 'indent': '-1'}, { 'indent': '+1' }],
-                        ['link', 'image', 'video'],
-                        ['clean']
-                    ]
-                },
-                placeholder: 'Write your blog post content here...'
-            });
-
             loadBlogPosts();
             setupTagsInput();
         });
+
+        // Preview toggle
+        function togglePreview() {
+            const editor = document.getElementById('contentEditor');
+            const preview = document.getElementById('contentPreview');
+
+            if (preview.classList.contains('show')) {
+                preview.classList.remove('show');
+            } else {
+                preview.innerHTML = editor.value;
+                preview.classList.add('show');
+            }
+        }
+
+        // Clear editor
+        function clearEditor() {
+            if (confirm('Are you sure you want to clear all content?')) {
+                document.getElementById('contentEditor').value = '';
+                document.getElementById('contentPreview').classList.remove('show');
+            }
+        }
 
         // Auto-generate slug from title
         document.getElementById('postTitle')?.addEventListener('input', (e) => {
@@ -808,9 +855,9 @@
                 currentTags = post.tags || [];
                 renderTags();
 
-                // Set content in Quill
+                // Set content in editor
                 if (post.content) {
-                    quill.root.innerHTML = post.content;
+                    document.getElementById('contentEditor').value = post.content;
                 }
 
                 document.getElementById('editorModal').classList.add('active');
@@ -858,7 +905,7 @@
                     slug: document.getElementById('postSlug').value.trim(),
                     title: document.getElementById('postTitle').value.trim(),
                     excerpt: document.getElementById('postExcerpt').value.trim(),
-                    content: quill.root.innerHTML,
+                    content: document.getElementById('contentEditor').value.trim(),
                     author: document.getElementById('postAuthor').value.trim(),
                     category: document.getElementById('postCategory').value,
                     tags: currentTags,
