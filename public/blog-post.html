@@ -158,6 +158,9 @@
             text-align: right;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            white-space: normal;
+            word-spacing: normal;
+            letter-spacing: normal;
         }
 
         /* Quill editor specific styles */
@@ -171,6 +174,18 @@
 
         .article-body > *:last-child {
             margin-bottom: 0;
+        }
+
+        /* Force proper text rendering for all elements */
+        .article-body * {
+            white-space: normal !important;
+            word-spacing: normal !important;
+        }
+
+        /* Override for code blocks */
+        .article-body pre,
+        .article-body code {
+            white-space: pre-wrap !important;
         }
 
         .article-body h1 {
@@ -227,6 +242,9 @@
             margin-bottom: 1.5rem;
             line-height: 2.2;
             display: block;
+            white-space: normal;
+            word-spacing: normal;
+            letter-spacing: normal;
         }
 
         .article-body div {
@@ -262,6 +280,8 @@
         .article-body li {
             margin-bottom: 0.8rem;
             line-height: 2;
+            white-space: normal;
+            word-spacing: normal;
         }
 
         .article-body img {
