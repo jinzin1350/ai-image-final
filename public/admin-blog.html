@@ -533,8 +533,11 @@
                     <div class="form-helper">Paste your HTML content directly here. Use Preview to see how it will look.</div>
                     <textarea id="contentEditor" class="form-textarea" required placeholder="<h2>Your heading</h2><p>Your content...</p>"></textarea>
                     <div class="editor-actions">
+                        <input type="file" id="contentImageUpload" accept="image/*" style="display: none;" onchange="insertImageToContent(event)">
+                        <button type="button" class="btn-preview" onclick="document.getElementById('contentImageUpload').click()" style="background: #10b981;">📷 Insert Image</button>
                         <button type="button" class="btn-preview" onclick="togglePreview()">👁️ Preview</button>
                         <button type="button" class="btn-preview" onclick="clearEditor()" style="background: #ef4444;">🗑️ Clear</button>
+                        <span id="imageInsertStatus" style="margin-left: 12px; font-size: 13px;"></span>
                     </div>
                     <div id="contentPreview" class="preview-container"></div>
                 </div>
@@ -682,6 +685,64 @@
                 document.getElementById('contentEditor').value = '';
                 document.getElementById('contentPreview').classList.remove('show');
             }
+        }
+
+        // Insert image into content
+        async function insertImageToContent(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusElement = document.getElementById('imageInsertStatus');
+            statusElement.textContent = 'Uploading image...';
+            statusElement.style.color = '#667eea';
+
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetchWithAuth('/api/admin/blog/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload failed');
+                }
+
+                const result = await response.json();
+
+                if (result.success && result.url) {
+                    // Insert image tag at cursor position (or end of content)
+                    const editor = document.getElementById('contentEditor');
+                    const imageTag = `\n<img src="${result.url}" alt="Blog image">\n`;
+
+                    // Insert at cursor position or end
+                    const cursorPos = editor.selectionStart;
+                    const textBefore = editor.value.substring(0, cursorPos);
+                    const textAfter = editor.value.substring(cursorPos);
+                    editor.value = textBefore + imageTag + textAfter;
+
+                    // Move cursor after inserted image
+                    editor.selectionStart = editor.selectionEnd = cursorPos + imageTag.length;
+                    editor.focus();
+
+                    statusElement.textContent = '✓ Image inserted!';
+                    statusElement.style.color = '#10b981';
+
+                    setTimeout(() => {
+                        statusElement.textContent = '';
+                    }, 3000);
+                } else {
+                    throw new Error('No URL returned');
+                }
+            } catch (error) {
+                statusElement.textContent = '✗ Upload failed';
+                statusElement.style.color = '#ef4444';
+            }
+
+            // Reset file input
+            event.target.value = '';
         }
 
         // Auto-generate slug from title
