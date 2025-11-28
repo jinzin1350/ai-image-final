@@ -7107,7 +7107,12 @@ app.post('/api/admin/blog/upload-image', authenticateAdmin, upload.single('image
       fileName: fileName
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to upload image' });
+    console.error('Blog image upload error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload image',
+      details: error.message
+    });
   }
 });
 
