@@ -46,8 +46,8 @@
                 <h2>ورود به حساب کاربری</h2>
                 <form onsubmit="handleSignIn(event)">
                     <div class="form-group">
-                        <label for="signInEmail">ایمیل</label>
-                        <input type="email" id="signInEmail" required placeholder="email@example.com">
+                        <label for="signInEmail">ایمیل یا شماره تلفن</label>
+                        <input type="text" id="signInEmail" required placeholder="email@example.com یا 09123456789">
                     </div>
                     <div class="form-group">
                         <label for="signInPassword">رمز عبور</label>
@@ -56,7 +56,7 @@
                     <button type="submit" class="btn-primary" id="signInBtn">ورود</button>
                 </form>
                 <p class="toggle-form">
-                    حساب کاربری ندارید؟ 
+                    حساب کاربری ندارید؟
                     <a href="#" onclick="toggleForms(event)">ثبت نام کنید</a>
                 </p>
             </div>

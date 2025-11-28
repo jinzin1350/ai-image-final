@@ -88,10 +88,35 @@ async function handleSignIn(event) {
         return;
     }
 
-    const email = document.getElementById('signInEmail').value;
+    const emailOrPhone = document.getElementById('signInEmail').value.trim();
     const password = document.getElementById('signInPassword').value;
 
     try {
+        let email = emailOrPhone;
+
+        // Check if input is a phone number (starts with 09 and is 11 digits)
+        const phonePattern = /^09[0-9]{9}$/;
+        if (phonePattern.test(emailOrPhone)) {
+            console.log('📱 Phone number detected, looking up email...');
+
+            // Query the users table to find email by phone
+            const { data: userData, error: userError } = await supabaseClient
+                .from('users')
+                .select('email')
+                .eq('phone', emailOrPhone)
+                .single();
+
+            if (userError || !userData) {
+                console.error('❌ User not found with this phone number:', userError);
+                showError('کاربری با این شماره تلفن یافت نشد');
+                hideLoading();
+                return;
+            }
+
+            email = userData.email;
+            console.log('✅ Found email for phone number');
+        }
+
         const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: password
