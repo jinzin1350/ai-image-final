@@ -152,10 +152,25 @@
 
         .article-body {
             font-size: 1.1rem;
-            line-height: 2;
+            line-height: 2.2;
             color: #333;
             direction: rtl;
             text-align: right;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Quill editor specific styles */
+        .article-body .ql-editor {
+            padding: 0;
+        }
+
+        .article-body > * {
+            margin-bottom: 1.5rem;
+        }
+
+        .article-body > *:last-child {
+            margin-bottom: 0;
         }
 
         .article-body h1 {
@@ -211,6 +226,30 @@
         .article-body p {
             margin-bottom: 1.5rem;
             line-height: 2.2;
+            display: block;
+        }
+
+        .article-body div {
+            margin-bottom: 1.5rem;
+            line-height: 2.2;
+        }
+
+        .article-body div.tldr {
+            background: #f0f4ff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-right: 4px solid #667eea;
+            margin: 2rem 0;
+        }
+
+        .article-body div.tldr h2 {
+            margin-top: 0;
+            font-size: 1.4rem;
+            color: #667eea;
+        }
+
+        .article-body div.tldr p {
+            margin-bottom: 0;
         }
 
         .article-body ul, .article-body ol {
@@ -282,11 +321,19 @@
             text-decoration: none;
             border-bottom: 1px solid #667eea;
             transition: all 0.3s;
+            word-break: break-word;
         }
 
         .article-body a:hover {
             border-bottom: 2px solid #667eea;
             color: #5568d3;
+        }
+
+        /* Ensure proper spacing for all elements */
+        .article-body > h1:first-child,
+        .article-body > h2:first-child,
+        .article-body > h3:first-child {
+            margin-top: 0;
         }
 
         .article-body table {
@@ -337,13 +384,14 @@
             background: #667eea;
             color: white;
             padding: 1rem;
-            text-align: left;
+            text-align: right;
             font-weight: 600;
         }
 
         .article-body table td {
             padding: 1rem;
             border-bottom: 1px solid #e0e0e0;
+            text-align: right;
         }
 
         .article-body table tr:last-child td {
@@ -751,6 +799,9 @@
 
                 // Display main content
                 let content = post.content || '';
+
+                // Decode HTML entities that may have been escaped
+                content = decodeHtmlEntities(content);
 
                 // Clean up and display content
                 document.getElementById('articleBody').innerHTML = content;
