@@ -99,22 +99,33 @@ async function handleSignIn(event) {
         if (phonePattern.test(emailOrPhone)) {
             console.log('📱 Phone number detected, looking up email...');
 
-            // Query the users table to find email by phone
-            const { data: userData, error: userError } = await supabaseClient
-                .from('users')
-                .select('email')
-                .eq('phone', emailOrPhone)
-                .single();
+            // Call API to lookup email by phone number
+            try {
+                const response = await fetch('/api/auth/lookup-email-by-phone', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone: emailOrPhone })
+                });
 
-            if (userError || !userData) {
-                console.error('❌ User not found with this phone number:', userError);
-                showError('کاربری با این شماره تلفن یافت نشد');
+                const result = await response.json();
+
+                if (!response.ok || result.error) {
+                    console.error('❌ User not found with this phone number:', result.error);
+                    showError('کاربری با این شماره تلفن یافت نشد');
+                    hideLoading();
+                    return;
+                }
+
+                email = result.email;
+                console.log('✅ Found email for phone number');
+            } catch (lookupError) {
+                console.error('❌ Error looking up phone number:', lookupError);
+                showError('خطا در جستجوی شماره تلفن');
                 hideLoading();
                 return;
             }
-
-            email = userData.email;
-            console.log('✅ Found email for phone number');
         }
 
         const { data, error } = await supabaseClient.auth.signInWithPassword({

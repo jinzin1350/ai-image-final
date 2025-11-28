@@ -2398,6 +2398,41 @@ app.get('/api/supabase-config', (req, res) => {
   });
 });
 
+// Lookup email by phone number for authentication
+app.post('/api/auth/lookup-email-by-phone', async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ error: 'Phone number is required' });
+    }
+
+    if (!supabaseAdmin) {
+      return res.status(500).json({ error: 'Admin client not configured' });
+    }
+
+    // Query auth.users to find user with matching phone in metadata
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+
+    if (error) {
+      console.error('Error fetching users:', error);
+      return res.status(500).json({ error: 'Failed to lookup user' });
+    }
+
+    // Find user with matching phone in user_metadata
+    const user = data.users.find(u => u.user_metadata?.phone === phone);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found with this phone number' });
+    }
+
+    res.json({ email: user.email });
+  } catch (error) {
+    console.error('Error in phone lookup:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // دریافت لیست نورپردازی
 app.get('/api/lightings', (req, res) => {
   res.json(lightings);
