@@ -7078,14 +7078,14 @@ app.post('/api/admin/blog/upload-image', authenticateAdmin, upload.single('image
       return res.status(400).json({ success: false, error: 'No file uploaded' });
     }
 
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase not configured' });
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin not configured' });
     }
 
     const fileName = `blog-${Date.now()}-${sanitizeFilename(req.file.originalname)}`;
 
-    // Upload to Supabase Storage in blog-images bucket
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    // Upload to Supabase Storage in blog-images bucket using admin client
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from('blog-images')
       .upload(fileName, req.file.buffer, {
         contentType: req.file.mimetype,
@@ -7097,7 +7097,7 @@ app.post('/api/admin/blog/upload-image', authenticateAdmin, upload.single('image
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseAdmin.storage
       .from('blog-images')
       .getPublicUrl(fileName);
 
