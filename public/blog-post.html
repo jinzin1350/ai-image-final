@@ -150,292 +150,107 @@
             font-weight: 400;
         }
 
+        /* Clean Article Body Styles - Rewritten from scratch */
         .article-body {
-            font-size: 1.1rem;
-            line-height: 2.2;
-            color: #333;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #2d3748;
             direction: rtl;
             text-align: right;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            white-space: normal;
-            word-spacing: normal;
-            letter-spacing: normal;
         }
 
-        /* Quill editor specific styles */
-        .article-body .ql-editor {
-            padding: 0;
-        }
-
-        .article-body > * {
-            margin-bottom: 1.5rem;
-        }
-
-        .article-body > *:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Force proper text rendering for all elements */
         .article-body * {
-            white-space: normal !important;
-            word-spacing: normal !important;
-        }
-
-        /* Override for code blocks */
-        .article-body pre,
-        .article-body code {
-            white-space: pre-wrap !important;
+            max-width: 100%;
         }
 
         .article-body h1 {
-            font-size: 2.2rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: #1a1a1a;
-            font-weight: 800;
-            line-height: 1.3;
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 30px 0 20px 0;
+            line-height: 1.4;
         }
 
         .article-body h2 {
-            font-size: 1.9rem;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            color: #1a1a2e;
-            font-weight: 800;
-            line-height: 1.5;
-            position: relative;
-            padding-right: 20px;
-        }
-
-        .article-body h2:before {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 5px;
-            height: 70%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 40px 0 20px 0;
+            line-height: 1.4;
+            padding-right: 15px;
+            border-right: 4px solid #667eea;
         }
 
         .article-body h3 {
-            font-size: 1.4rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1.2rem;
-            color: #1a1a1a;
+            font-size: 24px;
             font-weight: 600;
-            line-height: 1.6;
+            color: #2d3748;
+            margin: 30px 0 15px 0;
+            line-height: 1.4;
         }
 
         .article-body h4 {
-            font-size: 1.2rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            color: #333;
+            font-size: 20px;
             font-weight: 600;
-            line-height: 1.6;
+            color: #4a5568;
+            margin: 25px 0 15px 0;
+            line-height: 1.4;
         }
 
         .article-body p {
-            margin-bottom: 1.5rem;
-            line-height: 2.2;
-            display: block;
-            white-space: normal;
-            word-spacing: normal;
-            letter-spacing: normal;
+            margin: 0 0 20px 0;
+            line-height: 1.8;
         }
 
-        .article-body div {
-            margin-bottom: 1.5rem;
-            line-height: 2.2;
-        }
-
-        .article-body div.tldr {
-            background: #f0f4ff;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-right: 4px solid #667eea;
-            margin: 2rem 0;
-        }
-
-        .article-body div.tldr h2 {
-            margin-top: 0;
-            font-size: 1.4rem;
-            color: #667eea;
-        }
-
-        .article-body div.tldr p {
-            margin-bottom: 0;
-        }
-
-        .article-body ul, .article-body ol {
-            margin-bottom: 1.5rem;
-            margin-top: 1rem;
-            padding-right: 2rem;
+        .article-body ul,
+        .article-body ol {
+            margin: 20px 0;
+            padding-right: 30px;
             padding-left: 0;
         }
 
         .article-body li {
-            margin-bottom: 0.8rem;
-            line-height: 2;
-            white-space: normal;
-            word-spacing: normal;
+            margin-bottom: 12px;
+            line-height: 1.7;
         }
 
-        .article-body img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 12px;
-            margin: 2.5rem auto;
-            display: block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .article-body iframe {
-            max-width: 100%;
-            width: 100%;
-            height: 400px;
-            border-radius: 12px;
-            margin: 1.5rem auto;
-            display: block;
-            border: none;
-        }
-
-        .article-body blockquote {
-            border-right: 4px solid #667eea;
-            border-left: none;
-            padding-right: 1.5rem;
-            padding-left: 1.5rem;
-            margin: 2rem 0;
-            font-style: italic;
-            color: #555;
-            background: #f8f9ff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            line-height: 2;
-        }
-
-        .article-body pre {
-            background: #f5f5f5;
-            padding: 1.5rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 2rem 0;
-            border: 1px solid #e0e0e0;
-            line-height: 1.8;
-        }
-
-        .article-body code {
-            background: #f5f5f5;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #e83e8c;
+        .article-body strong {
+            font-weight: 700;
+            color: #1a202c;
         }
 
         .article-body a {
             color: #667eea;
-            text-decoration: none;
-            border-bottom: 1px solid #667eea;
-            transition: all 0.3s;
-            word-break: break-word;
+            text-decoration: underline;
         }
 
         .article-body a:hover {
-            border-bottom: 2px solid #667eea;
-            color: #5568d3;
-        }
-
-        /* Ensure proper spacing for all elements */
-        .article-body > h1:first-child,
-        .article-body > h2:first-child,
-        .article-body > h3:first-child {
-            margin-top: 0;
+            color: #5a67d8;
         }
 
         .article-body table {
             width: 100%;
             border-collapse: collapse;
-            margin: 2rem 0;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* Remove excessive spacing before and after tables */
-        .article-body h2 + p:empty,
-        .article-body h3 + p:empty,
-        .article-body h4 + p:empty {
-            display: none;
-        }
-
-        /* Collapse ALL empty paragraphs and breaks */
-        .article-body p:empty,
-        .article-body p:blank {
-            display: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Hide paragraphs with only whitespace/nbsp */
-        .article-body p:not(:has(*)):not(:has(img)) {
-            line-height: 0;
-        }
-
-        /* Remove consecutive breaks */
-        .article-body br + br,
-        .article-body br + br + br {
-            display: none;
-        }
-
-        /* Tighter spacing before tables */
-        .article-body h2 + table,
-        .article-body h3 + table,
-        .article-body h4 + table,
-        .article-body p + table {
-            margin-top: 1rem !important;
+            margin: 30px 0;
+            border: 1px solid #e2e8f0;
         }
 
         .article-body table th {
             background: #667eea;
             color: white;
-            padding: 1rem;
+            padding: 15px;
             text-align: right;
             font-weight: 600;
         }
 
         .article-body table td {
-            padding: 1rem;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
             text-align: right;
         }
 
-        .article-body table tr:last-child td {
-            border-bottom: none;
-        }
-
         .article-body table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        .article-body hr {
-            border: none;
-            border-top: 2px solid #e0e0e0;
-            margin: 1.5rem 0;
-        }
-
-        .article-body strong {
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .article-body em {
-            font-style: italic;
-            color: #555;
+            background: #f7fafc;
         }
 
         .tags-section {
