@@ -870,13 +870,14 @@
             currentEditId = null;
             document.getElementById('modalTitle').textContent = 'Create New Post';
             document.getElementById('blogForm').reset();
-            quill.setContents([]);
+            document.getElementById('contentEditor').value = '';
             currentTags = [];
             renderTags();
 
             // Clear image preview
             document.getElementById('imagePreview').style.display = 'none';
             document.getElementById('uploadStatus').textContent = '';
+            document.getElementById('contentPreview').classList.remove('show');
 
             document.getElementById('editorModal').classList.add('active');
         }
