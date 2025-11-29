@@ -1380,6 +1380,11 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
   try {
     console.log('📋 Fetching models from models table...');
 
+    if (!supabaseAdmin) {
+      console.error('❌ Supabase Admin not configured');
+      return res.status(500).json({ success: false, error: 'Supabase Admin not configured' });
+    }
+
     // Fetch from dedicated models table
     const { data: models, error } = await supabaseAdmin
       .from('models')
@@ -1400,17 +1405,21 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
         .select('user_id, tier, is_premium')
         .in('user_id', userIds);
 
-      const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
 
-      limits?.forEach(limit => {
-        const user = users.find(u => u.id === limit.user_id);
-        if (user) {
-          userEmails[limit.user_id] = {
-            email: user.email,
-            is_premium: limit.is_premium
-          };
-        }
-      });
+      if (authError) {
+        console.warn('⚠️ Could not fetch auth users:', authError.message);
+      } else if (authData && authData.users) {
+        limits?.forEach(limit => {
+          const user = authData.users.find(u => u.id === limit.user_id);
+          if (user) {
+            userEmails[limit.user_id] = {
+              email: user.email,
+              is_premium: limit.is_premium
+            };
+          }
+        });
+      }
     }
 
     // Format models for frontend with signed URLs
