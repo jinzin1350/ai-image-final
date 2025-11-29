@@ -345,6 +345,9 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
         id: authUser.id,
         user_id: authUser.id,
         email: authUser.email,
+        // User registration data from metadata
+        phone: authUser.user_metadata?.phone || null,
+        brand_name: authUser.user_metadata?.brand_name || null,
         // New tier system fields
         tier: limits?.tier || 'testlimit',
         credits_used: limits?.credits_used || 0,

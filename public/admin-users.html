@@ -92,6 +92,8 @@
                             <thead style="background:#f3f4f6;">
                                 <tr>
                                     <th style="padding:12px; text-align:left;">Email</th>
+                                    <th style="padding:12px; text-align:left;">Brand Name</th>
+                                    <th style="padding:12px; text-align:left;">Phone</th>
                                     <th style="padding:12px; text-align:center;">Tier</th>
                                     <th style="padding:12px; text-align:center;">Credits Used</th>
                                     <th style="padding:12px; text-align:center;">Last Reset</th>
@@ -114,6 +116,12 @@
                                     return `
                                     <tr style="border-bottom:1px solid #e5e7eb;">
                                         <td style="padding:12px;">${user.email}</td>
+                                        <td style="padding:12px; color:#374151;">
+                                            ${user.brand_name || '<span style="color:#9ca3af;">N/A</span>'}
+                                        </td>
+                                        <td style="padding:12px; color:#374151; direction:ltr; text-align:left;">
+                                            ${user.phone || '<span style="color:#9ca3af;">N/A</span>'}
+                                        </td>
                                         <td style="padding:12px; text-align:center;">
                                             <span style="padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:${tierStyle.bg}; color:${tierStyle.text};">
                                                 ${tierStyle.label}
