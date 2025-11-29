@@ -1391,84 +1391,122 @@ app.get('/api/admin/models', authenticateAdmin, async (req, res) => {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Error fetching models from database:', error);
+      throw error;
+    }
 
     console.log(`✅ Found ${models?.length || 0} models in database`);
+
+    // If no models, return empty array
+    if (!models || models.length === 0) {
+      return res.json({ success: true, models: [] });
+    }
 
     // Get user emails for models with owners
     const userIds = [...new Set(models.filter(m => m.owner_user_id).map(m => m.owner_user_id))];
     let userEmails = {};
 
     if (userIds.length > 0) {
-      const { data: limits } = await supabaseAdmin
-        .from('user_limits')
-        .select('user_id, tier, is_premium')
-        .in('user_id', userIds);
+      try {
+        const { data: limits } = await supabaseAdmin
+          .from('user_limits')
+          .select('user_id, tier, is_premium')
+          .in('user_id', userIds);
 
-      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
 
-      if (authError) {
-        console.warn('⚠️ Could not fetch auth users:', authError.message);
-      } else if (authData && authData.users) {
-        limits?.forEach(limit => {
-          const user = authData.users.find(u => u.id === limit.user_id);
-          if (user) {
-            userEmails[limit.user_id] = {
-              email: user.email,
-              is_premium: limit.is_premium
-            };
-          }
-        });
+        if (authError) {
+          console.warn('⚠️ Could not fetch auth users:', authError.message);
+        } else if (authData && authData.users) {
+          limits?.forEach(limit => {
+            const user = authData.users.find(u => u.id === limit.user_id);
+            if (user) {
+              userEmails[limit.user_id] = {
+                email: user.email,
+                is_premium: limit.is_premium
+              };
+            }
+          });
+        }
+      } catch (userErr) {
+        console.warn('⚠️ Error fetching user data, continuing without user emails:', userErr.message);
       }
     }
 
     // Format models for frontend with signed URLs
     const formattedModels = await Promise.all(models.map(async (model) => {
-      let imageUrl = model.image_url;
+      try {
+        let imageUrl = model.image_url;
 
-      // If model has storage info, try to get signed URL (fallback to public URL)
-      if (model.storage_bucket && model.storage_filename) {
-        try {
-          const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
-            .from(model.storage_bucket)
-            .createSignedUrl(model.storage_filename, 3600); // 1 hour expiry
+        // If model has storage info, try to get signed URL (fallback to public URL)
+        if (model.storage_bucket && model.storage_filename) {
+          try {
+            const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
+              .from(model.storage_bucket)
+              .createSignedUrl(model.storage_filename, 3600); // 1 hour expiry
 
-          if (signedUrlData && !signedUrlError) {
-            imageUrl = signedUrlData.signedUrl;
-            console.log(`✅ Created signed URL for ${model.name}`);
-          } else if (signedUrlError) {
-            console.warn(`⚠️ Signed URL failed for ${model.name}, using public URL:`, signedUrlError.message);
+            if (signedUrlData && !signedUrlError) {
+              imageUrl = signedUrlData.signedUrl;
+              console.log(`✅ Created signed URL for ${model.name}`);
+            } else if (signedUrlError) {
+              console.warn(`⚠️ Signed URL failed for ${model.name}, using public URL:`, signedUrlError.message);
+            }
+          } catch (err) {
+            console.warn(`⚠️ Error creating signed URL for ${model.name}:`, err.message);
           }
-        } catch (err) {
-          console.warn(`⚠️ Error creating signed URL for ${model.name}:`, err.message);
         }
-      }
 
-      return {
-        id: model.id,
-        name: model.name,
-        category: model.category,
-        visibility: model.visibility,
-        tier_requirement: model.tier_requirement || 'bronze',
-        image_url: imageUrl,
-        created_at: model.created_at,
-        user_id: model.owner_user_id,
-        user_email: model.owner_user_id && userEmails[model.owner_user_id]
-          ? userEmails[model.owner_user_id].email
-          : (model.storage_bucket === 'admin-content' ? 'Admin Upload' : 'System (AI Generated)'),
-        is_premium: model.owner_user_id && userEmails[model.owner_user_id]
-          ? userEmails[model.owner_user_id].is_premium
-          : false,
-        bucket: model.storage_bucket,
-        filename: model.storage_filename
-      };
+        return {
+          id: model.id,
+          name: model.name,
+          category: model.category,
+          visibility: model.visibility,
+          tier_requirement: model.tier_requirement || 'bronze',
+          image_url: imageUrl,
+          created_at: model.created_at,
+          user_id: model.owner_user_id,
+          user_email: model.owner_user_id && userEmails[model.owner_user_id]
+            ? userEmails[model.owner_user_id].email
+            : (model.storage_bucket === 'admin-content' ? 'Admin Upload' : 'System (AI Generated)'),
+          is_premium: model.owner_user_id && userEmails[model.owner_user_id]
+            ? userEmails[model.owner_user_id].is_premium
+            : false,
+          bucket: model.storage_bucket,
+          filename: model.storage_filename
+        };
+      } catch (modelErr) {
+        console.error(`❌ Error formatting model ${model.id}:`, modelErr.message);
+        // Return basic model info even if formatting fails
+        return {
+          id: model.id,
+          name: model.name,
+          category: model.category,
+          visibility: model.visibility,
+          tier_requirement: model.tier_requirement || 'bronze',
+          image_url: model.image_url,
+          created_at: model.created_at,
+          user_id: model.owner_user_id,
+          user_email: 'Unknown',
+          is_premium: false,
+          bucket: model.storage_bucket,
+          filename: model.storage_filename
+        };
+      }
     }));
 
+    console.log(`✅ Returning ${formattedModels.length} formatted models`);
     res.json({ success: true, models: formattedModels });
 
   } catch (error) {
-    console.error('❌ Error fetching models:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('❌ Error in /api/admin/models endpoint:', error);
+    console.error('Error stack:', error.stack);
+    // Always return valid JSON even on error
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to fetch models',
+      details: error.toString()
+    });
   }
 });
 
