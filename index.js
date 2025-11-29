@@ -470,6 +470,80 @@ app.put('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Delete user (admin only)
+app.delete('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase Admin not configured' });
+    }
+
+    console.log(`🗑️ Admin attempting to delete user: ${userId}`);
+
+    // Step 1: Delete from user_limits table
+    const { error: limitsError } = await supabase
+      .from('user_limits')
+      .delete()
+      .eq('user_id', userId);
+
+    if (limitsError && limitsError.code !== 'PGRST116') {
+      console.warn('⚠️ Error deleting user_limits:', limitsError.message);
+    } else {
+      console.log('✅ Deleted user_limits record');
+    }
+
+    // Step 2: Delete from user_profiles table
+    const { error: profilesError } = await supabaseAdmin
+      .from('user_profiles')
+      .delete()
+      .eq('id', userId);
+
+    if (profilesError && profilesError.code !== 'PGRST116') {
+      console.warn('⚠️ Error deleting user_profiles:', profilesError.message);
+    } else {
+      console.log('✅ Deleted user_profiles record');
+    }
+
+    // Step 3: Delete from generated_images table
+    const { error: imagesError } = await supabaseAdmin
+      .from('generated_images')
+      .delete()
+      .eq('user_id', userId);
+
+    if (imagesError && imagesError.code !== 'PGRST116') {
+      console.warn('⚠️ Error deleting generated_images:', imagesError.message);
+    } else {
+      console.log('✅ Deleted generated_images records');
+    }
+
+    // Step 4: Delete the actual auth user (requires admin client)
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+    if (authError) {
+      console.error('❌ Error deleting auth user:', authError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete user from authentication system',
+        details: authError.message
+      });
+    }
+
+    console.log(`✅ Successfully deleted user ${userId} and all associated data`);
+    res.json({
+      success: true,
+      message: 'User and all associated data deleted successfully'
+    });
+  } catch (error) {
+    console.error('❌ Error deleting user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete user',
+      details: error.message
+    });
+  }
+});
+
 // Update user's image generation model
 app.post('/api/admin/update-user-model', authenticateAdmin, async (req, res) => {
   try {

@@ -139,16 +139,21 @@
                                             ${user.last_reset_date ? new Date(user.last_reset_date).toLocaleDateString() : 'N/A'}
                                         </td>
                                         <td style="padding:12px; text-align:center;">
-                                            <select onchange="changeTier('${user.user_id}', this.value)" style="padding:6px 12px; background:white; border:2px solid #e5e7eb; border-radius:8px; cursor:pointer; font-weight:600;">
-                                                <option value="">Change Tier...</option>
-                                                <option value="testlimit" ${tier === 'testlimit' ? 'selected' : ''}>🧪 Test Limit (5)</option>
-                                                <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>🥉 Bronze (50)</option>
-                                                <option value="silver" ${tier === 'silver' ? 'selected' : ''}>⭐ Silver (100)</option>
-                                                <option value="gold" ${tier === 'gold' ? 'selected' : ''}>👑 Gold (130)</option>
-                                            </select>
-                                            <button onclick="resetCredits('${user.user_id}')" style="margin-left:8px; padding:6px 12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
-                                                Reset
-                                            </button>
+                                            <div style="display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap;">
+                                                <select onchange="changeTier('${user.user_id}', this.value)" style="padding:6px 12px; background:white; border:2px solid #e5e7eb; border-radius:8px; cursor:pointer; font-weight:600;">
+                                                    <option value="">Change Tier...</option>
+                                                    <option value="testlimit" ${tier === 'testlimit' ? 'selected' : ''}>🧪 Test Limit (5)</option>
+                                                    <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>🥉 Bronze (50)</option>
+                                                    <option value="silver" ${tier === 'silver' ? 'selected' : ''}>⭐ Silver (100)</option>
+                                                    <option value="gold" ${tier === 'gold' ? 'selected' : ''}>👑 Gold (130)</option>
+                                                </select>
+                                                <button onclick="resetCredits('${user.user_id}')" style="padding:6px 12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px; white-space:nowrap;">
+                                                    Reset
+                                                </button>
+                                                <button onclick="deleteUser('${user.user_id}', '${user.email}')" style="padding:6px 12px; background:#ef4444; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px; white-space:nowrap;">
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 `}).join('')}
@@ -225,6 +230,35 @@
             } catch (error) {
                 console.error('Error resetting credits:', error);
                 showNotification('Failed to reset credits', 'error');
+            }
+        }
+
+        async function deleteUser(userId, userEmail) {
+            if (!confirm(`Are you sure you want to DELETE user "${userEmail}"?\n\nThis will permanently delete:\n- User account\n- All user data\n- All generated images\n- All usage history\n\nThis action CANNOT be undone!`)) {
+                return;
+            }
+
+            // Double confirmation for safety
+            if (!confirm(`FINAL CONFIRMATION:\n\nDelete "${userEmail}" permanently?\n\nType the user's email to confirm.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`User "${userEmail}" deleted successfully`, 'success');
+                    loadUsers();
+                } else {
+                    showNotification(data.error || 'Failed to delete user', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showNotification('Failed to delete user', 'error');
             }
         }
 
