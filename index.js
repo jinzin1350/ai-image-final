@@ -3764,7 +3764,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     // تعریف نوع حجاب
     const hijabDescriptions = {
       'full': 'CRITICAL: Full traditional hijab - headscarf MUST completely cover all hair, neck, and ears. Tightly wrapped and secured. NO hair visible whatsoever. Conservative modest Islamic style with professional formal appearance.',
-      'relaxed': 'CRITICAL: Relaxed modern hijab - headscarf MUST be worn covering most of the head in a loose, casual modern style. The hijab should still cover the hair but draped more freely and trendy. Small amounts of hair may show at the front hairline or sides, but head is still mostly covered. NOT completely without hijab.',
+      'relaxed': 'CRITICAL: Relaxed modern Iranian-style hijab (حجاب راحت) - Loose, casual headscarf worn in the modern Iranian/Persian fashion style. IMPORTANT: The hijab is pushed back on the head showing SIGNIFICANT portions of the front hair (bangs/fringe area). Hair is CLEARLY VISIBLE at the front and sides. The scarf covers the back and top of head loosely, NOT tightly wrapped. This is the common everyday hijab style seen on Iranian women - stylish, modern, with visible hair at front. NOT full coverage - hair MUST be partially visible.',
       'no-hijab': 'CRITICAL: NO hijab at all - hair MUST be completely visible, uncovered, and freely shown. No head covering or scarf of any kind.'
     };
 
