@@ -6856,15 +6856,14 @@ app.delete('/api/admin/discount-codes/:id', authenticateAdmin, async (req, res) 
   }
 });
 
-// Validate and apply discount code (user endpoint)
-app.post('/api/validate-discount-code', authenticateUser, async (req, res) => {
+// Validate and apply discount code (public endpoint - no auth required)
+app.post('/api/validate-discount-code', async (req, res) => {
   try {
     if (!supabaseAdmin) {
       return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
     }
 
     const { code, tier, originalPrice } = req.body;
-    const userId = req.user.id;
 
     if (!code || !tier || !originalPrice) {
       return res.status(400).json({
@@ -6915,7 +6914,7 @@ app.post('/api/validate-discount-code', authenticateUser, async (req, res) => {
     const discountAmount = Math.round(originalPrice * (discountCode.discount_percentage / 100));
     const finalPrice = originalPrice - discountAmount;
 
-    console.log(`✅ Discount code ${code.toUpperCase()} validated for user ${userId} - ${discountCode.discount_percentage}% off`);
+    console.log(`✅ Discount code ${code.toUpperCase()} validated - ${discountCode.discount_percentage}% off`);
 
     res.json({
       success: true,

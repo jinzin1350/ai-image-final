@@ -877,21 +877,11 @@
                     priceAfterTierDiscount = originalPrice - (originalPrice * currentPlanData.discount_percentage / 100);
                 }
 
-                // Get auth token
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    showDiscountMessage('لطفاً ابتدا وارد حساب کاربری خود شوید', 'error');
-                    applyBtn.disabled = false;
-                    applyBtn.textContent = 'اعمال';
-                    return;
-                }
-
-                // Call validate discount code API
+                // Call validate discount code API (no authentication required)
                 const response = await fetch('/api/validate-discount-code', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         code,
