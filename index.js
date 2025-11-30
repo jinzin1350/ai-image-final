@@ -6713,6 +6713,283 @@ app.post('/api/admin/pricing/batch', authenticateAdmin, async (req, res) => {
   }
 });
 
+// ================== DISCOUNT CODES ENDPOINTS ==================
+
+// Get all discount codes (admin only)
+app.get('/api/admin/discount-codes', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('discount_codes')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    console.log(`✅ Retrieved ${data.length} discount codes`);
+    res.json({ success: true, codes: data });
+  } catch (error) {
+    console.error('Error fetching discount codes:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create new discount code (admin only)
+app.post('/api/admin/discount-codes', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { code, discount_percentage, expires_at, max_uses, description } = req.body;
+
+    // Validation
+    if (!code || !discount_percentage || !expires_at) {
+      return res.status(400).json({
+        success: false,
+        error: 'Code, discount_percentage, and expires_at are required'
+      });
+    }
+
+    if (discount_percentage < 1 || discount_percentage > 100) {
+      return res.status(400).json({
+        success: false,
+        error: 'Discount percentage must be between 1 and 100'
+      });
+    }
+
+    // Check if code already exists
+    const { data: existingCode } = await supabaseAdmin
+      .from('discount_codes')
+      .select('id')
+      .eq('code', code.toUpperCase())
+      .single();
+
+    if (existingCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'A discount code with this name already exists'
+      });
+    }
+
+    // Create the discount code
+    const { data, error } = await supabaseAdmin
+      .from('discount_codes')
+      .insert([{
+        code: code.toUpperCase(),
+        discount_percentage: parseInt(discount_percentage),
+        expires_at,
+        max_uses: max_uses ? parseInt(max_uses) : null,
+        description: description || null,
+        is_active: true,
+        current_uses: 0
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Created discount code: ${code.toUpperCase()} (${discount_percentage}% off)`);
+    res.json({ success: true, code: data });
+  } catch (error) {
+    console.error('Error creating discount code:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update discount code (admin only - toggle active/inactive)
+app.put('/api/admin/discount-codes/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { id } = req.params;
+    const { is_active } = req.body;
+
+    if (is_active === undefined) {
+      return res.status(400).json({ success: false, error: 'is_active field is required' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('discount_codes')
+      .update({ is_active })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`✅ Updated discount code ${data.code} - active: ${is_active}`);
+    res.json({ success: true, code: data });
+  } catch (error) {
+    console.error('Error updating discount code:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete discount code (admin only)
+app.delete('/api/admin/discount-codes/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { id } = req.params;
+
+    // Delete the code (cascade will delete usage records)
+    const { error } = await supabaseAdmin
+      .from('discount_codes')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    console.log(`✅ Deleted discount code ${id}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting discount code:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Validate and apply discount code (user endpoint)
+app.post('/api/validate-discount-code', authenticate, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { code, tier, originalPrice } = req.body;
+    const userId = req.user.id;
+
+    if (!code || !tier || !originalPrice) {
+      return res.status(400).json({
+        success: false,
+        error: 'Code, tier, and originalPrice are required'
+      });
+    }
+
+    // Fetch the discount code
+    const { data: discountCode, error: codeError } = await supabaseAdmin
+      .from('discount_codes')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .single();
+
+    if (codeError || !discountCode) {
+      return res.status(404).json({
+        success: false,
+        error: 'Invalid discount code'
+      });
+    }
+
+    // Check if code is active
+    if (!discountCode.is_active) {
+      return res.status(400).json({
+        success: false,
+        error: 'This discount code is no longer active'
+      });
+    }
+
+    // Check if code is expired
+    if (new Date(discountCode.expires_at) < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: 'This discount code has expired'
+      });
+    }
+
+    // Check if max uses reached
+    if (discountCode.max_uses && discountCode.current_uses >= discountCode.max_uses) {
+      return res.status(400).json({
+        success: false,
+        error: 'This discount code has reached its maximum usage limit'
+      });
+    }
+
+    // Calculate discounted price
+    const discountAmount = Math.round(originalPrice * (discountCode.discount_percentage / 100));
+    const finalPrice = originalPrice - discountAmount;
+
+    console.log(`✅ Discount code ${code.toUpperCase()} validated for user ${userId} - ${discountCode.discount_percentage}% off`);
+
+    res.json({
+      success: true,
+      discount: {
+        code: discountCode.code,
+        percentage: discountCode.discount_percentage,
+        amount: discountAmount,
+        finalPrice: finalPrice,
+        discountCodeId: discountCode.id
+      }
+    });
+  } catch (error) {
+    console.error('Error validating discount code:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Record discount code usage (called after successful payment)
+app.post('/api/record-discount-usage', authenticate, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
+    }
+
+    const { discountCodeId, orderAmount, tier } = req.body;
+    const userId = req.user.id;
+
+    if (!discountCodeId || !orderAmount || !tier) {
+      return res.status(400).json({
+        success: false,
+        error: 'discountCodeId, orderAmount, and tier are required'
+      });
+    }
+
+    // Record the usage
+    const { error: usageError } = await supabaseAdmin
+      .from('discount_code_usage')
+      .insert([{
+        discount_code_id: discountCodeId,
+        user_id: userId,
+        order_amount: parseFloat(orderAmount),
+        tier
+      }]);
+
+    if (usageError) throw usageError;
+
+    // Increment current_uses counter
+    const { error: updateError } = await supabaseAdmin
+      .rpc('increment_discount_usage', { discount_id: discountCodeId });
+
+    if (updateError) {
+      // If RPC doesn't exist, do it manually
+      const { data: currentCode } = await supabaseAdmin
+        .from('discount_codes')
+        .select('current_uses')
+        .eq('id', discountCodeId)
+        .single();
+
+      if (currentCode) {
+        await supabaseAdmin
+          .from('discount_codes')
+          .update({ current_uses: currentCode.current_uses + 1 })
+          .eq('id', discountCodeId);
+      }
+    }
+
+    console.log(`✅ Recorded discount code usage for user ${userId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error recording discount usage:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ================== GENERATE FACE MODEL ENDPOINTS ==================
 
 // Analyze face with Gemini Vision

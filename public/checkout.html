@@ -858,36 +858,63 @@
                 return;
             }
 
+            if (!currentPlanData) {
+                showDiscountMessage('لطفاً ابتدا یک پلن انتخاب کنید', 'error');
+                return;
+            }
+
             // Disable button during validation
             applyBtn.disabled = true;
             applyBtn.textContent = 'در حال بررسی...';
 
             try {
-                // TODO: Replace with actual API call when backend is ready
-                // const response = await fetch(`/api/discount-codes/validate`, {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify({ code, tier: plan })
-                // });
-                // const data = await response.json();
+                // Calculate the price to send (after tier discount but before code discount)
+                const hasTierDiscount = currentPlanData.discount_active && currentPlanData.discount_percentage > 0;
+                const originalPrice = currentPlanData.price;
+                let priceAfterTierDiscount = originalPrice;
 
-                // Temporary: Simulate API response with hardcoded codes
-                const validCodes = {
-                    'WELCOME10': { percentage: 10, description: '10% تخفیف خوش‌آمدگویی' },
-                    'SAVE20': { percentage: 20, description: '20% تخفیف ویژه' },
-                    'VIP30': { percentage: 30, description: '30% تخفیف VIP' }
-                };
+                if (hasTierDiscount) {
+                    priceAfterTierDiscount = originalPrice - (originalPrice * currentPlanData.discount_percentage / 100);
+                }
 
-                await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+                // Get auth token
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showDiscountMessage('لطفاً ابتدا وارد حساب کاربری خود شوید', 'error');
+                    applyBtn.disabled = false;
+                    applyBtn.textContent = 'اعمال';
+                    return;
+                }
 
-                if (validCodes[code]) {
-                    appliedDiscountCode = validCodes[code];
+                // Call validate discount code API
+                const response = await fetch('/api/validate-discount-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        code,
+                        tier: plan,
+                        originalPrice: Math.round(priceAfterTierDiscount)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    appliedDiscountCode = {
+                        ...data.discount,
+                        code: code
+                    };
                     updatePriceDisplay();
-                    showDiscountMessage(`✓ ${validCodes[code].description} اعمال شد!`, 'success');
+                    showDiscountMessage(`✓ کد تخفیف ${data.discount.percentage}٪ با موفقیت اعمال شد!`, 'success');
                     input.disabled = true;
                     applyBtn.textContent = 'اعمال شد ✓';
+
+                    console.log('Discount applied:', data.discount);
                 } else {
-                    showDiscountMessage('کد تخفیف نامعتبر است', 'error');
+                    showDiscountMessage(data.error || 'کد تخفیف نامعتبر است', 'error');
                     applyBtn.disabled = false;
                     applyBtn.textContent = 'اعمال';
                 }

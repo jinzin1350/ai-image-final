@@ -362,6 +362,60 @@
                     <!-- Preview cards will be loaded here -->
                 </div>
             </div>
+
+            <!-- Discount Code Management Section -->
+            <div class="preview-section" style="margin-top: 48px;">
+                <h2>🎟️ Discount Code Management</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 24px;">
+                    Create and manage promotional discount codes
+                </p>
+
+                <!-- Create New Discount Code Form -->
+                <div style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1f2937;">
+                        ➕ Create New Discount Code
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label">Code Name *</label>
+                            <input type="text" id="discountCodeName" class="form-input" placeholder="e.g., SUMMER2024" style="text-transform: uppercase;" maxlength="50">
+                            <small style="color: #6b7280; font-size: 12px;">Uppercase letters and numbers only</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discount % *</label>
+                            <input type="number" id="discountPercentage" class="form-input" placeholder="e.g., 20" min="1" max="100">
+                            <small style="color: #6b7280; font-size: 12px;">1-100%</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expires At *</label>
+                            <input type="datetime-local" id="discountExpiresAt" class="form-input">
+                            <small style="color: #6b7280; font-size: 12px;">Date and time</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Uses</label>
+                            <input type="number" id="discountMaxUses" class="form-input" placeholder="Unlimited" min="1">
+                            <small style="color: #6b7280; font-size: 12px;">Leave empty for unlimited</small>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label class="form-label">Description (Internal Note)</label>
+                        <textarea id="discountDescription" class="form-input" placeholder="e.g., Summer promotion campaign" rows="2" style="resize: vertical;"></textarea>
+                    </div>
+                    <button onclick="createDiscountCode()" class="save-btn" style="width: 100%; margin-top: 16px;">
+                        🎟️ Create Discount Code
+                    </button>
+                </div>
+
+                <!-- List of Existing Discount Codes -->
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1f2937;">
+                        📋 Existing Discount Codes
+                    </h3>
+                    <div id="discountCodesList">
+                        <p style="text-align: center; color: #9ca3af; padding: 40px 0;">Loading discount codes...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -678,8 +732,189 @@
             }, 3000);
         }
 
+        // Discount Code Management Functions
+        async function createDiscountCode() {
+            const code = document.getElementById('discountCodeName').value.trim().toUpperCase();
+            const percentage = parseInt(document.getElementById('discountPercentage').value);
+            const expiresAt = document.getElementById('discountExpiresAt').value;
+            const maxUses = document.getElementById('discountMaxUses').value;
+            const description = document.getElementById('discountDescription').value.trim();
+
+            // Validation
+            if (!code) {
+                showError('Please enter a discount code name');
+                return;
+            }
+            if (!percentage || percentage < 1 || percentage > 100) {
+                showError('Please enter a valid discount percentage (1-100)');
+                return;
+            }
+            if (!expiresAt) {
+                showError('Please select an expiration date and time');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/discount-codes', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        code,
+                        discount_percentage: percentage,
+                        expires_at: new Date(expiresAt).toISOString(),
+                        max_uses: maxUses ? parseInt(maxUses) : null,
+                        description: description || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                    // Clear form
+                    document.getElementById('discountCodeName').value = '';
+                    document.getElementById('discountPercentage').value = '';
+                    document.getElementById('discountExpiresAt').value = '';
+                    document.getElementById('discountMaxUses').value = '';
+                    document.getElementById('discountDescription').value = '';
+                    // Reload codes list
+                    loadDiscountCodes();
+                } else {
+                    showError(data.error || 'Failed to create discount code');
+                }
+            } catch (error) {
+                console.error('Error creating discount code:', error);
+                showError('Failed to create discount code: ' + error.message);
+            }
+        }
+
+        async function loadDiscountCodes() {
+            try {
+                const response = await fetchWithAuth('/api/admin/discount-codes');
+                const data = await response.json();
+
+                const container = document.getElementById('discountCodesList');
+
+                if (data.success && data.codes && data.codes.length > 0) {
+                    container.innerHTML = `
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead style="background:#f3f4f6;">
+                                <tr>
+                                    <th style="padding:12px; text-align:left;">Code</th>
+                                    <th style="padding:12px; text-align:center;">Discount</th>
+                                    <th style="padding:12px; text-align:center;">Usage</th>
+                                    <th style="padding:12px; text-align:center;">Expires</th>
+                                    <th style="padding:12px; text-align:left;">Description</th>
+                                    <th style="padding:12px; text-align:center;">Status</th>
+                                    <th style="padding:12px; text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.codes.map(code => {
+                                    const expiresAt = new Date(code.expires_at);
+                                    const isExpired = expiresAt < new Date();
+                                    const usageText = code.max_uses
+                                        ? `${code.current_uses}/${code.max_uses}`
+                                        : `${code.current_uses}/∞`;
+                                    const isMaxedOut = code.max_uses && code.current_uses >= code.max_uses;
+
+                                    return `
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px; font-weight:600; font-family:monospace;">${code.code}</td>
+                                        <td style="padding:12px; text-align:center; font-weight:600; color:#667eea;">${code.discount_percentage}%</td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <span style="color:${isMaxedOut ? '#ef4444' : '#6b7280'}; font-weight:${isMaxedOut ? '600' : '400'};">
+                                                ${usageText}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px; text-align:center; font-size:12px; color:${isExpired ? '#ef4444' : '#6b7280'};">
+                                            ${expiresAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            <br>
+                                            ${expiresAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                        </td>
+                                        <td style="padding:12px; color:#6b7280; font-size:13px;">
+                                            ${code.description || '<span style="color:#d1d5db;">No description</span>'}
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <span style="padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:${code.is_active && !isExpired && !isMaxedOut ? '#d1fae5' : '#fee2e2'}; color:${code.is_active && !isExpired && !isMaxedOut ? '#065f46' : '#991b1b'};">
+                                                ${!code.is_active ? '⏸️ Disabled' : isExpired ? '⏰ Expired' : isMaxedOut ? '🚫 Max Used' : '✅ Active'}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <div style="display:flex; gap:8px; justify-content:center;">
+                                                <button onclick="toggleDiscountCode('${code.id}', ${code.is_active})"
+                                                    style="padding:6px 12px; background:${code.is_active ? '#f59e0b' : '#10b981'}; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                                                    ${code.is_active ? '⏸️ Disable' : '▶️ Enable'}
+                                                </button>
+                                                <button onclick="deleteDiscountCode('${code.id}', '${code.code}')"
+                                                    style="padding:6px 12px; background:#ef4444; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                                                    🗑️ Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    container.innerHTML = '<div style="padding:40px; text-align:center; color:#9ca3af;">No discount codes created yet</div>';
+                }
+            } catch (error) {
+                console.error('Error loading discount codes:', error);
+                showError('Failed to load discount codes');
+            }
+        }
+
+        async function toggleDiscountCode(id, currentStatus) {
+            try {
+                const response = await fetchWithAuth(`/api/admin/discount-codes/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        is_active: !currentStatus
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                    loadDiscountCodes();
+                } else {
+                    showError(data.error || 'Failed to update discount code');
+                }
+            } catch (error) {
+                console.error('Error toggling discount code:', error);
+                showError('Failed to update discount code');
+            }
+        }
+
+        async function deleteDiscountCode(id, codeName) {
+            if (!confirm(`Are you sure you want to delete the discount code "${codeName}"?\n\nThis will permanently delete the code and all its usage history.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/discount-codes/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                    loadDiscountCodes();
+                } else {
+                    showError(data.error || 'Failed to delete discount code');
+                }
+            } catch (error) {
+                console.error('Error deleting discount code:', error);
+                showError('Failed to delete discount code');
+            }
+        }
+
         // Load on page load
         loadPricing();
+        loadDiscountCodes();
     </script>
 </body>
 </html>
