@@ -6857,7 +6857,7 @@ app.delete('/api/admin/discount-codes/:id', authenticateAdmin, async (req, res) 
 });
 
 // Validate and apply discount code (user endpoint)
-app.post('/api/validate-discount-code', authenticate, async (req, res) => {
+app.post('/api/validate-discount-code', authenticateUser, async (req, res) => {
   try {
     if (!supabaseAdmin) {
       return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
@@ -6934,7 +6934,7 @@ app.post('/api/validate-discount-code', authenticate, async (req, res) => {
 });
 
 // Record discount code usage (called after successful payment)
-app.post('/api/record-discount-usage', authenticate, async (req, res) => {
+app.post('/api/record-discount-usage', authenticateUser, async (req, res) => {
   try {
     if (!supabaseAdmin) {
       return res.status(500).json({ success: false, error: 'Supabase admin client not configured' });
