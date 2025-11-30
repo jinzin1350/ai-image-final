@@ -803,14 +803,15 @@
                         const planIcon = document.getElementById('planIcon');
                         const planName = document.getElementById('planName');
                         const planDetailsText = document.getElementById('planDetails');
+                        const discountSection = document.getElementById('discountCodeSection');
 
-                        planBox.style.display = 'block';
-                        planIcon.textContent = planIcons[plan] || '💎';
-                        planName.textContent = planNames[plan] || selectedPlan.tier;
-                        planDetailsText.textContent = `${selectedPlan.credits.toLocaleString('fa-IR')} اعتبار ماهانه`;
+                        if (planBox) planBox.style.display = 'block';
+                        if (planIcon) planIcon.textContent = planIcons[plan] || '💎';
+                        if (planName) planName.textContent = planNames[plan] || selectedPlan.tier;
+                        if (planDetailsText) planDetailsText.textContent = `${selectedPlan.credits.toLocaleString('fa-IR')} اعتبار ماهانه`;
 
                         // Show discount code section
-                        document.getElementById('discountCodeSection').style.display = 'block';
+                        if (discountSection) discountSection.style.display = 'block';
 
                         // Update price display
                         updatePriceDisplay();
@@ -826,6 +827,7 @@
             if (!currentPlanData) return;
 
             const planPrice = document.getElementById('planPrice');
+            if (!planPrice) return;
 
             // Calculate base discounted price if tier discount is active
             const hasTierDiscount = currentPlanData.discount_active && currentPlanData.discount_percentage > 0;
