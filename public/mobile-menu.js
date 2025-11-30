@@ -42,6 +42,10 @@
                     <span class="icon">🖼️</span>
                     <span>گالری تصاویر من</span>
                 </a>
+                <a href="/pricing.html" class="mobile-nav-link pricing">
+                    <span class="icon">💎</span>
+                    <span>خرید اشتراک</span>
+                </a>
                 <button onclick="handleLogout()" class="mobile-nav-link logout">
                     <span class="icon">🚪</span>
                     <span>خروج</span>
