@@ -4616,8 +4616,21 @@ ${hasTwoModels
 - Image ${currentImageIndex + garments.length + 1}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)`;
       }
 
-      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.
+      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.${hijabDescription ? `
 
+🚨🚨🚨 ABSOLUTE TOP PRIORITY - HIJAB OVERRIDE RULE 🚨🚨🚨
+${hijabDescription}
+🔥 THIS HIJAB REQUIREMENT IS NON-NEGOTIABLE AND OVERRIDES EVERYTHING 🔥
+- COMPLETELY IGNORE any hijab or head covering shown in the reference photo
+- The reference photo's hijab/head covering is IRRELEVANT - disregard it entirely
+- ONLY apply the hijab requirement specified above
+- If reference shows hijab but requirement is NO HIJAB → REMOVE all head covering, show full hair
+- If reference shows NO hijab but requirement is HIJAB → ADD the specified hijab type
+- If reference shows different hijab style → REPLACE with the specified hijab type above
+- This rule has ABSOLUTE PRIORITY over matching the reference photo
+🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+
+` : ''}
 IMAGES PROVIDED (IN ORDER):
 ${imageDescription}
 
@@ -4654,15 +4667,10 @@ ${hasTwoModels
 ❌ The exact specific location (create a similar type of place, not the identical spot)
 ❌ The person's face or identity from the reference
 ❌ Every tiny detail of the background
-❌ The exact clothing from the reference
+❌ The exact clothing from the reference${hijabDescription ? `
+❌ HIJAB OR HEAD COVERING from reference - COMPLETELY IGNORE IT` : ''}
 
-TASK DESCRIPTION:${hijabDescription ? `
-⚠️⚠️⚠️ MOST IMPORTANT - READ THIS FIRST ⚠️⚠️⚠️
-HIJAB REQUIREMENT: ${hijabDescription}
-DO NOT copy hijab style from reference photo. IGNORE reference photo's hijab. ONLY follow this requirement.
-⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-
-` : ''}${hasTwoModels
+TASK DESCRIPTION:${hasTwoModels
   ? `Create a NEW professional fashion photo of TWO MODELS: MODEL 1 from Image 1 wearing GARMENT 1, and MODEL 2 from Image ${garments.length + 2} wearing GARMENT 2, photographed in a similar style and mood as the reference photo. The key is: BOTH MODELS (separately) + THEIR GARMENTS + SIMILAR (not identical) SCENE/STYLE.`
   : `Create a NEW professional fashion photo of the MODEL from Image 1, wearing the GARMENT from Image 2, photographed in a similar style and mood as the reference photo. The key is: SAME MODEL + SAME GARMENT + SIMILAR (not identical) SCENE/STYLE.`}${multiPersonInstruction}
 
@@ -4710,12 +4718,28 @@ ${hasTwoModels
   ? `   - Dress MODEL 1 in ${garmentDescription}
    - Dress MODEL 2 in ${selectedModel.garmentPaths2.length === 1 ? 'the garment from their garment image' : `ALL ${selectedModel.garmentPaths2.length} garments (combine them on Model 2)`}
    - Each model wears THEIR OWN garment - do NOT mix them up`
-  : `   - Dress the MODEL in ${garmentDescription}`}${hijabDescription ? `\n\n5. ⚠️ **CRITICAL - HIJAB REQUIREMENT**:
+  : `   - Dress the MODEL in ${garmentDescription}`}${hijabDescription ? `\n\n🚨🚨🚨 5. **ABSOLUTE PRIORITY - HIJAB OVERRIDE (MOST CRITICAL)** 🚨🚨🚨:
+
    ${hijabDescription}
-   ❌ DO NOT copy or follow the hijab style from the reference photo - ONLY follow the requirement above.
-   - If reference has NO hijab but requirement says hijab → ADD the specified hijab to the MODEL
-   - If reference HAS hijab but requirement says NO hijab → REMOVE hijab from the MODEL and show hair
-   - The hijab requirement OVERRIDES whatever is in the reference photo` : ''}
+
+   🔴🔴🔴 HIJAB ENFORCEMENT RULES (READ 3 TIMES): 🔴🔴🔴
+   ✅ The hijab requirement above is THE ONLY rule for head covering
+   ✅ The reference photo's hijab is 100% IRRELEVANT - treat it as if it doesn't exist
+   ✅ Apply ONLY the hijab style specified above, regardless of what's in the reference
+
+   📋 SPECIFIC SCENARIOS:
+   ❌ Reference has NO hijab + Requirement = FULL HIJAB → YOU MUST ADD full traditional hijab covering all hair
+   ❌ Reference has NO hijab + Requirement = RELAXED HIJAB → YOU MUST ADD relaxed hijab showing front hair
+   ❌ Reference has FULL hijab + Requirement = NO HIJAB → YOU MUST REMOVE all hijab and show all hair uncovered
+   ❌ Reference has FULL hijab + Requirement = RELAXED HIJAB → YOU MUST CHANGE to relaxed style with visible front hair
+   ❌ Reference has RELAXED hijab + Requirement = FULL HIJAB → YOU MUST CHANGE to full coverage, no hair visible
+   ❌ Reference has RELAXED hijab + Requirement = NO HIJAB → YOU MUST REMOVE all hijab and show all hair
+
+   🔥 DO NOT BE INFLUENCED BY THE REFERENCE PHOTO'S HEAD COVERING 🔥
+   🔥 THE REFERENCE PHOTO IS ONLY A GUIDE FOR POSE, LIGHTING, AND LOCATION 🔥
+   🔥 HIJAB STYLE COMES FROM THE REQUIREMENT ABOVE, NOT THE REFERENCE 🔥
+
+   The hijab requirement has ABSOLUTE PRIORITY and OVERRIDES all reference photo elements.` : ''}
    - Garment${hasTwoModels ? 's' : ''} should fit naturally with realistic wrinkles and fabric draping
 
    ⚠️ **CRITICAL - EXACT COLOR & DETAIL PRESERVATION:**
@@ -4739,7 +4763,15 @@ ${hasTwoModels
 
 DO NOT:
 - ❌ CRITICAL: DO NOT use the face or body from any person in the reference photo (Image ${hasTwoModels ? garments.length + selectedModel.garment2Base64Array.length + 3 : garments.length + 2})
-- ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference${hijabDescription ? `\n- ❌ CRITICAL: DO NOT copy the hijab/head covering style from the reference photo - ONLY use the specified hijab requirement above. If reference has no hijab but user selected hijab, ADD hijab. If reference has hijab but user selected no hijab, REMOVE hijab.` : ''}
+- ❌ CRITICAL: DO NOT keep the people from the reference - only use them for pose reference${hijabDescription ? `\n🚨🚨🚨 ❌ MOST CRITICAL - HIJAB VIOLATION EXAMPLES 🚨🚨🚨:
+- ❌❌❌ DO NOT EVER copy, imitate, or follow the hijab/head covering from the reference photo
+- ❌❌❌ DO NOT look at the reference to determine hijab style - it is IRRELEVANT
+- ❌❌❌ DO NOT think "reference has no hijab so I won't add hijab" - WRONG! Use requirement only
+- ❌❌❌ DO NOT think "reference has hijab so I'll keep hijab" - WRONG! Check the requirement
+- ❌❌❌ DO NOT match the reference's head covering in any way
+- ✅✅✅ ONLY use the hijab requirement specified at the top of this prompt
+- ✅✅✅ IGNORE the reference photo completely when deciding hijab style
+- ✅✅✅ The requirement ${hijabDescription.includes('MUST completely cover') ? 'says FULL HIJAB → cover ALL hair' : hijabDescription.includes('NO hijab') ? 'says NO HIJAB → show ALL hair uncovered' : 'says RELAXED HIJAB → show front hair, loose covering'}` : ''}
 ${hasTwoModels
   ? `- ❌ CRITICAL: DO NOT duplicate Model 1 twice - use BOTH Model 1 AND Model 2 as two DIFFERENT people
 - ❌ The TWO people must be MODEL 1 from Image 1 and MODEL 2 from Image ${garments.length + 2}, not anyone from the reference photo`
