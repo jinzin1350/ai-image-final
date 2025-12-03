@@ -2304,6 +2304,24 @@ const authenticateUser = async (req, res, next) => {
       throw new Error('No user found');
     }
     console.log('✅ User authenticated:', user.email, 'ID:', user.id);
+
+    // Fetch user's phone number from user_limits table
+    try {
+      const { data: userLimits } = await supabase
+        .from('user_limits')
+        .select('phone_number, email')
+        .eq('user_id', user.id)
+        .single();
+
+      // Add phone to user object
+      if (userLimits) {
+        user.phone = userLimits.phone_number;
+        user.phone_number = userLimits.phone_number;
+      }
+    } catch (phoneError) {
+      console.log('⚠️ Could not fetch phone number:', phoneError.message);
+    }
+
     req.user = user;
     next();
   } catch (error) {
@@ -5361,6 +5379,8 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
       .insert([
         {
           user_id: req.user?.id || null,
+          user_email: req.user?.email || req.body?.userEmail || null,
+          user_phone: req.user?.phone || req.user?.phone_number || req.body?.userPhone || null,
           garment_path: garmentPathToStore,
           model_id: modelId,
           background_id: backgroundId,
