@@ -346,15 +346,29 @@
                 document.getElementById('imagesContainer').style.display = 'none';
                 document.getElementById('emptyState').style.display = 'none';
 
+                console.log('🔄 Fetching generated images...');
                 const response = await fetchWithAuth('/api/admin/generated-images');
+
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response content-type:', response.headers.get('content-type'));
+
+                // Check if response is OK
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error('❌ Server error:', text);
+                    throw new Error(`Server returned ${response.status}: ${text.substring(0, 100)}`);
+                }
 
                 // Check if response is JSON
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('Server returned non-JSON response. Please ensure you are logged in.');
+                    const text = await response.text();
+                    console.error('❌ Non-JSON response:', text.substring(0, 200));
+                    throw new Error('Server did not return JSON. Did you restart the server after git pull?');
                 }
 
                 const data = await response.json();
+                console.log('✅ Loaded', data.images?.length || 0, 'images');
 
                 document.getElementById('loading').style.display = 'none';
 
@@ -370,18 +384,17 @@
                     document.getElementById('emptyState').style.display = 'block';
                 }
             } catch (error) {
-                console.error('Error loading images:', error);
+                console.error('❌ Error loading images:', error);
                 document.getElementById('loading').style.display = 'none';
 
-                // If not authenticated, redirect to login
-                if (error.message.includes('authenticated') || error.message.includes('non-JSON')) {
-                    alert('Session expired. Please login again.');
-                    sessionStorage.clear();
-                    window.location.href = '/admin';
+                // If authentication error from fetchWithAuth
+                if (error.message.includes('Not authenticated') || error.message.includes('Authentication failed')) {
+                    // Already handled by fetchWithAuth - it redirects
                     return;
                 }
 
-                alert('Failed to load images: ' + error.message);
+                // Show detailed error
+                alert('Failed to load images:\n\n' + error.message + '\n\nCheck browser console (F12) for details.');
             }
         }
 
