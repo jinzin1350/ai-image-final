@@ -5750,6 +5750,49 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
   }
 });
 
+// Admin endpoint for generated images (uses admin auth)
+app.get('/api/admin/generated-images', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, images: [] });
+    }
+
+    // Fetch ALL generated images with user contact info
+    const { data, error } = await supabase
+      .from('generated_images')
+      .select('id, generated_image_url, created_at, user_id, user_email, user_phone')
+      .order('created_at', { ascending: false })
+      .limit(200); // Get recent 200 images
+
+    if (error) {
+      console.error('❌ Database error fetching generated images:', error);
+      throw error;
+    }
+
+    console.log(`📸 Admin fetched ${data?.length || 0} generated images`);
+
+    // Map to format expected by frontend
+    const images = data ? data.map(img => ({
+      id: img.id,
+      image_url: img.generated_image_url,
+      created_at: img.created_at,
+      user_email: img.user_email,
+      user_phone: img.user_phone
+    })) : [];
+
+    res.json({
+      success: true,
+      images: images
+    });
+  } catch (error) {
+    console.error('❌ Error in /api/admin/generated-images:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch generated images'
+    });
+  }
+});
+
 // ============================================
 // USER USAGE STATS ENDPOINT
 // ============================================

@@ -346,7 +346,7 @@
                 document.getElementById('imagesContainer').style.display = 'none';
                 document.getElementById('emptyState').style.display = 'none';
 
-                const response = await fetchWithAuth('/api/user-images');
+                const response = await fetchWithAuth('/api/admin/generated-images');
                 const data = await response.json();
 
                 document.getElementById('loading').style.display = 'none';
