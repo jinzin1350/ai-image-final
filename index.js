@@ -3369,6 +3369,23 @@ async function generateNanoBananaImage({ prompt, contentParts, aspectRatio = '1:
     throw new Error('No image generated. The model may have blocked the request due to safety filters.');
   } catch (error) {
     console.error('❌ Nano Banana 2 Generation Error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      cause: error.cause,
+      stack: error.stack?.split('\n').slice(0, 3).join('\n')
+    });
+
+    // Provide more helpful error message
+    if (error.message?.includes('fetch failed')) {
+      throw new Error('Network error: Cannot connect to Google AI service. Please check your internet connection and API key.');
+    } else if (error.message?.includes('API key')) {
+      throw new Error('Invalid API key. Please check your GEMINI_API_KEY environment variable.');
+    } else if (error.message?.includes('quota')) {
+      throw new Error('API quota exceeded. Please check your Google AI usage limits.');
+    }
+
     throw error;
   }
 }
