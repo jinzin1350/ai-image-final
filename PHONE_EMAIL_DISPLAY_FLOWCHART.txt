@@ -1,0 +1,117 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║         WHERE TO DISPLAY PHONE & EMAIL - COMPLETE FLOW              ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📍 3 MAIN DISPLAY LOCATIONS:
+
+1. Admin Users Page (admin-users.html) - ✅ Already shows phone!
+2. User Images API (/api/user-images) - ❌ Needs update
+3. My Content Page (my-content.html) - ❌ Needs update
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 CHANGES NEEDED:
+
+CHANGE 1: Update API Endpoint (index.js line ~5706)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BEFORE:
+  .select('id, generated_image_url, created_at, user_id')
+
+AFTER:
+  .select('id, generated_image_url, created_at, user_id, user_email, user_phone')
+                                                          ├──────────────────────┘
+                                                          └── Add these ✨
+
+
+CHANGE 2: Update Response (index.js line ~5726)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BEFORE:
+  const images = data.map(img => ({
+    id: img.id,
+    image_url: img.generated_image_url,
+    created_at: img.created_at
+  }));
+
+AFTER:
+  const images = data.map(img => ({
+    id: img.id,
+    image_url: img.generated_image_url,
+    created_at: img.created_at,
+    user_email: img.user_email,        // ✨ ADD
+    user_phone: img.user_phone         // ✨ ADD
+  }));
+
+
+CHANGE 3: When Saving Images
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Search for: "insert.*generated_images" in index.js
+
+ADD user_phone to all INSERT operations:
+
+  .insert({
+    user_id: userId,
+    user_email: userEmail,
+    user_phone: userPhone,        // ✨ ADD THIS
+    garment_path: garmentPath,
+    generated_image_url: imageUrl
+  })
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖥️  WHERE IT WILL APPEAR:
+
+LOCATION 1: Admin Users Page ✅
+  File: public/admin-users.html
+  Status: ALREADY WORKING
+  Shows: Email, Phone, Tier, Credits
+
+LOCATION 2: User Images Gallery ❌
+  File: index.js (/api/user-images endpoint)
+  Status: NEEDS UPDATE
+  Change: Add user_email, user_phone to SELECT query
+
+LOCATION 3: My Content Page ❌
+  File: public/my-content.html
+  Status: NEEDS UPDATE
+  Change: Display email & phone in image cards
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 TESTING:
+
+1. Run migrations in Supabase
+2. Update index.js code (changes above)
+3. Restart server
+4. Test in browser:
+
+   fetch('/api/user-images', {
+     headers: { Authorization: 'Bearer TOKEN' }
+   })
+   .then(r => r.json())
+   .then(d => console.log(d.images[0]))
+
+   Expected:
+   {
+     id: 123,
+     image_url: "...",
+     created_at: "...",
+     user_email: "user@email.com",  ← Should see this
+     user_phone: "+1234567890"      ← Should see this
+   }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 SUMMARY:
+
+Database: ✅ Ready (after running migrations)
+Backend:  ❌ Update /api/user-images endpoint
+Frontend: ❌ Display in UI (my-content.html)
+
+Total time: ~10 minutes of code changes
+
+See: WHERE_TO_DISPLAY_PHONE_EMAIL.md for detailed code examples

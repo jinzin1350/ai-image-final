@@ -5704,7 +5704,7 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
     // Admin sees ALL images, regular users see only their own
     let query = supabase
       .from('generated_images')
-      .select('id, generated_image_url, created_at, user_id')
+      .select('id, generated_image_url, created_at, user_id, user_email, user_phone')
       .order('created_at', { ascending: false })
       .limit(100); // Limit to recent 100 images
 
@@ -5726,7 +5726,9 @@ app.get('/api/user-images', authenticateUser, async (req, res) => {
     const images = data ? data.map(img => ({
       id: img.id,
       image_url: img.generated_image_url,
-      created_at: img.created_at
+      created_at: img.created_at,
+      user_email: img.user_email,
+      user_phone: img.user_phone
     })) : [];
 
     console.log(`✅ Returning ${images.length} images to frontend`);
