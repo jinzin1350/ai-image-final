@@ -87,9 +87,12 @@ WHERE table_name = 'generated_images'
 -- If you have existing generated_images, add phone to them
 UPDATE generated_images
 SET user_phone = '+1234567890'
-WHERE user_email = 'existing@email.com'
-  AND user_phone IS NULL
-LIMIT 1;
+WHERE id = (
+  SELECT id FROM generated_images
+  WHERE user_email = 'existing@email.com'
+    AND user_phone IS NULL
+  LIMIT 1
+);
 
 -- ============================================
 -- VERIFICATION QUERIES
