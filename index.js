@@ -1704,6 +1704,10 @@ app.get('/admin/gallery', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-gallery.html'));
 });
 
+app.get('/admin/generated-images', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-generated-images.html'));
+});
+
 app.get('/admin/llm-model', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-llm-model.html'));
 });
