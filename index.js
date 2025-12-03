@@ -1304,7 +1304,7 @@ app.post('/api/admin/sync-storage-to-db', authenticateAdmin, async (req, res) =>
 
         if (!existing) {
           await supabaseAdmin.from('content_library').insert({
-            content_type: 'model',
+            content_type: 'image', // Changed from 'model' - must match database constraint
             name: file.name.replace(/\.[^/.]+$/, ''),
             category: getCategoryFromFilename(file.name),
             visibility: 'public',
@@ -1344,7 +1344,7 @@ app.post('/api/admin/sync-storage-to-db', authenticateAdmin, async (req, res) =>
 
         if (!existing) {
           await supabaseAdmin.from('content_library').insert({
-            content_type: 'model',
+            content_type: 'image', // Changed from 'model' - must match database constraint
             name: file.name.replace(/\.[^/.]+$/, ''),
             category: getCategoryFromFilename(file.name),
             visibility: 'public',
@@ -2736,7 +2736,7 @@ app.post('/api/upload', authenticateUser, upload.single('garment'), async (req, 
       const { error: dbError } = await supabase
         .from('content_library')
         .insert({
-          content_type: 'garment',
+          content_type: 'image', // Changed from 'garment' - must match database constraint
           name: fileName.replace(/\.[^/.]+$/, ''),
           category: 'garment',
           visibility: 'private',
