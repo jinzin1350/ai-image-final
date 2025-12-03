@@ -5374,6 +5374,15 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
     // Store garments as JSON array if multiple, or single string if one
     const garmentPathToStore = garments.length === 1 ? garments[0] : JSON.stringify(garments);
 
+    // Debug: Log what we're about to save
+    console.log('📧 Saving to DB with contact info:', {
+      user_id: req.user?.id,
+      user_email: req.user?.email || req.body?.userEmail,
+      user_phone: req.user?.phone || req.user?.phone_number || req.body?.userPhone,
+      has_req_user: !!req.user,
+      req_user_keys: req.user ? Object.keys(req.user) : []
+    });
+
     const { data: generationData, error: dbError } = await supabase
       .from('generated_images')
       .insert([
