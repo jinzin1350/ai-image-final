@@ -1681,6 +1681,188 @@ app.get('/api/admin/generated-images', authenticateAdmin, async (req, res) => {
   }
 });
 
+// ============================================
+// ADMIN NANO BANANA ANALYTICS API
+// ============================================
+
+// Get Nano Banana statistics
+app.get('/api/admin/nanobanana/stats', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, stats: {} });
+    }
+
+    // Get total count
+    const { count: totalCount, error: countError } = await supabase
+      .from('generated_images')
+      .select('*', { count: 'exact', head: true })
+      .eq('content_type', 'nanobanana');
+
+    if (countError) throw countError;
+
+    // Get unique users count
+    const { data: allGenerations, error: usersError } = await supabase
+      .from('generated_images')
+      .select('user_id, user_email')
+      .eq('content_type', 'nanobanana');
+
+    if (usersError) throw usersError;
+
+    const uniqueUsers = new Set(allGenerations?.map(g => g.user_id).filter(Boolean));
+
+    // Get today's count
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const { count: todayCount, error: todayError } = await supabase
+      .from('generated_images')
+      .select('*', { count: 'exact', head: true })
+      .eq('content_type', 'nanobanana')
+      .gte('created_at', today.toISOString());
+
+    if (todayError) throw todayError;
+
+    // Get this week's count
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const { count: weekCount, error: weekError } = await supabase
+      .from('generated_images')
+      .select('*', { count: 'exact', head: true })
+      .eq('content_type', 'nanobanana')
+      .gte('created_at', weekAgo.toISOString());
+
+    if (weekError) throw weekError;
+
+    // Calculate average per user
+    const avgPerUser = uniqueUsers.size > 0 ? (totalCount / uniqueUsers.size).toFixed(1) : 0;
+
+    res.json({
+      success: true,
+      stats: {
+        totalGenerations: totalCount || 0,
+        uniqueUsers: uniqueUsers.size,
+        todayCount: todayCount || 0,
+        weekCount: weekCount || 0,
+        avgPerUser: parseFloat(avgPerUser)
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error fetching Nano Banana stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch statistics'
+    });
+  }
+});
+
+// Get Nano Banana generations with filters
+app.get('/api/admin/nanobanana/generations', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, generations: [], totalCount: 0 });
+    }
+
+    const {
+      page = 1,
+      limit = 50,
+      userEmail = '',
+      dateFilter = 'all'
+    } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    // Build query
+    let query = supabase
+      .from('generated_images')
+      .select('*', { count: 'exact' })
+      .eq('content_type', 'nanobanana');
+
+    // Apply user email filter
+    if (userEmail && userEmail.trim() !== '') {
+      query = query.ilike('user_email', `%${userEmail}%`);
+    }
+
+    // Apply date filter
+    if (dateFilter === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      query = query.gte('created_at', today.toISOString());
+    } else if (dateFilter === 'week') {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      query = query.gte('created_at', weekAgo.toISOString());
+    } else if (dateFilter === 'month') {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      query = query.gte('created_at', monthAgo.toISOString());
+    }
+
+    // Execute query with pagination
+    const { data, count, error } = await query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + parseInt(limit) - 1);
+
+    if (error) throw error;
+
+    console.log(`📊 Fetched ${data?.length || 0} Nano Banana generations (Total: ${count})`);
+
+    res.json({
+      success: true,
+      generations: data || [],
+      totalCount: count || 0,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil((count || 0) / parseInt(limit))
+    });
+  } catch (error) {
+    console.error('❌ Error fetching Nano Banana generations:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch generations'
+    });
+  }
+});
+
+// Get top Nano Banana users
+app.get('/api/admin/nanobanana/top-users', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.json({ success: true, users: [] });
+    }
+
+    const { data, error } = await supabase
+      .from('generated_images')
+      .select('user_id, user_email')
+      .eq('content_type', 'nanobanana');
+
+    if (error) throw error;
+
+    // Count generations per user
+    const userCounts = {};
+    data?.forEach(gen => {
+      if (gen.user_email) {
+        userCounts[gen.user_email] = (userCounts[gen.user_email] || 0) + 1;
+      }
+    });
+
+    // Convert to array and sort
+    const topUsers = Object.entries(userCounts)
+      .map(([email, count]) => ({ email, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10); // Top 10
+
+    res.json({
+      success: true,
+      users: topUsers
+    });
+  } catch (error) {
+    console.error('❌ Error fetching top Nano Banana users:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch top users'
+    });
+  }
+});
+
 // ================== END OF ADMIN PANEL API ==================
 
 // Admin panel page routes - MUST come after API routes
@@ -1758,6 +1940,10 @@ app.get('/admin/generated-images', (req, res) => {
 
 app.get('/admin/llm-model', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-llm-model.html'));
+});
+
+app.get('/admin/nanobanana', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-nanobanana.html'));
 });
 
 // Public blog page
