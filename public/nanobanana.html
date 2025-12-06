@@ -432,11 +432,12 @@
         .upload-preview {
             display: none;
             margin-bottom: 15px;
-            position: relative;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .upload-preview.active {
-            display: block;
+            display: flex;
         }
 
         .preview-container {
@@ -445,10 +446,11 @@
         }
 
         .preview-image {
-            max-width: 150px;
-            max-height: 150px;
+            max-width: 120px;
+            max-height: 120px;
             border-radius: 12px;
             border: 2px solid #e5e7eb;
+            object-fit: cover;
         }
 
         .remove-preview {
@@ -467,11 +469,36 @@
             justify-content: center;
             font-size: 16px;
             transition: all 0.2s;
+            z-index: 10;
         }
 
         .remove-preview:hover {
             background: #dc2626;
             transform: scale(1.1);
+        }
+
+        .upload-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-count.active {
+            display: flex;
+        }
+
+        .upload-btn {
+            position: relative;
         }
 
         .input-wrapper {
@@ -918,18 +945,15 @@
             <!-- Input Area -->
             <div class="input-area">
                 <div class="upload-preview" id="uploadPreview">
-                    <div class="preview-container">
-                        <img id="previewImage" class="preview-image" alt="Preview">
-                        <button class="remove-preview" id="removePreview">✕</button>
-                    </div>
+                    <!-- Multiple image previews will be added here dynamically -->
                 </div>
 
                 <div class="input-wrapper">
                     <div class="input-actions">
-                        <button class="upload-btn" id="uploadBtn" title="آپلود عکس مرجع">
-                            📎
+                        <button class="upload-btn" id="uploadBtn" title="آپلود تا 3 عکس مرجع">
+                            📎<span class="upload-count" id="uploadCount"></span>
                         </button>
-                        <input type="file" id="imageInput" accept="image/jpeg,image/jpg,image/png,image/webp">
+                        <input type="file" id="imageInput" accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
                     </div>
 
                     <div class="prompt-input-container">
@@ -971,14 +995,14 @@
         const uploadBtn = document.getElementById('uploadBtn');
         const imageInput = document.getElementById('imageInput');
         const uploadPreview = document.getElementById('uploadPreview');
-        const previewImage = document.getElementById('previewImage');
-        const removePreview = document.getElementById('removePreview');
+        const uploadCount = document.getElementById('uploadCount');
         const newChatBtn = document.getElementById('newChatBtn');
         const aspectRatio = document.getElementById('aspectRatio');
         const mobileAspectRatio = document.getElementById('mobileAspectRatio');
         const creditsCount = document.getElementById('creditsCount');
 
-        let selectedImage = null;
+        let selectedImages = []; // Array to store up to 3 images
+        const MAX_IMAGES = 3;
 
         // Sync aspect ratio selectors (mobile and desktop)
         if (aspectRatio && mobileAspectRatio) {
@@ -1015,29 +1039,98 @@
             sendBtn.disabled = promptInput.value.trim().length === 0;
         }
 
+        // Update upload count badge
+        function updateUploadCount() {
+            if (selectedImages.length > 0) {
+                uploadCount.textContent = selectedImages.length;
+                uploadCount.classList.add('active');
+            } else {
+                uploadCount.classList.remove('active');
+            }
+        }
+
+        // Render image previews
+        function renderImagePreviews() {
+            uploadPreview.innerHTML = '';
+
+            if (selectedImages.length === 0) {
+                uploadPreview.classList.remove('active');
+                return;
+            }
+
+            uploadPreview.classList.add('active');
+
+            selectedImages.forEach((imageData, index) => {
+                const container = document.createElement('div');
+                container.className = 'preview-container';
+
+                const img = document.createElement('img');
+                img.className = 'preview-image';
+                img.src = imageData.dataUrl;
+                img.alt = `Preview ${index + 1}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-preview';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = () => removeImage(index);
+
+                container.appendChild(img);
+                container.appendChild(removeBtn);
+                uploadPreview.appendChild(container);
+            });
+
+            updateUploadCount();
+        }
+
+        // Remove image by index
+        function removeImage(index) {
+            selectedImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
         // Handle image upload
         uploadBtn.addEventListener('click', () => {
             imageInput.click();
         });
 
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImage.src = e.target.result;
-                    uploadPreview.classList.add('active');
-                    selectedImage = file;
-                };
-                reader.readAsDataURL(file);
+        imageInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+
+            // Check if adding these files would exceed limit
+            const remainingSlots = MAX_IMAGES - selectedImages.length;
+            if (files.length > remainingSlots) {
+                alert(`می‌توانید حداکثر ${MAX_IMAGES} عکس آپلود کنید. ${remainingSlots} جا خالی است.`);
+                return;
             }
+
+            // Process each file
+            for (const file of files) {
+                if (selectedImages.length >= MAX_IMAGES) break;
+
+                try {
+                    const dataUrl = await readFileAsDataURL(file);
+                    selectedImages.push({
+                        file: file,
+                        dataUrl: dataUrl
+                    });
+                } catch (error) {
+                    console.error('Error reading file:', error);
+                }
+            }
+
+            renderImagePreviews();
+            imageInput.value = ''; // Reset input
         });
 
-        removePreview.addEventListener('click', () => {
-            uploadPreview.classList.remove('active');
-            selectedImage = null;
-            imageInput.value = '';
-        });
+        // Helper function to read file as data URL
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
         // Auto-resize textarea
         promptInput.addEventListener('input', () => {
@@ -1051,8 +1144,8 @@
             chatMessages.innerHTML = '';
             welcomeScreen.style.display = 'flex';
             chatMessages.appendChild(welcomeScreen);
-            selectedImage = null;
-            uploadPreview.classList.remove('active');
+            selectedImages = [];
+            renderImagePreviews();
             imageInput.value = '';
             promptInput.value = '';
             updateSendButton();
@@ -1141,8 +1234,8 @@
 
             // Add user message
             let userMessage = prompt;
-            if (selectedImage) {
-                userMessage += ' (با عکس مرجع 📸)';
+            if (selectedImages.length > 0) {
+                userMessage += ` (با ${selectedImages.length} عکس مرجع 📸)`;
             }
             addMessage('user', userMessage);
 
@@ -1162,9 +1255,10 @@
                 formData.append('aspectRatio', aspectRatioValue);
                 formData.append('imageSize', 'large');
 
-                if (selectedImage) {
-                    formData.append('referenceImage', selectedImage);
-                }
+                // Append all selected images
+                selectedImages.forEach((imageData, index) => {
+                    formData.append('referenceImages', imageData.file);
+                });
 
                 // Send request
                 const token = localStorage.getItem('supabase_token');
@@ -1188,9 +1282,9 @@
                     // Update credits
                     creditsCount.textContent = data.creditsRemaining;
 
-                    // Clear selected image
-                    selectedImage = null;
-                    uploadPreview.classList.remove('active');
+                    // Clear selected images
+                    selectedImages = [];
+                    renderImagePreviews();
                     imageInput.value = '';
                 } else {
                     // Show error

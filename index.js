@@ -5451,14 +5451,14 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
 // ============================================
 // NANO BANANA CHAT API - Direct AI Image Chat
 // ============================================
-app.post('/api/nanobanana/chat', authenticateUser, upload.single('referenceImage'), async (req, res) => {
+app.post('/api/nanobanana/chat', authenticateUser, upload.array('referenceImages', 3), async (req, res) => {
   try {
     const userId = req.user.id;
     const userEmail = req.user.email;
     const userPhone = req.user.phone || req.user.phone_number;
     const { prompt, aspectRatio = '1:1', imageSize = 'large' } = req.body;
 
-    console.log('🍌 Nano Banana Chat Request:', { userId, prompt: prompt?.substring(0, 50) });
+    console.log('🍌 Nano Banana Chat Request:', { userId, prompt: prompt?.substring(0, 50), images: req.files?.length || 0 });
 
     // Validate prompt
     if (!prompt || prompt.trim().length === 0) {
@@ -5483,18 +5483,21 @@ app.post('/api/nanobanana/chat', authenticateUser, upload.single('referenceImage
     // Prepare content parts for Nano Banana
     const contentParts = [];
 
-    // Add reference image if provided
-    if (req.file) {
-      const referenceImageBase64 = req.file.buffer.toString('base64');
-      contentParts.push({
-        text: '📸 REFERENCE IMAGE - Use this as inspiration for style, composition, or content:'
+    // Add reference images if provided (up to 3)
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file, index) => {
+        const referenceImageBase64 = file.buffer.toString('base64');
+        contentParts.push({
+          text: `📸 REFERENCE IMAGE ${index + 1} - Use this as inspiration for style, composition, or content:`
+        });
+        contentParts.push({
+          inlineData: {
+            data: referenceImageBase64,
+            mimeType: file.mimetype
+          }
+        });
       });
-      contentParts.push({
-        inlineData: {
-          data: referenceImageBase64,
-          mimeType: req.file.mimetype
-        }
-      });
+      console.log(`📸 Added ${req.files.length} reference image(s) to prompt`);
     }
 
     // Generate image using Nano Banana 2
