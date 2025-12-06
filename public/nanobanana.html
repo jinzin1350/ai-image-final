@@ -556,32 +556,234 @@
             cursor: not-allowed;
         }
 
+        /* Mobile Aspect Ratio Selector */
+        .mobile-aspect-selector {
+            display: none;
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .mobile-aspect-selector select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            font-size: 14px;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        /* Feature Pills (Mobile) */
+        .feature-pills {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .feature-pill {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
+            body {
+                background: #f9fafb;
+            }
+
             .container {
                 flex-direction: column;
+                margin: 0;
+                padding: 0;
+                gap: 0;
+                height: calc(100vh - 60px);
             }
 
+            /* Hide desktop sidebar */
             .sidebar {
-                width: 100%;
+                display: none;
             }
 
+            /* Show mobile aspect selector */
+            .mobile-aspect-selector {
+                display: block;
+            }
+
+            /* Top nav adjustments */
+            .top-nav {
+                padding: 10px 15px;
+            }
+
+            .top-nav-left {
+                gap: 10px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .credits-display {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .nav-buttons {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .nav-btn {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            /* Chat area - full screen */
+            .chat-area {
+                flex: 1;
+                border-radius: 0;
+                box-shadow: none;
+                background: white;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .chat-messages {
+                flex: 1;
+                padding: 20px 15px;
+                overflow-y: auto;
+            }
+
+            /* Welcome screen - compact */
+            .welcome-screen {
+                padding: 30px 20px;
+                height: auto;
+                min-height: 0;
+                justify-content: flex-start;
+            }
+
+            .welcome-icon {
+                font-size: 50px;
+                margin-bottom: 15px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .welcome-subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+                color: #6b7280;
+            }
+
+            /* Hide desktop feature cards */
             .feature-cards {
-                grid-template-columns: 1fr;
+                display: none;
+            }
+
+            /* Show mobile feature pills */
+            .feature-pills {
+                display: flex;
+            }
+
+            /* Input area - sticky bottom */
+            .input-area {
+                padding: 12px 15px;
+                border-top: 1px solid #e5e7eb;
+                background: white;
+                position: sticky;
+                bottom: 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+
+            .input-wrapper {
+                gap: 8px;
+            }
+
+            .upload-btn {
+                padding: 10px;
+                font-size: 18px;
+            }
+
+            #promptInput {
+                font-size: 14px;
+                padding: 12px 15px;
+                min-height: 44px;
+            }
+
+            .send-btn {
+                min-width: 44px;
+                padding: 10px;
+            }
+
+            /* Message adjustments */
+            .message-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .message-text {
+                font-size: 14px;
+                padding: 12px 16px;
             }
 
             .message-image {
                 max-width: 100%;
             }
 
-            .top-nav {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
+            .image-actions {
+                flex-wrap: wrap;
             }
 
-            .nav-buttons {
-                justify-content: space-between;
+            .action-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            /* Upload preview */
+            .preview-image {
+                max-width: 100px;
+                max-height: 100px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .top-nav-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .credits-display {
+                font-size: 12px;
+            }
+
+            .nav-btn {
+                font-size: 11px;
+                padding: 5px 8px;
+            }
+
+            .feature-pill {
+                font-size: 11px;
+                padding: 6px 10px;
             }
         }
 
@@ -629,6 +831,17 @@
         </div>
     </div>
 
+    <!-- Mobile Aspect Ratio Selector (Visible only on mobile) -->
+    <div class="mobile-aspect-selector">
+        <select id="mobileAspectRatio">
+            <option value="1:1">نسبت تصویر: مربع (1:1)</option>
+            <option value="16:9">نسبت تصویر: عرضی (16:9)</option>
+            <option value="9:16">نسبت تصویر: طولی (9:16)</option>
+            <option value="4:3">نسبت تصویر: استاندارد (4:3)</option>
+            <option value="3:4">نسبت تصویر: پرتره (3:4)</option>
+        </select>
+    </div>
+
     <!-- Main Container -->
     <div class="container">
         <!-- Sidebar -->
@@ -668,6 +881,7 @@
                     <h1 class="welcome-title">به Nano Banana خوش آمدید</h1>
                     <p class="welcome-subtitle">با هوش مصنوعی پیشرفته، تصاویر خلاقانه خود را بسازید</p>
 
+                    <!-- Desktop Feature Cards -->
                     <div class="feature-cards">
                         <div class="feature-card">
                             <div class="feature-card-icon">🎨</div>
@@ -689,6 +903,14 @@
                             <div class="feature-card-title">ذخیره خودکار</div>
                             <div class="feature-card-desc">همه تصاویر در گالری شما ذخیره می‌شوند</div>
                         </div>
+                    </div>
+
+                    <!-- Mobile Feature Pills -->
+                    <div class="feature-pills">
+                        <div class="feature-pill">✨ کیفیت حرفه‌ای</div>
+                        <div class="feature-pill">📸 آپلود عکس</div>
+                        <div class="feature-pill">⚡ سریع</div>
+                        <div class="feature-pill">💾 ذخیره خودکار</div>
                     </div>
                 </div>
             </div>
@@ -753,9 +975,20 @@
         const removePreview = document.getElementById('removePreview');
         const newChatBtn = document.getElementById('newChatBtn');
         const aspectRatio = document.getElementById('aspectRatio');
+        const mobileAspectRatio = document.getElementById('mobileAspectRatio');
         const creditsCount = document.getElementById('creditsCount');
 
         let selectedImage = null;
+
+        // Sync aspect ratio selectors (mobile and desktop)
+        if (aspectRatio && mobileAspectRatio) {
+            aspectRatio.addEventListener('change', () => {
+                mobileAspectRatio.value = aspectRatio.value;
+            });
+            mobileAspectRatio.addEventListener('change', () => {
+                aspectRatio.value = mobileAspectRatio.value;
+            });
+        }
 
         // Load user credits
         async function loadUserCredits() {
