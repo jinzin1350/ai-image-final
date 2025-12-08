@@ -228,7 +228,20 @@
 
                 <div class="form-group">
                     <label>Reference Image</label>
-                    <input type="file" id="angleImage" accept="image/*">
+                    <input type="file" id="angleImage" accept="image/*" onchange="analyzeAngleImage(event)">
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <img id="previewImg" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div id="aiAnalysisSection" style="display: none; margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 8px; border: 2px solid #3b82f6;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 20px;">🤖</span>
+                        <strong style="color: #1e40af;">AI Analysis</strong>
+                    </div>
+                    <div id="aiAnalysisResult" style="font-size: 14px; color: #374151;">
+                        Analyzing image...
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 25px;">
@@ -241,6 +254,7 @@
 
     <script>
         let allAngles = [];
+        let currentAnalyzedData = null;
 
         async function loadAngles() {
             try {
@@ -318,6 +332,117 @@
 
         function closeModal() {
             document.getElementById('angleModal').style.display = 'none';
+            document.getElementById('aiAnalysisSection').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            currentAnalyzedData = null;
+        }
+
+        // AI Analysis function using Nano Banana API
+        async function analyzeAngleImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Show AI analysis section
+            document.getElementById('aiAnalysisSection').style.display = 'block';
+            document.getElementById('aiAnalysisResult').innerHTML = '🔄 Analyzing image with AI...';
+
+            try {
+                // Convert image to base64
+                const base64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+
+                // Call Nano Banana API to analyze the angle
+                const response = await fetch('https://nanobanana.shop/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        image: base64,
+                        prompt: `Analyze this fashion photography image and identify the camera angle.
+Determine which of these angles it represents:
+- Front View: Direct frontal shot of the garment/model
+- Back View: Shot from behind showing the back
+- Left Side: Profile from the left side
+- Right Side: Profile from the right side
+- 3/4 Front-Left: 45-degree angle from front-left
+- 3/4 Front-Right: 45-degree angle from front-right
+- Full Body: Complete head-to-toe shot
+- Waist-Up: Upper body from waist upward
+- Close-Up: Detailed close-up of fabric/details
+
+Respond in this exact JSON format:
+{
+  "angle_key": "front|back|left-side|right-side|three-quarter-left|three-quarter-right|full-body|waist-up|close-up",
+  "title_en": "English title",
+  "title_fa": "Persian title",
+  "description_en": "English description of what this angle shows",
+  "description_fa": "Persian description"
+}
+
+Only return valid JSON, no other text.`
+                    })
+                });
+
+                const data = await response.json();
+                console.log('AI Analysis Response:', data);
+
+                if (data && data.response) {
+                    // Try to parse JSON from response
+                    let parsed;
+                    try {
+                        // Extract JSON from markdown code blocks if present
+                        const jsonMatch = data.response.match(/```json\n?([\s\S]*?)\n?```/);
+                        const jsonStr = jsonMatch ? jsonMatch[1] : data.response;
+                        parsed = JSON.parse(jsonStr.trim());
+                    } catch (e) {
+                        // Fallback: try to parse raw response
+                        parsed = JSON.parse(data.response);
+                    }
+
+                    currentAnalyzedData = parsed;
+
+                    // Auto-fill form fields
+                    document.getElementById('angleKey').value = parsed.angle_key || '';
+                    document.getElementById('titleEn').value = parsed.title_en || '';
+                    document.getElementById('titleFa').value = parsed.title_fa || '';
+                    document.getElementById('descriptionEn').value = parsed.description_en || '';
+                    document.getElementById('descriptionFa').value = parsed.description_fa || '';
+
+                    // Show success message
+                    document.getElementById('aiAnalysisResult').innerHTML = `
+                        <div style="color: #065f46;">
+                            ✅ <strong>Analysis Complete!</strong><br>
+                            <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 6px;">
+                                <div><strong>Detected Angle:</strong> ${parsed.title_en} (${parsed.title_fa})</div>
+                                <div style="margin-top: 5px; font-size: 13px; color: #6b7280;">${parsed.description_en}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Invalid AI response');
+                }
+
+            } catch (error) {
+                console.error('Error analyzing image:', error);
+                document.getElementById('aiAnalysisResult').innerHTML = `
+                    <div style="color: #dc2626;">
+                        ❌ <strong>Analysis Failed</strong><br>
+                        <span style="font-size: 13px;">Please fill in the fields manually. Error: ${error.message}</span>
+                    </div>
+                `;
+            }
         }
 
         async function saveAngle(event) {
