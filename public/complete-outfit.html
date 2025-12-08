@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عکاسی استایل کامل - هوش مصنوعی</title>
+    <link rel="stylesheet" href="style.css">
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>📸 عکاسی استایل کامل</h1>
+                <p class="subtitle">عکس مدل با لباس کامل + حجاب + اکسسوری</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/index.html" class="gallery-btn" style="background: #6b7280;">🏠 بازگشت به خدمات</a>
+                <a href="/profile.html" class="gallery-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👤 پروفایل من</a>
+                <a href="/gallery.html" class="gallery-btn">🖼️ گالری تصاویر من</a>
+                <button onclick="handleLogout()" class="gallery-btn" style="background: #ef4444; cursor: pointer; border: none;">🚪 خروج</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- بخش آپلود لباس -->
+            <section class="upload-section" id="garmentUploadSection">
+                <h2>۱. آپلود تصویر لباس</h2>
+                <div class="section-hint">
+                    💡 <strong>تصویر لباس خود را آپلود کنید.</strong> می‌توانید چند لباس همزمان انتخاب کنید (شلوار + تی‌شرت + کت و...).<br>
+                    فرمت‌های مجاز: JPG، PNG، WEBP (حداکثر ۱۰ مگابایت برای هر فایل)
+                </div>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="garmentInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصویر</h3>
+                        <p>کلیک کنید یا فایل را بکشید و رها کنید</p>
+                        <p class="multi-hint">می‌توانید چند تصویر انتخاب کنید (شلوار + تی‌شرت + کت و...)</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="garmentPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+                <button onclick="document.getElementById('garmentInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
+            </section>
+
+            <!-- بخش انتخاب مدل -->
+            <section class="selection-section" id="modelSection">
+                <h2>۲. انتخاب مدل</h2>
+                <div class="section-hint">
+                    💡 <strong>ابتدا دسته‌بندی مدل را انتخاب کنید</strong> (زن، مرد، پسر، دختر یا سایز بزرگ).<br>
+                    سپس روی مدل مورد نظر کلیک کنید تا انتخاب شود. می‌توانید بین صفحات مختلف مدل‌ها حرکت کنید.
+                </div>
+
+                <div class="category-selector">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;" id="modelSelectorLabel">انتخاب مدل اول:</label>
+                    <select id="categorySelect" class="category-dropdown">
+                        <option value="woman">👩 زن (Woman)</option>
+                        <option value="man">👨 مرد (Man)</option>
+                        <option value="girl">👧 دختر (Girl)</option>
+                        <option value="boy">👦 پسر (Boy)</option>
+                        <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                    </select>
+                </div>
+
+                <div class="models-grid" id="modelsGrid">
+                    <!-- مدل‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- بخش انتخاب نوع حجاب -->
+            <section class="selection-section hijab-section" id="hijabSection" style="display: none;">
+                <h2>۲.۱. انتخاب نوع حجاب</h2>
+                <p class="section-description">نوع حجاب مورد نظر خود را انتخاب کنید</p>
+                <div class="hijab-options-grid">
+                    <div class="hijab-option-card" data-hijab-type="full">
+                        <div class="hijab-icon">🧕</div>
+                        <div class="hijab-title">حجاب کامل</div>
+                        <div class="hijab-description">پوشش کامل و محکم - بدون نمایش مو</div>
+                    </div>
+                    <div class="hijab-option-card" data-hijab-type="relaxed">
+                        <div class="hijab-icon">👩‍🦰</div>
+                        <div class="hijab-title">حجاب راحت</div>
+                        <div class="hijab-description">حجاب شل و مدرن - ممکن است کمی مو پیدا باشد</div>
+                    </div>
+                    <div class="hijab-option-card" data-hijab-type="no-hijab">
+                        <div class="hijab-icon">💁‍♀️</div>
+                        <div class="hijab-title">بی حجاب</div>
+                        <div class="hijab-description">بدون پوشش سر - موها کاملاً باز</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب مدل دوم (مخفی به صورت پیش‌فرض) -->
+            <section class="selection-section" id="model2Section" style="display: none;">
+                <h2>۳. انتخاب مدل دوم</h2>
+
+                <div class="category-selector">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">دسته‌بندی مدل دوم:</label>
+                    <select id="categorySelect2" class="category-dropdown">
+                        <option value="woman">👩 زن (Woman)</option>
+                        <option value="man">👨 مرد (Man)</option>
+                        <option value="girl">👧 دختر (Girl)</option>
+                        <option value="boy">👦 پسر (Boy)</option>
+                        <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                    </select>
+                </div>
+
+                <div class="models-grid" id="modelsGrid2">
+                    <!-- مدل‌های دوم به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- بخش آپلود لباس برای مدل دوم (مخفی به صورت پیش‌فرض) -->
+            <section class="upload-section" id="garmentUploadSection2" style="display: none;">
+                <h2>۴. آپلود تصویر لباس برای مدل دوم</h2>
+                <p class="section-description">لباسی که مدل دوم خواهد پوشید را انتخاب کنید (می‌توانید چند تصویر انتخاب کنید)</p>
+                <div class="upload-area" id="garmentUploadArea2">
+                    <input type="file" id="garmentInput2" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">برای آپلود تصویر لباس کلیک کنید</div>
+                        <div class="upload-hint">یا فایل‌ها را اینجا بکشید (PNG, JPG, JPEG - حداکثر 10MB)</div>
+                    </div>
+                    <div id="garmentPreviews2" class="garment-previews" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب پس‌زمینه -->
+            <section class="selection-section" id="backgroundSection">
+                <h2>۳. انتخاب پس‌زمینه</h2>
+                <div class="section-hint">
+                    💡 <strong>محل یا پس‌زمینه‌ای که می‌خواهید مدل در آن ظاهر شود را انتخاب کنید.</strong>
+                </div>
+                <div class="backgrounds-grid" id="backgroundsGrid">
+                    <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- پارامترهای پیشرفته -->
+            <section class="selection-section advanced-params">
+                <h2>۴. پارامترهای پیشرفته (اختیاری)</h2>
+                <div class="section-hint">
+                    💡 <strong>این بخش اختیاری است.</strong> می‌توانید نوع فریم، حالت بدن، زاویه دوربین و سایر جزئیات حرفه‌ای را تنظیم کنید.<br>
+                    اگر انتخاب نکنید، هوش مصنوعی به صورت خودکار بهترین حالت را انتخاب می‌کند.
+                </div>
+
+                <div class="params-grid">
+                    <div class="param-group">
+                        <label for="shotTypeSelect">📐 نوع فریم</label>
+                        <select id="shotTypeSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="poseSelect">🎭 حالت بدن</label>
+                        <select id="poseSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="cameraAngleSelect">📷 زاویه دوربین</label>
+                        <select id="cameraAngleSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="styleSelect">✨ استایل</label>
+                        <select id="styleSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="lightingSelect">💡 نورپردازی</label>
+                        <select id="lightingSelect" class="param-dropdown"></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- تنظیمات کیفیت حرفه‌ای -->
+            <section class="selection-section quality-section">
+                <h2>🎨 تنظیمات کیفیت حرفه‌ای (اختیاری)</h2>
+                <div class="section-hint">
+                    💡 <strong>این بخش اختیاری است.</strong> می‌توانید عمق میدان (تاری پس‌زمینه) را تنظیم کنید.<br>
+                    اگر انتخاب نکنید، هوش مصنوعی به صورت خودکار بهترین حالت را انتخاب می‌کند.
+                </div>
+
+                <div class="params-grid">
+                    <div class="param-group">
+                        <label for="dofSelect">🎯 عمق میدان (Depth of Field)</label>
+                        <select id="dofSelect" class="param-dropdown"></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب لباس، مدل و پس‌زمینه، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
+            <button class="generate-btn" id="generateBtn" disabled>
+                ✨ تولید عکس حرفه‌ای
+            </button>
+
+            <!-- نمایش نتیجه -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 نتیجه نهایی</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image">
+                    <div class="result-info" id="resultInfo"></div>
+                    <button class="download-btn" id="downloadBtn">دانلود تصویر</button>
+                </div>
+            </section>
+
+            <!-- بخش لودینگ -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Selection Modal -->
+    <div id="galleryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
+        <div style="max-width: 1200px; margin: 50px auto; background: white; border-radius: 16px; padding: 30px; position: relative;">
+            <button onclick="closeGalleryModal()" style="position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">✕ بستن</button>
+
+            <h2 style="margin-bottom: 10px;">🖼️ انتخاب از گالری</h2>
+            <p id="gallerySelectionInfo" style="color: #666; margin-bottom: 20px;"></p>
+
+            <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 150px)); gap: 12px; margin-top: 20px; justify-content: center;">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="confirmGallerySelection" onclick="confirmGallerySelection()" class="generate-btn" style="display: inline-block; padding: 12px 30px; margin: 0;">
+                    ✓ تأیید انتخاب
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/service-auth-check.js"></script>
+    <script>
+        // Set the current mode for this page
+        window.currentMode = 'complete-outfit';
+    </script>
+    <script src="script.js"></script>
+    <script src="/mobile-menu.js"></script>
+</body>
+</html>

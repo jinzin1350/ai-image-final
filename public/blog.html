@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - FusionAI Team</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .search-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .blog-content {
+            padding: 1.5rem;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.75rem;
+        }
+
+        .blog-category {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .blog-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .blog-excerpt {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .blog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .blog-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .read-more {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="header">
+        <h1>📝 FusionAI Team Blog</h1>
+        <p>Latest insights on AI, technology, and innovation</p>
+    </div>
+
+    <div class="container">
+        <div class="search-bar">
+            <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="🔍 Search articles..."
+            >
+            <div class="filters" id="filters">
+                <button class="filter-btn active" data-category="all">All Posts</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">Loading blog posts...</div>
+
+        <div id="blogGrid" class="blog-grid" style="display: none;"></div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <h2>No Blog Posts Found</h2>
+            <p>Check back later for new content!</p>
+        </div>
+    </div>
+
+    <script>
+        let allPosts = [];
+        let currentCategory = 'all';
+
+        async function loadBlogPosts() {
+            try {
+                const response = await fetch('/api/blog');
+                const data = await response.json();
+
+                allPosts = data;
+
+                // Extract unique categories
+                const categories = ['all', ...new Set(data.map(post => post.category).filter(Boolean))];
+                renderFilters(categories);
+
+                renderPosts(data);
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (data.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                } else {
+                    document.getElementById('blogGrid').style.display = 'grid';
+                }
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 'Failed to load blog posts. Please try again later.';
+            }
+        }
+
+        function renderFilters(categories) {
+            const filtersContainer = document.getElementById('filters');
+            filtersContainer.innerHTML = categories.map(cat => `
+                <button class="filter-btn ${cat === 'all' ? 'active' : ''}" data-category="${cat}">
+                    ${cat === 'all' ? 'All Posts' : cat}
+                </button>
+            `).join('');
+
+            // Add click handlers
+            filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentCategory = btn.dataset.category;
+                    filtersContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterPosts();
+                });
+            });
+        }
+
+        function renderPosts(posts) {
+            const grid = document.getElementById('blogGrid');
+
+            if (posts.length === 0) {
+                grid.style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            document.getElementById('emptyState').style.display = 'none';
+
+            grid.innerHTML = posts.map(post => `
+                <a href="/blog/${post.slug}" class="blog-card">
+                    <div class="blog-image">
+                        ${post.featured_image
+                            ? `<img src="${post.featured_image}" alt="${escapeHtml(post.title)}" onerror="this.parentElement.innerHTML='📄'">`
+                            : '📄'
+                        }
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            ${post.category ? `<span class="blog-category">${escapeHtml(post.category)}</span>` : ''}
+                            <span>📅 ${formatDate(post.published_at)}</span>
+                        </div>
+                        <h2 class="blog-title">${escapeHtml(post.title)}</h2>
+                        <p class="blog-excerpt">${escapeHtml(post.excerpt || 'Click to read more...')}</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <span>✍️ ${escapeHtml(post.author)}</span>
+                            </div>
+                            <span class="read-more">Read More →</span>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function filterPosts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allPosts;
+
+            // Filter by category
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(post => post.category === currentCategory);
+            }
+
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter(post =>
+                    post.title.toLowerCase().includes(searchTerm) ||
+                    (post.excerpt && post.excerpt.toLowerCase().includes(searchTerm)) ||
+                    (post.content && post.content.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            renderPosts(filtered);
+        }
+
+        // Search input handler
+        document.getElementById('searchInput').addEventListener('input', filterPosts);
+
+        // Load posts on page load
+        loadBlogPosts();
+    </script>
+</body>
+</html>

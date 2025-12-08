@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Face Model | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .generate-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .step-card.active {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        }
+
+        .step-card.completed {
+            border-color: #10b981;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .step-card.completed .step-number {
+            background: #10b981;
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f3f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+            transform: scale(1.02);
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            margin-top: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .analysis-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-top: 16px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .analysis-section {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .analysis-section h3 {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .analysis-item {
+            background: #f9fafb;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .analysis-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .analysis-value {
+            font-size: 16px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                    <path d="M20 10 L12 18 L20 26 L28 18 Z" fill="white"/>
+                    <circle cx="20" cy="20" r="3" fill="white"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-nav-container" data-active-page="generate-model"></div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Generate Face Model</h1>
+                    <p>Create AI model from real face photo</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="generate-container">
+            <div class="alert alert-info">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>Upload a clear face photo, analyze it with AI, and generate a professional model portrait</span>
+            </div>
+
+            <div class="steps-grid">
+                <!-- Step 1: Upload -->
+                <div class="step-card active" id="step1">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Upload Face Photo</h3>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2" style="margin: 0 auto 16px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <p style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px;">Click to upload or drag and drop</p>
+                        <p style="font-size: 14px; color: #6b7280;">PNG, JPG up to 10MB</p>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+
+                    <div id="imagePreview" style="display: none;">
+                        <img id="previewImg" class="preview-image" alt="Preview">
+                        <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeFace()" style="width: 100%; margin-top: 16px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <span>Analyze Face</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Analysis -->
+                <div class="step-card" id="step2">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">AI Analysis Results</h3>
+                    </div>
+
+                    <div id="analysisResults" style="display: none;">
+                        <div class="analysis-grid" id="analysisGrid"></div>
+
+                        <button class="btn btn-primary" id="generateBtn" onclick="generateModel()" style="width: 100%; margin-top: 24px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                            <span>Generate Face Model</span>
+                        </button>
+                    </div>
+
+                    <div id="analysisPlaceholder">
+                        <p style="text-align: center; color: #9ca3af; padding: 40px 20px;">
+                            Upload and analyze a face photo first
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 3: Generated Result & Save -->
+                <div class="step-card" id="step3">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Save to Gallery</h3>
+                    </div>
+
+                    <div id="generatedResults" style="display: none;">
+                        <img id="generatedImg" class="preview-image" alt="Generated Model">
+
+                        <div style="margin-top: 24px;">
+                            <div class="form-group">
+                                <label class="form-label">Model Name</label>
+                                <input type="text" class="form-input" id="modelName" placeholder="e.g., Fashion Model 001">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" id="categorySelect">
+                                    <option value="">Select Category</option>
+                                    <option value="woman">👩 زن (Woman)</option>
+                                    <option value="man">👨 مرد (Man)</option>
+                                    <option value="girl">👧 دختر (Girl)</option>
+                                    <option value="boy">👦 پسر (Boy)</option>
+                                    <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                                    <option value="brand-woman">👩‍💼 زن برند (Brand Woman)</option>
+                                    <option value="brand-man">👨‍💼 مرد برند (Brand Man)</option>
+                                    <option value="brand-girl">👧‍💼 دختر برند (Brand Girl)</option>
+                                    <option value="brand-boy">👦‍💼 پسر برند (Brand Boy)</option>
+                                    <option value="brand-plus-size">➕‍💼 سایز بزرگ برند (Brand Plus Size)</option>
+                                    <option value="accessory">💍 اکسسوری (Accessory)</option>
+                                    <option value="underwear">👙 لباس زیر (Underwear)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Owner Account</label>
+                                <select class="form-select" id="ownerSelect">
+                                    <option value="">Loading accounts...</option>
+                                </select>
+                            </div>
+
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="activeCheckbox" checked>
+                                <label for="activeCheckbox" style="font-weight: 500; color: #374151;">Set as active/visible</label>
+                            </div>
+
+                            <button class="btn btn-success" id="saveBtn" onclick="saveModel()" style="width: 100%; margin-top: 24px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                    <polyline points="7 3 7 8 15 8"/>
+                                </svg>
+                                <span>Save to Gallery</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="generatePlaceholder">
+                        <p style="text-align: center; color: #9ca3af; padding: 40px 20px;">
+                            Generate a model first to save
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        let uploadedImage = null;
+        let analysisData = null;
+        let generatedImageUrl = null;
+
+        // File upload handling
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage = e.target.result;
+                previewImg.src = uploadedImage;
+                uploadArea.style.display = 'none';
+                imagePreview.style.display = 'block';
+
+                // Mark step 1 as completed
+                document.getElementById('step1').classList.add('completed');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Analyze face with Gemini Vision
+        async function analyzeFace() {
+            const btn = document.getElementById('analyzeBtn');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div><span>Analyzing...</span>';
+
+            try {
+                const response = await fetchWithAuth('/api/admin/analyze-face', {
+                    method: 'POST',
+                    body: JSON.stringify({ image: uploadedImage })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    analysisData = data.analysis;
+                    displayAnalysis(data.analysis);
+
+                    // Mark step 2 as active
+                    document.getElementById('step2').classList.add('active');
+                    document.getElementById('step1').classList.remove('active');
+                } else {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                console.error('Error analyzing face:', error);
+                alert('Failed to analyze face: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function displayAnalysis(analysis) {
+            const grid = document.getElementById('analysisGrid');
+            const placeholder = document.getElementById('analysisPlaceholder');
+            const results = document.getElementById('analysisResults');
+
+            const face = analysis.faceFeatures || {};
+            const hair = analysis.hairDetails || {};
+            const skin = analysis.skinDetails || {};
+            const body = analysis.bodyType || {};
+            const expr = analysis.expression || {};
+            const photo = analysis.photographyDetails || {};
+
+            grid.innerHTML = `
+                <div class="analysis-section">
+                    <h3>📋 اطلاعات پایه</h3>
+                    <div class="analysis-item"><span>جنسیت:</span> <strong>${analysis.gender === 'male' ? '👨 مرد' : '👩 زن'}</strong></div>
+                    <div class="analysis-item"><span>سن دقیق:</span> <strong>${analysis.age} سال</strong></div>
+                    <div class="analysis-item"><span>قومیت:</span> <strong>${analysis.ethnicity}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>😊 ویژگی‌های صورت</h3>
+                    <div class="analysis-item"><span>شکل صورت:</span> <strong>${face.faceShape || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>رنگ چشم:</span> <strong>${face.eyeColor || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>شکل چشم:</span> <strong>${face.eyeShape || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>ابرو:</span> <strong>${face.eyebrows || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نوع بینی:</span> <strong>${face.noseType || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>پری لب:</span> <strong>${face.lipFullness || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>استخوان گونه:</span> <strong>${face.cheekbones || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>خط فک:</span> <strong>${face.jawline || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>چانه:</span> <strong>${face.chin || 'N/A'}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>💇 مو و استایل</h3>
+                    <div class="analysis-item"><span>رنگ مو:</span> <strong>${hair.color || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>طول مو:</span> <strong>${hair.length || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>بافت مو:</span> <strong>${hair.texture || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>مدل مو:</span> <strong>${hair.style || 'N/A'}</strong></div>
+                    ${hair.facialHair !== 'none' ? `<div class="analysis-item"><span>موی صورت:</span> <strong>${hair.facialHair}</strong></div>` : ''}
+                </div>
+
+                <div class="analysis-section">
+                    <h3>🎨 پوست و نوع بدن</h3>
+                    <div class="analysis-item"><span>رنگ پوست:</span> <strong>${skin.tone || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>بافت پوست:</span> <strong>${Array.isArray(skin.texture) ? skin.texture.join(', ') : skin.texture || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>پوست:</span> <strong>${skin.complexion || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نوع بدن:</span> <strong>${Array.isArray(body.build) ? body.build.join(', ') : body.build || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>قد:</span> <strong>${body.height || 'N/A'}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>😃 حالت و ژست</h3>
+                    <div class="analysis-item"><span>حالت چهره:</span> <strong>${expr.mood || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>ژست:</span> <strong>${Array.isArray(expr.pose) ? expr.pose.join(', ') : expr.pose || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>زاویه سر:</span> <strong>${expr.headAngle || 'N/A'}</strong></div>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>📸 عکاسی و نورپردازی</h3>
+                    <div class="analysis-item"><span>زاویه دوربین:</span> <strong>${photo.cameraAngle || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نوع نما:</span> <strong>${photo.shotType || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>نورپردازی:</span> <strong>${photo.lighting || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>پس‌زمینه:</span> <strong>${photo.background || 'N/A'}</strong></div>
+                    <div class="analysis-item"><span>کیفیت تصویر:</span> <strong>${photo.imageQuality || 'N/A'}</strong></div>
+                </div>
+            `;
+
+            placeholder.style.display = 'none';
+            results.style.display = 'block';
+
+            // Mark step 2 as completed
+            document.getElementById('step2').classList.add('completed');
+        }
+
+        // Generate model with Gemini Image
+        async function generateModel() {
+            const btn = document.getElementById('generateBtn');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div><span>Generating Model...</span>';
+
+            try {
+                console.log('🎨 Starting model generation...');
+                const response = await fetchWithAuth('/api/admin/generate-face-model', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        analysisData,
+                        originalImage: uploadedImage  // Send reference image for style transfer
+                    })
+                });
+
+                const data = await response.json();
+                console.log('📦 Response received:', data);
+
+                if (data.success) {
+                    console.log('✅ Generation successful! Image URL:', data.imageUrl);
+                    generatedImageUrl = data.imageUrl;
+                    displayGeneratedModel(data.imageUrl);
+
+                    // Mark step 3 as active
+                    document.getElementById('step3').classList.add('active');
+                    document.getElementById('step2').classList.remove('active');
+
+                    // Auto-generate name
+                    const timestamp = Date.now();
+                    document.getElementById('modelName').value = `Generated Model ${timestamp}`;
+                } else {
+                    throw new Error(data.error || 'Generation failed');
+                }
+            } catch (error) {
+                console.error('❌ Error generating model:', error);
+                alert('Failed to generate model: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function displayGeneratedModel(imageUrl) {
+            console.log('🖼️ Displaying generated image:', imageUrl);
+            const placeholder = document.getElementById('generatePlaceholder');
+            const results = document.getElementById('generatedResults');
+            const img = document.getElementById('generatedImg');
+
+            console.log('📍 Elements found:', {
+                placeholder: !!placeholder,
+                results: !!results,
+                img: !!img
+            });
+
+            // Add loading state to image
+            img.style.opacity = '0.5';
+            img.src = imageUrl;
+
+            // Show image when loaded
+            img.onload = function() {
+                console.log('✅ Image loaded successfully!');
+                img.style.opacity = '1';
+                placeholder.style.display = 'none';
+                results.style.display = 'block';
+
+                // Mark step 3 as completed
+                document.getElementById('step3').classList.add('completed');
+            };
+
+            // Handle image load errors
+            img.onerror = function() {
+                console.error('❌ Failed to load image:', imageUrl);
+                alert('Failed to load generated image. Please try again.');
+                img.style.opacity = '1';
+            };
+        }
+
+        // Save model to gallery
+        async function saveModel() {
+            const name = document.getElementById('modelName').value.trim();
+            const category = document.getElementById('categorySelect').value;
+            const ownerId = document.getElementById('ownerSelect').value;
+            const isActive = document.getElementById('activeCheckbox').checked;
+
+            if (!name) {
+                alert('Please enter a model name');
+                return;
+            }
+
+            if (!category || category === '') {
+                alert('Please select a category');
+                return;
+            }
+
+            if (!ownerId || ownerId === '' || ownerId === 'undefined') {
+                const select = document.getElementById('ownerSelect');
+                const optionText = select.options[select.selectedIndex]?.text || '';
+
+                if (optionText.includes('No accounts available') || optionText.includes('Error loading')) {
+                    alert('⚠️ Cannot save: No user accounts available.\n\nThis might be because:\n1. Supabase is not configured\n2. No users exist in the database\n3. Failed to load users\n\nPlease configure Supabase and create users first.');
+                } else {
+                    alert('Please select an owner account from the dropdown');
+                }
+                return;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div><span>Saving...</span>';
+
+            try {
+                // Use the same endpoint as model-studio
+                const response = await fetchWithAuth('/api/admin/save-generated-to-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageUrl: generatedImageUrl,
+                        user_id: ownerId,
+                        content_type: 'model',
+                        visibility: isActive ? 'public' : 'private',
+                        category: category,
+                        name: name,
+                        description: `AI Generated Face Model: ${JSON.stringify(analysisData)}`
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Model saved successfully to user gallery!');
+
+                    // Reset form
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+            } catch (error) {
+                console.error('Error saving model:', error);
+                alert('Failed to save model: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // Load accounts for owner select
+        async function loadAccounts() {
+            try {
+                const response = await fetchWithAuth('/api/admin/users');
+                const data = await response.json();
+
+                const select = document.getElementById('ownerSelect');
+                select.innerHTML = '<option value="">Select Account</option>';
+
+                if (data.success && data.users && data.users.length > 0) {
+                    data.users.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.user_id;  // Use user_id like model-studio
+                        option.textContent = `${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''} (${user.tier || 'testlimit'})`;
+                        select.appendChild(option);
+                    });
+                    console.log(`✅ Loaded ${data.users.length} user accounts`);
+                } else {
+                    console.warn('⚠️ No users found or API error:', data);
+                    select.innerHTML = '<option value="">⚠️ No accounts available (Supabase required)</option>';
+
+                    // Show warning banner
+                    const warningDiv = document.createElement('div');
+                    warningDiv.style.cssText = 'background: #fef3c7; border: 2px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 8px; color: #92400e;';
+                    warningDiv.innerHTML = '<strong>⚠️ Warning:</strong> No user accounts available. Please configure Supabase and create users in the admin panel to use this feature.';
+                    document.querySelector('.step-card[id="step3"]').insertBefore(warningDiv, document.getElementById('generatedResults'));
+                }
+            } catch (error) {
+                console.error('❌ Error loading accounts:', error);
+                const select = document.getElementById('ownerSelect');
+                select.innerHTML = '<option value="">❌ Error loading accounts</option>';
+
+                // Show error banner
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #fee2e2; border: 2px solid #ef4444; padding: 16px; margin: 16px 0; border-radius: 8px; color: #991b1b;';
+                errorDiv.innerHTML = `<strong>❌ Error:</strong> Failed to load user accounts. ${error.message}`;
+                document.querySelector('.step-card[id="step3"]').insertBefore(errorDiv, document.getElementById('generatedResults'));
+            }
+        }
+
+        // Load accounts on page load
+        loadAccounts();
+    </script>
+</body>
+</html>

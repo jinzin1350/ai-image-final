@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عکاسی Flat Lay حرفه‌ای - هوش مصنوعی</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>📸 عکاسی Flat Lay حرفه‌ای</h1>
+                <p class="subtitle">عکس از بالا با چیدمان هنری محصولات</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/index.html" class="gallery-btn" style="background: #6b7280;">🏠 بازگشت به خدمات</a>
+                <a href="/profile.html" class="gallery-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👤 پروفایل من</a>
+                <a href="/gallery.html" class="gallery-btn">🖼️ گالری تصاویر من</a>
+                <button onclick="handleLogout()" class="gallery-btn" style="background: #ef4444; cursor: pointer; border: none;">🚪 خروج</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- بخش آپلود Flat Lay -->
+            <section class="upload-section" id="flatLayUploadSection">
+                <h2>۱. آپلود تصاویر محصولات</h2>
+                <p style="margin-bottom: 20px; color: #666;">تصاویر محصولاتی که می‌خواهید در Flat Lay چیده شوند را آپلود کنید (۱ تا ۶ محصول)</p>
+                <div class="upload-area" id="flatLayUploadArea">
+                    <input type="file" id="flatLayInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="flatLayPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصاویر محصولات</h3>
+                        <p>عکس‌های محصولاتی که می‌خواهید در Flat Lay چیده شوند</p>
+                        <p class="multi-hint">📸 می‌توانید چند محصول را با هم چیدمان کنید</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="flatLayPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب چیدمان Flat Lay -->
+            <section class="selection-section" id="flatLayArrangementSection">
+                <h2>۲. انتخاب نوع چیدمان</h2>
+                <p class="section-description">نحوه چیدمان محصولات را انتخاب کنید</p>
+                <div class="scenario-grid">
+                    <div class="scenario-card" data-arrangement="grid">
+                        <div class="scenario-icon">⊞</div>
+                        <div class="scenario-name">چیدمان شبکه‌ای</div>
+                        <div class="scenario-desc">منظم و مرتب</div>
+                    </div>
+                    <div class="scenario-card" data-arrangement="scattered">
+                        <div class="scenario-icon">✨</div>
+                        <div class="scenario-name">چیدمان آزاد</div>
+                        <div class="scenario-desc">طبیعی و پراکنده</div>
+                    </div>
+                    <div class="scenario-card" data-arrangement="circular">
+                        <div class="scenario-icon">⭕</div>
+                        <div class="scenario-name">چیدمان دایره‌ای</div>
+                        <div class="scenario-desc">به شکل دایره</div>
+                    </div>
+                    <div class="scenario-card" data-arrangement="diagonal">
+                        <div class="scenario-icon">⟋</div>
+                        <div class="scenario-name">چیدمان مورب</div>
+                        <div class="scenario-desc">قطری و پویا</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب پس‌زمینه -->
+            <section class="selection-section" id="backgroundSection">
+                <h2>۳. انتخاب پس‌زمینه یا توصیف سفارشی</h2>
+                <div class="backgrounds-grid" id="backgroundsGrid">
+                    <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+
+                <!-- Custom Location Input -->
+                <div class="custom-location-section" style="margin-top: 20px;">
+                    <div class="param-group">
+                        <label for="customLocation" style="font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                            <span>📍</span>
+                            <span>توصیف سفارشی محیط (اختیاری)</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="customLocation"
+                            placeholder="مثال: روی زمین چوبی سفید با نور طبیعی نرم"
+                            class="param-input"
+                            style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; direction: rtl;"
+                        >
+                        <p style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.6;">
+                            💡 نکته: اگر توصیف سفارشی بنویسید، به جای پس‌زمینه انتخابی از توصیف شما استفاده می‌شود.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- پارامترهای پیشرفته -->
+            <section class="selection-section advanced-params">
+                <h2>۴. پارامترهای پیشرفته (اختیاری)</h2>
+
+                <div class="params-grid">
+                    <div class="param-group">
+                        <label for="poseSelect">🎭 حالت بدن</label>
+                        <select id="poseSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="cameraAngleSelect">📷 زاویه دوربین</label>
+                        <select id="cameraAngleSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="styleSelect">✨ استایل</label>
+                        <select id="styleSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="lightingSelect">💡 نورپردازی</label>
+                        <select id="lightingSelect" class="param-dropdown"></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- تنظیمات کیفیت حرفه‌ای -->
+            <section class="selection-section quality-section">
+                <h2>🎨 تنظیمات کیفیت حرفه‌ای (اختیاری)</h2>
+
+                <div class="params-grid">
+                    <div class="param-group">
+                        <label for="aspectRatioSelect">📐 نسبت تصویر</label>
+                        <select id="aspectRatioSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="colorTempSelect">🌡️ دمای رنگ</label>
+                        <select id="colorTempSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="dofSelect">🎯 عمق میدان</label>
+                        <select id="dofSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="fabricSelect">🧵 نوع پارچه</label>
+                        <select id="fabricSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="shadowSelect">🌑 کیفیت سایه</label>
+                        <select id="shadowSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="bgBlurSelect">🌫️ تاری پس‌زمینه</label>
+                        <select id="bgBlurSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="fitSelect">👔 برازش لباس</label>
+                        <select id="fitSelect" class="param-dropdown"></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- دکمه تولید -->
+            <button class="generate-btn" id="generateBtn" disabled>
+                ✨ تولید عکس حرفه‌ای
+            </button>
+
+            <!-- نمایش نتیجه -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 نتیجه نهایی</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image">
+                    <div class="result-info" id="resultInfo"></div>
+                    <button class="download-btn" id="downloadBtn">دانلود تصویر</button>
+                </div>
+            </section>
+
+            <!-- بخش لودینگ -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set the current mode for this page
+        window.currentMode = 'flat-lay';
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>انتقال استایل - هوش مصنوعی</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🎨 انتقال استایل</h1>
+                <p class="subtitle">انتقال فضا و حال عکس‌های استایل به عکس اصلی</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/index.html" class="gallery-btn" style="background: #6b7280;">🏠 بازگشت به خدمات</a>
+                <a href="/profile.html" class="gallery-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👤 پروفایل من</a>
+                <a href="/gallery.html" class="gallery-btn">🖼️ گالری تصاویر من</a>
+                <button onclick="handleLogout()" class="gallery-btn" style="background: #ef4444; cursor: pointer; border: none;">🚪 خروج</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- بخش Style Transfer -->
+            <section class="upload-section" id="styleTransferSection">
+                <h2>۱. آپلود عکس‌های استایل (۱ تا ۳ عکس)</h2>
+                <p class="section-description">عکس‌هایی را آپلود کنید که می‌خواهید فضا، نور و حال و هوای آن‌ها را به عکس اصلی منتقل کنید</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button onclick="document.getElementById('styleImagesInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
+                        📤 آپلود از کامپیوتر
+                    </button>
+                    <button onclick="openGalleryForStyleImages()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
+                        🖼️ انتخاب از گالری
+                    </button>
+                </div>
+                <div class="upload-area" id="styleImagesUploadArea">
+                    <input type="file" id="styleImagesInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="styleImagesPlaceholder">
+                        <div class="upload-icon">🎨</div>
+                        <div class="upload-text">
+                            <p><strong>کلیک کنید یا عکس‌های استایل را بکشید و رها کنید</strong></p>
+                            <p class="upload-hint">۱ تا ۳ عکس با فضا و نوری که دوست دارید</p>
+                        </div>
+                        <div class="supported-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="styleImagesPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+
+                <h2 style="margin-top: 40px;">۲. آپلود عکس اصلی (محتوا)</h2>
+                <p class="section-description">عکسی که می‌خواهید استایل به آن اعمال شود (محتوا حفظ می‌شود، فقط فضا و نور تغییر می‌کند)</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button onclick="document.getElementById('contentImageInput').click()" class="gallery-btn" style="flex: 1; cursor: pointer;">
+                        📤 آپلود از کامپیوتر
+                    </button>
+                    <button onclick="openGalleryForContentImage()" class="gallery-btn" style="flex: 1; cursor: pointer; background: #10b981;">
+                        🖼️ انتخاب از گالری
+                    </button>
+                </div>
+                <div class="upload-area" id="contentImageUploadArea">
+                    <input type="file" id="contentImageInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="contentImagePlaceholder">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">
+                            <p><strong>کلیک کنید یا عکس اصلی را بکشید و رها کنید</strong></p>
+                            <p class="upload-hint">این عکس حفظ می‌شود، فقط فضا و نورش تغییر می‌کند</p>
+                        </div>
+                        <div class="supported-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="contentImageAnalysisStatus" style="display: none; margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 8px; border: 1px solid #ffc107;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="spinner" style="width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #ffc107; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <span style="color: #856404; font-weight: 500;">🔍 در حال تحلیل عکس محتوا...</span>
+                        </div>
+                    </div>
+                    <div id="contentImagePreview" style="display: none; margin-top: 20px;">
+                        <img id="contentImageImg" style="max-width: 100%; max-height: 400px; border-radius: 8px;">
+                        <button class="remove-btn" onclick="removeContentImage()">حذف عکس</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- پارامترهای پیشرفته -->
+            <section class="selection-section advanced-params">
+                <h2>۳. پارامترهای پیشرفته (اختیاری)</h2>
+
+                <div class="params-grid">
+                    <div class="param-group">
+                        <label for="poseSelect">🎭 حالت بدن</label>
+                        <select id="poseSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="cameraAngleSelect">📷 زاویه دوربین</label>
+                        <select id="cameraAngleSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="styleSelect">✨ استایل</label>
+                        <select id="styleSelect" class="param-dropdown"></select>
+                    </div>
+
+                    <div class="param-group">
+                        <label for="lightingSelect">💡 نورپردازی</label>
+                        <select id="lightingSelect" class="param-dropdown"></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- تنظیمات کیفیت حرفه‌ای -->
+            <section class="selection-section quality-section">
+                <h2>🎨 تنظیمات کیفیت حرفه‌ای (اختیاری)</h2>
+
+                <div class="params-grid">
+                    <div class="param-group">
+                        <label for="aspectRatioSelect">📐 نسبت تصویر</label>
+                        <select id="aspectRatioSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="colorTempSelect">🌡️ دمای رنگ</label>
+                        <select id="colorTempSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="dofSelect">🎯 عمق میدان</label>
+                        <select id="dofSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="fabricSelect">🧵 نوع پارچه</label>
+                        <select id="fabricSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="shadowSelect">🌑 کیفیت سایه</label>
+                        <select id="shadowSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="bgBlurSelect">🌫️ تاری پس‌زمینه</label>
+                        <select id="bgBlurSelect" class="param-dropdown"></select>
+                    </div>
+                    <div class="param-group">
+                        <label for="fitSelect">👔 برازش لباس</label>
+                        <select id="fitSelect" class="param-dropdown"></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- دکمه تولید -->
+            <button class="generate-btn" id="generateBtn" disabled>
+                ✨ تولید عکس حرفه‌ای
+            </button>
+
+            <!-- نمایش نتیجه -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 نتیجه نهایی</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image">
+                    <div class="result-info" id="resultInfo"></div>
+                    <button class="download-btn" id="downloadBtn">دانلود تصویر</button>
+                </div>
+            </section>
+
+            <!-- بخش لودینگ -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Selection Modal -->
+    <div id="galleryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
+        <div style="max-width: 1200px; margin: 50px auto; background: white; border-radius: 16px; padding: 30px; position: relative;">
+            <button onclick="closeGalleryModal()" style="position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">✕ بستن</button>
+
+            <h2 style="margin-bottom: 10px;">🖼️ انتخاب از گالری</h2>
+            <p id="gallerySelectionInfo" style="color: #666; margin-bottom: 20px;"></p>
+
+            <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 150px)); gap: 12px; margin-top: 20px; justify-content: center;">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="confirmGallerySelection" onclick="confirmGallerySelection()" class="generate-btn" style="display: inline-block; padding: 12px 30px; margin: 0;">
+                    ✓ تأیید انتخاب
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set the current mode for this page
+        window.currentMode = 'style-transfer';
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

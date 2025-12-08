@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عکاسی اکسسوری محصول - هوش مصنوعی</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Brand Selection Section Styles */
+        .brand-selection-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .brand-selection-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand-selection-header h2 {
+            font-size: 24px;
+            color: #1f2937;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .brand-selection-header p {
+            color: #6b7280;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .brand-select-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .brand-select-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            justify-content: center;
+        }
+
+        .brand-select-label span:first-child {
+            font-size: 24px;
+        }
+
+        #brandSelect {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            color: #374151;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        #brandSelect:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        #brandSelect:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .brand-photos-section {
+            margin-top: 30px;
+        }
+
+        .brand-photos-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .brand-photos-grid-container {
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .brand-photo-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f3f4f6;
+            aspect-ratio: 3/4;
+            border: 3px solid transparent;
+        }
+
+        .brand-photo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .brand-photo-card.selected {
+            border-color: #10b981;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .brand-photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .brand-photo-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .brand-photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .brand-photo-card:hover .brand-photo-overlay {
+            opacity: 1;
+        }
+
+        .brand-photo-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .selected-photo-preview {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 3px solid #10b981;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 25px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .selected-photo-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .selected-photo-header h3 {
+            margin: 0;
+            color: #065f46;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .selected-photo-content {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .selected-photo-img-wrapper {
+            flex-shrink: 0;
+        }
+
+        .selected-photo-img-wrapper img {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 16px;
+            border: 3px solid #10b981;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-photo-info {
+            flex: 1;
+        }
+
+        .selected-photo-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #065f46;
+            margin: 0 0 15px 0;
+        }
+
+        .clear-selection-btn {
+            padding: 12px 24px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clear-selection-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .brand-selection-container {
+                padding: 20px;
+            }
+
+            .brand-selection-header h2 {
+                font-size: 20px;
+            }
+
+            .brand-selection-header p {
+                font-size: 14px;
+            }
+
+            .selected-photo-content {
+                flex-direction: column;
+            }
+
+            .selected-photo-img-wrapper img {
+                max-width: 100%;
+            }
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>👜 عکاسی اکسسوری محصول</h1>
+                <p class="subtitle">عکس حرفه‌ای کیف، کفش، ساعت، جواهرات</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/index.html" class="gallery-btn" style="background: #6b7280;">🏠 بازگشت به خدمات</a>
+                <a href="/profile.html" class="gallery-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👤 پروفایل من</a>
+                <a href="/gallery.html" class="gallery-btn">🖼️ گالری تصاویر من</a>
+                <button onclick="handleLogout()" class="gallery-btn" style="background: #ef4444; cursor: pointer; border: none;">🚪 خروج</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- توضیحات کامل -->
+            <section class="upload-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #3b82f6; border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+                <h2 style="color: #1e40af; margin-top: 0;">📖 راهنمای عکاسی محصولات اکسسوری</h2>
+                <div style="background: white; padding: 20px; border-radius: 12px; line-height: 1.8;">
+                    <p style="font-size: 16px; color: #374151; margin: 0 0 15px 0;"><strong>این سرویس چه کاری انجام می‌دهد؟</strong></p>
+                    <p style="color: #6b7280; margin: 0 0 20px 0;">عکس محصول اکسسوری شما (کیف، ساعت، عینک و...) را روی مدل با استایل و نور برندهای بزرگ دنیا قرار می‌دهد!</p>
+
+                    <p style="font-size: 16px; color: #374151; margin: 20px 0 10px 0;"><strong>مراحل کار:</strong></p>
+                    <ol style="color: #6b7280; padding-right: 25px;">
+                        <li><strong>عکس مرجع برند:</strong> یک برند معتبر و یک عکس مرجع از آن برند انتخاب کنید (استایل و نور از این عکس الهام گرفته می‌شود)</li>
+                        <li><strong>آپلود محصول:</strong> عکس محصول اکسسوری خود را آپلود کنید (کیف، ساعت، کفش، عینک، جواهرات و...)</li>
+                        <li><strong>نوع اکسسوری:</strong> نوع اکسسوری را مشخص کنید تا هوش مصنوعی بداند کجا قرار دهد</li>
+                        <li><strong>انتخاب مدل:</strong> یک مدل مناسب برای نمایش محصول انتخاب کنید</li>
+                        <li><strong>نتیجه:</strong> عکس حرفه‌ای محصول روی مدل با استایل برند انتخابی!</li>
+                    </ol>
+
+                    <div style="background: #fef3c7; border-right: 4px solid #f59e0b; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <p style="margin: 0; color: #92400e;"><strong>💡 نکته:</strong> انتخاب عکس مرجع برند کیفیت و استایل عکس نهایی را بسیار بهتر می‌کند!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش Brand Reference Photo Selection -->
+            <section class="upload-section">
+                <div class="brand-selection-container">
+                    <div class="brand-selection-header">
+                        <h2>۱. انتخاب عکس مرجع از برندها (اختیاری)</h2>
+                        <div class="section-hint" style="margin: 15px 0;">
+                            💡 <strong>یک برند بزرگ را انتخاب کنید و سپس از عکس‌های آن برند، یک عکس مرجع انتخاب کنید.</strong><br>
+                            هوش مصنوعی عکس اکسسوری شما را شبیه عکس‌های محصولات برندهای بزرگ دنیا می‌سازد.
+                        </div>
+                        <p>ابتدا یک برند را انتخاب کنید، سپس از میان عکس‌های آن برند، یک عکس مرجع انتخاب کنید</p>
+                    </div>
+
+                    <!-- Brand Selection -->
+                    <div class="brand-select-wrapper">
+                        <div class="brand-select-label">
+                            <span>🏷️</span>
+                            <span>انتخاب برند</span>
+                        </div>
+                        <select id="brandSelect" onchange="loadBrandPhotos()">
+                            <option value="">ابتدا یک برند را انتخاب کنید...</option>
+                        </select>
+                    </div>
+
+                    <!-- Accessory Type Filter (shown after brand selection) -->
+                    <div id="accessoryTypeFilterContainer" class="brand-select-wrapper" style="display: none; margin-top: 20px;">
+                        <div class="brand-select-label">
+                            <span>💍</span>
+                            <span>انتخاب نوع اکسسوری</span>
+                        </div>
+                        <select id="accessoryTypeFilter" onchange="filterBrandPhotosByAccessoryType()">
+                            <option value="">همه انواع اکسسوری</option>
+                            <option value="ring">💍 انگشتر (Ring)</option>
+                            <option value="earrings">📿 گوشواره (Earrings)</option>
+                            <option value="bracelet">📿 دستبند (Bracelet)</option>
+                            <option value="necklace">📿 گردنبند (Necklace)</option>
+                            <option value="anklet">📿 پابند (Anklet)</option>
+                            <option value="watch">⌚ ساعت (Watch)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Brand Photos Grid -->
+                <div id="brandPhotosContainer" class="brand-photos-section" style="display: none;">
+                    <div class="brand-photos-header">
+                        <span>📸</span>
+                        <span>عکس‌های مرجع برند</span>
+                    </div>
+                    <div class="brand-photos-grid-container">
+                        <div id="brandPhotosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+                            <!-- Brand photos will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Reference Photo Preview -->
+                <div id="selectedReferencePhotoPreview" class="selected-photo-preview" style="display: none;">
+                    <div class="selected-photo-header">
+                        <span style="font-size: 28px;">✅</span>
+                        <h3>عکس مرجع انتخاب شده</h3>
+                    </div>
+                    <div class="selected-photo-content">
+                        <div class="selected-photo-img-wrapper">
+                            <img id="selectedReferencePhotoImg">
+                        </div>
+                        <div class="selected-photo-info">
+                            <p id="selectedReferencePhotoInfo" class="selected-photo-name"></p>
+                            <button onclick="clearSelectedReferencePhoto()" class="clear-selection-btn">
+                                <span>🗑️</span>
+                                <span>حذف و انتخاب مجدد</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش آپلود اکسسوری -->
+            <section class="upload-section" id="accessoryUploadSection">
+                <h2>۲. آپلود تصویر اکسسوری (محصول)</h2>
+                <div class="section-hint">
+                    💡 <strong>عکس محصول اکسسوری خود را آپلود کنید</strong> (کیف، عینک، ساعت، جواهرات، کفش و...).<br>
+                    سپس نوع اکسسوری را انتخاب کنید تا هوش مصنوعی بهتر آن را روی مدل قرار دهد.
+                </div>
+                <div class="upload-area" id="accessoryUploadArea">
+                    <input type="file" id="accessoryInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="accessoryUploadPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصویر اکسسوری</h3>
+                        <p>عکس محصول اکسسوری (کیف، عینک، ساعت، جواهرات و...) را آپلود کنید</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="accessoryPreview" class="garment-previews" style="display: none;"></div>
+                </div>
+                <button onclick="document.getElementById('accessoryInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
+            </section>
+
+            <!-- بخش انتخاب مدل -->
+            <section class="selection-section" id="modelSection">
+                <h2>۳. انتخاب مدل دست/بدن</h2>
+                <div class="section-hint">
+                    💡 <strong>ابتدا دسته‌بندی مدل را انتخاب کنید، سپس مدل مورد نظر را انتخاب کنید.</strong><br>
+                    مدل‌های مختلف برای زن، مرد، پسر و دختر در دسترس است.
+                </div>
+
+                <!-- Model Category Dropdown -->
+                <div class="param-group" style="margin-bottom: 20px;">
+                    <label for="modelCategorySelect">👥 دسته‌بندی مدل</label>
+                    <select id="modelCategorySelect" class="param-dropdown" onchange="selectModelCategory(this.value)">
+                        <option value="brand-woman">👗 زن برند</option>
+                        <option value="brand-man">👔 مرد برند</option>
+                        <option value="brand-boy">👦 پسر برند</option>
+                        <option value="brand-girl">👧 دختر برند</option>
+                    </select>
+                </div>
+
+                <div class="models-grid" id="modelsGrid">
+                    <!-- مدل‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب اکسسوری و مدل، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
+            <button class="generate-btn" id="generateBtn" disabled>
+                ✨ تولید عکس حرفه‌ای
+            </button>
+
+            <!-- نمایش نتیجه -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 نتیجه نهایی</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image">
+                    <div class="result-info" id="resultInfo"></div>
+                    <button class="download-btn" id="downloadBtn">دانلود تصویر</button>
+                </div>
+            </section>
+
+            <!-- بخش لودینگ -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Selection Modal -->
+    <div id="galleryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
+        <div style="max-width: 1200px; margin: 50px auto; background: white; border-radius: 16px; padding: 30px; position: relative;">
+            <button onclick="closeGalleryModal()" style="position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">✕ بستن</button>
+
+            <h2 style="margin-bottom: 10px;">🖼️ انتخاب از گالری</h2>
+            <p id="gallerySelectionInfo" style="color: #666; margin-bottom: 20px;"></p>
+
+            <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 150px)); gap: 12px; margin-top: 20px; justify-content: center;">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="confirmGallerySelection" onclick="confirmGallerySelection()" class="generate-btn" style="display: inline-block; padding: 12px 30px; margin: 0;">
+                    ✓ تأیید انتخاب
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/service-auth-check.js"></script>
+    <script>
+        // Set the current mode for this page
+        window.currentMode = 'accessories-only';
+
+        // Set default category
+        window.currentCategory = 'brand-woman';
+
+        // Select model category
+        function selectModelCategory(category) {
+            window.currentCategory = category;
+
+            console.log('🔄 Model category changed to:', category);
+
+            // Reload models with new category
+            if (typeof displayModelsByCategory === 'function') {
+                displayModelsByCategory(category);
+            }
+
+            // Reset model selection
+            window.selectedModelId = null;
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load models first for accessories-only mode
+            if (typeof loadModels === 'function') {
+                await loadModels('accessories-only');
+            }
+
+            // Then load default category (brand-woman)
+            if (typeof displayModelsByCategory === 'function') {
+                displayModelsByCategory('brand-woman');
+            }
+        });
+
+        // Brand Photo Selection Functions
+        let allBrands = [];
+        let allBrandPhotos = [];
+
+        // Load brands on page load
+        async function loadBrands() {
+            try {
+                const response = await fetch('/api/brands');
+                if (!response.ok) throw new Error('Failed to load brands');
+
+                const brands = await response.json();
+
+                // DEBUG: Log all brands received from API
+                console.log('🔍 ALL BRANDS from API:', brands);
+                console.log('🔍 Total brands count:', brands.length);
+
+                // Filter brands that have 'accessories' service type
+                allBrands = brands.filter(brand => {
+                    const serviceTypes = brand.service_types || [];
+                    const hasAccessories = serviceTypes.includes('accessories');
+
+                    // DEBUG: Log each brand's service types
+                    console.log(`🔍 Brand: ${brand.name} | Active: ${brand.is_active} | Service Types:`, serviceTypes, '| Has Accessories:', hasAccessories);
+
+                    return hasAccessories;
+                });
+
+                console.log('🔍 FILTERED BRANDS (with accessories):', allBrands);
+                console.log('🔍 Filtered brands count:', allBrands.length);
+
+                const brandSelect = document.getElementById('brandSelect');
+
+                if (allBrands.length === 0) {
+                    brandSelect.innerHTML = '<option value="">هیچ برندی برای این سرویس موجود نیست</option>';
+                    return;
+                }
+
+                brandSelect.innerHTML = '<option value="">ابتدا یک برند را انتخاب کنید...</option>' +
+                    allBrands.map(brand => `
+                        <option value="${brand.id}">${brand.name}</option>
+                    `).join('');
+            } catch (error) {
+                console.error('Error loading brands:', error);
+                alert('خطا در بارگذاری برندها. لطفاً صفحه را رفرش کنید.');
+            }
+        }
+
+        // Load brand photos when brand is selected
+        async function loadBrandPhotos() {
+            const brandSelect = document.getElementById('brandSelect');
+            const brandId = brandSelect.value;
+
+            const photosContainer = document.getElementById('brandPhotosContainer');
+            const photosGrid = document.getElementById('brandPhotosGrid');
+            const accessoryTypeFilterContainer = document.getElementById('accessoryTypeFilterContainer');
+            const accessoryTypeFilter = document.getElementById('accessoryTypeFilter');
+
+            if (!brandId) {
+                photosContainer.style.display = 'none';
+                accessoryTypeFilterContainer.style.display = 'none';
+                return;
+            }
+
+            // Show accessory type filter
+            accessoryTypeFilterContainer.style.display = 'block';
+
+            // Reset filter to "all"
+            accessoryTypeFilter.value = '';
+
+            // Show loading
+            photosContainer.style.display = 'block';
+            photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">در حال بارگذاری...</div>';
+
+            try {
+                // Fetch 'accessories' type photos
+                const response = await fetch(`/api/brands/${brandId}/photos?photo_type=accessories`);
+                if (!response.ok) throw new Error('Failed to load brand photos');
+
+                allBrandPhotos = await response.json();
+
+                if (allBrandPhotos.length === 0) {
+                    photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکسی برای این برند موجود نیست</div>';
+                    return;
+                }
+
+                // Display all photos initially
+                displayFilteredPhotos(allBrandPhotos);
+
+            } catch (error) {
+                console.error('Error loading brand photos:', error);
+                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">خطا در بارگذاری عکس‌ها</div>';
+            }
+        }
+
+        // Filter photos by accessory type
+        function filterBrandPhotosByAccessoryType() {
+            const selectedType = document.getElementById('accessoryTypeFilter').value;
+
+            let filteredPhotos = allBrandPhotos;
+
+            // Filter by accessory type if selected
+            if (selectedType) {
+                filteredPhotos = allBrandPhotos.filter(photo => photo.accessory_type === selectedType);
+            }
+
+            displayFilteredPhotos(filteredPhotos);
+        }
+
+        // Display filtered photos
+        function displayFilteredPhotos(photos) {
+            const photosGrid = document.getElementById('brandPhotosGrid');
+
+            if (photos.length === 0) {
+                photosGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">هیچ عکسی با این فیلتر یافت نشد</div>';
+                return;
+            }
+
+            photosGrid.innerHTML = photos.map(photo => `
+                    <div class="brand-photo-card" onclick="selectBrandReferencePhoto('${photo.id}')" data-photo-id="${photo.id}">
+                        <img src="${photo.image_url}" alt="${photo.title || 'Reference photo'}">
+                        ${photo.title ? `
+                            <div class="brand-photo-overlay">
+                                <p class="brand-photo-title">${photo.title}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+        }
+
+        // Select a brand reference photo
+        function selectBrandReferencePhoto(photoId) {
+            const photo = allBrandPhotos.find(p => p.id === photoId);
+            if (!photo) return;
+
+            window.selectedBrandReferencePhoto = photo;
+
+            // Update UI - highlight selected photo
+            document.querySelectorAll('.brand-photo-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const selectedCard = document.querySelector(`[data-photo-id="${photoId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+
+            // Show selected photo preview
+            const previewSection = document.getElementById('selectedReferencePhotoPreview');
+            const previewImg = document.getElementById('selectedReferencePhotoImg');
+            const previewInfo = document.getElementById('selectedReferencePhotoInfo');
+
+            previewImg.src = photo.image_url;
+            previewInfo.textContent = photo.title || 'عکس مرجع برند';
+            previewSection.style.display = 'block';
+
+            // Scroll to preview
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Clear selected reference photo
+        function clearSelectedReferencePhoto() {
+            window.selectedBrandReferencePhoto = null;
+
+            // Clear UI
+            document.querySelectorAll('.brand-photo-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            const previewSection = document.getElementById('selectedReferencePhotoPreview');
+            previewSection.style.display = 'none';
+        }
+
+        // Load brands when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBrands();
+        });
+    </script>
+    <script src="script.js"></script>
+    <script src="/mobile-menu.js"></script>
+</body>
+</html>

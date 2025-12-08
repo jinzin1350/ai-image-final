@@ -1,0 +1,112 @@
+╔════════════════════════════════════════════════════════════════════╗
+║           PHONE & EMAIL TRACKING ARCHITECTURE                      ║
+╚════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────┐
+│  USER UPLOADS GARMENT IMAGE                                     │
+└─────────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+         ┌─────────────────────────────────────┐
+         │  Frontend Form Collects:            │
+         │  ✓ Email                            │
+         │  ✓ Phone Number ← NEW               │
+         │  ✓ Garment Image File               │
+         └─────────────────────────────────────┘
+                           │
+                           ▼
+         ┌─────────────────────────────────────┐
+         │  Backend (index.js) Processes:      │
+         │  1. Upload image to Storage         │
+         │  2. Generate AI image               │
+         │  3. Save to database                │
+         └─────────────────────────────────────┘
+                           │
+        ┌──────────────────┴───────────────────┐
+        ▼                                      ▼
+┌───────────────────┐              ┌─────────────────────┐
+│ SUPABASE STORAGE  │              │ SUPABASE DATABASE   │
+│                   │              │                     │
+│ Bucket: garments  │              │ Table:              │
+│ ├─ user_123/      │              │ generated_images    │
+│ │  ├─ shirt.jpg   │◄─────────────┤ ├─ garment_path    │
+│ │  └─ pants.jpg   │              │ ├─ user_email ✅   │
+│ └─ user_456/      │              │ ├─ user_phone ✨   │
+│    └─ dress.jpg   │              │ ├─ image_url       │
+└───────────────────┘              │ └─ created_at      │
+                                   └─────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════╗
+║  DATABASE TABLES WITH CONTACT INFO                                ║
+╚════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────┐   ┌──────────────────────┐   ┌──────────────────────┐
+│ user_profiles        │   │ user_limits          │   │ generated_images     │
+├──────────────────────┤   ├──────────────────────┤   ├──────────────────────┤
+│ ✅ email (TEXT)      │   │ ✅ email (TEXT)      │   │ ✅ user_email (TEXT) │
+│ ✅ phone (TEXT)      │   │ ✨ phone_number      │   │ ✨ user_phone (TEXT) │
+│    ALREADY EXISTS    │   │    NEW - TO ADD      │   │    NEW - TO ADD      │
+│                      │   │                      │   │                      │
+│ Used for:            │   │ Used for:            │   │ Used for:            │
+│ • User signup        │   │ • Credits tracking   │   │ • Generated images   │
+│ • Profile management │   │ • Tier management    │   │ • Upload tracking    │
+└──────────────────────┘   └──────────────────────┘   └──────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════╗
+║  MIGRATION FILES TO RUN                                            ║
+╚════════════════════════════════════════════════════════════════════╝
+
+1️⃣  migrations/add_phone_number_to_user_limits.sql
+    └─► Adds phone_number field to user_limits table
+
+2️⃣  migrations/add_phone_number_to_generated_images.sql
+    └─► Adds user_phone field to generated_images table
+
+3️⃣  migrations/FIXED_user_profiles_with_phone.sql
+    └─► Already exists (phone field already in user_profiles)
+
+╔════════════════════════════════════════════════════════════════════╗
+║  EXAMPLE: QUERY USERS BY PHONE                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+-- Find all images uploaded by phone number
+SELECT 
+  gi.id,
+  gi.user_email,
+  gi.user_phone,
+  gi.garment_path,
+  gi.generated_image_url,
+  gi.created_at
+FROM generated_images gi
+WHERE gi.user_phone = '+1234567890'
+ORDER BY gi.created_at DESC;
+
+-- Find user profile by phone
+SELECT * FROM user_profiles WHERE phone = '+1234567890';
+
+-- Find user limits by phone
+SELECT * FROM user_limits WHERE phone_number = '+1234567890';
+
+╔════════════════════════════════════════════════════════════════════╗
+║  IMPLEMENTATION CHECKLIST                                          ║
+╚════════════════════════════════════════════════════════════════════╝
+
+Database:
+  [ ] Run migration for user_limits table
+  [ ] Run migration for generated_images table
+  [ ] Verify columns exist in database
+
+Backend (index.js):
+  [ ] Update image generation endpoint to accept phone
+  [ ] Save phone to generated_images table
+  [ ] Update user profile endpoints to save phone
+
+Frontend:
+  [ ] Add phone input field to upload forms
+  [ ] Send phone number with upload requests
+  [ ] Validate phone format (optional)
+
+Testing:
+  [ ] Upload test garment with phone number
+  [ ] Verify phone saved in database
+  [ ] Test querying by phone number

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نمایش کالکشن رنگی - هوش مصنوعی</title>
+    <link rel="stylesheet" href="style.css">
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🎨 نمایش کالکشن رنگی</h1>
+                <p class="subtitle">نمایش همه رنگ‌های محصول در یک عکس</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/index.html" class="gallery-btn" style="background: #6b7280;">🏠 بازگشت به خدمات</a>
+                <a href="/profile.html" class="gallery-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👤 پروفایل من</a>
+                <a href="/gallery.html" class="gallery-btn">🖼️ گالری تصاویر من</a>
+                <button onclick="handleLogout()" class="gallery-btn" style="background: #ef4444; cursor: pointer; border: none;">🚪 خروج</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- بخش آپلود کالکشن رنگی -->
+            <section class="upload-section" id="colorCollectionUploadSection">
+                <h2>۱. آپلود تصاویر رنگ‌های مختلف</h2>
+                <div class="section-hint">
+                    💡 <strong>تصاویر تمام رنگ‌های محصول را آپلود کنید</strong> (حداقل ۱ رنگ، حداکثر ۱۰ رنگ).<br>
+                    هر رنگ باید عکس جداگانه‌ای باشد. مثال: قرمز، آبی، سبز، مشکی و...
+                </div>
+                <div class="upload-area" id="colorCollectionUploadArea">
+                    <input type="file" id="colorCollectionInput" accept="image/*" multiple hidden>
+                    <div class="upload-placeholder" id="colorCollectionPlaceholder">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>انتخاب تصاویر رنگ‌ها</h3>
+                        <p>عکس‌های تمام رنگ‌بندی‌های محصول را آپلود کنید</p>
+                        <p class="multi-hint">🎨 شامل: رنگ قرمز، آبی، سبز، زرد، سیاه، سفید و...</p>
+                        <div class="upload-formats">
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">WEBP</span>
+                        </div>
+                    </div>
+                    <div id="colorCollectionPreviews" class="garment-previews" style="display: none;"></div>
+                </div>
+            </section>
+                <button onclick="document.getElementById('colorCollectionInput').click()" class="upload-from-computer-btn">
+                    📤 انتخاب فایل از کامپیوتر
+                </button>
+
+            <!-- بخش انتخاب سناریو نمایش -->
+            <section class="selection-section" id="displayScenarioSection">
+                <h2>۲. انتخاب نوع نمایش</h2>
+                <div class="section-hint">
+                    💡 <strong>نحوه نمایش رنگ‌های محصول را انتخاب کنید.</strong><br>
+                    می‌توانید رنگ‌ها را روی دست، آویزان روی رگال، تا شده روی هم یا پهن شده کنار هم ببینید.
+                </div>
+                <p class="section-description">نحوه نمایش رنگ‌های محصول را انتخاب کنید</p>
+                <div class="scenario-grid">
+                    <div class="scenario-card" data-scenario="on-arm">
+                        <div class="scenario-icon">👐</div>
+                        <div class="scenario-name">روی دست</div>
+                        <div class="scenario-desc">تمام رنگ‌ها روی دست</div>
+                    </div>
+                    <div class="scenario-card" data-scenario="hanging-rack">
+                        <div class="scenario-icon">👔</div>
+                        <div class="scenario-name">آویزان روی رگال</div>
+                        <div class="scenario-desc">روی رگال با چوب لباسی</div>
+                    </div>
+                    <div class="scenario-card" data-scenario="folded-stack">
+                        <div class="scenario-icon">📚</div>
+                        <div class="scenario-name">تا شده روی هم</div>
+                        <div class="scenario-desc">مرتب تا شده و چیده شده</div>
+                    </div>
+                    <div class="scenario-card" data-scenario="laid-out">
+                        <div class="scenario-icon">📐</div>
+                        <div class="scenario-name">کنار هم روی سطح</div>
+                        <div class="scenario-desc">پهن شده کنار هم</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- بخش انتخاب پس‌زمینه -->
+            <section class="selection-section" id="backgroundSection">
+                <h2>۳. انتخاب پس‌زمینه</h2>
+                <div class="section-hint">
+                    💡 <strong>محل یا پس‌زمینه‌ای که می‌خواهید رنگ‌ها در آن نمایش داده شوند را انتخاب کنید.</strong>
+                </div>
+                <div class="backgrounds-grid" id="backgroundsGrid">
+                    <!-- پس‌زمینه‌ها به صورت پویا اضافه می‌شوند -->
+                </div>
+            </section>
+
+            <!-- دکمه تولید -->
+            <div class="section-hint" style="margin-top: 30px; margin-bottom: 15px;">
+                💡 <strong>پس از انتخاب رنگ‌ها، نوع نمایش و پس‌زمینه، روی دکمه زیر کلیک کنید.</strong><br>
+                تصویر شما در عرض ۳۰-۶۰ ثانیه توسط هوش مصنوعی تولید خواهد شد. لطفاً صبور باشید.
+            </div>
+            <button class="generate-btn" id="generateBtn" disabled>
+                ✨ تولید عکس حرفه‌ای
+            </button>
+
+            <!-- نمایش نتیجه -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>🎉 نتیجه نهایی</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image">
+                    <div class="result-info" id="resultInfo"></div>
+                    <button class="download-btn" id="downloadBtn">دانلود تصویر</button>
+                </div>
+            </section>
+
+            <!-- بخش لودینگ -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>در حال تولید تصویر با هوش مصنوعی...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Selection Modal -->
+    <div id="galleryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; overflow-y: auto;">
+        <div style="max-width: 1200px; margin: 50px auto; background: white; border-radius: 16px; padding: 30px; position: relative;">
+            <button onclick="closeGalleryModal()" style="position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">✕ بستن</button>
+
+            <h2 style="margin-bottom: 10px;">🖼️ انتخاب از گالری</h2>
+            <p id="gallerySelectionInfo" style="color: #666; margin-bottom: 20px;"></p>
+
+            <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 150px)); gap: 12px; margin-top: 20px; justify-content: center;">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="confirmGallerySelection" onclick="confirmGallerySelection()" class="generate-btn" style="display: inline-block; padding: 12px 30px; margin: 0;">
+                    ✓ تأیید انتخاب
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/service-auth-check.js"></script>
+    <script>
+        // Set the current mode for this page
+        window.currentMode = 'color-collection';
+    </script>
+    <script src="script.js"></script>
+    <script src="/mobile-menu.js"></script>
+</body>
+</html>

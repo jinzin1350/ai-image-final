@@ -1,0 +1,615 @@
+// Supabase Configuration
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Global State
+let state = {
+    garmentImages: [],
+    selectedModel: null,
+    selectedBackground: null,
+    currentCategory: 'woman',
+    parameters: {
+        pose: '',
+        cameraAngle: '',
+        style: '',
+        lighting: '',
+        // Phase 1
+        colorTemp: '',
+        dof: '',
+        fabric: '',
+        shadow: '',
+        // Phase 2
+        aspectRatio: '',
+        lightingRatio: '',
+        bgBlur: '',
+        fit: '',
+        // Phase 3
+        postProc: '',
+        envReflect: '',
+        weather: '',
+        motion: ''
+    }
+};
+
+// Data
+const models = {
+    woman: [
+        { id: 'w1', name: 'مدل ۱', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=500&fit=crop' },
+        { id: 'w2', name: 'مدل ۲', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=500&fit=crop' },
+        { id: 'w3', name: 'مدل ۳', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=500&fit=crop' },
+        { id: 'w4', name: 'مدل ۴', image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=500&fit=crop' }
+    ],
+    man: [
+        { id: 'm1', name: 'مدل ۱', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop' },
+        { id: 'm2', name: 'مدل ۲', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=500&fit=crop' },
+        { id: 'm3', name: 'مدل ۳', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop' },
+        { id: 'm4', name: 'مدل ۴', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop' }
+    ],
+    girl: [
+        { id: 'g1', name: 'مدل ۱', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=500&fit=crop' },
+        { id: 'g2', name: 'مدل ۲', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=500&fit=crop' }
+    ],
+    boy: [
+        { id: 'b1', name: 'مدل ۱', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop' },
+        { id: 'b2', name: 'مدل ۲', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=500&fit=crop' }
+    ]
+};
+
+const backgrounds = [
+    { id: 'bg1', name: 'استودیو سفید', image: 'https://images.unsplash.com/photo-1558769132-cb1aea9c0b41?w=500&h=300&fit=crop' },
+    { id: 'bg2', name: 'خیابان شهری', image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&h=300&fit=crop' },
+    { id: 'bg3', name: 'کافه مدرن', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500&h=300&fit=crop' },
+    { id: 'bg4', name: 'پارک', image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=500&h=300&fit=crop' },
+    { id: 'bg5', name: 'ساحل', image: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=500&h=300&fit=crop' },
+    { id: 'bg6', name: 'فروشگاه', image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=500&h=300&fit=crop' }
+];
+
+const paramOptions = {
+    pose: ['ایستاده', 'نشسته', 'در حال راه رفتن', 'تکیه داده', 'حرکتی'],
+    cameraAngle: ['رو به رو', 'نیم‌رخ', 'از بالا', 'از پایین', 'کنج دار'],
+    style: ['مدرن', 'کلاسیک', 'اسپرت', 'رسمی', 'آوانگارد'],
+    lighting: ['نور روز', 'نور استودیو', 'نور طلایی', 'نور دراماتیک', 'نور نرم'],
+    // Phase 1
+    colorTemp: ['گرم (3200K)', 'خنثی (5500K)', 'سرد (6500K)', 'طلایی (2800K)'],
+    dof: ['عمیق (f/16)', 'متوسط (f/8)', 'کم (f/2.8)', 'خیلی کم (f/1.4)'],
+    fabric: ['پنبه', 'کتان', 'ابریشم', 'پشمی', 'سنتتیک', 'جین', 'چرم'],
+    shadow: ['نرم و پخش', 'متوسط', 'سخت و واضح', 'بدون سایه'],
+    // Phase 2
+    aspectRatio: ['۳:۴ (پرتره)', '۱:۱ (مربع)', '۹:۱۶ (استوری)', '۴:۵ (پست)'],
+    lightingRatio: ['۲:۱ (نرم)', '۳:۱ (متوسط)', '۴:۱ (دراماتیک)', '۸:۱ (سخت)'],
+    bgBlur: ['بدون تاری', 'تاری کم', 'تاری متوسط', 'تاری زیاد', 'بوکه'],
+    fit: ['اسلیم فیت', 'رگولار فیت', 'اورسایز', 'تایت فیت'],
+    // Phase 3
+    postProc: ['طبیعی', 'سینمایی', 'وینتیج', 'مینیمال', 'هایپر رئال'],
+    envReflect: ['بدون بازتاب', 'بازتاب کم', 'بازتاب طبیعی', 'بازتاب زیاد'],
+    weather: ['آفتابی', 'ابری', 'طلوع/غروب', 'شب', 'باران'],
+    motion: ['بدون حرکت', 'حرکت مو', 'حرکت لباس', 'حرکت کامل']
+};
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initializeUpload();
+    initializeCategories();
+    initializeParameters();
+    loadModels(state.currentCategory);
+    loadBackgrounds();
+    checkGenerateButton();
+});
+
+// Upload Initialization
+function initializeUpload() {
+    const uploadArea = document.getElementById('uploadArea');
+    const garmentInput = document.getElementById('garmentInput');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+
+    uploadPlaceholder.addEventListener('click', () => {
+        garmentInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    garmentInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+}
+
+// Handle File Upload
+function handleFiles(files) {
+    const fileArray = Array.from(files);
+    
+    fileArray.forEach(file => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state.garmentImages.push({
+                    id: Date.now() + Math.random(),
+                    file: file,
+                    dataUrl: e.target.result
+                });
+                renderGarmentPreviews();
+                checkGenerateButton();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Render Garment Previews
+function renderGarmentPreviews() {
+    const previewsContainer = document.getElementById('garmentPreviews');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    
+    if (state.garmentImages.length > 0) {
+        uploadPlaceholder.style.display = 'none';
+        previewsContainer.style.display = 'grid';
+        
+        previewsContainer.innerHTML = state.garmentImages.map(img => `
+            <div class="preview-item">
+                <img src="${img.dataUrl}" alt="Garment" class="preview-image">
+                <button class="preview-remove" onclick="removeGarment('${img.id}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        `).join('');
+    } else {
+        uploadPlaceholder.style.display = 'block';
+        previewsContainer.style.display = 'none';
+    }
+}
+
+// Remove Garment
+function removeGarment(id) {
+    state.garmentImages = state.garmentImages.filter(img => img.id !== id);
+    renderGarmentPreviews();
+    checkGenerateButton();
+}
+
+// Initialize Categories
+function initializeCategories() {
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    
+    categoryTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            categoryTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            state.currentCategory = tab.dataset.category;
+            loadModels(state.currentCategory);
+        });
+    });
+}
+
+// Load Models
+function loadModels(category) {
+    const modelsGrid = document.getElementById('modelsGrid');
+    const categoryModels = models[category] || [];
+    
+    modelsGrid.innerHTML = categoryModels.map(model => `
+        <div class="model-card ${state.selectedModel === model.id ? 'selected' : ''}" onclick="selectModel('${model.id}')">
+            <img src="${model.image}" alt="${model.name}" class="model-image">
+            <span class="model-badge">${state.selectedModel === model.id ? '✓ انتخاب شده' : 'انتخاب'}</span>
+            <div class="model-info">
+                <div class="model-name">${model.name}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Select Model
+function selectModel(modelId) {
+    state.selectedModel = modelId;
+    loadModels(state.currentCategory);
+    checkGenerateButton();
+}
+
+// Load Backgrounds
+function loadBackgrounds() {
+    const backgroundsGrid = document.getElementById('backgroundsGrid');
+    
+    backgroundsGrid.innerHTML = backgrounds.map(bg => `
+        <div class="background-card ${state.selectedBackground === bg.id ? 'selected' : ''}" onclick="selectBackground('${bg.id}')">
+            <img src="${bg.image}" alt="${bg.name}" class="background-image">
+            <div class="background-overlay">
+                <div class="background-name">${bg.name}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Select Background
+function selectBackground(bgId) {
+    state.selectedBackground = bgId;
+    loadBackgrounds();
+    checkGenerateButton();
+}
+
+// Initialize Parameters
+function initializeParameters() {
+    // Basic parameters
+    populateSelect('poseSelect', paramOptions.pose);
+    populateSelect('cameraAngleSelect', paramOptions.cameraAngle);
+    populateSelect('styleSelect', paramOptions.style);
+    populateSelect('lightingSelect', paramOptions.lighting);
+    
+    // Phase 1
+    populateSelect('colorTempSelect', paramOptions.colorTemp);
+    populateSelect('dofSelect', paramOptions.dof);
+    populateSelect('fabricSelect', paramOptions.fabric);
+    populateSelect('shadowSelect', paramOptions.shadow);
+    
+    // Phase 2
+    populateSelect('aspectRatioSelect', paramOptions.aspectRatio);
+    populateSelect('lightingRatioSelect', paramOptions.lightingRatio);
+    populateSelect('bgBlurSelect', paramOptions.bgBlur);
+    populateSelect('fitSelect', paramOptions.fit);
+    
+    // Phase 3
+    populateSelect('postProcSelect', paramOptions.postProc);
+    populateSelect('envReflectSelect', paramOptions.envReflect);
+    populateSelect('weatherSelect', paramOptions.weather);
+    populateSelect('motionSelect', paramOptions.motion);
+    
+    // Add event listeners
+    addParameterListeners();
+}
+
+// Populate Select
+function populateSelect(selectId, options) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        select.appendChild(optionElement);
+    });
+}
+
+// Add Parameter Listeners
+function addParameterListeners() {
+    const paramIds = [
+        'poseSelect', 'cameraAngleSelect', 'styleSelect', 'lightingSelect',
+        'colorTempSelect', 'dofSelect', 'fabricSelect', 'shadowSelect',
+        'aspectRatioSelect', 'lightingRatioSelect', 'bgBlurSelect', 'fitSelect',
+        'postProcSelect', 'envReflectSelect', 'weatherSelect', 'motionSelect'
+    ];
+    
+    paramIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', (e) => {
+                const paramName = id.replace('Select', '');
+                state.parameters[paramName] = e.target.value;
+            });
+        }
+    });
+}
+
+// Toggle Phase
+function togglePhase(button) {
+    const phase = button.closest('.quality-phase');
+    const content = phase.querySelector('.phase-content');
+    const isOpen = button.classList.contains('active');
+    
+    if (isOpen) {
+        button.classList.remove('active');
+        content.classList.remove('open');
+    } else {
+        button.classList.add('active');
+        content.classList.add('open');
+    }
+}
+
+// Check Generate Button
+function checkGenerateButton() {
+    const generateBtn = document.getElementById('generateBtn');
+    const canGenerate = state.garmentImages.length > 0 && 
+                       state.selectedModel && 
+                       state.selectedBackground;
+    
+    generateBtn.disabled = !canGenerate;
+}
+
+// Generate Button Click
+document.getElementById('generateBtn')?.addEventListener('click', generateImage);
+
+async function generateImage() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const resultSection = document.getElementById('resultSection');
+    
+    // Show loading
+    loadingOverlay.style.display = 'flex';
+    resultSection.style.display = 'none';
+    
+    // Simulate progress
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 95) progress = 95;
+        updateProgress(progress);
+    }, 500);
+    
+    try {
+        // Simulate AI processing
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // Clear progress interval
+        clearInterval(progressInterval);
+        updateProgress(100);
+        
+        // Hide loading and show result
+        setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+            showResult();
+        }, 500);
+        
+    } catch (error) {
+        console.error('Error generating image:', error);
+        clearInterval(progressInterval);
+        loadingOverlay.style.display = 'none';
+        showNotification('خطا در تولید تصویر. لطفاً دوباره تلاش کنید.', 'error');
+    }
+}
+
+// Update Progress
+function updateProgress(percentage) {
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressFill && progressText) {
+        progressFill.style.width = percentage + '%';
+        progressText.textContent = Math.round(percentage) + '%';
+    }
+}
+
+// Show Result
+function showResult() {
+    const resultSection = document.getElementById('resultSection');
+    const resultImage = document.getElementById('resultImage');
+    const resultDetails = document.getElementById('resultDetails');
+    
+    // Use first garment image as result (in real app, this would be the generated image)
+    resultImage.src = state.garmentImages[0].dataUrl;
+    
+    // Display details
+    const selectedModel = models[state.currentCategory].find(m => m.id === state.selectedModel);
+    const selectedBg = backgrounds.find(bg => bg.id === state.selectedBackground);
+    
+    resultDetails.innerHTML = `
+        <div class="info-row">
+            <span class="info-label">مدل:</span>
+            <span class="info-value">${selectedModel?.name || '-'}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">پس‌زمینه:</span>
+            <span class="info-value">${selectedBg?.name || '-'}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">دسته‌بندی:</span>
+            <span class="info-value">${getCategoryName(state.currentCategory)}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">وضوح:</span>
+            <span class="info-value">4K</span>
+        </div>
+        ${state.parameters.pose ? `
+        <div class="info-row">
+            <span class="info-label">حالت:</span>
+            <span class="info-value">${state.parameters.pose}</span>
+        </div>
+        ` : ''}
+        ${state.parameters.lighting ? `
+        <div class="info-row">
+            <span class="info-label">نورپردازی:</span>
+            <span class="info-value">${state.parameters.lighting}</span>
+        </div>
+        ` : ''}
+    `;
+    
+    resultSection.style.display = 'block';
+    resultSection.scrollIntoView({ behavior: 'smooth' });
+    
+    // Save to Supabase (optional)
+    saveGeneratedImage();
+}
+
+// Save Generated Image
+async function saveGeneratedImage() {
+    try {
+        const { data, error } = await supabase
+            .from('generated_images')
+            .insert([
+                {
+                    image_url: state.garmentImages[0].dataUrl,
+                    model_type: state.selectedModel,
+                    background: state.selectedBackground,
+                    parameters: state.parameters,
+                    created_at: new Date().toISOString()
+                }
+            ]);
+        
+        if (error) throw error;
+        console.log('Image saved to database');
+    } catch (error) {
+        console.error('Error saving image:', error);
+    }
+}
+
+// Get Category Name
+function getCategoryName(category) {
+    const names = {
+        woman: 'زن',
+        man: 'مرد',
+        girl: 'دختر',
+        boy: 'پسر'
+    };
+    return names[category] || category;
+}
+
+// Download Button
+document.getElementById('downloadBtn')?.addEventListener('click', () => {
+    const resultImage = document.getElementById('resultImage');
+    const link = document.createElement('a');
+    link.href = resultImage.src;
+    link.download = `AI-Fashion-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showNotification('دانلود شروع شد', 'success');
+});
+
+// Share Image
+function shareImage() {
+    const resultImage = document.getElementById('resultImage');
+    
+    if (navigator.share) {
+        fetch(resultImage.src)
+            .then(res => res.blob())
+            .then(blob => {
+                const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+                return navigator.share({
+                    files: [file],
+                    title: 'تصویر تولید شده با هوش مصنوعی',
+                    text: 'ساخته شده با استودیو AI'
+                });
+            })
+            .catch(err => console.error('Error sharing:', err));
+    } else {
+        showNotification('مرورگر شما از اشتراک‌گذاری پشتیبانی نمی‌کند', 'error');
+    }
+}
+
+// Generate Another
+function generateAnother() {
+    const resultSection = document.getElementById('resultSection');
+    resultSection.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// View Full Image
+function viewFullImage() {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const resultImage = document.getElementById('resultImage');
+    
+    modalImage.src = resultImage.src;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+// Close Image Modal
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Handle Logout
+function handleLogout() {
+    localStorage.removeItem('user');
+    showNotification('با موفقیت خارج شدید', 'success');
+    setTimeout(() => {
+        window.location.href = '/login.html';
+    }, 1000);
+}
+
+// Show Notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Add notification styles
+const style = document.createElement('style');
+style.textContent = `
+    .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 99999;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .notification.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    
+    .notification-success {
+        border-right: 4px solid #2ecc71;
+    }
+    
+    .notification-error {
+        border-right: 4px solid #ff4757;
+    }
+    
+    .notification-info {
+        border-right: 4px solid #667eea;
+    }
+`;
+document.head.appendChild(style);
+
+// Check for regenerate flag
+if (window.location.search.includes('regenerate=true')) {
+    const settings = localStorage.getItem('regenerateSettings');
+    if (settings) {
+        const parsed = JSON.parse(settings);
+        state.selectedModel = parsed.model_type;
+        state.selectedBackground = parsed.background;
+        localStorage.removeItem('regenerateSettings');
+        showNotification('تنظیمات قبلی بازیابی شد', 'success');
+    }
+}
+
+console.log('🎨 صفحه اصلی آماده است!');
+console.log('✨ تمام قابلیت‌های تعاملی فعال شدند');

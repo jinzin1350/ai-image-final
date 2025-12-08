@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود / ثبت نام - استودیو هوش مصنوعی مد</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="auth-style.css">
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="logo-section">
+                <span class="logo-icon">📸</span>
+                <h1>AI Fashion Studio</h1>
+                <p class="subtitle">استودیو هوش مصنوعی مد</p>
+                <a href="/landing.html" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: transform 0.2s;">
+                    🏠 بازگشت به صفحه اصلی
+                </a>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="signInForm" class="auth-form">
+                <h2>ورود به حساب کاربری</h2>
+                <form onsubmit="handleSignIn(event)">
+                    <div class="form-group">
+                        <label for="signInEmail">ایمیل یا شماره تلفن</label>
+                        <input type="text" id="signInEmail" required placeholder="email@example.com یا 09123456789">
+                    </div>
+                    <div class="form-group">
+                        <label for="signInPassword">رمز عبور</label>
+                        <input type="password" id="signInPassword" required placeholder="رمز عبور خود را وارد کنید">
+                    </div>
+                    <button type="submit" class="btn-primary" id="signInBtn">ورود</button>
+                </form>
+                <p class="toggle-form">
+                    حساب کاربری ندارید؟
+                    <a href="#" onclick="toggleForms(event)">ثبت نام کنید</a>
+                </p>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signUpForm" class="auth-form" style="display: none;">
+                <h2>ثبت نام</h2>
+                <form onsubmit="handleSignUp(event)">
+                    <div class="form-group">
+                        <label for="signUpEmail">ایمیل</label>
+                        <input type="email" id="signUpEmail" required placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPhone">شماره تلفن <span style="color: #e53e3e;">*</span></label>
+                        <input type="tel" id="signUpPhone" required placeholder="09123456789" pattern="09[0-9]{9}" title="شماره تلفن باید با 09 شروع شود و 11 رقم باشد">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpBrandName">نام برند (اختیاری)</label>
+                        <input type="text" id="signUpBrandName" placeholder="نام برند یا کسب‌وکار خود">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPassword">رمز عبور</label>
+                        <input type="password" id="signUpPassword" required placeholder="حداقل 6 کاراکتر">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPasswordConfirm">تکرار رمز عبور</label>
+                        <input type="password" id="signUpPasswordConfirm" required placeholder="رمز عبور را دوباره وارد کنید">
+                    </div>
+                    <button type="submit" class="btn-primary" id="signUpBtn">ثبت نام</button>
+                </form>
+                <p class="toggle-form">
+                    قبلاً ثبت نام کرده‌اید؟
+                    <a href="#" onclick="toggleForms(event)">وارد شوید</a>
+                </p>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="auth-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <title>استودیو تولید مدل | مدیریت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .studio-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .studio-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .studio-card-inner {
+            background: white;
+            padding: 30px;
+            border-radius: 13px;
+        }
+        .studio-section {
+            margin-bottom: 20px;
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .studio-section summary {
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        @media (max-width: 1024px) {
+            .param-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .param-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+            font-size: 14px;
+        }
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-generate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .preview-container {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #667eea;
+        }
+        .preview-image {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+        <div class="sidebar-nav-container" data-active-page="model-studio"></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()"><span>Logout</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1>🎨 استودیو حرفه‌ای تولید مدل</h1>
+                <p>ساخت مدل‌های سفارشی با کنترل‌های دقیق ظاهری</p>
+            </div>
+        </header>
+
+        <div class="studio-container">
+            <!-- User Selection -->
+            <div class="content-section">
+                <h2>انتخاب کاربر</h2>
+                <select id="selectedUser" onchange="handleUserSelect()" class="form-control" style="font-size: 15px; padding: 12px;">
+                    <option value="">-- کاربر را برای ساخت مدل انتخاب کنید --</option>
+                </select>
+            </div>
+
+            <!-- Upload Model Photo Section -->
+            <div class="studio-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <div class="studio-card-inner">
+                    <h2 style="margin-bottom: 20px; color: #047857;">📤 آپلود عکس مدل (اختیاری)</h2>
+                    <p style="color: #065f46; margin-bottom: 20px; font-size: 15px;">
+                        ⚠️ اگر عکس خاصی دارید که می‌خواهید به عنوان مدل استفاده کنید، می‌توانید اینجا آپلود کنید.
+                        <br>در غیر این صورت، مدل با تنظیمات زیر از صفر ساخته می‌شود.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #047857;">
+                                انتخاب عکس مدل:
+                            </label>
+                            <input type="file" id="modelPhotoUpload" accept="image/*"
+                                   style="width: 100%; padding: 12px; border: 2px dashed #10b981; border-radius: 8px; background: #f0fdf4; cursor: pointer; font-size: 14px;">
+                            <small style="color: #065f46; display: block; margin-top: 8px;">
+                                💡 فرمت‌های مجاز: JPG, PNG, WEBP (حداکثر 10MB)
+                            </small>
+                        </div>
+
+                        <div id="uploadedModelPreview" style="display: none; text-align: center;">
+                            <img id="uploadedModelImage" src="" alt="Uploaded Model"
+                                 style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px;">
+                            <button onclick="clearUploadedModel()"
+                                    style="background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                                ❌ حذف عکس
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <p style="color: #92400e; font-size: 14px; margin: 0;">
+                            <strong>⚠️ توجه:</strong> با آپلود عکس، همه تنظیمات پایین (صورت، مو، بدن و...) نادیده گرفته می‌شود
+                            و مدل از همین عکس استفاده می‌کند. فقط تنظیمات ژست، نورپردازی و پس‌زمینه اعمال خواهد شد.
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #047857;">
+                            دسته‌بندی مدل آپلود شده:
+                        </label>
+                        <select id="uploadedModelCategory" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px;">
+                            <option value="woman">👩 زن (Woman)</option>
+                            <option value="man">👨 مرد (Man)</option>
+                            <option value="girl">👧 دختر (Girl)</option>
+                            <option value="boy">👦 پسر (Boy)</option>
+                            <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                            <option value="brand-woman">👩‍💼 زن برند (Brand Woman)</option>
+                            <option value="brand-man">👨‍💼 مرد برند (Brand Man)</option>
+                            <option value="brand-girl">👧‍💼 دختر برند (Brand Girl)</option>
+                            <option value="brand-boy">👦‍💼 پسر برند (Brand Boy)</option>
+                            <option value="brand-plus-size">➕‍💼 سایز بزرگ برند (Brand Plus Size)</option>
+                            <option value="accessory">💍 اکسسوری زن (Accessory Woman)</option>
+                            <option value="accessory-man">💍 اکسسوری مرد (Accessory Man)</option>
+                            <option value="underwear">👙 لباس زیر (Underwear)</option>
+                        </select>
+                        <small style="color: #065f46; display: block; margin-top: 8px;">
+                            💡 دسته‌بندی کمک می‌کند تا مدل در بخش مناسب ذخیره شود
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Studio -->
+            <div class="studio-card">
+                <div class="studio-card-inner">
+
+                    <!-- Basic Info -->
+                    <details open class="studio-section" style="background: #f0f9ff;">
+                        <summary style="color: #0369a1;">📋 اطلاعات پایه</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>جنسیت</label>
+                                <select id="modelGender">
+                                    <option value="female">👩 زن</option>
+                                    <option value="male">👨 مرد</option>
+                                    <option value="non-binary">⚧ غیر دوجنسیتی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>سن دقیق (3-80 سال)</label>
+                                <input type="number" id="modelAge" min="3" max="80" value="25" placeholder="مثال: 25">
+                            </div>
+                            <div class="form-group">
+                                <label>قومیت</label>
+                                <select id="modelEthnicity">
+                                    <option value="iranian" selected>🇮🇷 ایرانی (Iranian)</option>
+                                    <option value="turkmen">🇹🇲 ترکمن (Turkmen)</option>
+                                    <option value="tajik">🇹🇯 تاجیک (Tajik)</option>
+                                    <option value="iraqi">🇮🇶 عراقی (Iraqi)</option>
+                                    <option value="arab">🇸🇦 عرب (Arab)</option>
+                                    <option value="afghan">🇦🇫 افغان (Afghan)</option>
+                                    <option value="kurdish">کُرد (Kurdish)</option>
+                                    <option value="azari">آذری (Azari)</option>
+                                    <option value="balochi">بلوچ (Balochi)</option>
+                                    <option value="african">🌍 آفریقایی (African)</option>
+                                    <option value="middle-east">🕌 خاورمیانه‌ای (Middle East)</option>
+                                    <option value="korean">🇰🇷 کره‌ای (Korean)</option>
+                                    <option value="mixed">🌐 ترکیبی (Mixed)</option>
+                                    <option value="caucasian">قفقازی (Caucasian)</option>
+                                    <option value="russian">🇷🇺 روسی (Russian)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Face Features -->
+                    <details open class="studio-section" style="background: #fff5f5;">
+                        <summary style="color: #e53e3e;">😊 ویژگی‌های صورت</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>شکل صورت</label>
+                                <select id="faceShape">
+                                    <option value="oval" selected>بیضی</option>
+                                    <option value="round">گرد</option>
+                                    <option value="square">مربعی</option>
+                                    <option value="heart">قلبی</option>
+                                    <option value="diamond">الماسی</option>
+                                    <option value="long">دراز</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>رنگ چشم</label>
+                                <select id="eyeColor">
+                                    <option value="brown">قهوه‌ای</option>
+                                    <option value="blue">آبی</option>
+                                    <option value="green">سبز</option>
+                                    <option value="hazel">عسلی</option>
+                                    <option value="gray">خاکستری</option>
+                                    <option value="amber">کهربایی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>شکل چشم</label>
+                                <select id="eyeShape">
+                                    <option value="almond" selected>بادامی</option>
+                                    <option value="round">گرد</option>
+                                    <option value="hooded">پوشیده</option>
+                                    <option value="upturned">گوشه بالا</option>
+                                    <option value="downturned">گوشه پایین</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>ابرو</label>
+                                <select id="eyebrows">
+                                    <option value="natural">طبیعی</option>
+                                    <option value="thick">ضخیم</option>
+                                    <option value="thin">نازک</option>
+                                    <option value="arched">کمانی</option>
+                                    <option value="straight">مستقیم</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع بینی</label>
+                                <select id="noseType">
+                                    <option value="straight">مستقیم</option>
+                                    <option value="button">دکمه‌ای</option>
+                                    <option value="roman">رومی</option>
+                                    <option value="greek">یونانی</option>
+                                    <option value="upturned">بالا رفته</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>پری لب</label>
+                                <select id="lipFullness">
+                                    <option value="thin">نازک</option>
+                                    <option value="medium" selected>متوسط</option>
+                                    <option value="full">پر</option>
+                                    <option value="very-full">خیلی پر</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>استخوان گونه</label>
+                                <select id="cheekbones">
+                                    <option value="subtle">ملایم</option>
+                                    <option value="defined" selected>مشخص</option>
+                                    <option value="high">برجسته و بالا</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>خط فک</label>
+                                <select id="jawline">
+                                    <option value="soft">نرم</option>
+                                    <option value="defined" selected>مشخص</option>
+                                    <option value="sharp">تیز</option>
+                                    <option value="square">مربعی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>چانه</label>
+                                <select id="chin">
+                                    <option value="rounded">گرد</option>
+                                    <option value="pointed">نوک تیز</option>
+                                    <option value="square">مربعی</option>
+                                    <option value="cleft">شکاف دار</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Hair Style -->
+                    <details open class="studio-section" style="background: #fffbeb;">
+                        <summary style="color: #d97706;">💇 مو و استایل</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>رنگ مو</label>
+                                <select id="hairColor">
+                                    <option value="black">مشکی</option>
+                                    <option value="dark-brown">قهوه‌ای تیره</option>
+                                    <option value="light-brown">قهوه‌ای روشن</option>
+                                    <option value="blonde">بلوند</option>
+                                    <option value="platinum">بلوند پلاتینی</option>
+                                    <option value="red">قرمز</option>
+                                    <option value="auburn">قرمز مایل به قهوه‌ای</option>
+                                    <option value="gray">خاکستری</option>
+                                    <option value="white">سفید</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>طول مو</label>
+                                <select id="hairLength">
+                                    <option value="bald">بدون مو</option>
+                                    <option value="very-short">خیلی کوتاه</option>
+                                    <option value="short">کوتاه</option>
+                                    <option value="medium">متوسط</option>
+                                    <option value="long" selected>بلند</option>
+                                    <option value="very-long">خیلی بلند</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>بافت مو</label>
+                                <select id="hairTexture">
+                                    <option value="straight" selected>صاف</option>
+                                    <option value="wavy">موج دار</option>
+                                    <option value="curly">فر</option>
+                                    <option value="coily">فر پیچیده</option>
+                                    <option value="kinky">فر خیلی ریز</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>مدل مو</label>
+                                <select id="hairstyle">
+                                    <option value="loose" selected>آزاد و طبیعی</option>
+                                    <option value="ponytail">دم اسبی</option>
+                                    <option value="bun">گوجه</option>
+                                    <option value="braids">بافته</option>
+                                    <option value="updo">شینیون</option>
+                                    <option value="bob">کوتاه باب</option>
+                                    <option value="pixie">کوتاه پیکسی</option>
+                                    <option value="slicked-back">چسبیده به عقب</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>موی صورت (مردانه)</label>
+                                <select id="facialHair">
+                                    <option value="none" selected>ندارد</option>
+                                    <option value="stubble">ته ریش سبک</option>
+                                    <option value="beard">ریش کامل</option>
+                                    <option value="goatee">ریش بزی</option>
+                                    <option value="mustache">سبیل</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Skin & Body -->
+                    <details open class="studio-section" style="background: #f0fdf4;">
+                        <summary style="color: #16a34a;">🎨 پوست و نوع بدن</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>رنگ پوست</label>
+                                <select id="skinTone">
+                                    <option value="porcelain">چینی (Porcelain) - بسیار بسیار روشن</option>
+                                    <option value="ivory">عاجی (Ivory) - بسیار روشن با لمس گرم</option>
+                                    <option value="very-fair">بسیار روشن (Very Fair)</option>
+                                    <option value="fair">روشن (Fair)</option>
+                                    <option value="light">روشن ملایم (Light)</option>
+                                    <option value="light-medium">روشن تا متوسط (Light Medium)</option>
+                                    <option value="medium" selected>متوسط (Medium)</option>
+                                    <option value="medium-tan">متوسط برنزه (Medium Tan)</option>
+                                    <option value="olive">زیتونی (Olive)</option>
+                                    <option value="tan">برنزه (Tan)</option>
+                                    <option value="golden-tan">برنزه طلایی (Golden Tan)</option>
+                                    <option value="caramel">کارامل (Caramel)</option>
+                                    <option value="honey">عسلی (Honey)</option>
+                                    <option value="bronze">برنزی (Bronze)</option>
+                                    <option value="brown">قهوه‌ای (Brown)</option>
+                                    <option value="dark-brown">قهوه‌ای تیره (Dark Brown)</option>
+                                    <option value="deep-brown">قهوه‌ای عمیق (Deep Brown)</option>
+                                    <option value="chocolate">شکلاتی (Chocolate)</option>
+                                    <option value="mahogany">ماهون (Mahogany)</option>
+                                    <option value="ebony">آبنوسی (Ebony)</option>
+                                    <option value="deep">تیره (Deep)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>بافت پوست (می‌توانید چند مورد انتخاب کنید)</label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; padding: 10px; background: white; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="smooth" checked> صاف و بی‌عیب (Smooth)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="natural"> طبیعی (Natural)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="flawless"> بی‌نقص (Flawless)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="glowing"> درخشان (Glowing)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="matte"> مات (Matte)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="dewy"> شبنم‌دار (Dewy)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="radiant"> تابان (Radiant)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="freckled"> کک و مک دار (Freckled)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="with-beauty-marks"> با خال زیبایی (Beauty Marks)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="dimpled"> چال‌دار (Dimpled)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="textured"> بافت‌دار (Textured)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="porous"> منفذدار (Porous)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="velvety"> مخملی (Velvety)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="skin-texture-checkbox" value="silky"> ابریشمی (Silky)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>نوع بدن (می‌توانید چند مورد انتخاب کنید)</label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; padding: 10px; background: white; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="petite"> ریزنقش (Petite)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="slim"> لاغر (Slim)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="slender"> باریک (Slender)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="lean"> لاغر اندام (Lean)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="athletic" checked> ورزشکاری (Athletic)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="toned"> تناسب اندام (Toned)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="fit"> آماده (Fit)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="muscular"> عضلانی (Muscular)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="bodybuilder"> بدنساز (Bodybuilder)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="average"> متوسط (Average)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="curvy"> خوش اندام (Curvy)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="hourglass"> ساعت شنی (Hourglass)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="pear-shaped"> گلابی (Pear-shaped)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="apple-shaped"> سیبی (Apple-shaped)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="rectangular"> مستطیلی (Rectangular)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="voluptuous"> برومند (Voluptuous)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="plus-size"> سایز بزرگ (Plus-size)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="full-figured"> پراندام (Full-figured)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="stocky"> تنومند (Stocky)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" class="body-type-checkbox" value="broad-shouldered"> شانه‌پهن (Broad-shouldered)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>قد</label>
+                                <select id="height">
+                                    <option value="very-short">خیلی کوتاه (زیر 150 سانتی)</option>
+                                    <option value="short">کوتاه (150-160 سانتی)</option>
+                                    <option value="petite">کوتاه متوسط (160-165 سانتی)</option>
+                                    <option value="below-average">کمتر از متوسط (165-170 سانتی)</option>
+                                    <option value="average" selected>متوسط (170-175 سانتی)</option>
+                                    <option value="above-average">بالاتر از متوسط (175-180 سانتی)</option>
+                                    <option value="tall">بلند (180-185 سانتی)</option>
+                                    <option value="very-tall">خیلی بلند (185-190 سانتی)</option>
+                                    <option value="extremely-tall">بلندقد (بالای 190 سانتی)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Expression & Pose -->
+                    <details open class="studio-section" style="background: #fef2f2;">
+                        <summary style="color: #dc2626;">😃 حالت و ژست</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>حالت چهره</label>
+                                <select id="expression">
+                                    <option value="neutral-confident" selected>خنثی و با اعتماد به نفس</option>
+                                    <option value="smiling">لبخند</option>
+                                    <option value="laughing">خندان</option>
+                                    <option value="serious">جدی</option>
+                                    <option value="mysterious">مرموز</option>
+                                    <option value="seductive">فریبنده</option>
+                                    <option value="friendly">دوستانه</option>
+                                    <option value="fierce">قاطع</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>ژست‌ها (می‌توانید چندتا انتخاب کنید)</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; max-height: 200px; overflow-y: auto; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="standing-front" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">ایستاده رو به جلو</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="standing-side" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">ایستاده نیمرخ</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="walking" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">در حال راه رفتن</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="sitting" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">نشسته</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="leaning" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">تکیه داده</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="hands-on-hips" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">دست به کمر</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="crossed-arms" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">دست به سینه</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="dynamic" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">ژست پویا</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="one-leg-bent" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">یک پا خم</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f9fafb; border-radius: 6px;">
+                                        <input type="checkbox" class="pose-checkbox" value="looking-back" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span style="font-size: 14px;">نگاه به عقب</span>
+                                    </label>
+                                </div>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 می‌توانید چندین ژست را ترکیب کنید. مثلاً "ایستاده رو به جلو" + "دست به کمر"
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label>زاویه سر</label>
+                                <select id="headAngle">
+                                    <option value="straight" selected>مستقیم</option>
+                                    <option value="tilted-left">کج به چپ</option>
+                                    <option value="tilted-right">کج به راست</option>
+                                    <option value="looking-up">نگاه به بالا</option>
+                                    <option value="looking-down">نگاه به پایین</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Photography Settings -->
+                    <details open class="studio-section" style="background: #ede9fe;">
+                        <summary style="color: #7c3aed;">📸 عکاسی و نورپردازی</summary>
+                        <div class="param-grid">
+                            <div class="form-group">
+                                <label>زاویه دوربین</label>
+                                <select id="cameraAngle">
+                                    <option value="eye-level" selected>سطح چشم</option>
+                                    <option value="slightly-above">کمی بالاتر</option>
+                                    <option value="slightly-below">کمی پایین‌تر</option>
+                                    <option value="high-angle">زاویه بالا</option>
+                                    <option value="low-angle">زاویه پایین</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع نما</label>
+                                <select id="shotType">
+                                    <option value="full-body" selected>تمام قد</option>
+                                    <option value="three-quarter">سه چهارم</option>
+                                    <option value="waist-up">نیم‌تنه</option>
+                                    <option value="headshot">سر و شانه</option>
+                                    <option value="close-up">نمای نزدیک چهره</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>🎯 نوع فریمینگ عکس مدل (برای سوال از کاربر)</label>
+                                <select id="modelFramingType">
+                                    <option value="full-length" selected>📏 تمام قد (Full Length)</option>
+                                    <option value="upper-half">⬆️ نیم‌تنه بالا (Upper Half)</option>
+                                    <option value="lower-half">⬇️ نیم‌تنه پایین (Lower Half)</option>
+                                    <option value="neck-up">🗣️ گردن به بالا (Neck Up)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 این گزینه مشخص می‌کند مدل به چه شکلی باید باشد: تمام بدن / فقط بالاتنه / فقط پایین تنه / فقط سر و گردن
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label>نورپردازی</label>
+                                <select id="lighting">
+                                    <option value="studio" selected>نور استودیو</option>
+                                    <option value="natural">نور طبیعی</option>
+                                    <option value="soft">نور ملایم</option>
+                                    <option value="dramatic">دراماتیک</option>
+                                    <option value="backlit">نور پشت</option>
+                                    <option value="golden-hour">ساعت طلایی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>سبک پس‌زمینه</label>
+                                <select id="bgStyle">
+                                    <option value="white" selected>استودیو سفید</option>
+                                    <option value="gray">استودیو خاکستری</option>
+                                    <option value="black">استودیو سیاه</option>
+                                    <option value="gradient">گرادیانت</option>
+                                    <option value="bokeh">بوکه/تار</option>
+                                    <option value="outdoor">فضای باز طبیعی</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>کیفیت تصویر</label>
+                                <select id="imageQuality">
+                                    <option value="professional" selected>مد حرفه‌ای</option>
+                                    <option value="editorial">مجله ادیتوریال</option>
+                                    <option value="commercial">تبلیغاتی</option>
+                                    <option value="artistic">هنری</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نسبت تصویر</label>
+                                <select id="aspectRatio">
+                                    <option value="1:1">مربع (1:1)</option>
+                                    <option value="3:4" selected>پرتره (3:4)</option>
+                                    <option value="4:3">افقی (4:3)</option>
+                                    <option value="16:9">عریض (16:9)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Accessory Photography Section -->
+                    <details class="studio-section" style="background: #fef3c7;">
+                        <summary style="color: #d97706;">💍 عکاسی اکسسوری (برای مدل‌های اکسسوری)</summary>
+                        <p style="color: #92400e; margin-bottom: 15px; font-size: 14px;">
+                            ⚠️ این بخش فقط برای مدل‌هایی است که می‌خواهید برای عکاسی محصولات اکسسوری استفاده کنید.
+                            <br>می‌توانید بین مدل تمام بدن یا عکس نزدیک اعضای بدن (دست، گردن، صورت) انتخاب کنید.
+                        </p>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>آیا این مدل برای عکاسی اکسسوری است؟</label>
+                            <select id="isAccessoryModel">
+                                <option value="no">❌ خیر - مدل معمولی</option>
+                                <option value="full-body">👤 بله - مدل تمام بدن برای اکسسوری</option>
+                                <option value="body-part">✋ بله - مدل نزدیک (دست، گردن، صورت)</option>
+                            </select>
+                        </div>
+
+                        <!-- Body Part Type Selection (NEW) -->
+                        <div id="bodyPartTypeSection" style="display: none; margin-bottom: 20px;">
+                            <div class="form-group">
+                                <label>🎯 نوع مدل نزدیک (Body Part)</label>
+                                <select id="bodyPartType">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="hand-palm">✋ دست - کف دست (برای انگشتر، دستبند)</option>
+                                    <option value="hand-side">🤚 دست - نمای جانبی (برای انگشتر، دستبند)</option>
+                                    <option value="wrist">⌚ مچ دست (برای ساعت، دستبند)</option>
+                                    <option value="neck-chest">👔 گردن و سینه (برای گردنبند)</option>
+                                    <option value="ear-profile">👂 پروفایل گوش (برای گوشواره)</option>
+                                    <option value="face-portrait">👤 پرتره صورت (برای عینک)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 برای عکاسی حرفه‌ای اکسسوری، مدل‌های نزدیک بهتر از تمام بدن هستند
+                                </small>
+                            </div>
+                        </div>
+
+                        <div id="accessoryClothingSection" style="display: none;">
+                            <div class="form-group">
+                                <label>سبک لباس برای مدل 🎨</label>
+                                <select id="accessoryClothingStyle">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="simple-white-tshirt">تی‌شرت سفید ساده</option>
+                                    <option value="black-turtleneck">یقه اسکی مشکی</option>
+                                    <option value="beige-blazer">کت بژ کلاسیک</option>
+                                    <option value="gray-sweater">ژاکت خاکستری ساده</option>
+                                    <option value="minimal-dress">لباس مینیمال و ساده</option>
+                                    <option value="plain-white-shirt">پیراهن سفید ساده</option>
+                                    <option value="navy-cardigan">کاردیگان سرمه‌ای</option>
+                                    <option value="cream-blouse">بلوز کرم رنگ</option>
+                                    <option value="black-v-neck">تی‌شرت یقه V مشکی</option>
+                                    <option value="neutral-tank-top">تاپ بدون آستین خنثی</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 لباس‌های ساده و تک‌رنگ بهترین انتخاب برای نمایش اکسسوری هستند
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>فریمینگ دوربین 📷</label>
+                                <select id="accessoryCameraFraming">
+                                    <option value="upper-body">نیم‌تنه بالایی (برای جواهرات، عینک، کلاه)</option>
+                                    <option value="three-quarter">سه‌چهارم بدن (برای کیف، کمربند)</option>
+                                    <option value="hands-focus">تمرکز روی دست‌ها (برای ساعت، انگشتر، دستبند)</option>
+                                    <option value="face-neck-focus">تمرکز روی صورت و گردن (برای گوشواره، گردنبند)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    📸 نحوه فریم شدن مدل بسته به نوع اکسسوری
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>حالت بدن برای اکسسوری 🤸</label>
+                                <select id="accessoryPose">
+                                    <option value="natural-standing">ایستاده طبیعی</option>
+                                    <option value="hands-visible">دست‌ها قابل رویت (برای ساعت، انگشتر)</option>
+                                    <option value="casual-confident">اعتماد به نفس و راحت</option>
+                                    <option value="minimal-movement">حرکت کم، تمرکز روی اکسسوری</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Underwear Photography Section -->
+                    <details class="studio-section" style="background: #fce7f3;">
+                        <summary style="color: #be123c;">👙 عکاسی لباس زیر (برای مدل‌های لباس زیر)</summary>
+                        <p style="color: #881337; margin-bottom: 15px; font-size: 14px;">
+                            ⚠️ این بخش فقط برای مدل‌هایی است که می‌خواهید برای عکاسی محصولات لباس زیر استفاده کنید.
+                            <br>عکاسی به صورت حرفه‌ای، محترمانه و مناسب برای کاتالوگ‌های فروشگاهی خواهد بود.
+                        </p>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>آیا این مدل برای عکاسی لباس زیر است؟</label>
+                            <select id="isUnderwearModel">
+                                <option value="no">❌ خیر - مدل معمولی</option>
+                                <option value="yes">✅ بله - مدل لباس زیر</option>
+                            </select>
+                        </div>
+
+                        <div id="underwearSettingsSection" style="display: none;">
+                            <div class="form-group">
+                                <label>نوع لباس زیر 👙</label>
+                                <select id="underwearTypeForModel">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="bra">سوتین (مدل با شورت می‌پوشد)</option>
+                                    <option value="panty">شورت (مدل با تاپ می‌پوشد)</option>
+                                    <option value="lingerie-set">ست لباس زیر (مدل فقط با لباس زیر)</option>
+                                    <option value="sports-bra">سوتین ورزشی (مدل با شورت ورزشی)</option>
+                                    <option value="boxers">باکسر (مدل با تاپ می‌پوشد)</option>
+                                    <option value="briefs">زیرشورت (مدل با تاپ می‌پوشد)</option>
+                                    <option value="bodysuit">بادی‌سوت (مدل کامل)</option>
+                                    <option value="shapewear">لباس فرم‌دهنده (مدل کامل)</option>
+                                    <option value="sleepwear">لباس خواب (مدل کامل)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 هوش مصنوعی به صورت خودکار لباس مکمل را اضافه می‌کند تا Gemini قبول کند
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>لباس اول مدل (برای بالاتنه) 👕</label>
+                                <select id="underwearTopClothing">
+                                    <option value="">هیچ (بالاتنه خالی)</option>
+                                    <option value="white-tank">تاپ سفید ساده</option>
+                                    <option value="black-tank">تاپ مشکی ساده</option>
+                                    <option value="gray-tank">تاپ خاکستری ساده</option>
+                                    <option value="white-sports-bra">سوتین ورزشی سفید</option>
+                                    <option value="black-sports-bra">سوتین ورزشی مشکی</option>
+                                    <option value="nude-tank">تاپ بژ (رنگ پوست)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 برای عکاسی سوتین: هیچ | برای عکاسی شورت: تاپ
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>لباس دوم مدل (برای پایین‌تنه) 🩳</label>
+                                <select id="underwearBottomClothing">
+                                    <option value="">هیچ (پایین‌تنه خالی)</option>
+                                    <option value="black-shorts">شورت ورزشی مشکی</option>
+                                    <option value="white-shorts">شورت ورزشی سفید</option>
+                                    <option value="gray-shorts">شورت ورزشی خاکستری</option>
+                                    <option value="black-athletic-shorts">شورت ورزشی کوتاه مشکی</option>
+                                    <option value="nude-shorts">شورت بژ (رنگ پوست)</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 برای عکاسی شورت: هیچ | برای عکاسی سوتین: شورت
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>فریمینگ دوربین 📷</label>
+                                <select id="underwearCameraFraming">
+                                    <option value="upper-body">نیم‌تنه بالایی</option>
+                                    <option value="three-quarter">سه‌چهارم بدن</option>
+                                    <option value="full-body">تمام بدن</option>
+                                    <option value="torso-focus">تمرکز روی تنه</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    📸 نحوه فریم شدن مدل برای عکاسی محترمانه محصول
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>حالت بدن 🤸</label>
+                                <select id="underwearPose">
+                                    <option value="natural-standing">ایستاده طبیعی</option>
+                                    <option value="confident-pose">ژست با اعتماد به نفس</option>
+                                    <option value="side-angle">زاویه نیم‌رخ</option>
+                                    <option value="catalog-pose">ژست کاتالوگ حرفه‌ای</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>سبک عکاسی 📸</label>
+                                <select id="underwearPhotoStyle">
+                                    <option value="clean-minimal">تمیز و مینیمال</option>
+                                    <option value="retail-catalog">کاتالوگ فروشگاهی</option>
+                                    <option value="professional-studio">استودیو حرفه‌ای</option>
+                                    <option value="elegant-tasteful">زیبا و محترمانه</option>
+                                </select>
+                                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                                    💡 همه سبک‌ها حرفه‌ای و محترمانه هستند
+                                </small>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Additional Details -->
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label>جزئیات اضافی (اختیاری)</label>
+                        <textarea id="additionalDetails" rows="3" placeholder="جزئیات خاص مثل اکسسوری، سبک آرایش، زیبایی شناسی برند، ویژگی‌های خاص..." style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-family: 'Inter', sans-serif;"></textarea>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button onclick="generateModel()" class="btn-generate" id="generateBtn">
+                        ✨ تولید مدل حرفه‌ای
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewSection" style="display: none; margin-top: 30px;">
+                <div class="preview-container">
+                    <h3 style="margin-bottom: 20px; color: #667eea; font-size: 20px;">پیش‌نمایش مدل تولید شده</h3>
+                    <img id="generatedImage" src="" alt="Generated Model" class="preview-image">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>دسته‌بندی *</label>
+                            <select id="saveCategory">
+                                <option value="woman">👩 زن (Woman)</option>
+                                <option value="man">👨 مرد (Man)</option>
+                                <option value="girl">👧 دختر (Girl)</option>
+                                <option value="boy">👦 پسر (Boy)</option>
+                                <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                                <option value="brand-woman">👩‍💼 زن برند (Brand Woman)</option>
+                                <option value="brand-man">👨‍💼 مرد برند (Brand Man)</option>
+                                <option value="brand-girl">👧‍💼 دختر برند (Brand Girl)</option>
+                                <option value="brand-boy">👦‍💼 پسر برند (Brand Boy)</option>
+                                <option value="brand-plus-size">➕‍💼 سایز بزرگ برند (Brand Plus Size)</option>
+                                <option value="accessory">💍 اکسسوری زن (Accessory Woman)</option>
+                                <option value="accessory-man">💍 اکسسوری مرد (Accessory Man)</option>
+                                <option value="underwear">👙 لباس زیر (Underwear)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>نام *</label>
+                            <input type="text" id="saveName" placeholder="مثال: Woman_Casual_001_A">
+                        </div>
+                    </div>
+
+                    <!-- Naming Convention Guide -->
+                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h4 style="color: #0369a1; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                            📝 راهنمای نام‌گذاری استاندارد
+                        </h4>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 12px;">
+                            <div style="color: #0c4a6e; font-weight: 600; margin-bottom: 8px; font-size: 14px;">📐 فرمت استاندارد:</div>
+                            <code style="background: #1e293b; color: #38bdf8; padding: 8px 12px; border-radius: 6px; display: block; font-size: 13px; font-family: monospace;">
+                                {Category}_{Style}_{Number}_{Variant}
+                            </code>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div style="background: white; border-radius: 8px; padding: 12px;">
+                                <div style="color: #0c4a6e; font-weight: 600; margin-bottom: 6px; font-size: 13px;">1️⃣ دسته‌بندی (Category)</div>
+                                <div style="color: #64748b; font-size: 12px; line-height: 1.5;">
+                                    Woman, Man, Girl, Boy, PlusSize<br>
+                                    BrandWoman, BrandMan, BrandGirl, etc.<br>
+                                    Accessory, AccessoryMan, Underwear
+                                </div>
+                            </div>
+
+                            <div style="background: white; border-radius: 8px; padding: 12px;">
+                                <div style="color: #0c4a6e; font-weight: 600; margin-bottom: 6px; font-size: 13px;">2️⃣ استایل (Style)</div>
+                                <div style="color: #64748b; font-size: 12px; line-height: 1.5;">
+                                    Casual, Formal, Business, Sports<br>
+                                    Studio, Outdoor, Fashion, Neutral
+                                </div>
+                            </div>
+
+                            <div style="background: white; border-radius: 8px; padding: 12px;">
+                                <div style="color: #0c4a6e; font-weight: 600; margin-bottom: 6px; font-size: 13px;">3️⃣ شماره (Number)</div>
+                                <div style="color: #64748b; font-size: 12px; line-height: 1.5;">
+                                    001, 002, 003, ...<br>
+                                    <span style="color: #0891b2; font-size: 11px;">✓ همیشه 3 رقمی با صفر اول</span>
+                                </div>
+                            </div>
+
+                            <div style="background: white; border-radius: 8px; padding: 12px;">
+                                <div style="color: #0c4a6e; font-weight: 600; margin-bottom: 6px; font-size: 13px;">4️⃣ نسخه (Variant)</div>
+                                <div style="color: #64748b; font-size: 12px; line-height: 1.5;">
+                                    A, B, C, D, ...<br>
+                                    <span style="color: #0891b2; font-size: 11px;">✓ برای ژست‌های مختلف</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; padding: 12px;">
+                            <div style="color: #166534; font-weight: 600; margin-bottom: 8px; font-size: 13px;">✅ مثال‌های صحیح:</div>
+                            <div style="font-family: monospace; font-size: 12px; color: #14532d; line-height: 1.8;">
+                                • Woman_Casual_001_A<br>
+                                • Man_Formal_005_B<br>
+                                • BrandWoman_Fashion_003_A<br>
+                                • Girl_Sports_012_C<br>
+                                • PlusSize_Business_001_A
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>نمایش *</label>
+                        <select id="saveVisibility">
+                            <option value="private">خصوصی (فقط این کاربر)</option>
+                            <option value="public">عمومی (همه کاربران)</option>
+                        </select>
+                        <small style="color: #6b7280; display: block; margin-top: 4px;">
+                            ⚠️ خصوصی = فقط کاربر انتخاب شده می‌بیند | عمومی = همه می‌بینند
+                        </small>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                        <button onclick="saveModel()" class="btn-primary">💾 ذخیره در محتوای کاربر</button>
+                        <button onclick="discardModel()" style="background: #6c757d; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                            ❌ حذف
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Models Management Section -->
+        <div class="studio-card" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); margin-top: 40px;">
+            <div class="studio-card-inner">
+                <h2 style="margin-bottom: 20px; color: #eef2ff; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📋 مدیریت مدل‌های ساخته شده</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="syncStorageToDatabase()" style="background: #f59e0b; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                            🔄 همگام‌سازی Storage
+                        </button>
+                        <button onclick="makeAllModelsPublic()" style="background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                            🌍 همه را عمومی کن
+                        </button>
+                        <button onclick="loadAllModels()" style="background: #eef2ff; color: #4f46e5; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                            🔄 به‌روزرسانی
+                        </button>
+                    </div>
+                </h2>
+                <p style="color: #c7d2fe; margin-bottom: 20px; font-size: 15px;">
+                    لیست تمام مدل‌هایی که در سیستم ساخته شده‌اند. می‌توانید ویرایش، حذف، یا تغییر دسترسی دهید.
+                </p>
+
+                <!-- Filter and Search -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس کاربر:</label>
+                        <select id="filterByUser" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه کاربران</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس دسته:</label>
+                        <select id="filterByCategory" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه دسته‌ها</option>
+                            <option value="woman">👩 زن</option>
+                            <option value="man">👨 مرد</option>
+                            <option value="girl">👧 دختر</option>
+                            <option value="boy">👦 پسر</option>
+                            <option value="plus-size">➕ سایز بزرگ</option>
+                            <option value="brand-woman">👩‍💼 زن برند</option>
+                            <option value="brand-man">👨‍💼 مرد برند</option>
+                            <option value="brand-girl">👧‍💼 دختر برند</option>
+                            <option value="brand-boy">👦‍💼 پسر برند</option>
+                            <option value="brand-plus-size">➕‍💼 سایز بزرگ برند</option>
+                            <option value="accessory">💍 اکسسوری</option>
+                            <option value="underwear">👙 لباس زیر</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #eef2ff; font-weight: 600; margin-bottom: 8px;">فیلتر بر اساس دسترسی:</label>
+                        <select id="filterByVisibility" onchange="filterModels()" style="width: 100%; padding: 10px; border: 2px solid #a5b4fc; border-radius: 8px; font-size: 14px;">
+                            <option value="">همه</option>
+                            <option value="public">🌍 عمومی</option>
+                            <option value="private">🔒 خصوصی</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Models Table -->
+                <div id="modelsTableContainer" style="background: white; border-radius: 12px; padding: 20px; max-height: 600px; overflow-y: auto;">
+                    <div id="modelsTableLoading" style="text-align: center; padding: 40px; color: #6b7280;">
+                        ⏳ در حال بارگذاری مدل‌ها...
+                    </div>
+                    <div id="modelsTableContent" style="display: none;">
+                        <!-- Bulk Edit Toolbar -->
+                        <div id="bulkEditToolbar" style="display: none; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 15px; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-weight: 600; color: #1f2937;">
+                                    <span id="selectedCount">0</span> مدل انتخاب شده
+                                </span>
+                                <button onclick="bulkEdit()" style="background: #3b82f6; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    ✏️ ویرایش دسته‌جمعی
+                                </button>
+                                <button onclick="bulkDelete()" style="background: #ef4444; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    🗑️ حذف دسته‌جمعی
+                                </button>
+                                <button onclick="clearSelection()" style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    ✖️ لغو انتخاب
+                                </button>
+                            </div>
+                        </div>
+
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151;">
+                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" style="width: 18px; height: 18px; cursor: pointer;">
+                                    </th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تصویر</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">نام</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسته</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">کاربر</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">دسترسی</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">سطح</th>
+                                    <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">تاریخ</th>
+                                    <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151;">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modelsTableBody">
+                                <!-- Models will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="modelsTableEmpty" style="display: none; text-align: center; padding: 40px; color: #9ca3af;">
+                        <p style="font-size: 18px; margin-bottom: 10px;">📭</p>
+                        <p>هیچ مدلی یافت نشد</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Edit Model Modal -->
+    <div id="editModelModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h2 style="margin-bottom: 20px; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                ✏️ ویرایش مدل
+            </h2>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">نام مدل:</label>
+                <input type="text" id="editModelName" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">دسته:</label>
+                <select id="editModelCategory" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                    <option value="woman">👩 زن (Woman)</option>
+                    <option value="man">👨 مرد (Man)</option>
+                    <option value="girl">👧 دختر (Girl)</option>
+                    <option value="boy">👦 پسر (Boy)</option>
+                    <option value="child">👶 کودک (Child)</option>
+                    <option value="couple">💑 زوج (Couple)</option>
+                    <option value="group">👥 گروه (Group)</option>
+                    <option value="elderly">👴 سالمند (Elderly)</option>
+                    <option value="teen">🧑 نوجوان (Teen)</option>
+                    <option value="plus-size">➕ سایز بزرگ (Plus Size)</option>
+                    <option value="brand-woman">👩‍💼 زن برند (Brand Woman)</option>
+                    <option value="brand-man">👨‍💼 مرد برند (Brand Man)</option>
+                    <option value="brand-girl">👧‍💼 دختر برند (Brand Girl)</option>
+                    <option value="brand-boy">👦‍💼 پسر برند (Brand Boy)</option>
+                    <option value="brand-plus-size">➕‍💼 سایز بزرگ برند (Brand Plus Size)</option>
+                    <option value="accessory">💍 اکسسوری زن (Accessory Woman)</option>
+                    <option value="accessory-man">💍 اکسسوری مرد (Accessory Man)</option>
+                    <option value="underwear">👙 لباس زیر (Underwear)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">دسترسی:</label>
+                <select id="editModelVisibility" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                    <option value="private">🔒 خصوصی (فقط این کاربر)</option>
+                    <option value="public">🌍 عمومی (همه کاربران)</option>
+                </select>
+                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                    💡 خصوصی: فقط کاربر انتخاب شده می‌بیند | عمومی: همه کاربران می‌بینند
+                </small>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">کاربر مالک:</label>
+                <select id="editModelUser" style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                    <!-- Will be populated with users -->
+                </select>
+                <small style="color: #6b7280; display: block; margin-top: 8px;">
+                    💡 می‌توانید این مدل را به کاربر دیگری منتقل کنید
+                </small>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                <button onclick="saveModelEdit()" style="background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    💾 ذخیره تغییرات
+                </button>
+                <button onclick="closeEditModal()" style="background: #6b7280; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    ❌ انصراف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Edit Modal -->
+    <div id="bulkEditModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h2 style="margin-bottom: 20px; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                ✏️ ویرایش دسته‌جمعی (<span id="bulkEditCount">0</span> مدل)
+            </h2>
+
+            <div style="background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                <p style="color: #92400e; font-size: 14px; margin: 0;">
+                    ⚠️ فقط فیلدهایی که تغییر می‌دهید برای همه مدل‌های انتخاب شده اعمال می‌شود
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    دسته‌بندی
+                </label>
+                <select id="bulkEditCategory" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                    <option value="woman">👩 زن</option>
+                    <option value="man">👨 مرد</option>
+                    <option value="girl">👧 دختر</option>
+                    <option value="boy">👦 پسر</option>
+                    <option value="child">👶 کودک</option>
+                    <option value="couple">💑 زوج</option>
+                    <option value="group">👥 گروه</option>
+                    <option value="elderly">👴 سالمند</option>
+                    <option value="teen">🧑 نوجوان</option>
+                    <option value="plus-size">➕ پلاس سایز</option>
+                    <option value="accessory">💍 اکسسوری زن</option>
+                    <option value="accessory-man">💍 اکسسوری مرد</option>
+                    <option value="underwear">👙 لباس زیر</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    نوع دسترسی
+                </label>
+                <select id="bulkEditVisibility" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                    <option value="public">🌍 عمومی (همه کاربران)</option>
+                    <option value="private">🔒 خصوصی (فقط مالک)</option>
+                    <option value="premium">⭐ پریمیوم (کاربران پریمیوم)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    حداقل سطح اشتراک مورد نیاز
+                </label>
+                <select id="bulkEditTierRequirement" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                    <option value="bronze">🥉 برنز (فقط برنز)</option>
+                    <option value="silver">🥈 نقره (نقره + برنز)</option>
+                    <option value="gold">🥇 طلا (همه سطوح)</option>
+                    <option value="testlimit">🧪 تست (همه سطوح)</option>
+                </select>
+                <small style="color: #6b7280; font-size: 12px; display: block; margin-top: 5px;">
+                    💡 دسترسی سلسله مراتبی: برنز فقط برنز، نقره برنز+نقره، طلا و تست همه را می‌بینند
+                </small>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                    مالک مدل
+                </label>
+                <select id="bulkEditUser" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <option value="">-- بدون تغییر --</option>
+                </select>
+                <small style="color: #6b7280; font-size: 12px; display: block; margin-top: 5px;">
+                    💡 می‌توانید همه مدل‌های انتخاب شده را به یک کاربر منتقل کنید
+                </small>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                <button onclick="saveBulkEdit()" style="background: #3b82f6; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    💾 اعمال تغییرات
+                </button>
+                <button onclick="closeBulkEditModal()" style="background: #6b7280; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;">
+                    ❌ انصراف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        // Notification system
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 100000;
+                font-size: 14px;
+                max-width: 400px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+
+            // Add to page
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        let allUsers = [];
+        let selectedUserId = null;
+        let generatedImageData = null;
+
+        // Age and Ethnicity Settings - use Basic Info dropdowns directly
+        // Age range to exact age mapping
+        const ageRangeToExact = {
+            'child': 8,        // کودک (5-12) → average 8
+            'teen': 15,        // نوجوان (13-17) → average 15
+            'young-adult': 22, // جوان (18-25) → average 22
+            'adult': 33,       // بزرگسال (26-40) → average 33
+            'middle-aged': 50, // میانسال (41-60) → average 50
+            'elderly': 65      // سالمند (60+) → 65
+        };
+
+        // Load users on page load
+        async function loadUsers() {
+            try {
+                const response = await fetchWithAuth('/api/admin/users');
+                const data = await response.json();
+
+                if (data.success) {
+                    allUsers = data.users;
+                    const select = document.getElementById('selectedUser');
+                    select.innerHTML = '<option value="">-- کاربر را برای ساخت مدل انتخاب کنید --</option>' +
+                        allUsers.map(user =>
+                            `<option value="${user.user_id}">${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}</option>`
+                        ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('خطا در بارگذاری کاربران', 'error');
+            }
+        }
+
+        function handleUserSelect() {
+            selectedUserId = document.getElementById('selectedUser').value;
+            if (selectedUserId) {
+                console.log('Selected user:', selectedUserId);
+            }
+        }
+
+        // Toggle accessory clothing section
+        document.getElementById('isAccessoryModel').addEventListener('change', function() {
+            const accessoryClothingSection = document.getElementById('accessoryClothingSection');
+            const bodyPartTypeSection = document.getElementById('bodyPartTypeSection');
+
+            if (this.value === 'full-body') {
+                accessoryClothingSection.style.display = 'block';
+                bodyPartTypeSection.style.display = 'none';
+            } else if (this.value === 'body-part') {
+                accessoryClothingSection.style.display = 'none';
+                bodyPartTypeSection.style.display = 'block';
+            } else {
+                accessoryClothingSection.style.display = 'none';
+                bodyPartTypeSection.style.display = 'none';
+            }
+        });
+
+        // Toggle underwear settings section
+        document.getElementById('isUnderwearModel').addEventListener('change', function() {
+            const underwearSettingsSection = document.getElementById('underwearSettingsSection');
+            if (this.value === 'yes') {
+                underwearSettingsSection.style.display = 'block';
+            } else {
+                underwearSettingsSection.style.display = 'none';
+            }
+        });
+
+        async function generateModel() {
+            if (!selectedUserId) {
+                showNotification('لطفاً ابتدا یک کاربر انتخاب کنید', 'error');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ در حال تولید...';
+
+            try {
+                // Check if user uploaded a model photo
+                if (uploadedModelDataUrl) {
+                    // Use the uploaded photo directly
+                    generatedImageData = {
+                        imageUrl: uploadedModelDataUrl,
+                        prompt: 'User uploaded model photo',
+                        isUploadedPhoto: true
+                    };
+
+                    document.getElementById('generatedImage').src = uploadedModelDataUrl;
+                    document.getElementById('previewSection').style.display = 'block';
+                    document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+                    // Pre-fill the category from the upload section
+                    document.getElementById('saveCategory').value = document.getElementById('uploadedModelCategory').value;
+
+                    showNotification('عکس آپلود شده آماده ذخیره است!', 'success');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '✨ تولید مدل حرفه‌ای';
+                    return;
+                }
+
+                // Get age and ethnicity for backend
+                const modelAge = parseInt(document.getElementById('modelAge').value) || 25;
+                const modelEthnicity = document.getElementById('modelEthnicity').value;
+
+                // Build comprehensive prompt from all form fields
+                const prompt = buildModelPrompt();
+                console.log('Generated prompt:', prompt);
+
+                const response = await fetchWithAuth('/api/generate-image-only', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        contentType: 'model',
+                        aspectRatio: document.getElementById('aspectRatio').value,
+                        modelAge: modelAge,
+                        modelEthnicity: modelEthnicity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    generatedImageData = {
+                        imageUrl: data.imageUrl,
+                        prompt: prompt
+                    };
+
+                    document.getElementById('generatedImage').src = data.imageUrl;
+                    document.getElementById('previewSection').style.display = 'block';
+                    document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+
+                    showNotification('مدل با موفقیت تولید شد!', 'success');
+                } else {
+                    throw new Error(data.error || 'Generation failed');
+                }
+            } catch (error) {
+                console.error('Generation error:', error);
+                showNotification('خطا در تولید مدل: ' + error.message, 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ تولید مدل حرفه‌ای';
+            }
+        }
+
+        function buildBodyPartPrompt(bodyPartType, gender, age, ethnicity, skinTone, skinTexture, quality) {
+            const bodyPartPrompts = {
+                'hand-palm': `Professional ${quality} close-up product photography of BARE ${gender} hand with NO jewelry or accessories, palm facing forward. ${skinTone} ${skinTexture} skin. Hand is elegantly positioned, fingers slightly spread, relaxed natural pose. IMPORTANT: Completely bare hand, no rings, no bracelets, no watches, no nail polish - clean natural hand ready for product placement. Clean white studio background, soft professional lighting. Extreme close-up, sharp focus on hand details, photorealistic, 8K resolution. Empty hand template for jewelry product photography.`,
+
+                'hand-side': `Professional ${quality} close-up product photography of BARE ${gender} hand with NO jewelry or accessories, from side angle. ${skinTone} ${skinTexture} skin. Hand in elegant relaxed pose, side profile view showing wrist and fingers clearly. IMPORTANT: Completely bare hand and wrist, no rings, no bracelets, no watches - clean natural hand ready for product placement. Clean white studio background, professional lighting. Extreme close-up, sharp focus, photorealistic, 8K resolution. Empty hand template for jewelry product photography.`,
+
+                'wrist': `Professional ${quality} close-up product photography focusing on BARE ${gender} wrist and forearm with NO jewelry or accessories. ${skinTone} ${skinTexture} skin. Wrist positioned elegantly at slight angle, forearm visible, hand relaxed. IMPORTANT: Completely bare wrist, no watches, no bracelets - clean natural wrist ready for product placement. Clean white studio background, professional lighting. Close-up shot, sharp focus on wrist area, photorealistic, 8K resolution. Empty wrist template for watch and bracelet product photography.`,
+
+                'neck-chest': `Professional ${quality} close-up product photography of BARE ${gender} neck and upper chest area with NO jewelry or accessories. ${skinTone} ${skinTexture} skin. Elegant neckline, shoulders visible, clean minimal styling. Head cropped at chin level (face not shown), focus on neck and collarbone area. IMPORTANT: Completely bare neck, no necklaces, no pendants, no chains - clean natural neck ready for product placement. Clean white studio background, professional lighting. Close-up shot, sharp focus, photorealistic, 8K resolution. Empty neck template for necklace product photography.`,
+
+                'ear-profile': `Professional ${quality} close-up product photography of BARE ${gender} side profile showing ear clearly with NO jewelry or accessories. ${skinTone} ${skinTexture} skin. Clean ear with elegant profile, hair pulled back away from ear. Face partially visible in profile (focus on ear), neck and shoulder visible. IMPORTANT: Completely bare ear, no earrings, no piercings visible - clean natural ear ready for product placement. Clean white studio background, professional lighting. Close-up shot, sharp focus on ear, photorealistic, 8K resolution. Empty ear template for earring product photography.`,
+
+                'face-portrait': `Professional ${quality} portrait close-up product photography of ${ethnicity} ${gender} face with NO glasses or accessories. ${skinTone} ${skinTexture} skin. Clean elegant facial features, neutral confident expression, straight head angle looking at camera. Hair styled neatly. IMPORTANT: Completely bare face, no sunglasses, no eyeglasses, no accessories - clean natural face ready for eyewear placement. Clean white studio background, professional lighting. Portrait headshot, sharp focus on face, photorealistic, 8K resolution. Empty face template for eyewear product photography.`
+            };
+
+            return bodyPartPrompts[bodyPartType] || `Professional product photography close-up of ${gender} ${bodyPartType}`;
+        }
+
+        function buildModelPrompt() {
+            // Basic info
+            const gender = document.getElementById('modelGender').value;
+
+            // Get exact age directly from input
+            const ageExact = parseInt(document.getElementById('modelAge').value) || 25;
+
+            // Convert exact age to age range description for prompt
+            let ageRange;
+            if (ageExact < 12) {
+                ageRange = 'child';
+            } else if (ageExact < 18) {
+                ageRange = 'teen';
+            } else if (ageExact < 26) {
+                ageRange = 'young adult';
+            } else if (ageExact < 41) {
+                ageRange = 'adult';
+            } else if (ageExact < 61) {
+                ageRange = 'middle aged';
+            } else {
+                ageRange = 'elderly';
+            }
+
+            // Get ethnicity from dropdown
+            const ethnicity = document.getElementById('modelEthnicity').value;
+
+            // Face
+            const faceShape = document.getElementById('faceShape').value;
+            const eyeColor = document.getElementById('eyeColor').value;
+            const eyeShape = document.getElementById('eyeShape').value;
+            const eyebrows = document.getElementById('eyebrows').value;
+            const noseType = document.getElementById('noseType').value;
+            const lipFullness = document.getElementById('lipFullness').value;
+            const cheekbones = document.getElementById('cheekbones').value;
+            const jawline = document.getElementById('jawline').value;
+            const chin = document.getElementById('chin').value;
+
+            // Hair
+            const hairColor = document.getElementById('hairColor').value;
+            const hairLength = document.getElementById('hairLength').value;
+            const hairTexture = document.getElementById('hairTexture').value;
+            const hairstyle = document.getElementById('hairstyle').value;
+            const facialHair = document.getElementById('facialHair').value;
+
+            // Skin & Body
+            const skinTone = document.getElementById('skinTone').value;
+            const selectedSkinTextures = Array.from(document.querySelectorAll('.skin-texture-checkbox:checked')).map(cb => cb.value);
+            const skinTexture = selectedSkinTextures.length > 0 ? selectedSkinTextures.join(', ') : 'smooth';
+            const selectedBodyTypes = Array.from(document.querySelectorAll('.body-type-checkbox:checked')).map(cb => cb.value);
+            const bodyType = selectedBodyTypes.length > 0 ? selectedBodyTypes.join(', ') : 'athletic';
+            const height = document.getElementById('height').value;
+
+            // Expression & Pose
+            const expression = document.getElementById('expression').value;
+            const selectedPoses = Array.from(document.querySelectorAll('.pose-checkbox:checked')).map(cb => cb.value);
+            const headAngle = document.getElementById('headAngle').value;
+
+            // Photography
+            const cameraAngle = document.getElementById('cameraAngle').value;
+            const shotType = document.getElementById('shotType').value;
+            const modelFramingType = document.getElementById('modelFramingType').value;
+            const lighting = document.getElementById('lighting').value;
+            const bgStyle = document.getElementById('bgStyle').value;
+            const quality = document.getElementById('imageQuality').value;
+
+            // Additional
+            const additional = document.getElementById('additionalDetails').value;
+
+            // Accessory photography specific
+            const isAccessoryValue = document.getElementById('isAccessoryModel').value;
+            const isAccessory = isAccessoryValue === 'full-body' || isAccessoryValue === 'body-part';
+            const isBodyPart = isAccessoryValue === 'body-part';
+            const bodyPartType = document.getElementById('bodyPartType').value;
+            const accessoryClothing = document.getElementById('accessoryClothingStyle').value;
+            const accessoryFraming = document.getElementById('accessoryCameraFraming').value;
+            const accessoryPose = document.getElementById('accessoryPose').value;
+
+            // Underwear photography specific
+            const isUnderwear = document.getElementById('isUnderwearModel').value === 'yes';
+            const underwearTypeForModel = document.getElementById('underwearTypeForModel').value;
+            const underwearTopClothing = document.getElementById('underwearTopClothing').value;
+            const underwearBottomClothing = document.getElementById('underwearBottomClothing').value;
+            const underwearFraming = document.getElementById('underwearCameraFraming').value;
+            const underwearPose = document.getElementById('underwearPose').value;
+            const underwearPhotoStyle = document.getElementById('underwearPhotoStyle').value;
+
+            // Build comprehensive prompt
+            let photoType = isAccessory ? 'accessory product' : (isUnderwear ? 'underwear product' : 'fashion');
+
+            // SPECIAL HANDLING: Body-part models for accessory photography
+            if (isBodyPart && bodyPartType) {
+                return buildBodyPartPrompt(bodyPartType, gender, ageExact, ethnicity, skinTone, skinTexture, quality);
+            }
+
+            let prompt = `Professional ${quality} ${photoType} photograph of a ${ageRange} ${ethnicity} ${gender} model. `;
+
+            // For underwear models: HEADLESS/CROPPED (no face shown) for e-commerce focus
+            if (!isUnderwear) {
+                prompt += `Face: ${faceShape} face shape, ${eyeShape} ${eyeColor} eyes, ${eyebrows} eyebrows, ${noseType} nose, ${lipFullness} lips, ${cheekbones} cheekbones, ${jawline} jawline, ${chin} chin. `;
+
+                prompt += `Hair: ${hairLength} ${hairTexture} ${hairColor} hair styled in ${hairstyle}. `;
+                if (gender === 'male' && facialHair !== 'none') {
+                    prompt += `${facialHair} facial hair. `;
+                }
+            } else {
+                // Headless model for underwear photography
+                prompt += `HEADLESS MODEL - face and head NOT SHOWN, cropped at neck level. E-commerce product photography style focusing only on body and garment. `;
+            }
+
+            prompt += `Skin: ${skinTone} skin tone, ${skinTexture}. `;
+            prompt += `Body: ${bodyType} ${height} build. `;
+
+            // CUSTOM CLOTHING: User-selected clothing for underwear models
+            if (isUnderwear) {
+                const topClothingDescriptions = {
+                    'white-tank': 'wearing simple plain white tank top on upper body',
+                    'black-tank': 'wearing simple plain black tank top on upper body',
+                    'gray-tank': 'wearing simple plain gray tank top on upper body',
+                    'white-sports-bra': 'wearing white sports bra on upper body',
+                    'black-sports-bra': 'wearing black sports bra on upper body',
+                    'nude-tank': 'wearing nude/beige tank top on upper body'
+                };
+
+                const bottomClothingDescriptions = {
+                    'black-shorts': 'wearing black athletic shorts on lower body',
+                    'white-shorts': 'wearing white athletic shorts on lower body',
+                    'gray-shorts': 'wearing gray athletic shorts on lower body',
+                    'black-athletic-shorts': 'wearing short black athletic shorts on lower body',
+                    'nude-shorts': 'wearing nude/beige shorts on lower body'
+                };
+
+                let clothingParts = [];
+
+                if (underwearTopClothing && topClothingDescriptions[underwearTopClothing]) {
+                    clothingParts.push(topClothingDescriptions[underwearTopClothing]);
+                }
+
+                if (underwearBottomClothing && bottomClothingDescriptions[underwearBottomClothing]) {
+                    clothingParts.push(bottomClothingDescriptions[underwearBottomClothing]);
+                }
+
+                if (clothingParts.length > 0) {
+                    prompt += `Clothing: ${clothingParts.join(', ')}. `;
+                    prompt += `IMPORTANT: Model prepared for underwear product photography - selected garments allow product placement. `;
+                } else {
+                    prompt += `IMPORTANT: Minimal coverage model for underwear product photography. `;
+                }
+            }
+
+            // Accessory-specific clothing and framing
+            if (isAccessory && accessoryClothing) {
+                const clothingDescriptions = {
+                    'simple-white-tshirt': 'wearing simple plain white t-shirt',
+                    'black-turtleneck': 'wearing black turtleneck sweater',
+                    'beige-blazer': 'wearing beige classic blazer',
+                    'gray-sweater': 'wearing gray plain sweater',
+                    'minimal-dress': 'wearing minimal simple dress',
+                    'plain-white-shirt': 'wearing plain white button-up shirt',
+                    'navy-cardigan': 'wearing navy blue cardigan',
+                    'cream-blouse': 'wearing cream-colored blouse',
+                    'black-v-neck': 'wearing black V-neck t-shirt',
+                    'neutral-tank-top': 'wearing neutral-colored tank top'
+                };
+                prompt += `Clothing: ${clothingDescriptions[accessoryClothing] || accessoryClothing}. `;
+                prompt += `IMPORTANT: Simple, solid-color, minimal clothing to NOT distract from accessories. `;
+            }
+
+            // Pose handling (accessory, underwear, or regular)
+            if (isAccessory && accessoryPose) {
+                prompt += `Pose: ${accessoryPose.replace('-', ' ')} pose. `;
+            } else if (isUnderwear && underwearPose) {
+                prompt += `Pose: ${underwearPose.replace('-', ' ')} pose. `;
+            } else {
+                // Multiple poses can be combined
+                if (selectedPoses && selectedPoses.length > 0) {
+                    const poseDescriptions = selectedPoses.map(p => p.replace('-', ' ')).join(', ');
+                    prompt += `Pose: ${poseDescriptions}, head ${headAngle.replace('-', ' ')}. `;
+                } else {
+                    prompt += `Pose: standing naturally, head ${headAngle.replace('-', ' ')}. `;
+                }
+            }
+
+            prompt += `Expression: ${expression.replace('-', ' ')} expression. `;
+
+            // Model Framing Type - What the user will see when they ask for model
+            const framingDescriptions = {
+                'full-length': 'FULL-LENGTH MODEL - complete full body from head to toe, entire person visible',
+                'upper-half': 'UPPER-HALF MODEL - from head down to waist/hips area, lower body NOT shown',
+                'lower-half': 'LOWER-HALF MODEL - from waist/hips down to feet, head and upper body NOT shown, focus on legs and lower body',
+                'neck-up': 'NECK-UP MODEL - from neck upwards only showing head and face, body NOT visible below neck'
+            };
+            if (modelFramingType && framingDescriptions[modelFramingType]) {
+                prompt += `Model Type: ${framingDescriptions[modelFramingType]}. `;
+            }
+
+            // Camera framing (accessory, underwear, or regular)
+            if (isAccessory && accessoryFraming) {
+                const framingDescriptions = {
+                    'upper-body': 'upper body shot focusing on face, neck, and shoulders area - perfect for jewelry, glasses, hats',
+                    'three-quarter': 'three-quarter body shot showing torso and upper legs - ideal for bags, belts',
+                    'hands-focus': 'shot with clear focus on hands and wrists - perfect for watches, rings, bracelets',
+                    'face-neck-focus': 'close-up focusing on face and neck area - ideal for earrings, necklaces'
+                };
+                prompt += `Camera Framing: ${framingDescriptions[accessoryFraming] || accessoryFraming}. `;
+            } else if (isUnderwear && underwearFraming) {
+                const underwearFramingDescriptions = {
+                    'upper-body': 'upper body shot - professional, tasteful',
+                    'three-quarter': 'three-quarter body shot - clean, respectful framing',
+                    'full-body': 'full body shot - professional product photography',
+                    'torso-focus': 'torso-focused shot - appropriate retail catalog style'
+                };
+                prompt += `Camera Framing: ${underwearFramingDescriptions[underwearFraming] || underwearFraming}. `;
+            } else {
+                prompt += `Photography: ${shotType.replace('-', ' ')} shot from ${cameraAngle.replace('-', ' ')} angle, ${lighting} lighting, ${bgStyle.replace('-', ' ')} background. `;
+            }
+
+            // Special instructions for product photography
+            if (isAccessory) {
+                prompt += `ACCESSORY PRODUCT PHOTOGRAPHY: Model is styled specifically for showcasing accessories. Clean background, professional lighting, model pose and framing optimized to display accessories clearly. The model complements the accessory, not competes with it. `;
+            }
+
+            if (isUnderwear) {
+                const photoStyleDescriptions = {
+                    'clean-minimal': 'Clean, minimal aesthetic - simple and professional',
+                    'retail-catalog': 'Retail catalog style - appropriate, professional product photography',
+                    'professional-studio': 'Professional studio photography - high-end, tasteful',
+                    'elegant-tasteful': 'Elegant and tasteful approach - sophisticated, respectful'
+                };
+                prompt += `UNDERWEAR PRODUCT PHOTOGRAPHY: ${photoStyleDescriptions[underwearPhotoStyle] || underwearPhotoStyle}. Model is styled for professional, tasteful underwear product photography similar to high-end retail catalogs. Clean background, professional lighting, APPROPRIATE and RESPECTFUL framing and composition. The model showcases the product professionally - NEVER overtly sexual or inappropriate. `;
+            }
+
+            const finalPhotoType = isAccessory ? 'product' : (isUnderwear ? 'product' : 'fashion');
+            prompt += `Professional ${finalPhotoType} photography, high-end editorial quality, sharp focus, perfect lighting, detailed features, photorealistic, 8K resolution. `;
+
+            if (additional) {
+                prompt += additional + ' ';
+            }
+
+            return prompt;
+        }
+
+        async function saveModel() {
+            if (!generatedImageData || !selectedUserId) {
+                showNotification('Missing required data', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/save-generated-to-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageUrl: generatedImageData.imageUrl,
+                        user_id: selectedUserId,
+                        content_type: 'model',
+                        visibility: document.getElementById('saveVisibility').value,
+                        category: document.getElementById('saveCategory').value,
+                        name: document.getElementById('saveName').value || 'AI Generated Model',
+                        description: `AI Generated Model: ${generatedImageData.prompt}`,
+                        prompt: generatedImageData.prompt
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('مدل در محتوای کاربر ذخیره شد!', 'success');
+                    discardModel();
+                } else {
+                    throw new Error(data.error || 'Save failed');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('خطا در ذخیره مدل: ' + error.message, 'error');
+            }
+        }
+
+        function discardModel() {
+            generatedImageData = null;
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('saveName').value = '';
+        }
+
+        // Handle model photo upload
+        let uploadedModelFile = null;
+        let uploadedModelDataUrl = null;
+
+        document.getElementById('modelPhotoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                showNotification('حجم فایل نباید بیشتر از 10 مگابایت باشد', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showNotification('لطفاً فقط فایل تصویری انتخاب کنید', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            uploadedModelFile = file;
+
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                uploadedModelDataUrl = event.target.result;
+                document.getElementById('uploadedModelImage').src = uploadedModelDataUrl;
+                document.getElementById('uploadedModelPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            showNotification('عکس آپلود شد! این عکس به عنوان مدل استفاده خواهد شد', 'success');
+        });
+
+        function clearUploadedModel() {
+            uploadedModelFile = null;
+            uploadedModelDataUrl = null;
+            document.getElementById('modelPhotoUpload').value = '';
+            document.getElementById('uploadedModelPreview').style.display = 'none';
+            showNotification('عکس آپلود شده حذف شد', 'success');
+        }
+
+        // Models Management Functions
+        let allModels = [];
+        let filteredModels = [];
+
+        async function loadAllModels() {
+            const loading = document.getElementById('modelsTableLoading');
+            const content = document.getElementById('modelsTableContent');
+            const empty = document.getElementById('modelsTableEmpty');
+
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            empty.style.display = 'none';
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models');
+                const data = await response.json();
+
+                if (data.success) {
+                    allModels = data.models || [];
+                    filteredModels = allModels;
+
+                    // Populate user filter dropdown
+                    const filterByUser = document.getElementById('filterByUser');
+                    const uniqueUsers = [...new Set(allModels.map(m => m.user_email))];
+                    filterByUser.innerHTML = '<option value="">همه کاربران</option>' +
+                        uniqueUsers.map(email => `<option value="${email}">${email}</option>`).join('');
+
+                    renderModelsTable();
+                } else {
+                    throw new Error(data.error || 'Failed to load models');
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                showNotification('خطا در بارگذاری مدل‌ها: ' + error.message, 'error');
+                loading.style.display = 'none';
+            }
+        }
+
+        function filterModels() {
+            const filterUser = document.getElementById('filterByUser').value;
+            const filterCategory = document.getElementById('filterByCategory').value;
+            const filterVisibility = document.getElementById('filterByVisibility').value;
+
+            filteredModels = allModels.filter(model => {
+                if (filterUser && model.user_email !== filterUser) return false;
+                if (filterCategory && model.category !== filterCategory) return false;
+                if (filterVisibility && model.visibility !== filterVisibility) return false;
+                return true;
+            });
+
+            renderModelsTable();
+        }
+
+        function renderModelsTable() {
+            const loading = document.getElementById('modelsTableLoading');
+            const content = document.getElementById('modelsTableContent');
+            const empty = document.getElementById('modelsTableEmpty');
+            const tbody = document.getElementById('modelsTableBody');
+
+            loading.style.display = 'none';
+
+            if (filteredModels.length === 0) {
+                content.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            content.style.display = 'block';
+            empty.style.display = 'none';
+
+            const categoryEmojis = {
+                'woman': '👩', 'man': '👨', 'girl': '👧', 'boy': '👦',
+                'plus-size': '➕', 'brand-woman': '👩‍💼', 'brand-man': '👨‍💼',
+                'brand-girl': '👧‍💼', 'brand-boy': '👦‍💼', 'brand-plus-size': '➕‍💼',
+                'accessory': '💍', 'underwear': '👙'
+            };
+
+            tbody.innerHTML = filteredModels.map(model => `
+                <tr style="border-bottom: 1px solid #e5e7eb; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <td style="padding: 12px; text-align: center;">
+                        <input type="checkbox" class="model-checkbox" data-model-id="${model.id}" data-bucket="${model.bucket}" onchange="updateBulkSelection()" style="width: 18px; height: 18px; cursor: pointer;">
+                    </td>
+                    <td style="padding: 12px;">
+                        <img src="${model.image_url}" alt="${model.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    </td>
+                    <td style="padding: 12px; font-weight: 500; color: #1f2937;">
+                        ${model.name || 'بدون نام'}
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: #f3f4f6; padding: 4px 8px; border-radius: 6px; font-size: 13px;">
+                            ${categoryEmojis[model.category] || '❓'} ${model.category}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; color: #6b7280; font-size: 14px;">
+                        ${model.user_email}
+                        ${model.is_premium ? '<span style="color: #f59e0b;">⭐</span>' : ''}
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: ${model.visibility === 'public' ? '#dcfce7' : '#fee2e2'}; color: ${model.visibility === 'public' ? '#166534' : '#991b1b'}; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                            ${model.visibility === 'public' ? '🌍 عمومی' : '🔒 خصوصی'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: ${
+                            model.tier_requirement === 'gold' ? '#fef08a' :
+                            model.tier_requirement === 'silver' ? '#e5e7eb' :
+                            model.tier_requirement === 'testlimit' ? '#fef3c7' :
+                            '#fed7aa'
+                        }; color: ${
+                            model.tier_requirement === 'gold' ? '#854d0e' :
+                            model.tier_requirement === 'silver' ? '#374151' :
+                            model.tier_requirement === 'testlimit' ? '#92400e' :
+                            '#9a3412'
+                        }; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                            ${
+                                model.tier_requirement === 'gold' ? '🥇 طلا' :
+                                model.tier_requirement === 'silver' ? '🥈 نقره' :
+                                model.tier_requirement === 'testlimit' ? '🧪 تست' :
+                                '🥉 برنز'
+                            }
+                        </span>
+                    </td>
+                    <td style="padding: 12px; color: #9ca3af; font-size: 13px;">
+                        ${new Date(model.created_at).toLocaleDateString('fa-IR')}
+                    </td>
+                    <td style="padding: 12px; text-align: center;">
+                        <button onclick="editModel('${model.id}', '${model.bucket}')" style="background: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; margin-left: 5px; font-size: 13px;">
+                            ✏️ ویرایش
+                        </button>
+                        <button onclick="deleteModel('${model.id}', '${model.bucket}')" style="background: #ef4444; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                            🗑️ حذف
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        let currentEditingModelId = null;
+
+        function editModel(modelId, bucket) {
+            console.log('Edit clicked! modelId:', modelId, 'type:', typeof modelId, 'bucket:', bucket);
+            console.log('allModels count:', allModels.length);
+            console.log('First 3 model IDs:', allModels.slice(0, 3).map(m => ({ id: m.id, type: typeof m.id })));
+            console.log('Looking for model with id:', modelId);
+
+            // Try both strict and loose comparison
+            let model = allModels.find(m => m.id === modelId);
+            if (!model) {
+                console.log('Strict match failed, trying loose match (==)');
+                model = allModels.find(m => m.id == modelId);
+            }
+            console.log('Found model:', model);
+
+            if (!model) {
+                console.error('Model not found! modelId:', modelId, 'type:', typeof modelId);
+                console.error('Sample IDs in array:', allModels.slice(0, 5).map(m => m.id));
+                alert('خطا: مدل پیدا نشد! شناسه: ' + modelId);
+                return;
+            }
+
+            currentEditingModelId = modelId;
+
+            // Populate modal fields with current values
+            document.getElementById('editModelName').value = model.name || '';
+            document.getElementById('editModelCategory').value = model.category || 'woman';
+            document.getElementById('editModelVisibility').value = model.visibility || 'private';
+
+            // Populate users dropdown
+            const userSelect = document.getElementById('editModelUser');
+            userSelect.innerHTML = '<option value="">-- بدون مالک (سیستمی) --</option>' +
+                allUsers.map(user =>
+                    `<option value="${user.user_id}" ${user.user_id === model.user_id ? 'selected' : ''}>
+                        ${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}
+                    </option>`
+                ).join('');
+
+            // Show modal
+            document.getElementById('editModelModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModelModal').style.display = 'none';
+            currentEditingModelId = null;
+        }
+
+        async function saveModelEdit() {
+            if (!currentEditingModelId) return;
+
+            const newName = document.getElementById('editModelName').value;
+            const newCategory = document.getElementById('editModelCategory').value;
+            const newVisibility = document.getElementById('editModelVisibility').value;
+            const newUserId = document.getElementById('editModelUser').value;
+
+            if (!newName.trim()) {
+                showNotification('نام مدل نمی‌تواند خالی باشد', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models/' + currentEditingModelId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: newName,
+                        category: newCategory,
+                        visibility: newVisibility,
+                        user_id: newUserId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('مدل با موفقیت ویرایش شد', 'success');
+                    closeEditModal();
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Update failed');
+                }
+            } catch (error) {
+                console.error('Error updating model:', error);
+                showNotification('خطا در ویرایش مدل: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteModel(modelId, bucket) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟\nاین عمل مدل را از دیتابیس و Storage حذف می‌کند و غیرقابل بازگشت است!')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/models/${modelId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('✅ مدل با موفقیت حذف شد', 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Delete failed');
+                }
+            } catch (error) {
+                console.error('Error deleting model:', error);
+                showNotification('خطا در حذف مدل: ' + error.message, 'error');
+            }
+        }
+
+        async function syncStorageToDatabase() {
+            if (!confirm('آیا می‌خواهید فایل‌های Storage را با دیتابیس همگام‌سازی کنید؟\nاین عمل فایل‌های جدید را به دیتابیس اضافه می‌کند.')) {
+                return;
+            }
+
+            try {
+                showNotification('⏳ در حال همگام‌سازی...', 'info');
+
+                const response = await fetchWithAuth('/api/admin/sync-storage-to-db', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`✅ همگام‌سازی موفق: ${data.synced} فایل جدید، ${data.skipped} موجود بود`, 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Sync failed');
+                }
+            } catch (error) {
+                console.error('Error syncing storage:', error);
+                showNotification('خطا در همگام‌سازی: ' + error.message, 'error');
+            }
+        }
+
+        async function makeAllModelsPublic() {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید همه مدل‌ها را عمومی کنید؟\nاین عمل همه مدل‌های خصوصی را برای همه کاربران قابل مشاهده می‌کند.')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/models/make-all-public', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`✅ ${data.count} مدل با موفقیت عمومی شدند!`, 'success');
+                    loadAllModels(); // Reload the list
+                } else {
+                    throw new Error(data.error || 'Update failed');
+                }
+            } catch (error) {
+                console.error('Error making models public:', error);
+                showNotification('خطا در تغییر دسترسی مدل‌ها: ' + error.message, 'error');
+            }
+        }
+
+        // Bulk Edit Functions
+        let selectedModels = [];
+
+        function updateBulkSelection() {
+            const checkboxes = document.querySelectorAll('.model-checkbox:checked');
+            selectedModels = Array.from(checkboxes).map(cb => ({
+                id: cb.dataset.modelId,
+                bucket: cb.dataset.bucket
+            }));
+
+            const count = selectedModels.length;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('bulkEditToolbar').style.display = count > 0 ? 'flex' : 'none';
+
+            // Update select all checkbox
+            const allCheckboxes = document.querySelectorAll('.model-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allCheckboxes.length > 0 && checkboxes.length === allCheckboxes.length;
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.model-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
+            updateBulkSelection();
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.model-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllCheckbox').checked = false;
+            updateBulkSelection();
+        }
+
+        function bulkEdit() {
+            if (selectedModels.length === 0) {
+                showNotification('لطفاً حداقل یک مدل انتخاب کنید', 'warning');
+                return;
+            }
+
+            // Populate user dropdown
+            const userSelect = document.getElementById('bulkEditUser');
+            userSelect.innerHTML = '<option value="">-- بدون تغییر --</option>' +
+                allUsers.map(user =>
+                    `<option value="${user.user_id}">
+                        ${user.email}${user.is_premium ? ' ⭐ پریمیوم' : ''}
+                    </option>`
+                ).join('');
+
+            // Reset form
+            document.getElementById('bulkEditCategory').value = '';
+            document.getElementById('bulkEditVisibility').value = '';
+            document.getElementById('bulkEditUser').value = '';
+
+            // Show count
+            document.getElementById('bulkEditCount').textContent = selectedModels.length;
+
+            // Show modal
+            document.getElementById('bulkEditModal').style.display = 'flex';
+        }
+
+        function closeBulkEditModal() {
+            document.getElementById('bulkEditModal').style.display = 'none';
+        }
+
+        async function saveBulkEdit() {
+            const category = document.getElementById('bulkEditCategory').value;
+            const visibility = document.getElementById('bulkEditVisibility').value;
+            const tierRequirement = document.getElementById('bulkEditTierRequirement').value;
+            const userId = document.getElementById('bulkEditUser').value;
+
+            // Check if at least one field is changed
+            if (!category && !visibility && !tierRequirement && !userId) {
+                showNotification('لطفاً حداقل یک فیلد را تغییر دهید', 'warning');
+                return;
+            }
+
+            try {
+                showNotification('در حال اعمال تغییرات...', 'info');
+
+                // Update each selected model
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const model of selectedModels) {
+                    try {
+                        const updates = {};
+                        if (category) updates.category = category;
+                        if (visibility) updates.visibility = visibility;
+                        if (tierRequirement) updates.tier_requirement = tierRequirement;
+                        if (userId) updates.user_id = userId || null;
+
+                        const response = await fetchWithAuth(`/api/admin/models/${model.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updates)
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    } catch (error) {
+                        console.error('Error updating model:', model.id, error);
+                        failCount++;
+                    }
+                }
+
+                closeBulkEditModal();
+                clearSelection();
+
+                if (successCount > 0) {
+                    showNotification(`✅ ${successCount} مدل با موفقیت به‌روز شد` + (failCount > 0 ? ` (${failCount} مورد ناموفق)` : ''), 'success');
+                    await loadAllModels();
+                } else {
+                    showNotification('❌ خطا در به‌روزرسانی مدل‌ها', 'error');
+                }
+            } catch (error) {
+                console.error('Bulk edit error:', error);
+                showNotification('خطا در ویرایش دسته‌جمعی: ' + error.message, 'error');
+            }
+        }
+
+        async function bulkDelete() {
+            if (selectedModels.length === 0) {
+                showNotification('لطفاً حداقل یک مدل انتخاب کنید', 'warning');
+                return;
+            }
+
+            if (!confirm(`آیا مطمئن هستید که می‌خواهید ${selectedModels.length} مدل را حذف کنید؟\nاین عمل قابل بازگشت نیست!`)) {
+                return;
+            }
+
+            try {
+                showNotification('در حال حذف مدل‌ها...', 'info');
+
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const model of selectedModels) {
+                    try {
+                        const response = await fetchWithAuth(`/api/admin/models/${model.id}?bucket=${model.bucket}`, {
+                            method: 'DELETE'
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    } catch (error) {
+                        console.error('Error deleting model:', model.id, error);
+                        failCount++;
+                    }
+                }
+
+                clearSelection();
+
+                if (successCount > 0) {
+                    showNotification(`✅ ${successCount} مدل با موفقیت حذف شد` + (failCount > 0 ? ` (${failCount} مورد ناموفق)` : ''), 'success');
+                    await loadAllModels();
+                } else {
+                    showNotification('❌ خطا در حذف مدل‌ها', 'error');
+                }
+            } catch (error) {
+                console.error('Bulk delete error:', error);
+                showNotification('خطا در حذف دسته‌جمعی: ' + error.message, 'error');
+            }
+        }
+
+        // Load users and models on page load
+        loadUsers();
+        loadAllModels();
+    </script>
+</body>
+</html>

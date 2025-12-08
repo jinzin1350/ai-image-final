@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Service Permissions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            direction: ltr;
+        }
+        h1 { color: #1f2937; }
+        .test-section {
+            background: #f9fafb;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .result {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border: 2px solid #e5e7eb;
+        }
+        .success { border-color: #10b981; background: #f0fdf4; }
+        .error { border-color: #ef4444; background: #fef2f2; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f3f4f6;
+            font-weight: 700;
+        }
+        .toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+        .enabled { color: #10b981; font-weight: bold; }
+        .disabled { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Service Permissions System</h1>
+    <p>This page helps diagnose permission issues.</p>
+
+    <div class="test-section">
+        <h2>Step 1: Load Current Permissions</h2>
+        <button onclick="loadAllPermissions()">Load All Permissions</button>
+        <div id="permissionsResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Test Update Permission</h2>
+        <p>Test updating bronze tier permissions:</p>
+        <button onclick="testUpdate('bronze', 'complete-outfit', true)">Enable Bronze → Complete Outfit</button>
+        <button onclick="testUpdate('bronze', 'accessories-only', true)">Enable Bronze → Accessories</button>
+        <button onclick="testUpdate('bronze', 'complete-outfit', false)">Disable Bronze → Complete Outfit</button>
+        <div id="updateResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Test User Access Check</h2>
+        <p>Check if user engi.alireza@gmail.com can access services:</p>
+        <button onclick="checkUserAccess('complete-outfit')">Check Complete Outfit</button>
+        <button onclick="checkUserAccess('accessories-only')">Check Accessories</button>
+        <div id="accessResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 4: Interactive Permission Manager</h2>
+        <div id="permissionsTable"></div>
+    </div>
+
+    <script>
+        // Check for admin credentials (email + password based auth)
+        const adminEmail = sessionStorage.getItem('adminEmail');
+        const adminPassword = sessionStorage.getItem('adminPassword');
+
+        console.log('🔑 Admin auth check:', {
+            adminEmail: adminEmail ? 'EXISTS' : 'MISSING',
+            adminPassword: adminPassword ? 'EXISTS' : 'MISSING'
+        });
+
+        if (!adminEmail || !adminPassword) {
+            document.body.innerHTML = `
+                <div style="text-align:center;padding:40px;">
+                    <h2>❌ Not Authenticated as Admin</h2>
+                    <p>Please login at <a href="/admin/dashboard">/admin/dashboard</a> first</p>
+                    <br>
+                    <p style="color: #6b7280; font-size: 14px;">
+                        Admin Email: ${adminEmail ? '✅ Found' : '❌ Not found'}<br>
+                        Admin Password: ${adminPassword ? '✅ Found' : '❌ Not found'}
+                    </p>
+                    <br>
+                    <button onclick="window.location.href='/admin/dashboard'" style="padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                        Go to Admin Dashboard
+                    </button>
+                </div>
+            `;
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const headers = {
+                'admin-email': adminEmail,
+                'admin-password': adminPassword,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            return fetch(url, {
+                ...options,
+                headers
+            });
+        }
+
+        async function loadAllPermissions() {
+            try {
+                const response = await fetchWithAuth('/api/admin/service-permissions');
+                const data = await response.json();
+
+                const resultDiv = document.getElementById('permissionsResult');
+
+                if (data.success) {
+                    let html = '<div class="result success">';
+                    html += '✅ Loaded Successfully!\n\n';
+                    html += JSON.stringify(data.permissions, null, 2);
+                    html += '</div>';
+
+                    // Also render interactive table
+                    renderPermissionsTable(data.permissions);
+
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('permissionsResult').innerHTML =
+                    `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testUpdate(tier, serviceKey, hasAccess) {
+            try {
+                console.log(`Updating ${tier} / ${serviceKey} = ${hasAccess}`);
+
+                const response = await fetchWithAuth(`/api/admin/service-permissions/${tier}/${serviceKey}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ has_access: hasAccess })
+                });
+
+                const data = await response.json();
+
+                const resultDiv = document.getElementById('updateResult');
+
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="result success">✅ Update Successful!\n\nRequest: ${tier} → ${serviceKey} = ${hasAccess}\n\nResponse:\n${JSON.stringify(data, null, 2)}</div>`;
+
+                    // Reload permissions
+                    setTimeout(() => loadAllPermissions(), 500);
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Update Failed!\n\nError: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('updateResult').innerHTML =
+                    `<div class="result error">❌ Error: ${error.message}\n\n${error.stack}</div>`;
+            }
+        }
+
+        async function checkUserAccess(serviceKey) {
+            try {
+                // Use regular user token, not admin token
+                const userToken = localStorage.getItem('supabase_token');
+
+                if (!userToken) {
+                    document.getElementById('accessResult').innerHTML =
+                        '<div class="result error">❌ No user token found. Please login as regular user first.</div>';
+                    return;
+                }
+
+                const response = await fetch(`/api/check-service-access/${serviceKey}`, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                const resultDiv = document.getElementById('accessResult');
+
+                if (data.success !== undefined) {
+                    const status = data.hasAccess ? '✅ HAS ACCESS' : '❌ NO ACCESS';
+                    resultDiv.innerHTML = `<div class="result ${data.hasAccess ? 'success' : 'error'}">${status}\n\nService: ${serviceKey}\n\n${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Error: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('accessResult').innerHTML =
+                    `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function renderPermissionsTable(permissions) {
+            const services = ['complete-outfit', 'accessories-only', 'color-collection', 'flat-lay', 'scene-recreation', 'style-transfer'];
+            const tiers = ['testlimit', 'bronze', 'silver', 'gold'];
+
+            let html = '<table><thead><tr><th>Service</th>';
+            tiers.forEach(tier => {
+                html += `<th>${tier.toUpperCase()}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            services.forEach(service => {
+                html += `<tr><td><strong>${service}</strong></td>`;
+
+                tiers.forEach(tier => {
+                    const tierPerms = permissions[tier] || [];
+                    const perm = tierPerms.find(p => p.service_key === service);
+                    const hasAccess = perm ? perm.has_access : false;
+
+                    const statusClass = hasAccess ? 'enabled' : 'disabled';
+                    const statusText = hasAccess ? '✅ YES' : '❌ NO';
+
+                    html += `<td class="toggle ${statusClass}" onclick="testUpdate('${tier}', '${service}', ${!hasAccess})">${statusText}</td>`;
+                });
+
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            html += '<p style="margin-top: 16px; color: #6b7280;">💡 Click on any cell to toggle permission</p>';
+
+            document.getElementById('permissionsTable').innerHTML = html;
+        }
+
+        // Auto-load on page load
+        window.addEventListener('load', () => {
+            if (adminEmail && adminPassword) {
+                loadAllPermissions();
+            }
+        });
+    </script>
+</body>
+</html>

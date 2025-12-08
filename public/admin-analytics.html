@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <title>Analytics | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><div class="logo"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/></svg><span>Admin Panel</span></div></div>
+        <div class="sidebar-nav-container" data-active-page="analytics"></div>
+        <div class="sidebar-footer"><button class="btn-logout" onclick="handleLogout()"><span>Logout</span></button></div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div><h1>Analytics</h1><p>Detailed statistics and insights</p></div>
+        </header>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>
+                <div class="stat-content">
+                    <div class="stat-label">Premium Users</div>
+                    <div class="stat-value" id="premiumUsers">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+                <div class="stat-content">
+                    <div class="stat-label">Images Generated</div>
+                    <div class="stat-value" id="totalImages">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div class="stat-content">
+                    <div class="stat-label">Today</div>
+                    <div class="stat-value" id="todayImages">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Platform Overview</h2>
+            <div style="display:grid; gap:16px;">
+                <div style="padding:16px; background:#f9fafb; border-radius:12px;">
+                    <div style="font-weight:600; margin-bottom:8px;">📊 Usage Statistics</div>
+                    <div style="color:#6b7280; font-size:14px;">Total models in library: <span id="totalModels">0</span></div>
+                    <div style="color:#6b7280; font-size:14px;">Total backgrounds: <span id="totalBackgrounds">0</span></div>
+                </div>
+                <div style="padding:16px; background:#f9fafb; border-radius:12px;">
+                    <div style="font-weight:600; margin-bottom:8px;">👥 User Base</div>
+                    <div style="color:#6b7280; font-size:14px;">Free users: <span id="freeUsers">0</span></div>
+                    <div style="color:#6b7280; font-size:14px;">Premium conversion: <span id="conversionRate">0%</span></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        async function loadAnalytics() {
+            try {
+                const response = await fetchWithAuth('/api/admin/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('totalUsers').textContent = stats.totalUsers.toLocaleString();
+                    document.getElementById('premiumUsers').textContent = stats.premiumUsers.toLocaleString();
+                    document.getElementById('totalImages').textContent = stats.totalImages.toLocaleString();
+                    document.getElementById('todayImages').textContent = stats.todayImages.toLocaleString();
+                    document.getElementById('totalModels').textContent = stats.totalModels.toLocaleString();
+                    document.getElementById('totalBackgrounds').textContent = stats.totalBackgrounds.toLocaleString();
+                    document.getElementById('freeUsers').textContent = stats.freeUsers.toLocaleString();
+
+                    const conversionRate = stats.totalUsers > 0 ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1) : 0;
+                    document.getElementById('conversionRate').textContent = conversionRate + '%';
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                showNotification('Failed to load analytics', 'error');
+            }
+        }
+
+        loadAnalytics();
+    </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation | استودیو هوش مصنوعی مد</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="landing-style.css">
+    <style>
+        .api-docs {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 100px;
+            right: 40px;
+            width: 250px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-right: 300px;
+        }
+
+        .endpoint {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .method {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .method.get { background: #e6f7ff; color: #0066cc; }
+        .method.post { background: #e6ffe6; color: #00cc00; }
+        .method.delete { background: #ffe6e6; color: #cc0000; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .param-table th,
+        .param-table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .param-table th {
+            background: var(--bg-light);
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .required {
+            color: #cc0000;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-right: 0;
+            }
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="12" fill="url(#gradient1)"/>
+                        <path d="M20 10L12 18L20 26L28 18L20 10Z" fill="white" opacity="0.9"/>
+                        <circle cx="20" cy="20" r="3" fill="white"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>استودیو Fusion</span>
+                </div>
+                <div class="nav-links">
+                    <a href="/">صفحه اصلی</a>
+                    <a href="/app">برنامه</a>
+                </div>
+                <a href="/app" class="btn-primary">شروع رایگان</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="api-docs">
+        <div class="sidebar">
+            <h3>فهرست</h3>
+            <ul>
+                <li><a href="#auth">احراز هویت</a></li>
+                <li><a href="#upload">آپلود تصویر</a></li>
+                <li><a href="#models">لیست مدل‌ها</a></li>
+                <li><a href="#backgrounds">لیست پس‌زمینه‌ها</a></li>
+                <li><a href="#generate">تولید عکس</a></li>
+                <li><a href="#caption">تولید کپشن</a></li>
+                <li><a href="#history">تاریخچه</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <h1 style="font-size: 42px; margin-bottom: 16px;">API Documentation</h1>
+            <p style="font-size: 18px; color: var(--text-light); margin-bottom: 48px;">راهنمای کامل استفاده از API استودیو هوش مصنوعی مد</p>
+
+            <div id="auth" class="endpoint">
+                <h2>احراز هویت</h2>
+                <p style="margin: 16px 0; color: var(--text-light);">برای استفاده از API، ابتدا باید ثبت نام کنید و توکن دریافت کنید.</p>
+
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/auth/signup</span>
+                </div>
+
+                <h4>Body:</h4>
+                <div class="code-block">{
+  "email": "user@example.com",
+  "password": "your_password"
+}</div>
+
+                <div class="endpoint-header" style="margin-top: 32px;">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/auth/signin</span>
+                </div>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  "success": true,
+  "session": {
+    "access_token": "eyJhbGc...",
+    "user": { ... }
+  }
+}</div>
+            </div>
+
+            <div id="upload" class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/upload</span>
+                </div>
+
+                <h3>آپلود تصویر لباس</h3>
+                <p style="margin: 16px 0; color: var(--text-light);">آپلود فایل تصویر برای پردازش</p>
+
+                <h4>Headers:</h4>
+                <div class="code-block">Content-Type: multipart/form-data
+Authorization: Bearer {access_token}</div>
+
+                <h4>Form Data:</h4>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>پارامتر</th>
+                            <th>نوع</th>
+                            <th>الزامی</th>
+                            <th>توضیحات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>garment</td>
+                            <td>File</td>
+                            <td class="required">✓</td>
+                            <td>فایل تصویر (JPG, PNG, WEBP, AVIF - حداکثر 10MB)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  "success": true,
+  "filePath": "https://...",
+  "fileName": "1234567890-shirt.jpg"
+}</div>
+            </div>
+
+            <div id="models" class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/models</span>
+                </div>
+
+                <h3>دریافت لیست مدل‌ها</h3>
+                <p style="margin: 16px 0; color: var(--text-light);">لیست تمام مدل‌های موجود (زن، مرد، دختر، پسر)</p>
+
+                <h4>Response:</h4>
+                <div class="code-block">[
+  {
+    "id": "woman-1",
+    "name": "مدل ۱",
+    "category": "woman",
+    "categoryName": "زن",
+    "description": "زن 35 ساله",
+    "image": "https://..."
+  },
+  ...
+]</div>
+            </div>
+
+            <div id="backgrounds" class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/backgrounds</span>
+                </div>
+
+                <h3>دریافت لیست پس‌زمینه‌ها</h3>
+                <p style="margin: 16px 0; color: var(--text-light);">لیست تمام پس‌زمینه‌های موجود</p>
+
+                <h4>Response:</h4>
+                <div class="code-block">[
+  {
+    "id": "studio-white",
+    "name": "استودیو سفید",
+    "description": "Professional white studio background",
+    "image": "https://..."
+  },
+  ...
+]</div>
+            </div>
+
+            <div id="generate" class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/generate</span>
+                </div>
+
+                <h3>تولید عکس با هوش مصنوعی</h3>
+                <p style="margin: 16px 0; color: var(--text-light);">تولید عکس استودیویی از لباس روی مدل</p>
+
+                <h4>Headers:</h4>
+                <div class="code-block">Content-Type: application/json
+Authorization: Bearer {access_token}</div>
+
+                <h4>Body Parameters:</h4>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>پارامتر</th>
+                            <th>نوع</th>
+                            <th>الزامی</th>
+                            <th>توضیحات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>garmentPaths</td>
+                            <td>Array</td>
+                            <td class="required">✓</td>
+                            <td>آرایه URL های تصاویر لباس</td>
+                        </tr>
+                        <tr>
+                            <td>modelId</td>
+                            <td>String</td>
+                            <td class="required">✓</td>
+                            <td>شناسه مدل (woman-1, man-1, ...)</td>
+                        </tr>
+                        <tr>
+                            <td>backgroundId</td>
+                            <td>String</td>
+                            <td class="required">✓</td>
+                            <td>شناسه پس‌زمینه</td>
+                        </tr>
+                        <tr>
+                            <td>poseId</td>
+                            <td>String</td>
+                            <td></td>
+                            <td>حالت بدن (پیش‌فرض: standing-front)</td>
+                        </tr>
+                        <tr>
+                            <td>styleId</td>
+                            <td>String</td>
+                            <td></td>
+                            <td>استایل عکس (پیش‌فرض: professional)</td>
+                        </tr>
+                        <tr>
+                            <td>aspectRatioId</td>
+                            <td>String</td>
+                            <td></td>
+                            <td>نسبت تصویر (پیش‌فرض: 1:1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Request Example:</h4>
+                <div class="code-block">{
+  "garmentPaths": ["https://..."],
+  "modelId": "woman-1",
+  "backgroundId": "studio-white",
+  "poseId": "standing-front",
+  "styleId": "professional",
+  "aspectRatioId": "1:1"
+}</div>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  "success": true,
+  "imagePath": "https://...",
+  "model": "مدل ۱",
+  "background": "استودیو سفید",
+  "description": "...",
+  "message": "تصویر با موفقیت تولید شد!"
+}</div>
+            </div>
+
+            <div id="caption" class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/generate-caption</span>
+                </div>
+
+                <h3>تولید کپشن اینستاگرام</h3>
+                <p style="margin: 16px 0; color: var(--text-light);">تولید کپشن جذاب فارسی برای تصاویر</p>
+
+                <h4>Body:</h4>
+                <div class="code-block">{
+  "imageUrl": "https://...",
+  "imageId": "uuid"
+}</div>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  "success": true,
+  "caption": "کپشن تولید شده...",
+  "imageId": "uuid"
+}</div>
+            </div>
+
+            <div id="history" class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/generations</span>
+                </div>
+
+                <h3>دریافت تاریخچه تولیدها</h3>
+                <p style="margin: 16px 0; color: var(--text-light);">لیست 100 تصویر آخر تولید شده توسط کاربر</p>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  "success": true,
+  "generations": [
+    {
+      "id": "uuid",
+      "garment_path": "https://...",
+      "generated_image_url": "https://...",
+      "created_at": "2024-01-01T00:00:00.000Z",
+      ...
+    },
+    ...
+  ]
+}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

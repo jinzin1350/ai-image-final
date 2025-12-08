@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Management | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .pricing-card.testlimit {
+            border-color: #3b82f6;
+        }
+
+        .pricing-card.bronze {
+            border-color: #f59e0b;
+        }
+
+        .pricing-card.silver {
+            border-color: #6b7280;
+        }
+
+        .pricing-card.gold {
+            border-color: #eab308;
+        }
+
+        .tier-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .tier-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .tier-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .tier-key {
+            font-size: 12px;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input[type="number"] {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: 'تومان';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #6b7280;
+            pointer-events: none;
+        }
+
+        .currency-input input {
+            padding-left: 70px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .info-banner h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .info-banner p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .preview-section {
+            margin-top: 48px;
+            padding: 32px;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+
+        .preview-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .preview-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-card .tier-name {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .preview-card .price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .preview-card .credits {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #ef4444;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .success-toast.show, .error-toast.show {
+            display: block;
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                    <path d="M20 10 L12 18 L20 26 L28 18 Z" fill="white"/>
+                    <circle cx="20" cy="20" r="3" fill="white"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-nav-container" data-active-page="pricing"></div>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Pricing Management</h1>
+                    <p>Configure pricing for each subscription tier</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="saveAllPricing()">
+                    💾 Save All Changes
+                </button>
+            </div>
+        </header>
+
+        <div class="pricing-container">
+            <div class="info-banner">
+                <h3>💰 How Pricing Works</h3>
+                <p>Set the monthly price for each tier. Prices will be displayed on the pricing page (/pricing.html) and in upgrade modals. Changes take effect immediately after saving.</p>
+                <p style="margin-top: 12px; opacity: 0.9;">
+                    <strong>Note:</strong> Credit limits are managed in <a href="/admin/tier-settings" style="color: white; text-decoration: underline;">Tier Settings</a> to avoid conflicts.
+                </p>
+            </div>
+
+            <div class="pricing-grid" id="pricingGrid">
+                <!-- Pricing cards will be loaded here -->
+            </div>
+
+            <div class="preview-section">
+                <h2>📊 Pricing Preview</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 24px;">
+                    This is how your pricing will appear to users
+                </p>
+                <div class="preview-grid" id="previewGrid">
+                    <!-- Preview cards will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Discount Code Management Section -->
+            <div class="preview-section" style="margin-top: 48px;">
+                <h2>🎟️ Discount Code Management</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 24px;">
+                    Create and manage promotional discount codes
+                </p>
+
+                <!-- Create New Discount Code Form -->
+                <div style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1f2937;">
+                        ➕ Create New Discount Code
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label">Code Name *</label>
+                            <input type="text" id="discountCodeName" class="form-input" placeholder="e.g., SUMMER2024" style="text-transform: uppercase;" maxlength="50">
+                            <small style="color: #6b7280; font-size: 12px;">Uppercase letters and numbers only</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discount % *</label>
+                            <input type="number" id="discountPercentage" class="form-input" placeholder="e.g., 20" min="1" max="100">
+                            <small style="color: #6b7280; font-size: 12px;">1-100%</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expires At *</label>
+                            <input type="datetime-local" id="discountExpiresAt" class="form-input">
+                            <small style="color: #6b7280; font-size: 12px;">Date and time</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Uses</label>
+                            <input type="number" id="discountMaxUses" class="form-input" placeholder="Unlimited" min="1">
+                            <small style="color: #6b7280; font-size: 12px;">Leave empty for unlimited</small>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label class="form-label">Description (Internal Note)</label>
+                        <textarea id="discountDescription" class="form-input" placeholder="e.g., Summer promotion campaign" rows="2" style="resize: vertical;"></textarea>
+                    </div>
+                    <button onclick="createDiscountCode()" class="save-btn" style="width: 100%; margin-top: 16px;">
+                        🎟️ Create Discount Code
+                    </button>
+                </div>
+
+                <!-- List of Existing Discount Codes -->
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1f2937;">
+                        📋 Existing Discount Codes
+                    </h3>
+                    <div id="discountCodesList">
+                        <p style="text-align: center; color: #9ca3af; padding: 40px 0;">Loading discount codes...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="successToast" class="success-toast">
+        ✓ Pricing updated successfully
+    </div>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        const tiers = [
+            { key: 'testlimit', name: 'Test Limit', icon: '🧪', defaultPrice: 0, defaultCredits: 5 },
+            { key: 'bronze', name: 'Bronze', icon: '🥉', defaultPrice: 199000, defaultCredits: 50 },
+            { key: 'silver', name: 'Silver', icon: '🥈', defaultPrice: 399000, defaultCredits: 100 },
+            { key: 'gold', name: 'Gold', icon: '🥇', defaultPrice: 599000, defaultCredits: 130 }
+        ];
+
+        let pricingData = {};
+
+        // Load pricing from database
+        async function loadPricing() {
+            try {
+                const response = await fetchWithAuth('/api/admin/pricing');
+                const data = await response.json();
+
+                if (data.success && data.pricing) {
+                    // Convert array to object for easy lookup
+                    pricingData = {};
+                    data.pricing.forEach(item => {
+                        pricingData[item.tier] = {
+                            price: item.price,
+                            credits: item.credits,
+                            discount_percentage: item.discount_percentage || 0,
+                            discount_active: item.discount_active || false
+                        };
+                    });
+                } else {
+                    // Initialize with defaults if no data
+                    tiers.forEach(tier => {
+                        pricingData[tier.key] = {
+                            price: tier.defaultPrice,
+                            credits: tier.defaultCredits,
+                            discount_percentage: 0,
+                            discount_active: false
+                        };
+                    });
+                }
+
+                renderPricingCards();
+                renderPreview();
+            } catch (error) {
+                console.error('Error loading pricing:', error);
+                showError('Failed to load pricing data');
+            }
+        }
+
+        function renderPricingCards() {
+            const container = document.getElementById('pricingGrid');
+            container.innerHTML = '';
+
+            tiers.forEach(tier => {
+                const data = pricingData[tier.key] || {
+                    price: tier.defaultPrice,
+                    credits: tier.defaultCredits,
+                    discount_percentage: 0,
+                    discount_active: false
+                };
+
+                const card = document.createElement('div');
+                card.className = `pricing-card ${tier.key}`;
+                card.innerHTML = `
+                    <div class="tier-header">
+                        <div class="tier-icon">${tier.icon}</div>
+                        <div class="tier-name">${tier.name}</div>
+                        <div class="tier-key">${tier.key}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Monthly Price (Toman)</label>
+                        <div class="currency-input">
+                            <input type="number"
+                                   class="form-input"
+                                   id="price-${tier.key}"
+                                   value="${data.price}"
+                                   min="0"
+                                   step="1000"
+                                   onchange="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Discount Percentage (%)
+                            <span style="font-size: 12px; color: #9ca3af; font-weight: 400;">(0-100)</span>
+                        </label>
+                        <input type="number"
+                               class="form-input"
+                               id="discount-${tier.key}"
+                               value="${data.discount_percentage}"
+                               min="0"
+                               max="100"
+                               step="5"
+                               onchange="updatePreview()">
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <input type="checkbox"
+                                   id="discount-active-${tier.key}"
+                                   ${data.discount_active ? 'checked' : ''}
+                                   onchange="updatePreview()"
+                                   style="width: 20px; height: 20px; cursor: pointer;">
+                            <span class="form-label" style="margin: 0; cursor: pointer;">🎯 Activate Discount</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Monthly Credits</label>
+                        <div style="
+                            padding: 12px 16px;
+                            background: #f3f4f6;
+                            border-radius: 8px;
+                            font-size: 18px;
+                            font-weight: 600;
+                            color: #6b7280;
+                            text-align: center;
+                        ">
+                            ${data.credits} credits
+                        </div>
+                        <div style="
+                            font-size: 12px;
+                            color: #9ca3af;
+                            margin-top: 8px;
+                            text-align: center;
+                        ">
+                            Credits are managed in <a href="/admin/tier-settings" style="color: #667eea; text-decoration: underline;">Tier Settings</a>
+                        </div>
+                    </div>
+
+                    <button class="save-btn" onclick="saveTierPricing('${tier.key}')">
+                        Save ${tier.name} Pricing
+                    </button>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function renderPreview() {
+            const container = document.getElementById('previewGrid');
+            container.innerHTML = '';
+
+            tiers.forEach(tier => {
+                const data = pricingData[tier.key] || {
+                    price: tier.defaultPrice,
+                    credits: tier.defaultCredits,
+                    discount_percentage: 0,
+                    discount_active: false
+                };
+
+                const hasDiscount = data.discount_active && data.discount_percentage > 0;
+                const discountedPrice = hasDiscount
+                    ? data.price - (data.price * data.discount_percentage / 100)
+                    : data.price;
+
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.innerHTML = `
+                    <div class="tier-icon">${tier.icon}</div>
+                    <div class="tier-name">${tier.name}</div>
+                    ${hasDiscount ? `
+                        <div style="font-size: 16px; color: #9ca3af; text-decoration: line-through; margin-bottom: 4px;">
+                            ${parseInt(data.price).toLocaleString('fa-IR')}
+                        </div>
+                        <div class="price">${parseInt(discountedPrice).toLocaleString('fa-IR')}</div>
+                        <div style="
+                            display: inline-block;
+                            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                            color: white;
+                            padding: 4px 12px;
+                            border-radius: 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            margin: 8px 0;
+                        ">
+                            ${data.discount_percentage}% OFF
+                        </div>
+                    ` : `
+                        <div class="price">${parseInt(data.price).toLocaleString('fa-IR')}</div>
+                    `}
+                    <div class="credits">${data.credits} credits/month</div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function updatePreview() {
+            // Update pricing data from inputs
+            tiers.forEach(tier => {
+                const priceInput = document.getElementById(`price-${tier.key}`);
+                const discountInput = document.getElementById(`discount-${tier.key}`);
+                const discountActiveInput = document.getElementById(`discount-active-${tier.key}`);
+
+                if (priceInput && discountInput && discountActiveInput) {
+                    pricingData[tier.key].price = parseInt(priceInput.value) || 0;
+                    pricingData[tier.key].discount_percentage = parseInt(discountInput.value) || 0;
+                    pricingData[tier.key].discount_active = discountActiveInput.checked;
+                    // Keep existing credits value from database
+                }
+            });
+
+            renderPreview();
+        }
+
+        async function saveTierPricing(tierKey) {
+            const priceInput = document.getElementById(`price-${tierKey}`);
+            const discountInput = document.getElementById(`discount-${tierKey}`);
+            const discountActiveInput = document.getElementById(`discount-active-${tierKey}`);
+            const saveBtn = event.target;
+
+            const price = parseInt(priceInput.value) || 0;
+            const discount_percentage = parseInt(discountInput.value) || 0;
+            const discount_active = discountActiveInput.checked;
+
+            try {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                const response = await fetchWithAuth(`/api/admin/pricing/${tierKey}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        price,
+                        discount_percentage,
+                        discount_active
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    pricingData[tierKey].price = price;
+                    pricingData[tierKey].discount_percentage = discount_percentage;
+                    pricingData[tierKey].discount_active = discount_active;
+                    // Credits remain unchanged from database
+                    renderPreview();
+                    showSuccess();
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+            } catch (error) {
+                console.error('Error saving pricing:', error);
+                showError('Failed to save pricing: ' + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                const tier = tiers.find(t => t.key === tierKey);
+                saveBtn.textContent = `Save ${tier.name} Pricing`;
+            }
+        }
+
+        async function saveAllPricing() {
+            updatePreview();
+
+            // Prepare batch data with discount info
+            const pricingArray = tiers.map(tier => ({
+                tier: tier.key,
+                price: pricingData[tier.key].price,
+                discount_percentage: pricingData[tier.key].discount_percentage,
+                discount_active: pricingData[tier.key].discount_active
+                // Don't send credits - they're managed in Tier Settings
+            }));
+
+            try {
+                const response = await fetchWithAuth('/api/admin/pricing/batch', {
+                    method: 'POST',
+                    body: JSON.stringify({ pricing: pricingArray })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+            } catch (error) {
+                console.error('Error saving all pricing:', error);
+                showError('Failed to save all pricing: ' + error.message);
+            }
+        }
+
+        function showSuccess() {
+            const toast = document.getElementById('successToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function showError(message) {
+            // Create error toast if it doesn't exist
+            let errorToast = document.getElementById('errorToast');
+            if (!errorToast) {
+                errorToast = document.createElement('div');
+                errorToast.id = 'errorToast';
+                errorToast.className = 'error-toast';
+                document.body.appendChild(errorToast);
+            }
+
+            errorToast.textContent = '❌ ' + message;
+            errorToast.classList.add('show');
+            setTimeout(() => {
+                errorToast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Discount Code Management Functions
+        async function createDiscountCode() {
+            const code = document.getElementById('discountCodeName').value.trim().toUpperCase();
+            const percentage = parseInt(document.getElementById('discountPercentage').value);
+            const expiresAt = document.getElementById('discountExpiresAt').value;
+            const maxUses = document.getElementById('discountMaxUses').value;
+            const description = document.getElementById('discountDescription').value.trim();
+
+            // Validation
+            if (!code) {
+                showError('Please enter a discount code name');
+                return;
+            }
+            if (!percentage || percentage < 1 || percentage > 100) {
+                showError('Please enter a valid discount percentage (1-100)');
+                return;
+            }
+            if (!expiresAt) {
+                showError('Please select an expiration date and time');
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth('/api/admin/discount-codes', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        code,
+                        discount_percentage: percentage,
+                        expires_at: new Date(expiresAt).toISOString(),
+                        max_uses: maxUses ? parseInt(maxUses) : null,
+                        description: description || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                    // Clear form
+                    document.getElementById('discountCodeName').value = '';
+                    document.getElementById('discountPercentage').value = '';
+                    document.getElementById('discountExpiresAt').value = '';
+                    document.getElementById('discountMaxUses').value = '';
+                    document.getElementById('discountDescription').value = '';
+                    // Reload codes list
+                    loadDiscountCodes();
+                } else {
+                    showError(data.error || 'Failed to create discount code');
+                }
+            } catch (error) {
+                console.error('Error creating discount code:', error);
+                showError('Failed to create discount code: ' + error.message);
+            }
+        }
+
+        async function loadDiscountCodes() {
+            try {
+                const response = await fetchWithAuth('/api/admin/discount-codes');
+                const data = await response.json();
+
+                const container = document.getElementById('discountCodesList');
+
+                if (data.success && data.codes && data.codes.length > 0) {
+                    container.innerHTML = `
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead style="background:#f3f4f6;">
+                                <tr>
+                                    <th style="padding:12px; text-align:left;">Code</th>
+                                    <th style="padding:12px; text-align:center;">Discount</th>
+                                    <th style="padding:12px; text-align:center;">Usage</th>
+                                    <th style="padding:12px; text-align:center;">Expires</th>
+                                    <th style="padding:12px; text-align:left;">Description</th>
+                                    <th style="padding:12px; text-align:center;">Status</th>
+                                    <th style="padding:12px; text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.codes.map(code => {
+                                    const expiresAt = new Date(code.expires_at);
+                                    const isExpired = expiresAt < new Date();
+                                    const usageText = code.max_uses
+                                        ? `${code.current_uses}/${code.max_uses}`
+                                        : `${code.current_uses}/∞`;
+                                    const isMaxedOut = code.max_uses && code.current_uses >= code.max_uses;
+
+                                    return `
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px; font-weight:600; font-family:monospace;">${code.code}</td>
+                                        <td style="padding:12px; text-align:center; font-weight:600; color:#667eea;">${code.discount_percentage}%</td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <span style="color:${isMaxedOut ? '#ef4444' : '#6b7280'}; font-weight:${isMaxedOut ? '600' : '400'};">
+                                                ${usageText}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px; text-align:center; font-size:12px; color:${isExpired ? '#ef4444' : '#6b7280'};">
+                                            ${expiresAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            <br>
+                                            ${expiresAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                        </td>
+                                        <td style="padding:12px; color:#6b7280; font-size:13px;">
+                                            ${code.description || '<span style="color:#d1d5db;">No description</span>'}
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <span style="padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:${code.is_active && !isExpired && !isMaxedOut ? '#d1fae5' : '#fee2e2'}; color:${code.is_active && !isExpired && !isMaxedOut ? '#065f46' : '#991b1b'};">
+                                                ${!code.is_active ? '⏸️ Disabled' : isExpired ? '⏰ Expired' : isMaxedOut ? '🚫 Max Used' : '✅ Active'}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <div style="display:flex; gap:8px; justify-content:center;">
+                                                <button onclick="toggleDiscountCode('${code.id}', ${code.is_active})"
+                                                    style="padding:6px 12px; background:${code.is_active ? '#f59e0b' : '#10b981'}; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                                                    ${code.is_active ? '⏸️ Disable' : '▶️ Enable'}
+                                                </button>
+                                                <button onclick="deleteDiscountCode('${code.id}', '${code.code}')"
+                                                    style="padding:6px 12px; background:#ef4444; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px;">
+                                                    🗑️ Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    container.innerHTML = '<div style="padding:40px; text-align:center; color:#9ca3af;">No discount codes created yet</div>';
+                }
+            } catch (error) {
+                console.error('Error loading discount codes:', error);
+                showError('Failed to load discount codes');
+            }
+        }
+
+        async function toggleDiscountCode(id, currentStatus) {
+            try {
+                const response = await fetchWithAuth(`/api/admin/discount-codes/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        is_active: !currentStatus
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                    loadDiscountCodes();
+                } else {
+                    showError(data.error || 'Failed to update discount code');
+                }
+            } catch (error) {
+                console.error('Error toggling discount code:', error);
+                showError('Failed to update discount code');
+            }
+        }
+
+        async function deleteDiscountCode(id, codeName) {
+            if (!confirm(`Are you sure you want to delete the discount code "${codeName}"?\n\nThis will permanently delete the code and all its usage history.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/discount-codes/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                    loadDiscountCodes();
+                } else {
+                    showError(data.error || 'Failed to delete discount code');
+                }
+            } catch (error) {
+                console.error('Error deleting discount code:', error);
+                showError('Failed to delete discount code');
+            }
+        }
+
+        // Load on page load
+        loadPricing();
+        loadDiscountCodes();
+    </script>
+</body>
+</html>

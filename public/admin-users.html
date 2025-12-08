@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="white" opacity="0.2"/>
+                    <path d="M20 10 L12 18 L20 26 L28 18 Z" fill="white"/>
+                </svg>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+        <div class="sidebar-nav-container" data-active-page="users"></div>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1>User Management</h1>
+                <p>Manage users, premium status, and usage limits</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="loadUsers()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <div class="content-section">
+            <div id="usersTable" class="loading">Loading users...</div>
+        </div>
+    </main>
+
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
+    <script>
+        async function loadUsers() {
+            try {
+                const response = await fetchWithAuth('/api/admin/users');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const container = document.getElementById('usersTable');
+
+                if (data.success && data.users && data.users.length > 0) {
+                    container.innerHTML = `
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead style="background:#f3f4f6;">
+                                <tr>
+                                    <th style="padding:12px; text-align:left;">Email</th>
+                                    <th style="padding:12px; text-align:left;">Brand Name</th>
+                                    <th style="padding:12px; text-align:left;">Phone</th>
+                                    <th style="padding:12px; text-align:center;">Tier</th>
+                                    <th style="padding:12px; text-align:center;">Credits Used</th>
+                                    <th style="padding:12px; text-align:center;">Last Reset</th>
+                                    <th style="padding:12px; text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.users.map(user => {
+                                    const tier = user.tier || 'testlimit';
+                                    const tierColors = {
+                                        testlimit: { bg: '#dbeafe', text: '#1e40af', label: '🧪 Test' },
+                                        bronze: { bg: '#fef3c7', text: '#92400e', label: '🥉 Bronze' },
+                                        silver: { bg: '#e5e7eb', text: '#374151', label: '⭐ Silver' },
+                                        gold: { bg: '#fef3c7', text: '#92400e', label: '👑 Gold' }
+                                    };
+                                    const creditsUsed = user.credits_used || 0;
+                                    const creditsLimit = user.credits_limit || 50;
+                                    const tierStyle = tierColors[tier];
+
+                                    return `
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px;">${user.email}</td>
+                                        <td style="padding:12px; color:#374151;">
+                                            ${user.brand_name || '<span style="color:#9ca3af;">N/A</span>'}
+                                        </td>
+                                        <td style="padding:12px; color:#374151; direction:ltr; text-align:left;">
+                                            ${user.phone || '<span style="color:#9ca3af;">N/A</span>'}
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <span style="padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:${tierStyle.bg}; color:${tierStyle.text};">
+                                                ${tierStyle.label}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                                                <span>${creditsUsed}/${creditsLimit}</span>
+                                                <div style="width:100%; height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden;">
+                                                    <div style="width:${Math.min((creditsUsed/creditsLimit)*100, 100)}%; height:100%; background:${creditsUsed >= creditsLimit ? '#ef4444' : '#667eea'};"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="padding:12px; text-align:center; font-size:12px; color:#6b7280;">
+                                            ${user.last_reset_date ? new Date(user.last_reset_date).toLocaleDateString() : 'N/A'}
+                                        </td>
+                                        <td style="padding:12px; text-align:center;">
+                                            <div style="display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap;">
+                                                <select onchange="changeTier('${user.user_id}', this.value)" style="padding:6px 12px; background:white; border:2px solid #e5e7eb; border-radius:8px; cursor:pointer; font-weight:600;">
+                                                    <option value="">Change Tier...</option>
+                                                    <option value="testlimit" ${tier === 'testlimit' ? 'selected' : ''}>🧪 Test Limit (5)</option>
+                                                    <option value="bronze" ${tier === 'bronze' ? 'selected' : ''}>🥉 Bronze (50)</option>
+                                                    <option value="silver" ${tier === 'silver' ? 'selected' : ''}>⭐ Silver (100)</option>
+                                                    <option value="gold" ${tier === 'gold' ? 'selected' : ''}>👑 Gold (130)</option>
+                                                </select>
+                                                <button onclick="resetCredits('${user.user_id}')" style="padding:6px 12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px; white-space:nowrap;">
+                                                    Reset
+                                                </button>
+                                                <button onclick="deleteUser('${user.user_id}', '${user.email}')" style="padding:6px 12px; background:#ef4444; color:white; border:none; border-radius:8px; cursor:pointer; font-size:12px; white-space:nowrap;">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    container.innerHTML = '<div class="empty-state">No users found</div>';
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('Failed to load users', 'error');
+            }
+        }
+
+        async function changeTier(userId, newTier) {
+            if (!newTier) return;
+
+            try {
+                const tierLimits = {
+                    testlimit: { credits: 5, name: 'Test Limit' },
+                    bronze: { credits: 50, name: 'Bronze' },
+                    silver: { credits: 100, name: 'Silver' },
+                    gold: { credits: 130, name: 'Gold' }
+                };
+
+                const tierInfo = tierLimits[newTier];
+
+                const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        tier: newTier,
+                        credits_limit: tierInfo.credits,
+                        is_premium: newTier === 'gold' // Gold is premium
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`User tier changed to ${tierInfo.name}`, 'success');
+                    loadUsers();
+                } else {
+                    showNotification('Failed to update user tier', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user tier:', error);
+                showNotification('Failed to update user tier', 'error');
+            }
+        }
+
+        async function resetCredits(userId) {
+            if (!confirm('Are you sure you want to reset this user\'s credits to 0?')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        credits_used: 0,
+                        last_reset_date: new Date().toISOString()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('User credits reset successfully', 'success');
+                    loadUsers();
+                } else {
+                    showNotification('Failed to reset credits', 'error');
+                }
+            } catch (error) {
+                console.error('Error resetting credits:', error);
+                showNotification('Failed to reset credits', 'error');
+            }
+        }
+
+        async function deleteUser(userId, userEmail) {
+            if (!confirm(`Are you sure you want to DELETE user "${userEmail}"?\n\nThis will permanently delete:\n- User account\n- All user data\n- All generated images\n- All usage history\n\nThis action CANNOT be undone!`)) {
+                return;
+            }
+
+            // Double confirmation for safety
+            if (!confirm(`FINAL CONFIRMATION:\n\nDelete "${userEmail}" permanently?\n\nType the user's email to confirm.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`User "${userEmail}" deleted successfully`, 'success');
+                    loadUsers();
+                } else {
+                    showNotification(data.error || 'Failed to delete user', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showNotification('Failed to delete user', 'error');
+            }
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>

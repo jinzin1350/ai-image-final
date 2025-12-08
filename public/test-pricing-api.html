@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Pricing API</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        h1 {
+            color: #00ff00;
+            margin-bottom: 20px;
+        }
+        pre {
+            background: #000;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 2px solid #00ff00;
+        }
+        .error {
+            color: #ff0000;
+        }
+        .success {
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Pricing API</h1>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+
+            try {
+                resultDiv.innerHTML = '<p class="success">⏳ Loading pricing data from /api/pricing...</p>';
+
+                const response = await fetch('/api/pricing');
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <p class="success">✅ API Response Status: ${response.status}</p>
+                    <p class="success">✅ Success: ${data.success}</p>
+                    <p class="success">✅ Number of pricing tiers: ${data.pricing?.length || 0}</p>
+                    <h2>📊 Full API Response:</h2>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+
+                    <h2>💰 Formatted Pricing:</h2>
+                    <pre>${formatPricingTable(data.pricing)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Error: ${error.message}</p>
+                    <pre class="error">${error.stack}</pre>
+                `;
+            }
+        }
+
+        function formatPricingTable(pricing) {
+            if (!pricing || !pricing.length) {
+                return 'No pricing data available';
+            }
+
+            let table = 'Tier         | Credits | Price (Rials) | Price (Tomans) | Active\n';
+            table += '-------------|---------|---------------|----------------|--------\n';
+
+            pricing.forEach(p => {
+                const tier = (p.tier || '').padEnd(12);
+                const credits = String(p.credits || 0).padEnd(7);
+                const price = String(p.price || 0).padEnd(13);
+                const tomans = String(Math.floor((p.price || 0) / 10)).padEnd(14);
+                const active = p.is_active ? '✓' : '✗';
+
+                table += `${tier} | ${credits} | ${price} | ${tomans} | ${active}\n`;
+            });
+
+            return table;
+        }
+
+        // Run test immediately
+        testAPI();
+    </script>
+</body>
+</html>

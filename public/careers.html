@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فرصت‌های شغلی | استودیو AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .header-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .intro-section {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .intro-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .intro-section p {
+            font-size: 18px;
+            color: #6b7280;
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .benefits-section {
+            margin-bottom: 48px;
+        }
+
+        .benefits-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .benefit-card {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            background: #f0f9ff;
+        }
+
+        .benefit-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .benefit-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .benefit-card p {
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .jobs-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .job-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .job-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .job-title {
+            flex: 1;
+        }
+
+        .job-title h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .job-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .job-description {
+            color: #4b5563;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .job-requirements {
+            margin-bottom: 24px;
+        }
+
+        .job-requirements h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .job-requirements ul {
+            list-style: none;
+        }
+
+        .job-requirements li {
+            padding: 8px 0;
+            color: #4b5563;
+            font-size: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .job-requirements li::before {
+            content: "•";
+            color: #667eea;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .apply-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .no-jobs {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+
+        .no-jobs-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .no-jobs h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .no-jobs p {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .contact-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 12px;
+        }
+
+        .contact-section p {
+            font-size: 16px;
+            color: #3b82f6;
+            margin-bottom: 20px;
+        }
+
+        .contact-links {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid #667eea;
+        }
+
+        .contact-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .card {
+                padding: 28px 24px;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .job-header {
+                flex-direction: column;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="container">
+        <a href="/landing.html" class="back-link">← بازگشت به صفحه اصلی</a>
+
+        <div class="header">
+            <div class="header-icon">💼</div>
+            <h1>فرصت‌های شغلی</h1>
+            <p>به تیم استودیو AI بپیوندید</p>
+        </div>
+
+        <div class="card">
+            <div class="intro-section">
+                <h2>در استودیو AI، آینده را می‌سازیم</h2>
+                <p>
+                    ما به دنبال افراد با استعداد، خلاق و پرانگیزه هستیم که بخواهند در یک استارتاپ پیشرو در حوزه هوش مصنوعی، تاثیرگذار باشند. اگر علاقه‌مند به نوآوری، یادگیری مستمر و کار در یک محیط پویا هستید، جای شما اینجاست.
+                </p>
+            </div>
+
+            <div class="benefits-section">
+                <h2>🎁 مزایای کار با ما</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">💰</div>
+                        <h3>حقوق رقابتی</h3>
+                        <p>پکیج حقوقی و مزایای مناسب با تجربه و توانایی شما</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🏠</div>
+                        <h3>دورکاری</h3>
+                        <p>امکان کار از راه دور یا حضور در دفتر</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">📚</div>
+                        <h3>یادگیری مستمر</h3>
+                        <p>دسترسی به آموزش‌ها و کنفرانس‌های تخصصی</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">⏰</div>
+                        <h3>ساعات انعطاف‌پذیر</h3>
+                        <p>زمان‌بندی منعطف کاری مناسب شما</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🚀</div>
+                        <h3>رشد سریع</h3>
+                        <p>فرصت پیشرفت و ارتقای شغلی</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🎯</div>
+                        <h3>تاثیرگذاری واقعی</h3>
+                        <p>کار روی محصولی که هزاران نفر استفاده می‌کنند</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jobs-section">
+                <h2>📋 موقعیت‌های شغلی باز</h2>
+
+                <!-- No active jobs message -->
+                <div class="no-jobs">
+                    <div class="no-jobs-icon">🔍</div>
+                    <h3>در حال حاضر موقعیت شغلی باز نداریم</h3>
+                    <p>
+                        ما همیشه به دنبال استعدادهای جدید هستیم. حتی اگر الان موقعیت شغلی مناسب شما وجود ندارد، رزومه خود را برای ما ارسال کنید تا در فرصت‌های آینده با شما تماس بگیریم.
+                    </p>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="contact-section">
+                    <h3>📧 ارسال رزومه</h3>
+                    <p>رزومه خود را به همراه نمونه‌کارها (در صورت داشتن) برای ما ارسال کنید</p>
+                    <div class="contact-links">
+                        <a href="mailto:careers@fusionaiteam.com" class="contact-btn">
+                            📧 careers@fusionaiteam.com
+                        </a>
+                        <a href="https://t.me/alirezaaaatehrani" target="_blank" class="contact-btn">
+                            📱 تلگرام
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
