@@ -978,6 +978,11 @@ function selectModel(modelId) {
         card.classList.toggle('selected', card.dataset.id === modelId);
     });
 
+    // Show angle selection section for scene-recreation mode
+    if (currentMode === 'scene-recreation' && typeof window.showAngleSection === 'function') {
+        window.showAngleSection();
+    }
+
     // نمایش بخش انتخاب حجاب فقط برای دسته‌های مناسب
     // Check if hijabSection exists first (not available on all pages)
     if (hijabSection) {
@@ -1766,12 +1771,15 @@ function checkGenerateButton() {
                   hasReferencePhoto;
 
     } else if (currentMode === 'scene-recreation') {
-        // Scene Recreation mode: need brand reference photo, garment, model, and hijab
+        // Scene Recreation mode: need brand reference photo, garment, model, hijab, and angles
         const shouldShowHijab = ['woman', 'girl', 'teen', 'brand-woman', 'brand-girl'].includes(currentCategory);
         const hijabCondition = !shouldShowHijab || selectedHijabType !== null;
 
         // Check if brand reference photo is selected (new method)
         const hasReferencePhoto = window.selectedBrandReferencePhoto !== null && window.selectedBrandReferencePhoto !== undefined;
+
+        // Check if at least one angle is selected
+        const hasAngles = window.selectedAngles && window.selectedAngles.length > 0;
 
         // If 2+ people detected, require model 2 as well
         if (referencePhotoPeopleCount >= 2) {
@@ -1780,12 +1788,14 @@ function checkGenerateButton() {
                       uploadedGarmentPaths2.length > 0 &&
                       selectedModelId &&
                       selectedModelId2 &&
-                      hijabCondition;
+                      hijabCondition &&
+                      hasAngles;
         } else {
             isValid = hasReferencePhoto &&
                       uploadedGarmentPaths.length > 0 &&
                       selectedModelId &&
-                      hijabCondition;
+                      hijabCondition &&
+                      hasAngles;
         }
 
     } else if (currentMode === 'style-transfer') {
@@ -2211,6 +2221,11 @@ function resetAllSelections() {
     if (brandSelect) brandSelect.selectedIndex = 0;
     if (brandPhotosContainer) brandPhotosContainer.style.display = 'none';
 
+    // Reset angle selection
+    if (typeof window.hideAngleSection === 'function') {
+        window.hideAngleSection();
+    }
+
     // Check generate button state (should be disabled now)
     checkGenerateButton();
 
@@ -2335,40 +2350,120 @@ if (generateBtn) {
         console.log('🚀 Sending request:', requestBody);
 
         const token = localStorage.getItem('supabase_token');
-        const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(requestBody)
-        });
 
-        const data = await response.json();
-        console.log('📥 Response:', data);
+        // Check if this is scene-recreation with multiple angles
+        if (currentMode === 'scene-recreation' && window.selectedAngles && window.selectedAngles.length > 0) {
+            // MULTI-ANGLE GENERATION MODE
+            const generatedImages = [];
+            const totalAngles = window.selectedAngles.length;
 
-        if (data.success) {
-            // ذخیره در localStorage برای گالری
-            saveToLocalStorage(data);
+            // Get angle labels from scene-recreation.html
+            const angleLabels = {
+                'front': 'نمای جلو',
+                'back': 'نمای پشت',
+                'left-side': 'نمای چپ',
+                'right-side': 'نمای راست',
+                'three-quarter-left': 'سه‌ربع چپ',
+                'three-quarter-right': 'سه‌ربع راست',
+                'full-body': 'تمام قد',
+                'waist-up': 'نیم‌تنه',
+                'close-up': 'نمای نزدیک'
+            };
 
-            // نمایش تصویر تولید شده
-            resultImage.src = data.imagePath;
-            resultInfo.innerHTML = `
-                <p><strong>مدل:</strong> ${data.model}</p>
-                <p><strong>پس‌زمینه:</strong> ${data.background}</p>
-                <p><strong>✅ وضعیت:</strong> ${data.message}</p>
-                ${data.description ? `<p style="margin-top: 10px; color: #666; font-size: 0.9rem;">${data.description}</p>` : ''}
-            `;
-            resultSection.style.display = 'block';
-            resultSection.scrollIntoView({ behavior: 'smooth' });
+            // Update loading overlay to show progress
+            const loadingText = document.querySelector('#loadingOverlay p');
 
-            // Reset all selections after successful generation
-            // This prevents spam clicking and forces user to make deliberate choices
-            // Improves AI quality by preventing concurrent requests
-            setTimeout(() => {
-                resetAllSelections();
-            }, 1000); // 1 second delay so user sees the result first
+            for (let i = 0; i < window.selectedAngles.length; i++) {
+                const angle = window.selectedAngles[i];
+
+                // Update progress message
+                if (loadingText) {
+                    loadingText.textContent = `در حال تولید تصویر ${i + 1} از ${totalAngles} (${angleLabels[angle]})...`;
+                }
+
+                // Add angle to request body
+                const angleRequestBody = { ...requestBody, cameraAngle: angle };
+
+                console.log(`🚀 Sending request for angle ${i + 1}/${totalAngles}:`, angle);
+
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(angleRequestBody)
+                    });
+
+                    const data = await response.json();
+                    console.log(`📥 Response for angle ${angle}:`, data);
+
+                    if (data.success) {
+                        generatedImages.push({
+                            angle: angle,
+                            angleLabel: angleLabels[angle],
+                            data: data
+                        });
+                        // Save to localStorage
+                        saveToLocalStorage(data);
+                    } else {
+                        console.error(`❌ Failed to generate image for angle ${angle}:`, data.error);
+                    }
+                } catch (error) {
+                    console.error(`❌ Error generating image for angle ${angle}:`, error);
+                }
+            }
+
+            // Display all generated images
+            if (generatedImages.length > 0) {
+                displayMultipleResults(generatedImages);
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Reset all selections after successful generation
+                setTimeout(() => {
+                    resetAllSelections();
+                }, 1000);
+            } else {
+                alert('خطا در تولید تصاویر. لطفاً دوباره تلاش کنید.');
+            }
+
         } else {
+            // SINGLE IMAGE GENERATION MODE (original logic)
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+            console.log('📥 Response:', data);
+
+            if (data.success) {
+                // ذخیره در localStorage برای گالری
+                saveToLocalStorage(data);
+
+                // نمایش تصویر تولید شده
+                resultImage.src = data.imagePath;
+                resultInfo.innerHTML = `
+                    <p><strong>مدل:</strong> ${data.model}</p>
+                    <p><strong>پس‌زمینه:</strong> ${data.background}</p>
+                    <p><strong>✅ وضعیت:</strong> ${data.message}</p>
+                    ${data.description ? `<p style="margin-top: 10px; color: #666; font-size: 0.9rem;">${data.description}</p>` : ''}
+                `;
+                resultSection.style.display = 'block';
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Reset all selections after successful generation
+                // This prevents spam clicking and forces user to make deliberate choices
+                // Improves AI quality by preventing concurrent requests
+                setTimeout(() => {
+                    resetAllSelections();
+                }, 1000); // 1 second delay so user sees the result first
+            } else {
             // Show error message
             alert(`خطا: ${data.error}\n${data.details || ''}`);
         }
@@ -2428,6 +2523,85 @@ function saveToLocalStorage(imageData) {
     } catch (error) {
         console.error('خطا در ذخیره تصویر:', error);
     }
+}
+
+// Display multiple generated images (for multi-angle generation)
+function displayMultipleResults(generatedImages) {
+    const resultSection = document.getElementById('resultSection');
+    if (!resultSection) return;
+
+    // Update result section title
+    const resultTitle = resultSection.querySelector('h2');
+    if (resultTitle) {
+        resultTitle.textContent = `🎉 نتایج نهایی (${generatedImages.length} عکس)`;
+    }
+
+    // Get result container
+    const resultContainer = resultSection.querySelector('.result-container');
+    if (!resultContainer) return;
+
+    // Clear existing content
+    resultContainer.innerHTML = '';
+
+    // Create grid for multiple images
+    const multiImageGrid = document.createElement('div');
+    multiImageGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;';
+
+    // Add each image to the grid
+    generatedImages.forEach((imgData, index) => {
+        const imageCard = document.createElement('div');
+        imageCard.style.cssText = 'background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.2s;';
+        imageCard.onmouseover = () => imageCard.style.transform = 'translateY(-4px)';
+        imageCard.onmouseout = () => imageCard.style.transform = 'translateY(0)';
+
+        imageCard.innerHTML = `
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 8px 8px 0 0; margin: -15px -15px 15px -15px; text-align: center; font-weight: 600;">
+                ${imgData.angleLabel}
+            </div>
+            <img src="${imgData.data.imagePath}" alt="${imgData.angleLabel}" style="width: 100%; border-radius: 8px; margin-bottom: 12px;">
+            <div style="text-align: center;">
+                <button onclick="downloadSingleImage('${imgData.data.imagePath}', '${imgData.angle}')"
+                        style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
+                    📥 دانلود
+                </button>
+            </div>
+        `;
+
+        multiImageGrid.appendChild(imageCard);
+    });
+
+    resultContainer.appendChild(multiImageGrid);
+
+    // Add "Download All" button
+    const downloadAllBtn = document.createElement('button');
+    downloadAllBtn.textContent = '📦 دانلود همه تصاویر';
+    downloadAllBtn.className = 'download-btn';
+    downloadAllBtn.style.cssText = 'margin-top: 20px;';
+    downloadAllBtn.onclick = () => downloadAllImages(generatedImages);
+    resultContainer.appendChild(downloadAllBtn);
+
+    // Show result section
+    resultSection.style.display = 'block';
+}
+
+// Download single image
+window.downloadSingleImage = function(imagePath, angle) {
+    const link = document.createElement('a');
+    link.href = imagePath;
+    link.download = `fashion-ai-${angle}-${Date.now()}.jpg`;
+    link.click();
+};
+
+// Download all images
+function downloadAllImages(generatedImages) {
+    generatedImages.forEach((imgData, index) => {
+        setTimeout(() => {
+            const link = document.createElement('a');
+            link.href = imgData.data.imagePath;
+            link.download = `fashion-ai-${imgData.angle}-${Date.now()}.jpg`;
+            link.click();
+        }, index * 500); // Delay each download by 500ms to avoid browser blocking
+    });
 }
 
 // بارگذاری اولیه

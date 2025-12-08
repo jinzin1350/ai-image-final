@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <title>Angle Management | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-style.css">
+    <style>
+        .angles-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .angles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .angle-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .angle-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .angle-image {
+            width: 100%;
+            height: 200px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .angle-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .angle-body {
+            padding: 20px;
+        }
+
+        .angle-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .angle-meta {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+
+        .angle-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="angles-container">
+        <div class="header-section">
+            <h1>📸 Angle Reference Management</h1>
+            <p>Manage camera angle references for product photography</p>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="showAddModal()">➕ Add New Angle</button>
+            <button class="btn" onclick="window.location.href='/admin.html'" style="background: #f3f4f6;">← Back to Admin</button>
+        </div>
+
+        <div id="anglesGrid" class="angles-grid">
+            <p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #6b7280;">Loading angles...</p>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="angleModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add New Angle</h2>
+            <form id="angleForm" onsubmit="saveAngle(event)">
+                <input type="hidden" id="angleId">
+
+                <div class="form-group">
+                    <label>Angle Key (e.g., front, back, left-side)</label>
+                    <input type="text" id="angleKey" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Title (English)</label>
+                    <input type="text" id="titleEn" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Title (Persian)</label>
+                    <input type="text" id="titleFa" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description (English)</label>
+                    <textarea id="descriptionEn" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Description (Persian)</label>
+                    <textarea id="descriptionFa" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" id="displayOrder" value="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Reference Image</label>
+                    <input type="file" id="angleImage" accept="image/*">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn" onclick="closeModal()" style="background: #f3f4f6;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allAngles = [];
+
+        async function loadAngles() {
+            try {
+                const token = localStorage.getItem('supabase_token');
+                const response = await fetch('/api/admin/angles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load angles');
+
+                allAngles = await response.json();
+                renderAngles();
+            } catch (error) {
+                console.error('Error loading angles:', error);
+                alert('Error loading angles. Please refresh the page.');
+            }
+        }
+
+        function renderAngles() {
+            const grid = document.getElementById('anglesGrid');
+
+            if (allAngles.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #6b7280;">No angles found. Add your first angle!</p>';
+                return;
+            }
+
+            grid.innerHTML = allAngles.map(angle => `
+                <div class="angle-card">
+                    <div class="angle-image">
+                        ${angle.image_url ?
+                            `<img src="${angle.image_url}" alt="${angle.title_en}">` :
+                            '📸'
+                        }
+                    </div>
+                    <div class="angle-body">
+                        <div class="angle-title">${angle.title_fa} / ${angle.title_en}</div>
+                        <div class="angle-meta">
+                            <span class="badge ${angle.is_active ? 'badge-success' : 'badge-warning'}">
+                                ${angle.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                            <span style="margin-left: 10px; color: #9ca3af;">Order: ${angle.display_order}</span>
+                        </div>
+                        <div class="angle-actions">
+                            <button class="btn" onclick="editAngle('${angle.id}')" style="background: #3b82f6; color: white; flex: 1;">Edit</button>
+                            <button class="btn" onclick="toggleAngle('${angle.id}', ${!angle.is_active})" style="background: ${angle.is_active ? '#ef4444' : '#10b981'}; color: white;">
+                                ${angle.is_active ? 'Disable' : 'Enable'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Angle';
+            document.getElementById('angleForm').reset();
+            document.getElementById('angleId').value = '';
+            document.getElementById('angleModal').style.display = 'block';
+        }
+
+        function editAngle(id) {
+            const angle = allAngles.find(a => a.id === id);
+            if (!angle) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Angle';
+            document.getElementById('angleId').value = angle.id;
+            document.getElementById('angleKey').value = angle.angle_key;
+            document.getElementById('titleEn').value = angle.title_en;
+            document.getElementById('titleFa').value = angle.title_fa;
+            document.getElementById('descriptionEn').value = angle.description_en || '';
+            document.getElementById('descriptionFa').value = angle.description_fa || '';
+            document.getElementById('displayOrder').value = angle.display_order;
+            document.getElementById('angleModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('angleModal').style.display = 'none';
+        }
+
+        async function saveAngle(event) {
+            event.preventDefault();
+
+            const angleId = document.getElementById('angleId').value;
+            const formData = new FormData();
+
+            formData.append('angle_key', document.getElementById('angleKey').value);
+            formData.append('title_en', document.getElementById('titleEn').value);
+            formData.append('title_fa', document.getElementById('titleFa').value);
+            formData.append('description_en', document.getElementById('descriptionEn').value);
+            formData.append('description_fa', document.getElementById('descriptionFa').value);
+            formData.append('display_order', document.getElementById('displayOrder').value);
+
+            const imageFile = document.getElementById('angleImage').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            try {
+                const token = localStorage.getItem('supabase_token');
+                const url = angleId ? `/api/admin/angles/${angleId}` : '/api/admin/angles';
+                const method = angleId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Failed to save angle');
+
+                alert(angleId ? 'Angle updated successfully!' : 'Angle created successfully!');
+                closeModal();
+                loadAngles();
+            } catch (error) {
+                console.error('Error saving angle:', error);
+                alert('Error saving angle. Please try again.');
+            }
+        }
+
+        async function toggleAngle(id, newStatus) {
+            if (!confirm(`Are you sure you want to ${newStatus ? 'enable' : 'disable'} this angle?`)) return;
+
+            try {
+                const token = localStorage.getItem('supabase_token');
+                const response = await fetch(`/api/admin/angles/${id}/toggle`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+
+                if (!response.ok) throw new Error('Failed to toggle angle');
+
+                alert('Angle status updated!');
+                loadAngles();
+            } catch (error) {
+                console.error('Error toggling angle:', error);
+                alert('Error updating angle status. Please try again.');
+            }
+        }
+
+        // Load angles on page load
+        document.addEventListener('DOMContentLoaded', loadAngles);
+    </script>
+</body>
+</html>

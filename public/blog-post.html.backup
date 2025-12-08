@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Blog Post - FusionAI Team</title>
+    <meta name="description" id="pageDescription" content="Read our latest blog post">
+    <meta name="keywords" id="pageKeywords" content="">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.8;
+            color: #1a1a2e;
+            background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1rem 3rem 1rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: -2rem auto 0;
+            padding: 0 1rem 3rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .article-card:hover {
+            box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        }
+
+        .featured-image {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .article-content {
+            padding: 3rem;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+            direction: rtl;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8f9ff;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .article-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: #1a1a2e;
+            line-height: 1.3;
+            direction: rtl;
+            text-align: right;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .article-excerpt {
+            font-size: 1.3rem;
+            color: #555;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 3px solid #f0f0f0;
+            direction: rtl;
+            text-align: right;
+            line-height: 2;
+            font-weight: 400;
+        }
+
+        .article-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .article-body h1 {
+            font-size: 2.2rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .article-body h2 {
+            font-size: 1.9rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #1a1a2e;
+            font-weight: 800;
+            line-height: 1.4;
+            position: relative;
+            padding-right: 20px;
+        }
+
+        .article-body h2:before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 70%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .article-body h3 {
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.7rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .article-body h4 {
+            font-size: 1.2rem;
+            margin-top: 1.2rem;
+            margin-bottom: 0.6rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .article-body p {
+            margin-bottom: 1rem;
+        }
+
+        .article-body ul, .article-body ol {
+            margin-bottom: 1rem;
+            padding-right: 2rem;
+            padding-left: 0;
+        }
+
+        .article-body li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .article-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 1.5rem auto;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .article-body iframe {
+            max-width: 100%;
+            width: 100%;
+            height: 400px;
+            border-radius: 12px;
+            margin: 1.5rem auto;
+            display: block;
+            border: none;
+        }
+
+        .article-body blockquote {
+            border-right: 4px solid #667eea;
+            border-left: none;
+            padding-right: 1.5rem;
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #555;
+            background: #f8f9ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .article-body pre {
+            background: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .article-body code {
+            background: #f5f5f5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .article-body a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .article-body a:hover {
+            border-bottom: 2px solid #667eea;
+            color: #5568d3;
+        }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Remove excessive spacing before and after tables */
+        .article-body h2 + p:empty,
+        .article-body h3 + p:empty,
+        .article-body h4 + p:empty {
+            display: none;
+        }
+
+        /* Collapse ALL empty paragraphs and breaks */
+        .article-body p:empty,
+        .article-body p:blank {
+            display: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Hide paragraphs with only whitespace/nbsp */
+        .article-body p:not(:has(*)):not(:has(img)) {
+            line-height: 0;
+        }
+
+        /* Remove consecutive breaks */
+        .article-body br + br,
+        .article-body br + br + br {
+            display: none;
+        }
+
+        /* Tighter spacing before tables */
+        .article-body h2 + table,
+        .article-body h3 + table,
+        .article-body h4 + table,
+        .article-body p + table {
+            margin-top: 1rem !important;
+        }
+
+        .article-body table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .article-body table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .article-body table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .article-body table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .article-body hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 1.5rem 0;
+        }
+
+        .article-body strong {
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .article-body em {
+            font-style: italic;
+            color: #555;
+        }
+
+        .tags-section {
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 3px solid #f0f0f0;
+            direction: rtl;
+        }
+
+        .tags-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: #555;
+        }
+
+        .tags-list {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            direction: rtl;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tag:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border-right: 5px solid #667eea;
+            border-left: none;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+            direction: rtl;
+        }
+
+        .summary-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 1.2rem;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #summaryContent {
+            direction: rtl;
+            text-align: right;
+            line-height: 1.9;
+            color: #444;
+        }
+
+        .key-points-section {
+            background: linear-gradient(135deg, #fff9f0 0%, #ffedd5 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border-right: 5px solid #f59e0b;
+            border-left: none;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
+            direction: rtl;
+        }
+
+        .key-points-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 1.2rem;
+            color: #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .key-points-list {
+            list-style: none;
+            padding: 0;
+            direction: rtl;
+        }
+
+        .key-points-list li {
+            padding-right: 2rem;
+            padding-left: 0;
+            margin-bottom: 0.7rem;
+            position: relative;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .key-points-list li:before {
+            content: "✦";
+            position: absolute;
+            right: 0;
+            left: auto;
+            color: #f59e0b;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .faq-section {
+            background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border-right: 5px solid #10b981;
+            border-left: none;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+            direction: rtl;
+        }
+
+        .faq-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .faq-item {
+            margin-bottom: 1rem;
+            background: white;
+            padding: 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .faq-question {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #1a1a2e;
+            font-size: 1.1rem;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .faq-answer {
+            color: #555;
+            padding-right: 1.5rem;
+            padding-left: 0;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 4rem;
+            color: #ef4444;
+        }
+
+        .error-state h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2rem;
+            }
+
+            .article-content {
+                padding: 1.5rem;
+            }
+
+            .featured-image {
+                height: 250px;
+            }
+        }
+    </style>
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+</head>
+<body>
+    <div class="header">
+        <a href="/blog" class="back-button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Blog
+        </a>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="loading">Loading blog post...</div>
+
+        <div id="errorState" class="error-state" style="display: none;">
+            <h2>Post Not Found</h2>
+            <p>The blog post you're looking for doesn't exist.</p>
+            <a href="/blog" class="back-button" style="display: inline-flex; margin-top: 1rem;">
+                Back to Blog
+            </a>
+        </div>
+
+        <article id="articleContent" class="article-card" style="display: none;">
+            <img id="featuredImage" class="featured-image" src="" alt="" style="display: none;">
+
+            <div class="article-content">
+                <div class="article-meta" id="articleMeta"></div>
+
+                <h1 class="article-title" id="articleTitle"></h1>
+
+                <p class="article-excerpt" id="articleExcerpt"></p>
+
+                <div id="articleSummary" class="summary-section" style="display: none;">
+                    <div class="summary-title">📝 Article Summary</div>
+                    <div id="summaryContent"></div>
+                </div>
+
+                <div id="articleKeyPoints" class="key-points-section" style="display: none;">
+                    <div class="key-points-title">🔑 Key Points</div>
+                    <ul class="key-points-list" id="keyPointsList"></ul>
+                </div>
+
+                <div class="article-body" id="articleBody"></div>
+
+                <div id="articleFaq" class="faq-section" style="display: none;">
+                    <div class="faq-title">❓ Frequently Asked Questions</div>
+                    <div id="faqContent"></div>
+                </div>
+
+                <div id="tagsSection" class="tags-section" style="display: none;">
+                    <div class="tags-title">Tags:</div>
+                    <div class="tags-list" id="tagsList"></div>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <script>
+        async function loadBlogPost() {
+            try {
+                // Extract slug from URL
+                const pathParts = window.location.pathname.split('/');
+                const slug = pathParts[pathParts.length - 1];
+
+                if (!slug) {
+                    showError();
+                    return;
+                }
+
+                // Fetch blog post data
+                const response = await fetch(`/api/blog/${slug}`);
+
+                if (!response.ok) {
+                    showError();
+                    return;
+                }
+
+                const post = await response.json();
+
+                // Update page title and meta
+                document.getElementById('pageTitle').textContent = post.meta_title || post.title || 'Blog Post - FusionAI Team';
+                document.getElementById('pageDescription').setAttribute('content', post.meta_description || post.excerpt || '');
+                if (post.seo_keywords) {
+                    document.getElementById('pageKeywords').setAttribute('content', post.seo_keywords);
+                }
+
+                // Inject schema markup if available
+                if (post.article_schema) {
+                    const script = document.createElement('script');
+                    script.type = 'application/ld+json';
+                    script.textContent = JSON.stringify(post.article_schema);
+                    document.head.appendChild(script);
+                }
+
+                if (post.faq_schema) {
+                    const script = document.createElement('script');
+                    script.type = 'application/ld+json';
+                    script.textContent = JSON.stringify(post.faq_schema);
+                    document.head.appendChild(script);
+                }
+
+                // Display featured image
+                if (post.featured_image) {
+                    const img = document.getElementById('featuredImage');
+                    img.src = post.featured_image;
+                    img.alt = post.title;
+                    img.style.display = 'block';
+
+                    // Add error handler for broken images
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        const container = this.parentElement;
+                        if (container) {
+                            container.innerHTML = '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center; border-radius: 12px; font-size: 48px;">📸</div>';
+                        }
+                    };
+                } else {
+                    // No featured image - show placeholder
+                    const imgContainer = document.getElementById('featuredImage').parentElement;
+                    if (imgContainer) {
+                        imgContainer.innerHTML = '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center; border-radius: 12px; font-size: 48px;">📝</div>';
+                    }
+                }
+
+                // Display meta information
+                const metaHtml = [];
+                if (post.category) {
+                    metaHtml.push(`<span class="category-badge">${escapeHtml(post.category)}</span>`);
+                }
+                if (post.published_at) {
+                    metaHtml.push(`<span class="meta-item">📅 ${formatDate(post.published_at)}</span>`);
+                }
+                if (post.author) {
+                    metaHtml.push(`<span class="meta-item">✍️ ${escapeHtml(post.author)}</span>`);
+                }
+                document.getElementById('articleMeta').innerHTML = metaHtml.join('');
+
+                // Display title and excerpt
+                document.getElementById('articleTitle').textContent = post.title;
+                if (post.excerpt) {
+                    document.getElementById('articleExcerpt').textContent = post.excerpt;
+                } else {
+                    document.getElementById('articleExcerpt').style.display = 'none';
+                }
+
+                // Display article summary
+                if (post.article_summary) {
+                    document.getElementById('summaryContent').textContent = post.article_summary;
+                    document.getElementById('articleSummary').style.display = 'block';
+                }
+
+                // Display key points
+                if (post.key_points) {
+                    const points = post.key_points.split('\n').filter(p => p.trim());
+                    if (points.length > 0) {
+                        const listHtml = points.map(point => {
+                            const cleanPoint = point.trim().replace(/^\d+\.\s*/, ''); // Remove leading numbers
+                            return `<li>${escapeHtml(cleanPoint)}</li>`;
+                        }).join('');
+                        document.getElementById('keyPointsList').innerHTML = listHtml;
+                        document.getElementById('articleKeyPoints').style.display = 'block';
+                    }
+                }
+
+                // Display main content (decode HTML entities if needed and format)
+                let content = decodeHtmlEntities(post.content);
+                content = formatContentToHTML(content);
+                document.getElementById('articleBody').innerHTML = content;
+
+                // Clean up excessive whitespace around tables
+                cleanupTableSpacing();
+
+                // Display FAQ
+                if (post.faq_content) {
+                    const faqHtml = parseFaq(post.faq_content);
+                    if (faqHtml) {
+                        document.getElementById('faqContent').innerHTML = faqHtml;
+                        document.getElementById('articleFaq').style.display = 'block';
+                    }
+                }
+
+                // Display tags
+                if (post.tags && post.tags.length > 0) {
+                    const tagsHtml = post.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
+                    document.getElementById('tagsList').innerHTML = tagsHtml;
+                    document.getElementById('tagsSection').style.display = 'block';
+                }
+
+                // Show article, hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('articleContent').style.display = 'block';
+
+            } catch (error) {
+                showError();
+            }
+        }
+
+        function parseFaq(faqContent) {
+            const lines = faqContent.split('\n');
+            let faqItems = [];
+            let currentQ = '';
+            let currentA = '';
+
+            for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith('Q:')) {
+                    if (currentQ && currentA) {
+                        faqItems.push({ question: currentQ, answer: currentA });
+                    }
+                    currentQ = line.substring(2).trim();
+                    currentA = '';
+                } else if (line.startsWith('A:')) {
+                    currentA = line.substring(2).trim();
+                } else if (line && currentA) {
+                    currentA += ' ' + line;
+                }
+            }
+            if (currentQ && currentA) {
+                faqItems.push({ question: currentQ, answer: currentA });
+            }
+
+            if (faqItems.length === 0) return null;
+
+            return faqItems.map(item => `
+                <div class="faq-item">
+                    <div class="faq-question">Q: ${escapeHtml(item.question)}</div>
+                    <div class="faq-answer">A: ${escapeHtml(item.answer)}</div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function decodeHtmlEntities(text) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            return textarea.value;
+        }
+
+        function formatContentToHTML(content) {
+            // If content already has HTML tags, return as is
+            if (content.includes('<p>') || content.includes('<h2>') || content.includes('<div>')) {
+                return content;
+            }
+
+            // Split by single line breaks
+            const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+
+            let html = '';
+            let currentList = [];
+            let inList = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+
+                // Check if it's a heading (ends with ? or : or ؟)
+                if (line.match(/[؟?:]$/)) {
+                    // Close any open list
+                    if (inList && currentList.length > 0) {
+                        html += '<ul>';
+                        currentList.forEach(item => {
+                            html += `<li>${item}</li>`;
+                        });
+                        html += '</ul>';
+                        currentList = [];
+                        inList = false;
+                    }
+
+                    html += `<h2>${line}</h2>`;
+                }
+                // Check if it's a list item (contains : at the end after text)
+                else if (line.includes(':') && !line.endsWith('؟') && !line.endsWith('?')) {
+                    // This might be a list item title
+                    // Close previous list if needed
+                    if (!inList && currentList.length > 0) {
+                        html += '<ul>';
+                        currentList.forEach(item => {
+                            html += `<li>${item}</li>`;
+                        });
+                        html += '</ul>';
+                        currentList = [];
+                    }
+
+                    currentList.push(line);
+                    inList = true;
+                }
+                // Regular paragraph
+                else {
+                    // Close any open list
+                    if (inList && currentList.length > 0) {
+                        html += '<ul>';
+                        currentList.forEach(item => {
+                            html += `<li>${item}</li>`;
+                        });
+                        html += '</ul>';
+                        currentList = [];
+                        inList = false;
+                    }
+
+                    // Only add paragraph if it's not empty
+                    if (line.length > 0) {
+                        html += `<p>${line}</p>`;
+                    }
+                }
+            }
+
+            // Close any remaining list
+            if (currentList.length > 0) {
+                html += '<ul>';
+                currentList.forEach(item => {
+                    html += `<li>${item}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            return html;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function cleanupTableSpacing() {
+            const articleBody = document.getElementById('articleBody');
+            if (!articleBody) return;
+
+            // Find all tables
+            const tables = articleBody.querySelectorAll('table');
+
+            tables.forEach(table => {
+                // Remove all previous siblings that are empty or whitespace-only
+                let prev = table.previousElementSibling;
+                while (prev) {
+                    const next = prev.previousElementSibling;
+
+                    // Check if element is empty or contains only whitespace
+                    const text = prev.textContent.trim();
+                    const isEmpty = !text || text === '' || /^[\s\u00A0]*$/.test(text);
+
+                    if (isEmpty && (prev.tagName === 'P' || prev.tagName === 'BR' || prev.tagName === 'DIV')) {
+                        prev.remove();
+                    } else {
+                        break; // Stop when we hit non-empty content
+                    }
+
+                    prev = next;
+                }
+            });
+
+            // Also remove consecutive empty paragraphs throughout
+            const paragraphs = articleBody.querySelectorAll('p');
+            paragraphs.forEach(p => {
+                const text = p.textContent.trim();
+                if (!text || text === '' || /^[\s\u00A0]*$/.test(text)) {
+                    p.remove();
+                }
+            });
+        }
+
+        // Load post on page load
+        loadBlogPost();
+    </script>
+</body>
+</html>

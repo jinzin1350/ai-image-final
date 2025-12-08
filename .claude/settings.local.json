@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(findstr:*)",
+      "Bash(dir \"C:\\Users\\alire\\ai-image-final\\ai-image-final\\*.js\" /b)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix hijab selection enforcement in scene-recreation with expert triple-layer strategy\n\nCRITICAL FIX: Hijab selection was being ignored - AI followed reference photo instead of user choice\n\nExpert-Level Solution Applied:\n- 🔥 Triple enforcement at TOP, MIDDLE, and BOTTOM of prompt\n- 🎯 Hijab requirement now placed BEFORE all other instructions (primacy effect)\n- 📋 Added explicit scenario mapping for all 6 hijab combinations\n- 🚨 Visual emphasis with fire emojis and warning symbols AI models prioritize\n- ❌ Negative constraint examples to prevent wrong interpretations\n- ✅ Treats reference photo hijab as \"IRRELEVANT\" for head covering decisions\n\nTechnical Changes:\n1. TOP PRIORITY section (lines 4621-4632): Absolute hijab override before any context\n2. MIDDLE reinforcement (lines 4721-4742): Scenario-by-scenario enforcement rules\n3. BOTTOM violations (lines 4766-4774): Explicit DO NOT examples with correct interpretations\n\nAlso Updated:\n- Improved mobile UI/UX for photography tutorial section across 3 pages\n- Converted grid layout to single-column responsive design\n- Consolidated tips into clean bullet points for better mobile readability\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(node -c:*)",
+      "Bash(dir \"C:\\Users\\alire\\ai-image-final\\ai-image-final\\public\\nanobanana.html\" /b)",
+      "Bash(git rebase:*)"
     ],
     "deny": [],
     "ask": []

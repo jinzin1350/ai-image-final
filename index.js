@@ -8413,6 +8413,198 @@ app.delete('/api/admin/brands/:brandId/photos/:photoId', authenticateAdmin, asyn
 });
 
 // ============================================
+// ANGLE REFERENCE MANAGEMENT API
+// ============================================
+
+// PUBLIC: Get all active angle references
+app.get('/api/angles', async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('angle_references')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching angle references:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Get all angle references (including inactive)
+app.get('/api/admin/angles', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { data, error} = await supabaseAdmin
+      .from('angle_references')
+      .select('*')
+      .order('display_order', { ascending: true });
+
+    if (error) throw error;
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Error fetching all angle references:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Create new angle reference
+app.post('/api/admin/angles', authenticateAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { angle_key, title_en, title_fa, description_en, description_fa, display_order } = req.body;
+
+    let image_url = null;
+
+    // Handle image upload if provided
+    if (req.file) {
+      const fileName = `angle-${angle_key}-${Date.now()}${path.extname(req.file.originalname)}`;
+      const filePath = `angles/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('images')
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabaseAdmin.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      image_url = publicUrl;
+    }
+
+    // Insert into database
+    const { data, error } = await supabaseAdmin
+      .from('angle_references')
+      .insert({
+        angle_key,
+        title_en,
+        title_fa,
+        description_en: description_en || null,
+        description_fa: description_fa || null,
+        image_url,
+        display_order: parseInt(display_order) || 0,
+        is_active: true
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error creating angle reference:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Update angle reference
+app.put('/api/admin/angles/:id', authenticateAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+    const { title_en, title_fa, description_en, description_fa, display_order } = req.body;
+
+    // Prepare update data
+    const updateData = {
+      title_en,
+      title_fa,
+      description_en: description_en || null,
+      description_fa: description_fa || null,
+      display_order: parseInt(display_order),
+      updated_at: new Date().toISOString()
+    };
+
+    // If new image is uploaded, handle upload
+    if (req.file) {
+      const fileName = `angle-${id}-${Date.now()}${path.extname(req.file.originalname)}`;
+      const filePath = `angles/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('images')
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabaseAdmin.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      updateData.image_url = publicUrl;
+    }
+
+    // Update database
+    const { data, error } = await supabaseAdmin
+      .from('angle_references')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error updating angle reference:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ADMIN: Toggle angle active status
+app.patch('/api/admin/angles/:id/toggle', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+    const { is_active } = req.body;
+
+    const { data, error } = await supabaseAdmin
+      .from('angle_references')
+      .update({ is_active, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error toggling angle status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
 // BACKGROUND WORKER: Process Pending Brand Photo Analyses
 // ============================================
 app.post('/api/admin/process-brand-photo-analyses', async (req, res) => {
