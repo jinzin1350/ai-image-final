@@ -192,52 +192,30 @@
     <!-- Add/Edit Modal -->
     <div id="angleModal" class="modal">
         <div class="modal-content">
-            <h2 id="modalTitle">Add New Angle</h2>
+            <h2 id="modalTitle">Add New Angle - Upload Image</h2>
+            <p style="color: #6b7280; margin-bottom: 20px;">Upload an angle reference image. AI will automatically analyze and detect the angle details.</p>
+
             <form id="angleForm" onsubmit="saveAngle(event)">
                 <input type="hidden" id="angleId">
+                <input type="hidden" id="angleKey">
+                <input type="hidden" id="titleEn">
+                <input type="hidden" id="titleFa">
+                <input type="hidden" id="descriptionEn">
+                <input type="hidden" id="descriptionFa">
+                <input type="hidden" id="displayOrder" value="0">
 
                 <div class="form-group">
-                    <label>Angle Key (e.g., front, back, left-side)</label>
-                    <input type="text" id="angleKey" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Title (English)</label>
-                    <input type="text" id="titleEn" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Title (Persian)</label>
-                    <input type="text" id="titleFa" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Description (English)</label>
-                    <textarea id="descriptionEn" rows="2"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Description (Persian)</label>
-                    <textarea id="descriptionFa" rows="2"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Display Order</label>
-                    <input type="number" id="displayOrder" value="0" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Reference Image</label>
-                    <input type="file" id="angleImage" accept="image/*" onchange="analyzeAngleImage(event)">
-                    <div id="imagePreview" style="margin-top: 10px; display: none;">
-                        <img id="previewImg" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                    <label style="font-size: 16px; font-weight: 600;">📸 Select Angle Reference Image</label>
+                    <input type="file" id="angleImage" accept="image/*" onchange="analyzeAngleImage(event)" required style="margin-top: 10px; padding: 10px; border: 2px dashed #d1d5db; border-radius: 8px; width: 100%; cursor: pointer;">
+                    <div id="imagePreview" style="margin-top: 15px; display: none; text-align: center;">
+                        <img id="previewImg" style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     </div>
                 </div>
 
-                <div id="aiAnalysisSection" style="display: none; margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 8px; border: 2px solid #3b82f6;">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                        <span style="font-size: 20px;">🤖</span>
-                        <strong style="color: #1e40af;">AI Analysis</strong>
+                <div id="aiAnalysisSection" style="display: none; margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border: 2px solid #3b82f6;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <span style="font-size: 24px;">🤖</span>
+                        <strong style="color: #1e40af; font-size: 18px;">AI Analysis Results</strong>
                     </div>
                     <div id="aiAnalysisResult" style="font-size: 14px; color: #374151;">
                         Analyzing image...
@@ -245,8 +223,8 @@
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 25px;">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn" onclick="closeModal()" style="background: #f3f4f6;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn" disabled>💾 Save Angle</button>
+                    <button type="button" class="btn" onclick="closeModal()" style="background: #f3f4f6;">✕ Cancel</button>
                 </div>
             </form>
         </div>
@@ -309,9 +287,13 @@
         }
 
         function showAddModal() {
-            document.getElementById('modalTitle').textContent = 'Add New Angle';
+            document.getElementById('modalTitle').textContent = 'Add New Angle - Upload Image';
             document.getElementById('angleForm').reset();
             document.getElementById('angleId').value = '';
+            document.getElementById('saveBtn').disabled = true;
+            document.getElementById('aiAnalysisSection').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            currentAnalyzedData = null;
             document.getElementById('angleModal').style.display = 'block';
         }
 
@@ -319,7 +301,7 @@
             const angle = allAngles.find(a => a.id === id);
             if (!angle) return;
 
-            document.getElementById('modalTitle').textContent = 'Edit Angle';
+            document.getElementById('modalTitle').textContent = 'Edit Angle - Upload New Image (Optional)';
             document.getElementById('angleId').value = angle.id;
             document.getElementById('angleKey').value = angle.angle_key;
             document.getElementById('titleEn').value = angle.title_en;
@@ -327,6 +309,12 @@
             document.getElementById('descriptionEn').value = angle.description_en || '';
             document.getElementById('descriptionFa').value = angle.description_fa || '';
             document.getElementById('displayOrder').value = angle.display_order;
+
+            // For edit mode, enable save button since we already have data
+            document.getElementById('saveBtn').disabled = false;
+            document.getElementById('aiAnalysisSection').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+
             document.getElementById('angleModal').style.display = 'block';
         }
 
@@ -334,6 +322,7 @@
             document.getElementById('angleModal').style.display = 'none';
             document.getElementById('aiAnalysisSection').style.display = 'none';
             document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('saveBtn').disabled = true;
             currentAnalyzedData = null;
         }
 
@@ -413,35 +402,81 @@ Only return valid JSON, no other text.`
 
                     currentAnalyzedData = parsed;
 
-                    // Auto-fill form fields
+                    // Auto-fill hidden form fields
                     document.getElementById('angleKey').value = parsed.angle_key || '';
                     document.getElementById('titleEn').value = parsed.title_en || '';
                     document.getElementById('titleFa').value = parsed.title_fa || '';
                     document.getElementById('descriptionEn').value = parsed.description_en || '';
                     document.getElementById('descriptionFa').value = parsed.description_fa || '';
 
+                    // Set display order based on angle type
+                    const orderMap = {
+                        'front': 1, 'back': 2, 'left-side': 3, 'right-side': 4,
+                        'three-quarter-left': 5, 'three-quarter-right': 6,
+                        'full-body': 7, 'waist-up': 8, 'close-up': 9
+                    };
+                    document.getElementById('displayOrder').value = orderMap[parsed.angle_key] || 0;
+
                     // Show success message
                     document.getElementById('aiAnalysisResult').innerHTML = `
                         <div style="color: #065f46;">
-                            ✅ <strong>Analysis Complete!</strong><br>
-                            <div style="margin-top: 8px; padding: 10px; background: white; border-radius: 6px;">
-                                <div><strong>Detected Angle:</strong> ${parsed.title_en} (${parsed.title_fa})</div>
-                                <div style="margin-top: 5px; font-size: 13px; color: #6b7280;">${parsed.description_en}</div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <span style="font-size: 32px;">✅</span>
+                                <strong style="font-size: 18px;">Analysis Complete!</strong>
+                            </div>
+                            <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #10b981;">
+                                <div style="margin-bottom: 10px;">
+                                    <strong style="color: #1f2937;">Detected Angle:</strong>
+                                    <div style="font-size: 16px; margin-top: 5px; color: #059669;">${parsed.title_en} / ${parsed.title_fa}</div>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <strong style="color: #1f2937;">Angle Key:</strong>
+                                    <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 13px;">${parsed.angle_key}</code>
+                                </div>
+                                <div>
+                                    <strong style="color: #1f2937;">Description:</strong>
+                                    <div style="margin-top: 5px; font-size: 14px; color: #6b7280; line-height: 1.5;">${parsed.description_en}</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px; padding: 10px; background: #ecfdf5; border-radius: 6px; font-size: 13px; color: #059669;">
+                                ℹ️ Ready to save! Click the "Save Angle" button below.
                             </div>
                         </div>
                     `;
+
+                    // Enable save button
+                    document.getElementById('saveBtn').disabled = false;
+
                 } else {
-                    throw new Error('Invalid AI response');
+                    throw new Error('Invalid AI response - no data received');
                 }
 
             } catch (error) {
                 console.error('Error analyzing image:', error);
                 document.getElementById('aiAnalysisResult').innerHTML = `
                     <div style="color: #dc2626;">
-                        ❌ <strong>Analysis Failed</strong><br>
-                        <span style="font-size: 13px;">Please fill in the fields manually. Error: ${error.message}</span>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 32px;">❌</span>
+                            <strong style="font-size: 18px;">Analysis Failed</strong>
+                        </div>
+                        <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #ef4444;">
+                            <div style="margin-bottom: 8px; font-size: 14px; color: #991b1b;">
+                                <strong>Error:</strong> ${error.message}
+                            </div>
+                            <div style="font-size: 13px; color: #6b7280;">
+                                The AI couldn't analyze this image. Possible reasons:
+                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                    <li>Network connection issue</li>
+                                    <li>Invalid image format</li>
+                                    <li>API temporarily unavailable</li>
+                                </ul>
+                                Please try again or contact support.
+                            </div>
+                        </div>
                     </div>
                 `;
+                // Keep save button disabled on error
+                document.getElementById('saveBtn').disabled = true;
             }
         }
 
