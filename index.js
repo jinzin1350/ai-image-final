@@ -3613,6 +3613,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       backgroundId,
       customLocation,   // NEW: Custom location description (overrides backgroundId)
       hijabType,        // NEW: نوع حجاب
+      cameraAngle,      // NEW: Angle key for scene-recreation (front, back, left-side, etc.)
       poseId = 'standing-front',
       cameraAngleId = 'eye-level',
       styleId = 'professional',
@@ -4046,6 +4047,25 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
       : null;
 
     console.log('🧕 Hijab type:', hijabType, hijabDescription);
+
+    // Camera angle descriptions for scene-recreation
+    const angleDescriptions = {
+      'front': 'Front View - Full frontal shot showing complete front of the person and garment. Camera positioned directly in front at eye level.',
+      'back': 'Back View - Complete back view showing the person from behind. Camera positioned behind showing full back details.',
+      'left-side': 'Left Side Profile - Side profile view from the left showing the person\'s left side and garment silhouette.',
+      'right-side': 'Right Side Profile - Side profile view from the right showing the person\'s right side and garment silhouette.',
+      'three-quarter-left': 'Three-Quarter Left (Over-Shoulder) - 45-degree angle from the left showing both front and side, capturing over-the-shoulder perspective.',
+      'three-quarter-right': 'Three-Quarter Right - 45-degree angle from the right front showing both front and right side of the person.',
+      'full-body': 'Full Body Shot - Complete head-to-toe view showing the entire person from head to feet.',
+      'waist-up': 'Waist-Up Shot - Upper body shot from waist upward, focusing on upper garment and face.',
+      'close-up': 'Close-Up Details - Detailed close-up shot showing neckline, fabric texture, and embellishments.'
+    };
+
+    const cameraAngleDescription = cameraAngle && angleDescriptions[cameraAngle]
+      ? angleDescriptions[cameraAngle]
+      : null;
+
+    console.log('📸 Camera angle:', cameraAngle, cameraAngleDescription);
 
     // ========================================
     // NEW: Mode-Specific Prompt Generation
@@ -4981,8 +5001,11 @@ ${hasTwoModels
    - Copy the FEEL and VIBE, not the exact pixels
 
 3. **Pose and Composition Guidance**:
-   - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}
-   - Use a similar camera angle and framing style
+   - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}${cameraAngleDescription ? `
+   - 🎯 CAMERA ANGLE REQUIREMENT: ${cameraAngleDescription}
+   - This camera angle is MANDATORY - position camera and frame the shot exactly as described above
+   - The angle specification overrides any different angle seen in the reference photo` : `
+   - Use a similar camera angle and framing style`}
    - Match the general composition approach
    - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}
 

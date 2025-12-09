@@ -2373,6 +2373,10 @@ if (generateBtn) {
             // Update loading overlay to show progress
             const loadingText = document.querySelector('#loadingOverlay p');
 
+            // Show result section immediately and prepare for progressive display
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+
             for (let i = 0; i < window.selectedAngles.length; i++) {
                 const angle = window.selectedAngles[i];
 
@@ -2407,6 +2411,17 @@ if (generateBtn) {
                         });
                         // Save to localStorage
                         saveToLocalStorage(data);
+
+                        // 🎯 PROGRESSIVE DISPLAY: Show image immediately as it's generated
+                        displayMultipleResults(generatedImages);
+                        loadingOverlay.style.display = 'none'; // Hide loading while showing results
+
+                        // Show loading again if there are more images to generate
+                        if (i < window.selectedAngles.length - 1) {
+                            setTimeout(() => {
+                                loadingOverlay.style.display = 'flex';
+                            }, 100);
+                        }
                     } else {
                         console.error(`❌ Failed to generate image for angle ${angle}:`, data.error);
                     }
@@ -2415,10 +2430,12 @@ if (generateBtn) {
                 }
             }
 
-            // Display all generated images
+            // Hide loading overlay when all done
+            loadingOverlay.style.display = 'none';
+
+            // Final check and cleanup
             if (generatedImages.length > 0) {
                 displayMultipleResults(generatedImages);
-                resultSection.scrollIntoView({ behavior: 'smooth' });
 
                 // Reset all selections after successful generation
                 setTimeout(() => {
