@@ -4050,15 +4050,23 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // Camera angle descriptions for scene-recreation
     const angleDescriptions = {
-      'front': 'Front View - Full frontal shot showing complete front of the person and garment. Camera positioned directly in front at eye level.',
-      'back': 'Back View - Complete back view showing the person from behind. Camera positioned behind showing full back details.',
-      'left-side': 'Left Side Profile - Side profile view from the left showing the person\'s left side and garment silhouette.',
-      'right-side': 'Right Side Profile - Side profile view from the right showing the person\'s right side and garment silhouette.',
-      'three-quarter-left': 'Three-Quarter Left (Over-Shoulder) - 45-degree angle from the left showing both front and side, capturing over-the-shoulder perspective.',
-      'three-quarter-right': 'Three-Quarter Right - 45-degree angle from the right front showing both front and right side of the person.',
-      'full-body': 'Full Body Shot - Complete head-to-toe view showing the entire person from head to feet.',
-      'waist-up': 'Waist-Up Shot - Upper body shot from waist upward, focusing on upper garment and face.',
-      'close-up': 'Close-Up Details - Detailed close-up shot showing neckline, fabric texture, and embellishments.'
+      'front': 'FRONT VIEW - Camera positioned directly in front of the model at eye level. Show the complete front of the person facing the camera head-on. The model should be looking at the camera. This is a straight-on frontal shot showing the full front of the garment and the model\'s face directly.',
+
+      'back': 'BACK VIEW - Camera positioned directly behind the model. Show the complete back of the person with their back facing the camera. The model is facing AWAY from camera. Show full back details of the garment, back of the head, and rear view of the person.',
+
+      'left-side': 'LEFT SIDE PROFILE - Camera positioned to the LEFT side of the model at 90 degrees. The model stands sideways showing their LEFT SIDE ONLY to the camera. You should see the side profile: left shoulder, left side of face, left side of body, left side of garment. The model faces to their RIGHT (your left when viewing). This is a pure side view showing the garment\'s silhouette from the left.',
+
+      'right-side': 'RIGHT SIDE PROFILE - Camera positioned to the RIGHT side of the model at 90 degrees. The model stands sideways showing their RIGHT SIDE ONLY to the camera. You should see the side profile: right shoulder, right side of face, right side of body, right side of garment. The model faces to their LEFT (your right when viewing). This is a pure side view showing the garment\'s silhouette from the right.',
+
+      'three-quarter-left': 'THREE-QUARTER LEFT (Over-Shoulder) - Camera positioned at 45-degree angle from the front-left. The model is positioned so you can see approximately 3/4 of their body - showing both the front and left side simultaneously. This captures an over-the-shoulder perspective showing partial face and left side.',
+
+      'three-quarter-right': 'THREE-QUARTER RIGHT - Camera positioned at 45-degree angle from the front-right. The model is positioned so you can see approximately 3/4 of their body - showing both the front and right side simultaneously. This angle shows partial face and right side of the garment.',
+
+      'full-body': 'FULL BODY SHOT - CRITICAL: Show the COMPLETE person from HEAD TO TOES. The entire body must be visible in the frame including the head at top and feet at bottom. Camera positioned further back to capture the whole person standing. This is a full-length portrait showing every part of the body from top to bottom. The feet MUST be visible in the frame - do not crop them out.',
+
+      'waist-up': 'WAIST-UP SHOT (Half-Length) - Show ONLY the upper body from the waist line upward to the head. Frame the shot so the bottom of the frame cuts at the waist/belt level. Focus on the upper garment, torso, arms, shoulders, and face. The lower body and legs should NOT be visible. This is a mid-shot cutting off at the waist.',
+
+      'close-up': 'CLOSE-UP DETAILS - Tight framing focused on specific garment details. Zoom in close to show fabric texture, neckline design, collar details, buttons, embellishments, or embroidery. This is a detail shot showing the craftsmanship and material quality up close. The frame should be filled with garment details, not showing the full body.'
     };
 
     const cameraAngleDescription = cameraAngle && angleDescriptions[cameraAngle]
@@ -5001,13 +5009,21 @@ ${hasTwoModels
    - Copy the FEEL and VIBE, not the exact pixels
 
 3. **Pose and Composition Guidance**:
-   - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}${cameraAngleDescription ? `
-   - 🎯 CAMERA ANGLE REQUIREMENT: ${cameraAngleDescription}
-   - This camera angle is MANDATORY - position camera and frame the shot exactly as described above
-   - The angle specification overrides any different angle seen in the reference photo` : `
-   - Use a similar camera angle and framing style`}
+   - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}
    - Match the general composition approach
-   - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}
+   - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}${cameraAngleDescription ? `
+
+🎯🎯🎯 CRITICAL CAMERA ANGLE REQUIREMENT (HIGHEST PRIORITY) 🎯🎯🎯
+${cameraAngleDescription}
+
+⚠️ ABSOLUTE CAMERA ANGLE RULES:
+- This camera angle specification is MANDATORY and NON-NEGOTIABLE
+- Position the camera EXACTLY as described above
+- Frame the shot PRECISELY according to these angle instructions
+- This camera angle requirement OVERRIDES any different angle in the reference photo
+- If reference photo shows a different angle, IGNORE it and use the angle specified above
+- The angle description is more important than matching the reference photo's angle
+🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯` : ''}
 
 4. **Garment Integration**:
 ${hasTwoModels
