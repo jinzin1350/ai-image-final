@@ -8537,7 +8537,7 @@ app.post('/api/admin/angles', authenticateAdmin, upload.single('image'), async (
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-        .from('images')
+        .from('admin-content')
         .upload(filePath, req.file.buffer, {
           contentType: req.file.mimetype,
           upsert: false
@@ -8547,7 +8547,7 @@ app.post('/api/admin/angles', authenticateAdmin, upload.single('image'), async (
 
       // Get public URL
       const { data: { publicUrl } } = supabaseAdmin.storage
-        .from('images')
+        .from('admin-content')
         .getPublicUrl(filePath);
 
       image_url = publicUrl;
@@ -8605,7 +8605,7 @@ app.put('/api/admin/angles/:id', authenticateAdmin, upload.single('image'), asyn
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-        .from('images')
+        .from('admin-content')
         .upload(filePath, req.file.buffer, {
           contentType: req.file.mimetype,
           upsert: false
@@ -8615,7 +8615,7 @@ app.put('/api/admin/angles/:id', authenticateAdmin, upload.single('image'), asyn
 
       // Get public URL
       const { data: { publicUrl } } = supabaseAdmin.storage
-        .from('images')
+        .from('admin-content')
         .getPublicUrl(filePath);
 
       updateData.image_url = publicUrl;
