@@ -8459,6 +8459,66 @@ app.get('/api/admin/angles', authenticateAdmin, async (req, res) => {
   }
 });
 
+// ADMIN: Analyze angle from image using AI
+app.post('/api/admin/angles/analyze', authenticateAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+    const prompt = `Analyze this fashion photography image and identify the camera angle.
+Determine which of these angles it represents:
+- Front View: Direct frontal shot of the garment/model
+- Back View: Shot from behind showing the back
+- Left Side: Profile from the left side
+- Right Side: Profile from the right side
+- 3/4 Front-Left: 45-degree angle from front-left
+- 3/4 Front-Right: 45-degree angle from front-right
+- Full Body: Complete head-to-toe shot
+- Waist-Up: Upper body from waist upward
+- Close-Up: Detailed close-up of fabric/details
+
+Respond in this exact JSON format:
+{
+  "angle_key": "front|back|left-side|right-side|three-quarter-left|three-quarter-right|full-body|waist-up|close-up",
+  "title_en": "English title",
+  "title_fa": "Persian title",
+  "description_en": "English description of what this angle shows",
+  "description_fa": "Persian description"
+}
+
+Only return valid JSON, no other text.`;
+
+    const imageParts = [{
+      inlineData: {
+        data: req.file.buffer.toString('base64'),
+        mimeType: req.file.mimetype
+      }
+    }];
+
+    const result = await model.generateContent([prompt, ...imageParts]);
+    const responseText = result.response.text();
+
+    console.log('AI Angle Analysis Response:', responseText);
+
+    res.json({
+      success: true,
+      text: responseText
+    });
+
+  } catch (error) {
+    console.error('Error analyzing angle:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to analyze angle'
+    });
+  }
+});
+
 // ADMIN: Create new angle reference
 app.post('/api/admin/angles', authenticateAdmin, upload.single('image'), async (req, res) => {
   try {
