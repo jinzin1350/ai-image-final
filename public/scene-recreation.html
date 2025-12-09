@@ -882,9 +882,13 @@
         let allBrandPhotos = [];
         window.selectedBrandReferencePhoto = null;
 
-        // Load brands on page load
+        // Load brands and models on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadBrands();
+            // Load models for scene-recreation mode
+            if (typeof loadModels === 'function') {
+                loadModels('scene-recreation');
+            }
         });
 
         // Load all available brands
