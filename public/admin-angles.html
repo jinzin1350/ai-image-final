@@ -236,10 +236,7 @@
 
         async function loadAngles() {
             try {
-                const token = localStorage.getItem('supabase_token');
-                const response = await fetch('/api/admin/angles', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetchWithAuth('/api/admin/angles');
 
                 if (!response.ok) throw new Error('Failed to load angles');
 
@@ -348,15 +345,9 @@
                 const formData = new FormData();
                 formData.append('image', file);
 
-                // Get auth token
-                const token = localStorage.getItem('supabase_token');
-
                 // Call angle analysis API
-                const response = await fetch('/api/admin/angles/analyze', {
+                const response = await fetchWithAuth('/api/admin/angles/analyze', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: formData
                 });
 
@@ -479,13 +470,11 @@
             }
 
             try {
-                const token = localStorage.getItem('supabase_token');
                 const url = angleId ? `/api/admin/angles/${angleId}` : '/api/admin/angles';
                 const method = angleId ? 'PUT' : 'POST';
 
-                const response = await fetch(url, {
+                const response = await fetchWithAuth(url, {
                     method,
-                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
 
@@ -504,12 +493,10 @@
             if (!confirm(`Are you sure you want to ${newStatus ? 'enable' : 'disable'} this angle?`)) return;
 
             try {
-                const token = localStorage.getItem('supabase_token');
-                const response = await fetch(`/api/admin/angles/${id}/toggle`, {
+                const response = await fetchWithAuth(`/api/admin/angles/${id}/toggle`, {
                     method: 'PATCH',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ is_active: newStatus })
                 });
@@ -527,5 +514,7 @@
         // Load angles on page load
         document.addEventListener('DOMContentLoaded', loadAngles);
     </script>
+    <script src="/admin-menu.js"></script>
+    <script src="/admin-common.js"></script>
 </body>
 </html>
