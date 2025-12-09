@@ -2464,8 +2464,9 @@ if (generateBtn) {
                     resetAllSelections();
                 }, 1000); // 1 second delay so user sees the result first
             } else {
-            // Show error message
-            alert(`خطا: ${data.error}\n${data.details || ''}`);
+                // Show error message
+                alert(`خطا: ${data.error}\n${data.details || ''}`);
+            }
         }
     } catch (error) {
         console.error('خطا در تولید تصویر:', error);
