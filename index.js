@@ -8703,6 +8703,56 @@ app.patch('/api/admin/angles/:id/toggle', authenticateAdmin, async (req, res) =>
   }
 });
 
+// DELETE angle
+app.delete('/api/admin/angles/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(503).json({ error: 'Database not configured' });
+    }
+
+    const { id } = req.params;
+
+    // First, get the angle to check if it has an image to delete
+    const { data: angleData, error: fetchError } = await supabaseAdmin
+      .from('angle_references')
+      .select('image_url')
+      .eq('id', id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // If there's an image, delete it from storage
+    if (angleData?.image_url) {
+      try {
+        // Extract the file path from the full URL
+        const urlParts = angleData.image_url.split('/admin-content/');
+        if (urlParts.length > 1) {
+          const filePath = urlParts[1];
+          await supabaseAdmin.storage
+            .from('admin-content')
+            .remove([filePath]);
+        }
+      } catch (storageError) {
+        console.error('Error deleting image from storage:', storageError);
+        // Continue with angle deletion even if image deletion fails
+      }
+    }
+
+    // Delete the angle from database
+    const { error: deleteError } = await supabaseAdmin
+      .from('angle_references')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) throw deleteError;
+
+    res.json({ success: true, message: 'Angle deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting angle:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ============================================
 // BACKGROUND WORKER: Process Pending Brand Photo Analyses
 // ============================================
