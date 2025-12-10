@@ -4917,9 +4917,23 @@ ${hasTwoModels
 - Image ${currentImageIndex + garments.length + 1}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)`;
       }
 
-      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.${hijabDescription ? `
+      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.${cameraAngleDescription ? `
 
-🚨🚨🚨 ABSOLUTE TOP PRIORITY - HIJAB OVERRIDE RULE 🚨🚨🚨
+🎯🎯🎯 ABSOLUTE TOP PRIORITY #1 - CAMERA ANGLE REQUIREMENT 🎯🎯🎯
+${cameraAngleDescription}
+
+⚠️ CRITICAL CAMERA ANGLE ENFORCEMENT:
+- This camera angle specification is MANDATORY and comes BEFORE all other instructions
+- Position the camera EXACTLY as described above - this is the FIRST requirement
+- Frame the shot PRECISELY according to these angle instructions
+- This camera angle requirement OVERRIDES any different angle shown in the reference photo
+- If reference photo shows a different angle, COMPLETELY IGNORE it and use the angle specified above
+- The angle description above is MORE IMPORTANT than matching the reference photo's angle
+- READ THE ANGLE REQUIREMENT 3 TIMES before generating
+🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯
+
+` : ''}${hijabDescription ? `
+🚨🚨🚨 ABSOLUTE TOP PRIORITY #2 - HIJAB OVERRIDE RULE 🚨🚨🚨
 ${hijabDescription}
 🔥 THIS HIJAB REQUIREMENT IS NON-NEGOTIABLE AND OVERRIDES EVERYTHING 🔥
 - COMPLETELY IGNORE any hijab or head covering shown in the reference photo
@@ -5011,19 +5025,8 @@ ${hasTwoModels
 3. **Pose and Composition Guidance**:
    - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}
    - Match the general composition approach
-   - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}${cameraAngleDescription ? `
-
-🎯🎯🎯 CRITICAL CAMERA ANGLE REQUIREMENT (HIGHEST PRIORITY) 🎯🎯🎯
-${cameraAngleDescription}
-
-⚠️ ABSOLUTE CAMERA ANGLE RULES:
-- This camera angle specification is MANDATORY and NON-NEGOTIABLE
-- Position the camera EXACTLY as described above
-- Frame the shot PRECISELY according to these angle instructions
-- This camera angle requirement OVERRIDES any different angle in the reference photo
-- If reference photo shows a different angle, IGNORE it and use the angle specified above
-- The angle description is more important than matching the reference photo's angle
-🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯` : ''}
+   - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}
+   - Remember: Camera angle was specified at the TOP of these instructions - follow it precisely
 
 4. **Garment Integration**:
 ${hasTwoModels
@@ -6596,6 +6599,8 @@ The final image should look like a professional photography backdrop.`;
     }
 
     console.log('📝 Enhanced Prompt:', enhancedPrompt);
+    console.log('📸 Camera Angle Being Used:', cameraAngle);
+    console.log('📸 Camera Angle Description:', cameraAngleDescription ? cameraAngleDescription.substring(0, 100) + '...' : 'NONE');
 
     // Use Gemini 2.5 Flash Image for generation
     const model = genAI.getGenerativeModel({
