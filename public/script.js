@@ -2373,6 +2373,10 @@ if (generateBtn) {
             // Update loading overlay to show progress
             const loadingText = document.querySelector('#loadingOverlay p');
 
+            // Debug: Log ALL selected angles before generation
+            console.log('📸 ALL SELECTED ANGLES:', window.selectedAngles);
+            console.log('📊 Total angles to generate:', totalAngles);
+
             // Show result section immediately and prepare for progressive display
             resultSection.style.display = 'block';
             resultSection.scrollIntoView({ behavior: 'smooth' });
@@ -2388,7 +2392,8 @@ if (generateBtn) {
                 // Add angle to request body
                 const angleRequestBody = { ...requestBody, cameraAngle: angle };
 
-                console.log(`🚀 Sending request for angle ${i + 1}/${totalAngles}:`, angle);
+                console.log(`🚀 Sending request ${i + 1}/${totalAngles} for angle:`, angle);
+                console.log(`📦 Request body cameraAngle:`, angleRequestBody.cameraAngle);
 
                 try {
                     const response = await fetch('/api/generate', {

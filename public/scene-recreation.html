@@ -1134,6 +1134,9 @@
             const checkboxes = document.querySelectorAll('input[name="angle"]:checked');
             window.selectedAngles = Array.from(checkboxes).map(cb => cb.value);
 
+            // Debug log to see what's selected
+            console.log('🎯 Selected angles:', window.selectedAngles);
+
             const previewSection = document.getElementById('selectedAnglesPreview');
             const anglesList = document.getElementById('selectedAnglesList');
             const angleCount = document.getElementById('angleCount');
