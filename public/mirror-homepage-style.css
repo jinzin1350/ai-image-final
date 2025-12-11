@@ -386,6 +386,17 @@ body {
     align-items: flex-end;
     justify-content: center;
     padding: 1rem;
+    overflow: hidden;
+}
+
+.demo-product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
 }
 
 .demo-competitor {
@@ -402,6 +413,8 @@ body {
     color: white;
     font-size: 0.875rem;
     font-weight: 600;
+    position: relative;
+    z-index: 1;
 }
 
 .quality-badge {
@@ -414,6 +427,8 @@ body {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--success);
+    position: relative;
+    z-index: 1;
 }
 
 .demo-arrow {
@@ -657,11 +672,8 @@ body {
     width: 100%;
     aspect-ratio: 1;
     border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 600;
+    display: block;
+    object-fit: cover;
 }
 
 .zara-style {
