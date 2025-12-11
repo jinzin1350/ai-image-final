@@ -120,6 +120,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
+// Mirror Landing page route (MirrorAI positioning)
+app.get('/mirror-landing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'mirror-landing.html'));
+});
+
 // App page route
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
