@@ -125,6 +125,11 @@ app.get('/mirror-landing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mirror-landing.html'));
 });
 
+// Mirror Homepage route (Farsi/RTL landing for mirroring competitors)
+app.get('/mirror-homepage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'mirror-homepage.html'));
+});
+
 // App page route
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
