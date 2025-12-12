@@ -211,21 +211,33 @@ const authenticateAdmin = (req, res, next) => {
   }
 };
 
+// Admin debug endpoint - check Supabase connection
+app.get('/api/admin/debug', authenticateAdmin, async (req, res) => {
+  res.json({
+    success: true,
+    supabase_configured: !!supabase,
+    supabase_admin_configured: !!supabaseAdmin,
+    supabase_url: process.env.SUPABASE_URL?.substring(0, 30) + '...' || 'NOT SET',
+    service_role_key_set: !!process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY !== 'your_supabase_service_role_key',
+    anon_key_set: !!process.env.SUPABASE_ANON_KEY && process.env.SUPABASE_ANON_KEY !== 'your_supabase_anon_key'
+  });
+});
+
 // Admin login
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     const validEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const validPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    
+
     if (email === validEmail && password === validPassword) {
-      res.json({ 
-        success: true, 
-        admin: { 
-          email: email, 
-          role: 'admin' 
-        } 
+      res.json({
+        success: true,
+        admin: {
+          email: email,
+          role: 'admin'
+        }
       });
     } else {
       res.status(401).json({ success: false, error: 'Invalid credentials' });
@@ -295,10 +307,19 @@ app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
 // Get all users
 app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
   try {
+    console.log('🔍 Admin users endpoint called');
+    console.log('📊 Supabase Admin configured:', !!supabaseAdmin);
+
     if (!supabaseAdmin) {
-      console.warn('⚠️ Supabase Admin client not configured - returning empty user list');
-      console.warn('💡 Please set SUPABASE_SERVICE_ROLE_KEY in your environment variables');
-      return res.json({ success: true, users: [] });
+      console.warn('⚠️ Supabase Admin client not configured');
+      console.warn('💡 Environment check:');
+      console.warn('   - SUPABASE_URL:', process.env.SUPABASE_URL ? 'SET' : 'NOT SET');
+      console.warn('   - SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET' : 'NOT SET');
+      return res.json({
+        success: true,
+        users: [],
+        warning: 'Supabase Admin client not configured. Please check environment variables.'
+      });
     }
 
     console.log('📋 Fetching all users from Supabase auth...');
