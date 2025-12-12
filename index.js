@@ -5723,6 +5723,471 @@ Think of it as: "Take ${numStyleImages === 1 ? 'this person with their outfit' :
 });
 
 // ============================================
+// MIRROR CREATION API - Copy competitor's photo style exactly
+// ============================================
+app.post('/api/mirror-generate', authenticateUser, async (req, res) => {
+  try {
+    const {
+      reference_image_url,
+      model_id,
+      garment_url
+    } = req.body;
+
+    console.log('🪞 Mirror Creation Request:', {
+      reference_image_url,
+      model_id,
+      garment_url,
+      user_id: req.user?.id
+    });
+
+    // Validation
+    if (!reference_image_url || !model_id || !garment_url) {
+      return res.status(400).json({
+        error: 'لطفاً تمام فیلدها را پر کنید (عکس مرجع، مدل، لباس)'
+      });
+    }
+
+    // ============================================
+    // CHECK AND DEDUCT CREDITS
+    // ============================================
+    const creditCheck = await checkAndDeductCredits(req.user?.id, 'mirror-creation');
+
+    if (!creditCheck.allowed) {
+      return res.status(403).json({
+        error: creditCheck.message,
+        remaining: creditCheck.remaining,
+        needsUpgrade: true
+      });
+    }
+
+    console.log(`✅ Credits deducted: ${creditCheck.message}, Remaining: ${creditCheck.remaining}`);
+
+    // ============================================
+    // CREATE DATABASE RECORD
+    // ============================================
+    const { data: mirrorCreation, error: insertError } = await supabase
+      .from('mirror_creations')
+      .insert([
+        {
+          user_id: req.user?.id || null,
+          reference_image_url: reference_image_url,
+          model_id: parseInt(model_id),
+          garment_url: garment_url,
+          status: 'analyzing'
+        }
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('❌ Error creating mirror_creations record:', insertError);
+      return res.status(500).json({
+        error: 'خطا در ایجاد رکورد',
+        details: insertError.message
+      });
+    }
+
+    const creationId = mirrorCreation.id;
+    console.log(`📝 Mirror creation record created: ${creationId}`);
+
+    // ============================================
+    // ANALYZE REFERENCE IMAGE WITH GEMINI VISION
+    // ============================================
+    console.log('🔍 Analyzing reference image for ALL attributes...');
+
+    const referenceBase64 = await imageUrlToBase64(reference_image_url);
+    const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    const analysisPrompt = `You are an expert fashion photographer analyzing a reference photo that needs to be EXACTLY replicated with a different model and garment.
+
+Analyze this photo and extract EVERY detail that needs to be copied:
+
+1. **Lighting**:
+   - Light source direction (front, side, back, top)
+   - Light quality (soft/hard shadows)
+   - Time of day feel
+   - Color temperature (warm/cool)
+   - Shadow characteristics
+
+2. **Camera Angle & Framing**:
+   - Camera height (eye level, high angle, low angle)
+   - Camera direction (front view, 3/4 view, side view, back view)
+   - Distance from subject (close-up, medium shot, full body)
+   - Framing and composition
+
+3. **Model Pose**:
+   - Body position and stance
+   - Arm positions
+   - Leg positions
+   - Head tilt and direction
+   - Overall body language
+
+4. **Hijab & Head Covering** (CRITICAL):
+   - Is there a hijab/head covering? (yes/no)
+   - If yes: Hijab style (loose, tight, wrapped)
+   - Hijab color
+   - Hijab fabric and texture
+   - How it's styled (ends visible, tucked, draped)
+
+5. **Accessories** (CRITICAL - list ALL):
+   - Glasses (style, color, shape)
+   - Hat/cap (type, color, position)
+   - Jewelry (earrings, necklace, rings, watch)
+   - Belt or waist accessories
+   - Bag or purse
+   - Any other accessories visible
+
+6. **Background**:
+   - Setting type (indoor/outdoor/studio)
+   - Background color or scene
+   - Depth of field (blurred/sharp background)
+   - Background elements
+
+7. **Colors & Mood**:
+   - Overall color palette
+   - Mood and atmosphere
+   - Photography style (casual, professional, editorial)
+
+Provide your analysis in JSON format with these exact keys:
+{
+  "lighting": "detailed description",
+  "camera_angle": "detailed description",
+  "pose": "detailed description",
+  "hijab": "yes/no and full description if present",
+  "accessories": ["item 1", "item 2", ...] or [] if none,
+  "background": "detailed description",
+  "colors": "color palette description",
+  "mood": "mood and atmosphere description"
+}
+
+Be extremely specific and detailed - every detail will be copied exactly.`;
+
+    const analysisResult = await visionModel.generateContent([
+      analysisPrompt,
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: referenceBase64
+        }
+      }
+    ]);
+
+    const analysisResponse = await analysisResult.response;
+    const analysisText = analysisResponse.text();
+
+    // Parse JSON from response (handle markdown code blocks)
+    let referenceAnalysis;
+    try {
+      const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        referenceAnalysis = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in response');
+      }
+    } catch (parseError) {
+      console.warn('⚠️ Could not parse JSON, using raw text');
+      referenceAnalysis = {
+        raw_analysis: analysisText,
+        lighting: 'natural lighting',
+        camera_angle: 'eye level',
+        pose: 'standing naturally',
+        hijab: 'as shown in reference',
+        accessories: [],
+        background: 'neutral background',
+        colors: 'natural tones',
+        mood: 'professional'
+      };
+    }
+
+    console.log('✅ Reference analysis complete:', JSON.stringify(referenceAnalysis, null, 2));
+
+    // Update database with analysis
+    await supabase
+      .from('mirror_creations')
+      .update({
+        reference_analysis: referenceAnalysis,
+        status: 'generating'
+      })
+      .eq('id', creationId);
+
+    // ============================================
+    // FETCH MODEL FROM content_library
+    // ============================================
+    const { data: modelData, error: modelError } = await supabase
+      .from('content_library')
+      .select('image_url')
+      .eq('id', parseInt(model_id))
+      .single();
+
+    if (modelError || !modelData) {
+      throw new Error('Model not found in content_library');
+    }
+
+    const modelImageUrl = modelData.image_url;
+    console.log(`👤 Using model: ${modelImageUrl}`);
+
+    // Update model_image_url in database
+    await supabase
+      .from('mirror_creations')
+      .update({ model_image_url: modelImageUrl })
+      .eq('id', creationId);
+
+    // ============================================
+    // GET USER'S PREFERRED IMAGE GENERATION MODEL
+    // ============================================
+    let userGenerationModel = 'gemini-2-flash'; // Default model
+
+    if (supabaseAdmin && req.user?.id) {
+      try {
+        const { data: userProfile } = await supabaseAdmin
+          .from('user_profiles')
+          .select('image_generation_model')
+          .eq('id', req.user.id)
+          .single();
+
+        if (userProfile && userProfile.image_generation_model) {
+          userGenerationModel = userProfile.image_generation_model;
+        }
+      } catch (modelError) {
+        console.warn('⚠️ Could not fetch user model preference, using default');
+      }
+    }
+
+    console.log(`🤖 Using generation model: ${userGenerationModel}`);
+
+    // ============================================
+    // BUILD GENERATION PROMPT
+    // ============================================
+    const prompt = `Create a professional fashion photography image that EXACTLY replicates the reference photo's style with a new model wearing the provided garment.
+
+IMAGES PROVIDED:
+- Image 1: Reference photo (competitor's photo to mirror EXACTLY)
+- Image 2: Model (the person who will wear the garment)
+- Image 3: Garment/Product (clothing item to place on model)
+
+CRITICAL TASK:
+Copy EVERYTHING from the reference photo (Image 1) and apply it to the new model (Image 2) wearing the new garment (Image 3).
+
+REFERENCE PHOTO ANALYSIS - COPY ALL OF THESE EXACTLY:
+
+🎨 LIGHTING (Copy exactly from reference):
+${referenceAnalysis.lighting}
+
+📷 CAMERA ANGLE & FRAMING (Copy exactly from reference):
+${referenceAnalysis.camera_angle}
+
+🧍 MODEL POSE (Copy exactly from reference):
+${referenceAnalysis.pose}
+
+🧕 HIJAB/HEAD COVERING (CRITICAL - Copy exactly from reference):
+${referenceAnalysis.hijab}
+**IMPORTANT**: The hijab/head covering in the REFERENCE PHOTO is what matters, NOT what the model image shows. If reference has hijab, the output MUST have hijab. If reference has no hijab, the output MUST NOT have hijab.
+
+👓 ACCESSORIES (CRITICAL - Copy ALL from reference):
+${Array.isArray(referenceAnalysis.accessories) && referenceAnalysis.accessories.length > 0
+  ? referenceAnalysis.accessories.join(', ')
+  : 'No accessories'}
+**IMPORTANT**: Copy EVERY accessory from the reference photo (glasses, hat, jewelry, etc.). The accessories shown in the REFERENCE PHOTO must appear in the output, regardless of what the model image shows.
+
+🏞️ BACKGROUND (Copy exactly from reference):
+${referenceAnalysis.background}
+
+🎨 COLORS & MOOD (Copy exactly from reference):
+Colors: ${referenceAnalysis.colors}
+Mood: ${referenceAnalysis.mood}
+
+KEY REQUIREMENTS:
+1. Keep model's face EXACTLY the same from Image 2
+2. Place the garment from Image 3 naturally on the model
+3. Copy EVERY detail from reference photo:
+   - Exact same lighting direction and quality
+   - Exact same camera angle and framing
+   - Exact same pose and body position
+   - Exact same hijab style (if present in reference)
+   - ALL accessories from reference (glasses, hat, jewelry, etc.)
+   - Exact same background and setting
+   - Exact same color mood and atmosphere
+
+4. The garment should look natural and realistic on the model
+5. Professional photography quality
+6. Natural skin texture (no plastic smoothing)
+
+CRITICAL RULES:
+❌ DO NOT change the model's face or identity
+❌ DO NOT ignore hijab from reference photo
+❌ DO NOT skip accessories from reference photo (glasses, hats, jewelry)
+❌ DO NOT add different lighting than reference
+❌ DO NOT use different camera angle than reference
+❌ DO NOT make the garment look pasted or fake
+
+✅ DO copy the reference photo's style EXACTLY
+✅ DO maintain all accessories from reference
+✅ DO preserve hijab exactly as shown in reference (or lack thereof)
+✅ DO keep natural, realistic appearance
+
+Generate the exact copy of the reference photo's style with the new model and garment.`;
+
+    console.log('📝 Generation prompt created');
+
+    // ============================================
+    // PREPARE CONTENT PARTS FOR GENERATION
+    // ============================================
+    const referenceImageBase64 = await imageUrlToBase64(reference_image_url);
+    const modelImageBase64 = await imageUrlToBase64(modelImageUrl);
+    const garmentImageBase64 = await imageUrlToBase64(garment_url);
+
+    const contentParts = [
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: referenceImageBase64
+        }
+      },
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: modelImageBase64
+        }
+      },
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: garmentImageBase64
+        }
+      }
+    ];
+
+    // ============================================
+    // GENERATE IMAGE
+    // ============================================
+    console.log('🎨 Generating mirror image...');
+
+    let generatedImageBase64 = null;
+
+    if (userGenerationModel === 'nano-banana-2') {
+      const nanoBananaResult = await generateNanoBananaImage({
+        prompt: prompt,
+        contentParts: contentParts,
+        aspectRatio: '1:1',
+        imageSize: 'large'
+      });
+      generatedImageBase64 = nanoBananaResult.imageData;
+    } else {
+      // Use Gemini 2.5 Flash Image (default)
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash-image",
+        generationConfig: {
+          responseModalities: ["Image"]
+        }
+      });
+
+      contentParts.push({ text: prompt });
+      const result = await model.generateContent(contentParts);
+      const response = await result.response;
+
+      if (!response.candidates || !response.candidates[0]?.content?.parts) {
+        throw new Error('Invalid response from Gemini API');
+      }
+
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          generatedImageBase64 = part.inlineData.data;
+          break;
+        }
+      }
+
+      if (!generatedImageBase64) {
+        throw new Error('No image was generated by Gemini');
+      }
+    }
+
+    console.log('✅ Image generated successfully!');
+
+    // ============================================
+    // UPLOAD RESULT TO STORAGE
+    // ============================================
+    const imageBuffer = Buffer.from(generatedImageBase64, 'base64');
+    const fileName = `mirror-${creationId}-${Date.now()}.png`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('garments')
+      .upload(fileName, imageBuffer, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Error uploading generated image:', uploadError);
+      throw uploadError;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('garments')
+      .getPublicUrl(fileName);
+
+    const resultImageUrl = urlData.publicUrl;
+    console.log(`📸 Result uploaded: ${resultImageUrl}`);
+
+    // ============================================
+    // UPDATE DATABASE WITH RESULT
+    // ============================================
+    const { error: updateError } = await supabase
+      .from('mirror_creations')
+      .update({
+        result_image_url: resultImageUrl,
+        result_storage_path: fileName,
+        prompt: prompt,
+        generation_params: {
+          model: userGenerationModel,
+          analysis: referenceAnalysis
+        },
+        credits_used: 1,
+        status: 'completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', creationId);
+
+    if (updateError) {
+      console.error('Error updating mirror_creations record:', updateError);
+    }
+
+    console.log('✅ Mirror creation completed successfully!');
+
+    // ============================================
+    // RETURN RESULT
+    // ============================================
+    res.json({
+      success: true,
+      data: {
+        id: creationId,
+        result_image_url: resultImageUrl,
+        reference_analysis: referenceAnalysis,
+        credits_remaining: creditCheck.remaining - 1
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Mirror generation error:', error);
+
+    // Update status to failed in database if we have creation ID
+    if (error.creationId) {
+      await supabase
+        .from('mirror_creations')
+        .update({
+          status: 'failed',
+          error_message: error.message
+        })
+        .eq('id', error.creationId);
+    }
+
+    res.status(500).json({
+      error: 'خطا در تولید تصویر میرور',
+      details: error.message
+    });
+  }
+});
+
+// ============================================
 // NANO BANANA CHAT API - Direct AI Image Chat
 // ============================================
 app.post('/api/nanobanana/chat', authenticateUser, upload.array('referenceImages', 3), async (req, res) => {
