@@ -843,10 +843,11 @@
                 // Upload reference image
                 const referenceFormData = new FormData();
                 referenceFormData.append('garment', wizardData.referenceFile);
+                const token = localStorage.getItem('supabase_token');
                 const referenceRes = await fetch('/api/upload', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: referenceFormData
                 });
@@ -858,7 +859,7 @@
                 const garmentRes = await fetch('/api/upload', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: garmentFormData
                 });
@@ -872,7 +873,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         reference_image_url: referenceData.filePath,
