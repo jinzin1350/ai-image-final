@@ -5775,7 +5775,7 @@ app.post('/api/mirror-generate', authenticateUser, async (req, res) => {
           {
             user_id: req.user?.id || null,
             reference_image_url: reference_image_url,
-            model_id: parseInt(model_id),
+            model_id: model_id,
             garment_url: garment_url,
             status: 'analyzing'
           }
@@ -5928,11 +5928,12 @@ Be extremely specific and detailed - every detail will be copied exactly.`;
     const { data: modelData, error: modelError } = await supabase
       .from('models')
       .select('image_url')
-      .eq('id', parseInt(model_id))
+      .eq('id', model_id)
       .single();
 
     if (modelError || !modelData) {
-      throw new Error('Model not found in models table');
+      console.error('❌ Model query error:', modelError);
+      throw new Error(`Model not found in models table (ID: ${model_id})`);
     }
 
     const modelImageUrl = modelData.image_url;
