@@ -5763,32 +5763,38 @@ app.post('/api/mirror-generate', authenticateUser, async (req, res) => {
     console.log(`✅ Credits deducted: ${creditCheck.message}, Remaining: ${creditCheck.remaining}`);
 
     // ============================================
-    // CREATE DATABASE RECORD
+    // CREATE DATABASE RECORD (optional - table might not exist yet)
     // ============================================
-    const { data: mirrorCreation, error: insertError } = await supabase
-      .from('mirror_creations')
-      .insert([
-        {
-          user_id: req.user?.id || null,
-          reference_image_url: reference_image_url,
-          model_id: parseInt(model_id),
-          garment_url: garment_url,
-          status: 'analyzing'
-        }
-      ])
-      .select()
-      .single();
+    let creationId = Date.now(); // Fallback ID
+    let mirrorCreation = null;
 
-    if (insertError) {
-      console.error('❌ Error creating mirror_creations record:', insertError);
-      return res.status(500).json({
-        error: 'خطا در ایجاد رکورد',
-        details: insertError.message
-      });
+    try {
+      const { data, error: insertError } = await supabase
+        .from('mirror_creations')
+        .insert([
+          {
+            user_id: req.user?.id || null,
+            reference_image_url: reference_image_url,
+            model_id: parseInt(model_id),
+            garment_url: garment_url,
+            status: 'analyzing'
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.warn('⚠️ Could not create mirror_creations record (table may not exist):', insertError.message);
+        console.warn('Hint:', insertError.hint);
+        console.log('ℹ️ Continuing without database record...');
+      } else {
+        mirrorCreation = data;
+        creationId = mirrorCreation.id;
+        console.log(`📝 Mirror creation record created: ${creationId}`);
+      }
+    } catch (dbError) {
+      console.warn('⚠️ Database insert failed, continuing anyway:', dbError.message);
     }
-
-    const creationId = mirrorCreation.id;
-    console.log(`📝 Mirror creation record created: ${creationId}`);
 
     // ============================================
     // ANALYZE REFERENCE IMAGE WITH GEMINI VISION
@@ -5901,14 +5907,20 @@ Be extremely specific and detailed - every detail will be copied exactly.`;
 
     console.log('✅ Reference analysis complete:', JSON.stringify(referenceAnalysis, null, 2));
 
-    // Update database with analysis
-    await supabase
-      .from('mirror_creations')
-      .update({
-        reference_analysis: referenceAnalysis,
-        status: 'generating'
-      })
-      .eq('id', creationId);
+    // Update database with analysis (optional)
+    if (mirrorCreation) {
+      try {
+        await supabase
+          .from('mirror_creations')
+          .update({
+            reference_analysis: referenceAnalysis,
+            status: 'generating'
+          })
+          .eq('id', creationId);
+      } catch (err) {
+        console.warn('⚠️ Could not update mirror_creations with analysis');
+      }
+    }
 
     // ============================================
     // FETCH MODEL FROM models
@@ -5926,11 +5938,17 @@ Be extremely specific and detailed - every detail will be copied exactly.`;
     const modelImageUrl = modelData.image_url;
     console.log(`👤 Using model: ${modelImageUrl}`);
 
-    // Update model_image_url in database
-    await supabase
-      .from('mirror_creations')
-      .update({ model_image_url: modelImageUrl })
-      .eq('id', creationId);
+    // Update model_image_url in database (optional)
+    if (mirrorCreation) {
+      try {
+        await supabase
+          .from('mirror_creations')
+          .update({ model_image_url: modelImageUrl })
+          .eq('id', creationId);
+      } catch (err) {
+        console.warn('⚠️ Could not update mirror_creations with model URL');
+      }
+    }
 
     // ============================================
     // GET USER'S PREFERRED IMAGE GENERATION MODEL
@@ -6129,26 +6147,32 @@ Generate the exact copy of the reference photo's style with the new model and ga
     console.log(`📸 Result uploaded: ${resultImageUrl}`);
 
     // ============================================
-    // UPDATE DATABASE WITH RESULT
+    // UPDATE DATABASE WITH RESULT (optional)
     // ============================================
-    const { error: updateError } = await supabase
-      .from('mirror_creations')
-      .update({
-        result_image_url: resultImageUrl,
-        result_storage_path: fileName,
-        prompt: prompt,
-        generation_params: {
-          model: userGenerationModel,
-          analysis: referenceAnalysis
-        },
-        credits_used: 1,
-        status: 'completed',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', creationId);
+    if (mirrorCreation) {
+      try {
+        const { error: updateError } = await supabase
+          .from('mirror_creations')
+          .update({
+            result_image_url: resultImageUrl,
+            result_storage_path: fileName,
+            prompt: prompt,
+            generation_params: {
+              model: userGenerationModel,
+              analysis: referenceAnalysis
+            },
+            credits_used: 1,
+            status: 'completed',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', creationId);
 
-    if (updateError) {
-      console.error('Error updating mirror_creations record:', updateError);
+        if (updateError) {
+          console.warn('⚠️ Could not update mirror_creations with result:', updateError.message);
+        }
+      } catch (err) {
+        console.warn('⚠️ Database update failed (table may not exist)');
+      }
     }
 
     console.log('✅ Mirror creation completed successfully!');
@@ -6169,15 +6193,19 @@ Generate the exact copy of the reference photo's style with the new model and ga
   } catch (error) {
     console.error('❌ Mirror generation error:', error);
 
-    // Update status to failed in database if we have creation ID
-    if (error.creationId) {
-      await supabase
-        .from('mirror_creations')
-        .update({
-          status: 'failed',
-          error_message: error.message
-        })
-        .eq('id', error.creationId);
+    // Update status to failed in database if we have creation ID (optional)
+    if (error.creationId && mirrorCreation) {
+      try {
+        await supabase
+          .from('mirror_creations')
+          .update({
+            status: 'failed',
+            error_message: error.message
+          })
+          .eq('id', error.creationId);
+      } catch (dbErr) {
+        console.warn('⚠️ Could not update failed status in database');
+      }
     }
 
     res.status(500).json({
