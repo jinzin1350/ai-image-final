@@ -82,19 +82,65 @@
     <script src="/admin-menu.js"></script>
     <script src="/admin-common.js"></script>
     <script>
+        let allUsers = [];
+        let currentPage = 1;
+        const usersPerPage = 50; // Show 50 users per page
+
         async function loadUsers() {
             try {
                 const response = await fetchWithAuth('/api/admin/users');
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
+                allUsers = data.users || [];
+                currentPage = 1;
+
+                console.log(`✅ Loaded ${allUsers.length} total users`);
+                renderUsers();
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('Failed to load users', 'error');
+            }
+        }
+
+        function renderUsers() {
+            try {
                 const container = document.getElementById('usersTable');
 
-                if (data.success && data.users && data.users.length > 0) {
+                // Apply search filter
+                const searchTerm = document.getElementById('userSearch')?.value.toLowerCase() || '';
+                const filteredUsers = allUsers.filter(user =>
+                    user.email?.toLowerCase().includes(searchTerm)
+                );
+
+                // Pagination
+                const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+                const startIndex = (currentPage - 1) * usersPerPage;
+                const endIndex = startIndex + usersPerPage;
+                const usersToShow = filteredUsers.slice(startIndex, endIndex);
+
+                if (filteredUsers.length > 0) {
                     container.innerHTML = `
+                        <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; padding:12px; background:#f9fafb; border-radius:8px;">
+                            <div style="font-size:14px; color:#6b7280;">
+                                Showing ${startIndex + 1}-${Math.min(endIndex, filteredUsers.length)} of ${filteredUsers.length} users
+                                ${searchTerm ? `(filtered from ${allUsers.length} total)` : ''}
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
+                                    style="padding:6px 12px; border:1px solid #e5e7eb; background:white; border-radius:6px; cursor:${currentPage === 1 ? 'not-allowed' : 'pointer'}; opacity:${currentPage === 1 ? '0.5' : '1'};">
+                                    ← Previous
+                                </button>
+                                <span style="padding:6px 12px; font-weight:600;">Page ${currentPage} of ${totalPages}</span>
+                                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}
+                                    style="padding:6px 12px; border:1px solid #e5e7eb; background:white; border-radius:6px; cursor:${currentPage === totalPages ? 'not-allowed' : 'pointer'}; opacity:${currentPage === totalPages ? '0.5' : '1'};">
+                                    Next →
+                                </button>
+                            </div>
+                        </div>
                         <table style="width:100%; border-collapse:collapse;">
                             <thead style="background:#f3f4f6;">
                                 <tr>
@@ -108,7 +154,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${data.users.map(user => {
+                                ${usersToShow.map(user => {
                                     const tier = user.tier || 'testlimit';
                                     const tierColors = {
                                         testlimit: { bg: '#dbeafe', text: '#1e40af', label: '🧪 Test' },
@@ -171,8 +217,22 @@
                     container.innerHTML = '<div class="empty-state">No users found</div>';
                 }
             } catch (error) {
-                console.error('Error loading users:', error);
-                showNotification('Failed to load users', 'error');
+                console.error('Error rendering users:', error);
+                document.getElementById('usersTable').innerHTML = '<div class="empty-state">Error rendering users</div>';
+            }
+        }
+
+        function changePage(page) {
+            const searchTerm = document.getElementById('userSearch')?.value.toLowerCase() || '';
+            const filteredUsers = allUsers.filter(user =>
+                user.email?.toLowerCase().includes(searchTerm)
+            );
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderUsers();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
@@ -270,25 +330,16 @@
         }
 
         function filterUsers() {
+            // Reset to page 1 when filtering
+            currentPage = 1;
+            renderUsers();
+
             const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-            const table = document.querySelector('#usersTable table');
+            const filteredCount = allUsers.filter(user =>
+                user.email?.toLowerCase().includes(searchTerm)
+            ).length;
 
-            if (!table) return;
-
-            const rows = table.querySelectorAll('tbody tr');
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                const email = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
-                if (email.includes(searchTerm)) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            console.log(`🔍 Showing ${visibleCount} / ${rows.length} users matching "${searchTerm}"`);
+            console.log(`🔍 Filtered to ${filteredCount} / ${allUsers.length} users matching "${searchTerm}"`);
         }
 
         loadUsers();
