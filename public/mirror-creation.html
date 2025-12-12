@@ -547,7 +547,6 @@
     <script src="script.js"></script>
     <script>
         let currentStep = 1;
-        let allModels = []; // Store all models from API
         let wizardData = {
             referenceFile: null,
             referenceUrl: null,
@@ -559,7 +558,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             setupUploads();
-            loadModels();
+            loadModelsForWizard();
         });
 
         // Setup upload areas
@@ -646,15 +645,18 @@
             reader.readAsDataURL(file);
         }
 
-        // Load models from API
-        async function loadModels() {
+        // Load models for wizard (uses global allModels from script.js)
+        async function loadModelsForWizard() {
             try {
                 const response = await fetch('/api/get-models?mode=scene-recreation');
                 const data = await response.json();
 
-                if (data.success) {
+                if (data.success && data.models) {
+                    // Store in window.allModels (used by script.js)
+                    window.allModels = data.models;
+
                     const categories = [...new Set(data.models.map(m => m.category))];
-                    renderCategories(categories);
+                    renderCategories(categories, data.models);
                     renderModels(data.models, categories[0]);
                 }
             } catch (error) {
@@ -662,19 +664,13 @@
             }
         }
 
-        function renderCategories(categories) {
+        function renderCategories(categories, models) {
             const container = document.getElementById('modelCategories');
-
-            fetch('/api/get-models?mode=scene-recreation')
-                .then(r => r.json())
-                .then(data => {
-                    allModels = data.models;
-                    container.innerHTML = categories.map((cat, idx) => `
-                        <button class="category-btn ${idx === 0 ? 'active' : ''}" onclick="filterModels('${cat}', this)">
-                            ${cat}
-                        </button>
-                    `).join('');
-                });
+            container.innerHTML = categories.map((cat, idx) => `
+                <button class="category-btn ${idx === 0 ? 'active' : ''}" onclick="filterModels('${cat}', this)">
+                    ${cat}
+                </button>
+            `).join('');
         }
 
         function renderModels(models, category) {
@@ -695,7 +691,7 @@
             btn.classList.add('active');
 
             // Filter and render
-            renderModels(allModels, category);
+            renderModels(window.allModels || [], category);
         }
 
         function selectModel(modelId, card) {
@@ -704,7 +700,8 @@
             card.classList.add('selected');
 
             // Save selection
-            wizardData.selectedModel = allModels.find(m => m.id === modelId);
+            const models = window.allModels || [];
+            wizardData.selectedModel = models.find(m => m.id === modelId);
             document.getElementById('step2Next').disabled = false;
         }
 
