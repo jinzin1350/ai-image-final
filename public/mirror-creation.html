@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirror Creation - ساخت تصویر مشابه رقیب</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .mirror-wizard-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Progress Steps */
+        .wizard-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .wizard-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 1;
+            transition: width 0.3s ease;
+        }
+
+        .wizard-step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .wizard-step.active .step-circle {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .wizard-step.completed .step-circle {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .wizard-step.active .step-label {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        /* Step Content */
+        .step-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            min-height: 400px;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .step-header h2 {
+            font-size: 26px;
+            color: #1f2937;
+            margin: 0 0 10px 0;
+        }
+
+        .step-header p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 16px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9fafb;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-area.has-file {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .file-preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Model Grid */
+        .model-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .model-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .model-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .model-card.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .model-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .model-card .checkmark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #10b981;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .model-card.selected .checkmark {
+            display: flex;
+        }
+
+        /* Navigation Buttons */
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .btn-wizard {
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-prev {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-prev:hover {
+            background: #f9fafb;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Summary Section */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .summary-item {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .cost-info {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .cost-info strong {
+            font-size: 24px;
+            color: #92400e;
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .models-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="mirror-wizard-container">
+            <!-- Progress Steps -->
+            <div class="wizard-progress">
+                <div class="progress-line" id="progressLine" style="width: 0%"></div>
+
+                <div class="wizard-step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">عکس مرجع</div>
+                </div>
+
+                <div class="wizard-step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">انتخاب مدل</div>
+                </div>
+
+                <div class="wizard-step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">آپلود لباس</div>
+                </div>
+
+                <div class="wizard-step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">تولید</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Reference Image -->
+            <div class="step-content active" data-step="1">
+                <div class="step-header">
+                    <h2>📸 آپلود عکس مرجع</h2>
+                    <p>عکس رقیب یا برند موردنظر را آپلود کنید - همه چیز از این عکس کپی می‌شود</p>
+                </div>
+
+                <div class="upload-area" id="referenceUploadArea">
+                    <input type="file" id="referenceInput" accept="image/*" style="display: none;">
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">کلیک کنید یا عکس را بکشید و رها کنید</div>
+                    <div class="upload-hint">فرمت: JPG, PNG - همه جزئیات (حجاب، عینک، کلاه، ...) کپی می‌شود</div>
+                </div>
+
+                <div class="file-preview" id="referencePreview"></div>
+
+                <div class="wizard-nav">
+                    <button class="btn-wizard btn-prev" onclick="location.href='/app'" style="flex: 0.3;">بازگشت</button>
+                    <button class="btn-wizard btn-next" id="step1Next" disabled onclick="nextStep()">مرحله بعد ←</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Model -->
+            <div class="step-content" data-step="2">
+                <div class="step-header">
+                    <h2>👤 انتخاب مدل</h2>
+                    <p>مدلی که محصول شما روی آن نمایش داده می‌شود</p>
+                </div>
+
+                <div class="model-categories" id="modelCategories"></div>
+                <div class="models-grid" id="modelsGrid"></div>
+
+                <div class="wizard-nav">
+                    <button class="btn-wizard btn-prev" onclick="prevStep()">→ قبلی</button>
+                    <button class="btn-wizard btn-next" id="step2Next" disabled onclick="nextStep()">مرحله بعد ←</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Upload Garment -->
+            <div class="step-content" data-step="3">
+                <div class="step-header">
+                    <h2>👕 آپلود محصول شما</h2>
+                    <p>لباس یا محصولی که می‌خواهید با استایل مرجع نمایش داده شود</p>
+                </div>
+
+                <div class="upload-area" id="garmentUploadArea">
+                    <input type="file" id="garmentInput" accept="image/*" style="display: none;">
+                    <div class="upload-icon">👔</div>
+                    <div class="upload-text">کلیک کنید یا عکس محصول را بکشید</div>
+                    <div class="upload-hint">فرمت: JPG, PNG - عکس ساده محصول کافی است</div>
+                </div>
+
+                <div class="file-preview" id="garmentPreview"></div>
+
+                <div class="wizard-nav">
+                    <button class="btn-wizard btn-prev" onclick="prevStep()">→ قبلی</button>
+                    <button class="btn-wizard btn-next" id="step3Next" disabled onclick="nextStep()">مرحله بعد ←</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Summary & Generate -->
+            <div class="step-content" data-step="4">
+                <div class="step-header">
+                    <h2>✨ آماده برای تولید</h2>
+                    <p>مشخصات نهایی را بررسی کنید</p>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">عکس مرجع</div>
+                        <div id="summaryReference"></div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">مدل انتخابی</div>
+                        <div id="summaryModel"></div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">محصول شما</div>
+                        <div id="summaryGarment"></div>
+                    </div>
+                </div>
+
+                <div class="cost-info">
+                    💰 هزینه: <strong>1 اعتبار</strong>
+                    <div style="font-size: 14px; color: #92400e; margin-top: 8px;">
+                        همه جزئیات عکس مرجع (حجاب، عینک، کلاه، نور، زاویه، ...) کپی می‌شود
+                    </div>
+                </div>
+
+                <div class="wizard-nav">
+                    <button class="btn-wizard btn-prev" onclick="prevStep()">→ قبلی</button>
+                    <button class="btn-wizard btn-generate" onclick="generateMirror()">🎨 تولید تصویر</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>در حال تولید تصویر...</h3>
+            <p style="color: #6b7280; margin-top: 10px;">لطفاً صبر کنید، این ممکن است چند ثانیه طول بکشد</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let currentStep = 1;
+        let wizardData = {
+            referenceFile: null,
+            referenceUrl: null,
+            selectedModel: null,
+            garmentFile: null,
+            garmentUrl: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupUploads();
+            loadModels();
+        });
+
+        // Setup upload areas
+        function setupUploads() {
+            // Reference upload
+            const referenceArea = document.getElementById('referenceUploadArea');
+            const referenceInput = document.getElementById('referenceInput');
+
+            referenceArea.addEventListener('click', () => referenceInput.click());
+            referenceInput.addEventListener('change', (e) => handleReferenceUpload(e.target.files[0]));
+
+            // Drag & drop
+            referenceArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                referenceArea.style.borderColor = '#667eea';
+            });
+            referenceArea.addEventListener('dragleave', () => {
+                referenceArea.style.borderColor = '#d1d5db';
+            });
+            referenceArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                handleReferenceUpload(e.dataTransfer.files[0]);
+            });
+
+            // Garment upload (same pattern)
+            const garmentArea = document.getElementById('garmentUploadArea');
+            const garmentInput = document.getElementById('garmentInput');
+
+            garmentArea.addEventListener('click', () => garmentInput.click());
+            garmentInput.addEventListener('change', (e) => handleGarmentUpload(e.target.files[0]));
+
+            garmentArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                garmentArea.style.borderColor = '#667eea';
+            });
+            garmentArea.addEventListener('dragleave', () => {
+                garmentArea.style.borderColor = '#d1d5db';
+            });
+            garmentArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                handleGarmentUpload(e.dataTransfer.files[0]);
+            });
+        }
+
+        // Handle reference upload
+        function handleReferenceUpload(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('لطفاً یک فایل تصویر انتخاب کنید');
+                return;
+            }
+
+            wizardData.referenceFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                wizardData.referenceUrl = e.target.result;
+                document.getElementById('referencePreview').innerHTML = `
+                    <img src="${e.target.result}" alt="Reference">
+                    <div style="margin-top: 10px; color: #10b981; font-weight: 600;">✓ عکس مرجع آپلود شد</div>
+                `;
+                document.getElementById('referenceUploadArea').classList.add('has-file');
+                document.getElementById('step1Next').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle garment upload
+        function handleGarmentUpload(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('لطفاً یک فایل تصویر انتخاب کنید');
+                return;
+            }
+
+            wizardData.garmentFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                wizardData.garmentUrl = e.target.result;
+                document.getElementById('garmentPreview').innerHTML = `
+                    <img src="${e.target.result}" alt="Garment">
+                    <div style="margin-top: 10px; color: #10b981; font-weight: 600;">✓ محصول آپلود شد</div>
+                `;
+                document.getElementById('garmentUploadArea').classList.add('has-file');
+                document.getElementById('step3Next').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Load models from API
+        async function loadModels() {
+            try {
+                const response = await fetch('/api/get-models?mode=scene-recreation');
+                const data = await response.json();
+
+                if (data.success) {
+                    const categories = [...new Set(data.models.map(m => m.category))];
+                    renderCategories(categories);
+                    renderModels(data.models, categories[0]);
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+            }
+        }
+
+        let allModels = [];
+
+        function renderCategories(categories) {
+            const container = document.getElementById('modelCategories');
+            allModels = [];
+
+            fetch('/api/get-models?mode=scene-recreation')
+                .then(r => r.json())
+                .then(data => {
+                    allModels = data.models;
+                    container.innerHTML = categories.map((cat, idx) => `
+                        <button class="category-btn ${idx === 0 ? 'active' : ''}" onclick="filterModels('${cat}', this)">
+                            ${cat}
+                        </button>
+                    `).join('');
+                });
+        }
+
+        function renderModels(models, category) {
+            const filtered = models.filter(m => m.category === category);
+            const grid = document.getElementById('modelsGrid');
+
+            grid.innerHTML = filtered.map(model => `
+                <div class="model-card" onclick="selectModel(${model.id}, this)">
+                    <img src="${model.image_url}" alt="${model.name}">
+                    <div class="checkmark">✓</div>
+                </div>
+            `).join('');
+        }
+
+        function filterModels(category, btn) {
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Filter and render
+            renderModels(allModels, category);
+        }
+
+        function selectModel(modelId, card) {
+            // Remove previous selection
+            document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+
+            // Save selection
+            wizardData.selectedModel = allModels.find(m => m.id === modelId);
+            document.getElementById('step2Next').disabled = false;
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                currentStep++;
+                updateWizard();
+
+                if (currentStep === 4) {
+                    updateSummary();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateWizard();
+            }
+        }
+
+        function updateWizard() {
+            // Update steps
+            document.querySelectorAll('.wizard-step').forEach((step, idx) => {
+                const stepNum = idx + 1;
+                step.classList.remove('active', 'completed');
+
+                if (stepNum === currentStep) {
+                    step.classList.add('active');
+                } else if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+
+            // Update content
+            document.querySelectorAll('.step-content').forEach((content, idx) => {
+                content.classList.remove('active');
+                if (idx + 1 === currentStep) {
+                    content.classList.add('active');
+                }
+            });
+
+            // Update progress line
+            const progress = ((currentStep - 1) / 3) * 100;
+            document.getElementById('progressLine').style.width = progress + '%';
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateSummary() {
+            document.getElementById('summaryReference').innerHTML = `
+                <img src="${wizardData.referenceUrl}" alt="Reference">
+            `;
+            document.getElementById('summaryModel').innerHTML = `
+                <img src="${wizardData.selectedModel.image_url}" alt="Model">
+            `;
+            document.getElementById('summaryGarment').innerHTML = `
+                <img src="${wizardData.garmentUrl}" alt="Garment">
+            `;
+        }
+
+        // Generate mirror
+        async function generateMirror() {
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            try {
+                // Upload reference image
+                const referenceFormData = new FormData();
+                referenceFormData.append('file', wizardData.referenceFile);
+                const referenceRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: referenceFormData
+                });
+                const referenceData = await referenceRes.json();
+
+                // Upload garment
+                const garmentFormData = new FormData();
+                garmentFormData.append('file', wizardData.garmentFile);
+                const garmentRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: garmentFormData
+                });
+                const garmentData = await garmentRes.json();
+
+                // Call generation API
+                const response = await fetch('/api/mirror-generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reference_image_url: referenceData.url,
+                        model_id: wizardData.selectedModel.id,
+                        garment_url: garmentData.url
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ تصویر با موفقیت تولید شد!');
+                    location.href = '/app';
+                } else {
+                    throw new Error(result.error || 'خطا در تولید تصویر');
+                }
+            } catch (error) {
+                console.error('Generation error:', error);
+                alert('❌ خطا: ' + error.message);
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

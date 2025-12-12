@@ -130,6 +130,11 @@ app.get('/mirror-homepage', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mirror-homepage.html'));
 });
 
+// Mirror Creation route (Copy competitor's style exactly)
+app.get('/mirror-creation', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'mirror-creation.html'));
+});
+
 // App page route
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
