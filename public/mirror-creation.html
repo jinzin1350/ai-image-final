@@ -637,12 +637,15 @@
         async function loadModelsForWizard() {
             try {
                 const response = await fetch('/api/models?mode=scene-recreation');
-                const data = await response.json();
+                const models = await response.json();
 
-                if (data.success && data.models) {
-                    loadedModels = data.models;
+                if (Array.isArray(models) && models.length > 0) {
+                    loadedModels = models;
+                    console.log(`✅ Loaded ${models.length} models for mirror creation`);
                     // Display first category
                     handleCategoryChange('brand-woman');
+                } else {
+                    console.warn('⚠️ No models returned from API');
                 }
             } catch (error) {
                 console.error('Error loading models:', error);
@@ -659,8 +662,8 @@
             }
 
             grid.innerHTML = filtered.map(model => `
-                <div class="model-card" onclick="selectModel(${model.id}, this, ${JSON.stringify(model).replace(/"/g, '&quot;')})">
-                    <img src="${model.image_url}" alt="${model.name || 'Model'}">
+                <div class="model-card" onclick="selectModel('${model.id}', this, ${JSON.stringify(model).replace(/"/g, '&quot;')})">
+                    <img src="${model.image || model.image_url}" alt="${model.name || 'Model'}">
                     <div class="checkmark">✓</div>
                 </div>
             `).join('');
@@ -729,7 +732,7 @@
                 <img src="${wizardData.referenceUrl}" alt="Reference">
             `;
             document.getElementById('summaryModel').innerHTML = `
-                <img src="${wizardData.selectedModel.image_url}" alt="Model">
+                <img src="${wizardData.selectedModel.image || wizardData.selectedModel.image_url}" alt="Model">
             `;
             document.getElementById('summaryGarment').innerHTML = `
                 <img src="${wizardData.garmentUrl}" alt="Garment">
@@ -759,13 +762,19 @@
                 });
                 const garmentData = await garmentRes.json();
 
+                // Extract numeric model ID from "custom-123" format
+                const modelId = wizardData.selectedModel.id.toString().replace('custom-', '');
+
                 // Call generation API
                 const response = await fetch('/api/mirror-generate', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    },
                     body: JSON.stringify({
                         reference_image_url: referenceData.url,
-                        model_id: wizardData.selectedModel.id,
+                        model_id: modelId,
                         garment_url: garmentData.url
                     })
                 });
