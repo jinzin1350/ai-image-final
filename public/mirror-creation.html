@@ -636,7 +636,7 @@
 
         async function loadModelsForWizard() {
             try {
-                const response = await fetch('/api/get-models?mode=scene-recreation');
+                const response = await fetch('/api/models?mode=scene-recreation');
                 const data = await response.json();
 
                 if (data.success && data.models) {
