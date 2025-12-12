@@ -34,6 +34,11 @@ const SERVICE_INFO = {
         icon: '🎨',
         name: 'انتقال استایل',
         nameEn: 'Style Transfer'
+    },
+    'mirror-creation': {
+        icon: '🪞',
+        name: 'کپی استایل عکس رقیب',
+        nameEn: 'Mirror Creation (Competitor Photo Copy)'
     }
 };
 

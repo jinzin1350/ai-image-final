@@ -7437,7 +7437,8 @@ app.post('/api/admin/init-permissions', authenticateAdmin, async (req, res) => {
       'color-collection',
       'flat-lay',
       'scene-recreation',
-      'style-transfer'
+      'style-transfer',
+      'mirror-creation'
     ];
 
     const permissionsToInsert = [];
