@@ -6179,10 +6179,16 @@ Generate the exact copy of the reference photo's style with the new model and ga
     console.log('✅ Mirror creation completed successfully!');
 
     // ============================================
-    // RETURN RESULT
+    // RETURN RESULT (matching /api/generate format for gallery compatibility)
     // ============================================
     res.json({
       success: true,
+      imagePath: resultImageUrl,
+      model: 'Mirror Creation',
+      background: 'Competitor Photo Style',
+      description: 'تولید شده با کپی دقیق استایل عکس رقیب',
+      message: 'تصویر با موفقیت تولید شد!',
+      // Additional data for advanced use
       data: {
         id: creationId,
         result_image_url: resultImageUrl,

@@ -805,26 +805,23 @@
             `;
         }
 
-        // Save to localStorage for gallery
-        function saveToGallery(result) {
+        // Save to localStorage for gallery (matching script.js format)
+        function saveToGallery(imageData) {
             try {
                 const savedImages = JSON.parse(localStorage.getItem('generatedImages') || '[]');
 
-                // Get the result image URL from the response
-                const resultImageUrl = result.data?.result_image_url || result.result_image_url;
-
+                // Use the same format as script.js saveToLocalStorage function
                 const newImage = {
                     id: Date.now(),
-                    imagePath: resultImageUrl,
-                    model: wizardData.selectedModel?.name || 'Mirror Creation Model',
-                    background: 'Mirror Creation',
-                    description: 'تولید شده با کپی استایل عکس رقیب',
+                    imagePath: imageData.imagePath,  // From API response
+                    model: imageData.model,  // From API response
+                    background: imageData.background,  // From API response
+                    description: imageData.description || '',  // From API response
                     modelId: wizardData.selectedModel?.id || null,
                     backgroundId: null,
                     shotTypeId: null,
                     poseId: null,
-                    date: new Date().toISOString(),
-                    mode: 'mirror-creation'
+                    created_at: new Date().toISOString()
                 };
 
                 savedImages.unshift(newImage);
@@ -885,15 +882,14 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Save to localStorage for gallery
+                    // Save to localStorage for gallery (result has imagePath, model, background, description)
                     saveToGallery(result);
 
                     // Hide loading
                     document.getElementById('loadingOverlay').classList.remove('active');
 
                     // Show result image
-                    const resultImageUrl = result.data?.result_image_url || result.result_image_url;
-                    document.getElementById('resultImage').src = resultImageUrl;
+                    document.getElementById('resultImage').src = result.imagePath;
 
                     // Navigate to step 5 (result page)
                     currentStep = 5;
