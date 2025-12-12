@@ -766,18 +766,24 @@
             try {
                 // Upload reference image
                 const referenceFormData = new FormData();
-                referenceFormData.append('file', wizardData.referenceFile);
+                referenceFormData.append('garment', wizardData.referenceFile);
                 const referenceRes = await fetch('/api/upload', {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    },
                     body: referenceFormData
                 });
                 const referenceData = await referenceRes.json();
 
                 // Upload garment
                 const garmentFormData = new FormData();
-                garmentFormData.append('file', wizardData.garmentFile);
+                garmentFormData.append('garment', wizardData.garmentFile);
                 const garmentRes = await fetch('/api/upload', {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    },
                     body: garmentFormData
                 });
                 const garmentData = await garmentRes.json();
@@ -793,9 +799,9 @@
                         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                     },
                     body: JSON.stringify({
-                        reference_image_url: referenceData.url,
+                        reference_image_url: referenceData.filePath,
                         model_id: modelId,
-                        garment_url: garmentData.url
+                        garment_url: garmentData.filePath
                     })
                 });
 

@@ -5911,16 +5911,16 @@ Be extremely specific and detailed - every detail will be copied exactly.`;
       .eq('id', creationId);
 
     // ============================================
-    // FETCH MODEL FROM content_library
+    // FETCH MODEL FROM models
     // ============================================
     const { data: modelData, error: modelError } = await supabase
-      .from('content_library')
+      .from('models')
       .select('image_url')
       .eq('id', parseInt(model_id))
       .single();
 
     if (modelError || !modelData) {
-      throw new Error('Model not found in content_library');
+      throw new Error('Model not found in models table');
     }
 
     const modelImageUrl = modelData.image_url;
