@@ -547,6 +547,7 @@
     <script src="script.js"></script>
     <script>
         let currentStep = 1;
+        let allModels = []; // Store all models from API
         let wizardData = {
             referenceFile: null,
             referenceUrl: null,
@@ -661,11 +662,8 @@
             }
         }
 
-        let allModels = [];
-
         function renderCategories(categories) {
             const container = document.getElementById('modelCategories');
-            allModels = [];
 
             fetch('/api/get-models?mode=scene-recreation')
                 .then(r => r.json())
