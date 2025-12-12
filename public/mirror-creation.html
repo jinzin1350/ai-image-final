@@ -636,31 +636,51 @@
 
         async function loadModelsForWizard() {
             try {
+                console.log('🔄 Loading models...');
                 const response = await fetch('/api/models?mode=scene-recreation');
                 const models = await response.json();
+
+                console.log('📦 API Response:', {
+                    isArray: Array.isArray(models),
+                    length: models?.length,
+                    firstModel: models?.[0]
+                });
 
                 if (Array.isArray(models) && models.length > 0) {
                     loadedModels = models;
                     console.log(`✅ Loaded ${models.length} models for mirror creation`);
+                    console.log('📋 Categories available:', [...new Set(models.map(m => m.category))]);
                     // Display first category
                     handleCategoryChange('brand-woman');
                 } else {
                     console.warn('⚠️ No models returned from API');
                 }
             } catch (error) {
-                console.error('Error loading models:', error);
+                console.error('❌ Error loading models:', error);
             }
         }
 
         function handleCategoryChange(category) {
+            console.log(`🔄 Changing category to: ${category}`);
+            console.log(`📊 Total models loaded: ${loadedModels.length}`);
+
             const filtered = loadedModels.filter(m => m.category === category);
+            console.log(`📊 Filtered models for ${category}: ${filtered.length}`);
+
             const grid = document.getElementById('modelsGrid');
 
+            if (!grid) {
+                console.error('❌ modelsGrid element not found!');
+                return;
+            }
+
             if (filtered.length === 0) {
+                console.warn(`⚠️ No models found for category: ${category}`);
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #9ca3af;">مدلی در این دسته یافت نشد</div>';
                 return;
             }
 
+            console.log(`✅ Rendering ${filtered.length} models`);
             grid.innerHTML = filtered.map(model => `
                 <div class="model-card" onclick="selectModel('${model.id}', this, ${JSON.stringify(model).replace(/"/g, '&quot;')})">
                     <img src="${model.image || model.image_url}" alt="${model.name || 'Model'}">
