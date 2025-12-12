@@ -181,30 +181,6 @@
         }
 
         /* Model Grid */
-        .model-categories {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .category-btn {
-            padding: 10px 20px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .category-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-color: #667eea;
-        }
-
         .models-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -467,7 +443,17 @@
                     <p>مدلی که محصول شما روی آن نمایش داده می‌شود</p>
                 </div>
 
-                <div class="model-categories" id="modelCategories"></div>
+                <div class="category-selector" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">دسته‌بندی مدل:</label>
+                    <select id="categorySelect" class="category-dropdown" onchange="handleCategoryChange(this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 16px; background: white; cursor: pointer;">
+                        <option value="brand-woman">👩‍💼 زن برند (Brand Woman)</option>
+                        <option value="brand-man">👨‍💼 مرد برند (Brand Man)</option>
+                        <option value="brand-girl">👧‍💼 دختر برند (Brand Girl)</option>
+                        <option value="brand-boy">👦‍💼 پسر برند (Brand Boy)</option>
+                        <option value="brand-plus-size">➕‍💼 سایز بزرگ برند (Brand Plus Size)</option>
+                    </select>
+                </div>
+
                 <div class="models-grid" id="modelsGrid"></div>
 
                 <div class="wizard-nav">
@@ -646,62 +632,47 @@
         }
 
         // Load models for wizard (uses global allModels from script.js)
+        let loadedModels = [];
+
         async function loadModelsForWizard() {
             try {
                 const response = await fetch('/api/get-models?mode=scene-recreation');
                 const data = await response.json();
 
                 if (data.success && data.models) {
-                    // Store in window.allModels (used by script.js)
-                    window.allModels = data.models;
-
-                    const categories = [...new Set(data.models.map(m => m.category))];
-                    renderCategories(categories, data.models);
-                    renderModels(data.models, categories[0]);
+                    loadedModels = data.models;
+                    // Display first category
+                    handleCategoryChange('brand-woman');
                 }
             } catch (error) {
                 console.error('Error loading models:', error);
             }
         }
 
-        function renderCategories(categories, models) {
-            const container = document.getElementById('modelCategories');
-            container.innerHTML = categories.map((cat, idx) => `
-                <button class="category-btn ${idx === 0 ? 'active' : ''}" onclick="filterModels('${cat}', this)">
-                    ${cat}
-                </button>
-            `).join('');
-        }
-
-        function renderModels(models, category) {
-            const filtered = models.filter(m => m.category === category);
+        function handleCategoryChange(category) {
+            const filtered = loadedModels.filter(m => m.category === category);
             const grid = document.getElementById('modelsGrid');
 
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #9ca3af;">مدلی در این دسته یافت نشد</div>';
+                return;
+            }
+
             grid.innerHTML = filtered.map(model => `
-                <div class="model-card" onclick="selectModel(${model.id}, this)">
-                    <img src="${model.image_url}" alt="${model.name}">
+                <div class="model-card" onclick="selectModel(${model.id}, this, ${JSON.stringify(model).replace(/"/g, '&quot;')})">
+                    <img src="${model.image_url}" alt="${model.name || 'Model'}">
                     <div class="checkmark">✓</div>
                 </div>
             `).join('');
         }
 
-        function filterModels(category, btn) {
-            // Update active button
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            // Filter and render
-            renderModels(window.allModels || [], category);
-        }
-
-        function selectModel(modelId, card) {
+        function selectModel(modelId, card, modelData) {
             // Remove previous selection
             document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
 
             // Save selection
-            const models = window.allModels || [];
-            wizardData.selectedModel = models.find(m => m.id === modelId);
+            wizardData.selectedModel = modelData || loadedModels.find(m => m.id === modelId);
             document.getElementById('step2Next').disabled = false;
         }
 
