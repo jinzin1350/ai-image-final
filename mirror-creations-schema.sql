@@ -1,8 +1,9 @@
 -- ============================================
 -- MIRROR CREATIONS TABLE
 -- ============================================
--- Feature: Mirror competitor's photo style with user's own product
--- Flow: Upload reference → AI analyzes style → Select model → Upload garment → Generate
+-- Feature: Mirror competitor's photo EXACTLY with user's own product
+-- Copies EVERYTHING: lighting, angle, pose, background, colors, hijab, accessories (glasses, hats, jewelry)
+-- Flow: Upload reference → AI analyzes ALL attributes → Select model → Upload garment → Generate EXACT copy
 
 CREATE TABLE IF NOT EXISTS mirror_creations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -11,7 +12,7 @@ CREATE TABLE IF NOT EXISTS mirror_creations (
   -- Reference image (competitor's photo to mirror)
   reference_image_url TEXT NOT NULL,
   reference_image_storage_path TEXT,
-  reference_analysis JSONB, -- AI analysis: {lighting, angle, mood, colors, background, pose}
+  reference_analysis JSONB, -- AI analysis: {lighting, angle, pose, colors, background, hijab, accessories, everything}
 
   -- Selected model from content_library
   model_id BIGINT REFERENCES content_library(id), -- BIGINT to match content_library.id
@@ -105,15 +106,15 @@ CREATE TRIGGER mirror_creations_updated_at
 -- COMMENTS
 -- ============================================
 
-COMMENT ON TABLE mirror_creations IS 'Stores mirror creation requests where users recreate competitor photo styles with their own products';
-COMMENT ON COLUMN mirror_creations.reference_image_url IS 'URL of the competitor/reference photo to mirror';
-COMMENT ON COLUMN mirror_creations.reference_analysis IS 'AI-extracted style attributes from reference image: lighting, angle, mood, colors, background, pose';
-COMMENT ON COLUMN mirror_creations.model_id IS 'Selected model from content_library (BIGINT foreign key)';
-COMMENT ON COLUMN mirror_creations.garment_url IS 'User uploaded garment/product image';
-COMMENT ON COLUMN mirror_creations.result_image_url IS 'Final generated image matching reference style';
-COMMENT ON COLUMN mirror_creations.status IS 'pending → analyzing → generating → completed/failed';
-COMMENT ON COLUMN mirror_creations.credits_used IS 'Number of credits deducted for this generation';
-COMMENT ON COLUMN mirror_creations.processing_time_ms IS 'Time taken to generate image in milliseconds';
+COMMENT ON TABLE mirror_creations IS 'Stores mirror creation requests where users recreate competitor photo styles EXACTLY with their own products - copies everything including hijab, accessories, pose, lighting, background';
+COMMENT ON COLUMN mirror_creations.reference_image_url IS 'URL of the competitor/reference photo to mirror EXACTLY';
+COMMENT ON COLUMN mirror_creations.reference_analysis IS 'AI-extracted ALL attributes from reference image: lighting, camera angle, pose, colors, background, hijab, accessories (glasses, hats, jewelry), mood, composition - EVERYTHING will be copied';
+COMMENT ON COLUMN mirror_creations.model_id IS 'Selected model from content_library (BIGINT foreign key) - will be styled to match reference';
+COMMENT ON COLUMN mirror_creations.garment_url IS 'User uploaded garment/product image - will be placed on model with reference styling';
+COMMENT ON COLUMN mirror_creations.result_image_url IS 'Final generated image matching reference style EXACTLY - same angle, same accessories, same everything';
+COMMENT ON COLUMN mirror_creations.status IS 'pending → analyzing (extracting all reference attributes) → generating (copying style) → completed/failed';
+COMMENT ON COLUMN mirror_creations.credits_used IS 'Number of credits deducted for this generation (default: 1)';
+COMMENT ON COLUMN mirror_creations.processing_time_ms IS 'Time taken to analyze and generate image in milliseconds';
 
 -- ============================================
 -- EXAMPLE USAGE
@@ -130,7 +131,17 @@ COMMENT ON COLUMN mirror_creations.processing_time_ms IS 'Time taken to generate
 -- ) VALUES (
 --   auth.uid(),
 --   'https://example.com/zara-reference.jpg',
---   '{"lighting": "soft natural", "angle": "45 degrees", "mood": "minimalist", "colors": "warm beige"}'::jsonb,
+--   '{
+--     "lighting": "soft natural from left",
+--     "camera_angle": "3/4 front, slightly above",
+--     "pose": "standing, arms at sides",
+--     "background": "plain white wall",
+--     "colors": "warm beige tones, soft shadows",
+--     "hijab": "light beige hijab, wrapped loosely",
+--     "accessories": ["round sunglasses", "small gold earrings"],
+--     "mood": "minimalist, clean, professional",
+--     "composition": "centered, rule of thirds"
+--   }'::jsonb,
 --   123, -- model_id from content_library
 --   'https://example.com/my-garment.jpg',
 --   'pending'
