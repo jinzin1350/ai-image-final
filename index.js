@@ -404,6 +404,16 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
     });
 
     console.log(`✅ Returning ${usersWithLimits.length} users to admin panel`);
+
+    // Log first few users for debugging
+    if (usersWithLimits.length > 0) {
+      console.log('📋 Sample users:', usersWithLimits.slice(0, 3).map(u => ({
+        email: u.email,
+        tier: u.tier,
+        credits: `${u.credits_used}/${u.credits_limit}`
+      })));
+    }
+
     res.json({ success: true, users: usersWithLimits });
   } catch (error) {
     console.error('❌ Error in /api/admin/users:', error);

@@ -58,6 +58,13 @@
                 <p>Manage users, premium status, and usage limits</p>
             </div>
             <div class="header-actions">
+                <input
+                    type="text"
+                    id="userSearch"
+                    placeholder="🔍 Search by email..."
+                    style="padding:10px 16px; border:2px solid #e5e7eb; border-radius:8px; font-size:14px; width:250px; margin-right:12px;"
+                    oninput="filterUsers()"
+                />
                 <button class="btn-refresh" onclick="loadUsers()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
@@ -260,6 +267,28 @@
                 console.error('Error deleting user:', error);
                 showNotification('Failed to delete user', 'error');
             }
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const table = document.querySelector('#usersTable table');
+
+            if (!table) return;
+
+            const rows = table.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const email = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+                if (email.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            console.log(`🔍 Showing ${visibleCount} / ${rows.length} users matching "${searchTerm}"`);
         }
 
         loadUsers();
