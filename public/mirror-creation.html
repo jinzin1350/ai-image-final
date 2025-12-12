@@ -532,6 +532,21 @@
 
     <!-- script.js removed - causes conflicts with wizard-specific code -->
     <script>
+        // ============================================
+        // AUTH CHECK - Require login
+        // ============================================
+        (function checkAuth() {
+            const token = localStorage.getItem('supabase_token');
+            const session = localStorage.getItem('supabase_session');
+
+            if (!token || !session) {
+                console.log('⚠️ No auth credentials - redirecting to login');
+                window.location.replace('/auth');
+                return;
+            }
+            console.log('✅ User is authenticated');
+        })();
+
         let currentStep = 1;
         let wizardData = {
             referenceFile: null,
@@ -759,6 +774,30 @@
             `;
         }
 
+        // Save to localStorage for gallery
+        function saveToGallery(imageData) {
+            try {
+                const savedImages = JSON.parse(localStorage.getItem('generatedImages') || '[]');
+
+                const newImage = {
+                    id: Date.now(),
+                    imagePath: imageData.data?.result_image_url || imageData.result_image_url,
+                    model: wizardData.selectedModel.name || 'Mirror Creation Model',
+                    background: 'Mirror Creation',
+                    description: 'تولید شده با کپی استایل عکس رقیب',
+                    modelId: wizardData.selectedModel.id,
+                    date: new Date().toISOString(),
+                    mode: 'mirror-creation'
+                };
+
+                savedImages.unshift(newImage);
+                localStorage.setItem('generatedImages', JSON.stringify(savedImages));
+                console.log('✅ Image saved to gallery');
+            } catch (error) {
+                console.error('⚠️ Could not save to gallery:', error);
+            }
+        }
+
         // Generate mirror
         async function generateMirror() {
             document.getElementById('loadingOverlay').classList.add('active');
@@ -808,8 +847,14 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    alert('✅ تصویر با موفقیت تولید شد!');
-                    location.href = '/app';
+                    // Save to localStorage for gallery
+                    saveToGallery(result);
+
+                    // Show success message with link to gallery
+                    alert('✅ تصویر با موفقیت تولید شد!\n\nبرای مشاهده تصویر خود به گالری بروید.');
+
+                    // Redirect to gallery to show the new image
+                    location.href = '/gallery.html';
                 } else {
                     throw new Error(result.error || 'خطا در تولید تصویر');
                 }
