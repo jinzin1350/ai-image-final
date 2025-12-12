@@ -6148,7 +6148,38 @@ Generate the exact copy of the reference photo's style with the new model and ga
     console.log(`📸 Result uploaded: ${resultImageUrl}`);
 
     // ============================================
-    // UPDATE DATABASE WITH RESULT (optional)
+    // SAVE TO generated_images TABLE (for gallery)
+    // ============================================
+    try {
+      const { data: galleryData, error: galleryError } = await supabase
+        .from('generated_images')
+        .insert([
+          {
+            user_id: req.user?.id || null,
+            user_email: req.user?.email || null,
+            user_phone: req.user?.phone || req.user?.phone_number || null,
+            garment_path: garment_url,
+            model_id: model_id,
+            background_id: null,
+            prompt: prompt,
+            description: 'تولید شده با کپی دقیق استایل عکس رقیب (Mirror Creation)',
+            generated_image_url: resultImageUrl,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (galleryError) {
+        console.error('⚠️ خطا در ذخیره در generated_images:', galleryError);
+      } else {
+        console.log('✅ Image saved to gallery (generated_images table)');
+      }
+    } catch (galleryDbError) {
+      console.error('⚠️ Could not save to generated_images:', galleryDbError);
+    }
+
+    // ============================================
+    // UPDATE DATABASE WITH RESULT (optional - mirror_creations table)
     // ============================================
     if (mirrorCreation) {
       try {
