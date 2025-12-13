@@ -1,477 +1,575 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirrorAI - Turn Competitor Posts Into Your Professional Photos</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fusion AI Mirror — تکنیک عکس‌های پرفروش را برای محصولت بازسازی کن</title>
 
-    <link rel="stylesheet" href="mirror-landing-style.css">
+  <!-- Meta Tags -->
+  <meta name="description" content="با Fusion AI تکنیک‌های عکاسی رقبا را تحلیل کنید و برای محصول خود بازسازی کنید. خروجی حرفه‌ای در 30 ثانیه بدون عکاس و استودیو.">
+  <meta name="keywords" content="mirror creation, کپی استایل عکس, تحلیل عکس رقیب, عکاسی هوش مصنوعی, AI photography">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Hotjar Tracking Code -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+  <link rel="stylesheet" href="mirror-landing-style.css" />
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="15" fill="url(#logo-gradient)"/>
-                    <circle cx="11" cy="16" r="5" fill="white" opacity="0.3"/>
-                    <circle cx="21" cy="16" r="5" fill="white" opacity="0.3"/>
-                    <defs>
-                        <linearGradient id="logo-gradient" x1="0" y1="0" x2="32" y2="32">
-                            <stop offset="0%" stop-color="#667eea"/>
-                            <stop offset="100%" stop-color="#764ba2"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span>MirrorAI</span>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="12" fill="url(#gradient1)"/>
+          <path d="M20 10L12 18L20 26L28 18L20 10Z" fill="white" opacity="0.9"/>
+          <circle cx="20" cy="20" r="3" fill="white"/>
+          <defs>
+            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0%" stop-color="#667eea"/>
+              <stop offset="100%" stop-color="#764ba2"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>Fusion AI</span>
+      </div>
+
+      <div class="nav-links">
+        <a href="#how">چطور کار می‌کنه؟</a>
+        <a href="#pricing">پلن‌ها</a>
+        <a href="#faq">سوالات</a>
+        <a href="/app">همه سرویس‌ها</a>
+      </div>
+
+      <button class="btn-primary btn-nav" onclick="scrollToStart()">شروع رایگان ←</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <div class="hero-container">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        طراحی‌شده برای استفاده قانونی و اخلاقی · مناسب فروش آنلاین
+      </div>
+
+      <h1 class="hero-title">
+        تماشا نکن.<br>
+        شروع کن به <span class="gradient-text">Mirror کردن</span>.
+      </h1>
+
+      <p class="hero-description">
+        رقیبت یه پست گذاشته که ترکونده؟ Fusion AI زاویه، نور، ترکیب‌بندی و حال‌وهوای عکس رو تحلیل می‌کنه
+        و همون <b>تکنیک</b> رو برای <b>محصول خودت</b> بازسازی می‌کنه — خروجی حرفه‌ای در حدود ۳۰ ثانیه، بدون عکاس و استودیو.
+      </p>
+
+      <div class="hero-buttons">
+        <button class="btn-hero-primary" onclick="scrollToStart()">
+          شروع رایگان
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h10M7 4l-4 4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <button class="btn-hero-secondary" onclick="scrollToDemo()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M5 3l8 5-8 5V3z"/>
+          </svg>
+          دیدن دمو
+        </button>
+      </div>
+
+      <!-- Visual Demo -->
+      <div class="demo-visual" id="demo">
+        <div class="demo-card">
+          <div class="demo-label">پست وایرال (الهام‌بخش)</div>
+          <div class="demo-image demo-competitor">
+            <div class="image-overlay">
+              <div class="engagement">
+                <span>❤️ 12.4K</span>
+                <span>💬 832</span>
+              </div>
             </div>
-            <div class="nav-links">
-                <a href="#how">How It Works</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#faq">FAQ</a>
-            </div>
-            <button class="btn-primary btn-nav">Start Free →</button>
+          </div>
         </div>
-    </nav>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-badge">
-                <span class="pulse-dot"></span>
-                100% Legal · Used by 1,200+ sellers
+        <div class="demo-arrow" aria-hidden="true">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="23" fill="white" stroke="#e5e7eb" stroke-width="2"/>
+            <path d="M30 24H18M22 18l-6 6 6 6" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="demo-card">
+          <div class="demo-label">نسخه تو (در ~۳۰ ثانیه)</div>
+          <div class="demo-image demo-yours">
+            <div class="image-overlay">
+              <div class="quality-badge">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="#10b981" aria-hidden="true">
+                  <path d="M8 1l2 5 5 .5-4 3.5 1.5 5L8 12l-4.5 2.5L5 9 1 5.5 6 5z"/>
+                </svg>
+                کیفیت حرفه‌ای
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <h1 class="hero-title">
-                Stop Admiring.<br>
-                Start <span class="gradient-text">Mirroring</span>.
-            </h1>
+      <!-- Social Proof -->
+      <div class="social-proof">
+        <div class="avatar-group" aria-hidden="true">
+          <div class="avatar"></div>
+          <div class="avatar"></div>
+          <div class="avatar"></div>
+          <div class="avatar"></div>
+          <div class="avatar-count">+۱٫۲K</div>
+        </div>
+        <div class="proof-text">
+          <div class="stars">★★★★★</div>
+          <p>۴.۹/۵ از ۲۴۳ فروشنده</p>
+        </div>
+      </div>
 
-            <p class="hero-description">
-                See a competitor post that's crushing it? Analyze it. Recreate that vibe for YOUR product.
-                Professional photos in 30 seconds. No photographer needed.
+      <p class="pricing-note" style="margin-top:16px; max-width:820px;">
+        *نکته حرفه‌ای: Fusion AI «تصویر را کپی نمی‌کند»؛ ما تکنیک‌های عکاسی (زاویه/نور/ترکیب‌بندی) را تحلیل می‌کنیم و برای محصول شما بازسازی می‌کنیم.
+        با این حال، مسئولیت استفاده نهایی و رعایت قوانین/حقوق مالکیت فکری در کشور شما با کاربر است.
+      </p>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how" class="how-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">سریع و ساده</span>
+        <h2>۳ قدم تا عکس حرفه‌ای</h2>
+        <p>نه مهارت خاص می‌خواد، نه تجهیزات. فقط نتیجه.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <div class="step-icon">📸</div>
+          <h3>عکس الهام‌بخش رو آپلود کن</h3>
+          <p>یک عکس موفق پیدا کن. عکس رو آپلود کن تا Fusion AI تحلیلش کنه.</p>
+          <div class="step-example">
+            <div class="timer-badge">⚡ آپلود آسان</div>
+          </div>
+        </div>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <div class="step">
+          <div class="step-number">02</div>
+          <div class="step-icon">🤖</div>
+          <h3>AI تکنیک رو تحلیل می‌کنه</h3>
+          <p>زاویه دوربین، نور و سایه، ترکیب‌بندی، رنگ و mood بررسی می‌شن تا «فرمول عکس» دربیاد.</p>
+          <div class="step-example">
+            <div class="analysis-tags">
+              <span>✓ زاویه</span>
+              <span>✓ نور</span>
+              <span>✓ mood</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <div class="step" id="start">
+          <div class="step-number">03</div>
+          <div class="step-icon">✨</div>
+          <h3>محصولت رو آپلود کن</h3>
+          <p>یک عکس ساده از محصول بده (موبایل هم اوکیه). خروجی فروش‌محور رو بگیر و دانلود کن.</p>
+          <div class="step-example">
+            <div class="timer-badge">⚡ ~۳۰ ثانیه</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Button -->
+      <div style="text-align: center; margin-top: 3rem;">
+        <a href="/mirror-creation.html" class="btn-hero-primary" style="display: inline-flex; text-decoration: none;">
+          🪞 شروع ساخت عکس Mirror
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M7 4l-4 4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Section -->
+  <section class="trust-section">
+    <div class="section-container">
+      <div class="trust-content">
+        <div class="trust-icon" aria-hidden="true">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="30" stroke="#10b981" stroke-width="3" fill="rgba(16, 185, 129, 0.1)"/>
+            <path d="M32 16l-6 10 6 10 6-10z" fill="#10b981"/>
+            <circle cx="32" cy="32" r="6" fill="#10b981"/>
+          </svg>
+        </div>
+
+        <h2>قانونی و اخلاقی — وقتی درست اجرا بشه</h2>
+        <p class="trust-lead">«این دزدی نیست؛ یادگیریه.»</p>
+
+        <div class="trust-grid">
+          <div class="trust-col">
+            <h3>✅ کاری که انجام می‌دیم</h3>
+            <ul>
+              <li>تحلیل هندسه زاویه دوربین</li>
+              <li>بررسی منطق نورپردازی و سایه</li>
+              <li>تشخیص قواعد ترکیب‌بندی</li>
+              <li>تحلیل رنگ و حس‌وحال تصویر</li>
+            </ul>
+          </div>
+
+          <div class="trust-col">
+            <h3>❌ کاری که انجام نمی‌دیم</h3>
+            <ul>
+              <li>کپی عکس طرف مقابل</li>
+              <li>استفاده از لوگو/متن/برندینگ آن‌ها</li>
+              <li>بازسازی چهره یا المان‌های محافظت‌شده</li>
+              <li>تکرار دقیق عناصر اختصاصی/شخصی</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="trust-analogy">
+          <p><strong>مثل آموزش آشپزیه.</strong></p>
+          <p>تکنیک رو یاد می‌گیری و با مواد خودت اجرا می‌کنی — نتیجه می‌تونه شبیه «سبک» باشه، نه کپیِ همون غذا.</p>
+          <p><strong>Fusion AI همین کار رو برای عکاسی محصول انجام می‌ده.</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="pricing-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">قیمت‌گذاری</span>
+        <h2>شروع رایگان. رشد وقتی آماده‌ای.</h2>
+        <p>لغو هر زمان. بدون دردسر.</p>
+      </div>
+
+      <div class="pricing-cards">
+        <!-- Bronze -->
+        <div class="pricing-card">
+          <div class="card-header">
+            <h3>برنزی</h3>
+            <div class="price">
+              <span class="amount">۵۰</span>
+              <span class="period">عکس/ماه</span>
+            </div>
+            <p class="price-per">۵۰ اعتبار ماهانه</p>
+          </div>
+          <ul class="features">
+            <li><strong>۵۰ خروجی در ماه</strong></li>
+            <li>خروجی در ~۳۰ ثانیه</li>
+            <li>مناسب شروع پیج/فروشگاه</li>
+            <li>استفاده تجاری</li>
+            <li>پشتیبانی ایمیل</li>
+          </ul>
+          <button class="btn-card" onclick="scrollToStart()">شروع رایگان</button>
+        </div>
+
+        <!-- Silver (Popular) -->
+        <div class="pricing-card popular">
+          <div class="popular-badge">محبوب‌ترین</div>
+          <div class="card-header">
+            <h3>نقره‌ای</h3>
+            <div class="price">
+              <span class="amount">۱۰۰</span>
+              <span class="period">عکس/ماه</span>
+            </div>
+            <p class="price-per">۱۰۰ اعتبار ماهانه</p>
+          </div>
+          <ul class="features">
+            <li><strong>۱۰۰ خروجی در ماه</strong></li>
+            <li><strong>صف سریع‌تر</strong> (اولویت پردازش)</li>
+            <li>ساخت دسته‌ای (Batch)</li>
+            <li>ذخیره سبک‌های محبوب</li>
+            <li>پشتیبانی اولویت‌دار</li>
+            <li>دسترسی API</li>
+          </ul>
+          <button class="btn-card btn-card-popular" onclick="scrollToStart()">شروع رایگان</button>
+        </div>
+
+        <!-- Gold -->
+        <div class="pricing-card">
+          <div class="card-header">
+            <h3>طلایی</h3>
+            <div class="price">
+              <span class="amount">۱۳۰</span>
+              <span class="period">عکس/ماه</span>
+            </div>
+            <p class="price-per">۱۳۰ اعتبار ماهانه</p>
+          </div>
+          <ul class="features">
+            <li><strong>۱۳۰ خروجی در ماه</strong></li>
+            <li><strong>پردازش سریع‌تر</strong> (اولویت بالاتر)</li>
+            <li>Batch نامحدود</li>
+            <li>انتقال استایل/بازسازی صحنه</li>
+            <li>پشتیبانی اختصاصی</li>
+            <li>ادغام سفارشی (در صورت نیاز)</li>
+          </ul>
+          <button class="btn-card" onclick="scrollToStart()">شروع رایگان</button>
+        </div>
+      </div>
+
+      <p class="pricing-note">۵ عکس رایگان · بدون کارت اعتباری · لغو هر زمان</p>
+      <p class="pricing-note" style="margin-top: 1rem;"><a href="/pricing.html" style="color: #667eea; text-decoration: underline;">مشاهده جزئیات کامل قیمت‌گذاری و مقایسه پلن‌ها</a></p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="faq-section">
+    <div class="section-container faq-container">
+      <div class="section-header">
+        <span class="section-tag">سوال داری؟</span>
+        <h2>سوالات پرتکرار</h2>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>این کار واقعاً قانونی و اخلاقیه؟ 🤔</span>
+            <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>
+              ما <strong>تکنیک‌های عکاسی</strong> (زاویه، نور، ترکیب‌بندی) را تحلیل می‌کنیم و <strong>عکس را کپی نمی‌کنیم</strong>.
+              اما رعایت قوانین، برندینگ و استفاده نهایی در کشور شما به نحوه استفاده شما هم بستگی دارد؛ برای همین در محصول،
+              محدودیت‌های «لوگو/متن/چهره» را جدی می‌گیریم.
             </p>
-
-            <div class="hero-buttons">
-                <button class="btn-hero-primary">
-                    Try 5 Photos Free
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-                <button class="btn-hero-secondary">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M5 3l8 5-8 5V3z"/>
-                    </svg>
-                    Watch Demo
-                </button>
-            </div>
-
-            <!-- Visual Demo -->
-            <div class="demo-visual">
-                <div class="demo-card">
-                    <div class="demo-label">Their viral post</div>
-                    <div class="demo-image demo-competitor">
-                        <div class="image-overlay">
-                            <div class="engagement">
-                                <span>❤️ 12.4K</span>
-                                <span>💬 832</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="demo-arrow">
-                    <svg width="48" height="48" viewBox="0 0 48 48">
-                        <circle cx="24" cy="24" r="23" fill="white" stroke="#e5e7eb" stroke-width="2"/>
-                        <path d="M18 24h12M26 18l6 6-6 6" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-
-                <div class="demo-card">
-                    <div class="demo-label">Your version in 30s</div>
-                    <div class="demo-image demo-yours">
-                        <div class="image-overlay">
-                            <div class="quality-badge">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="#10b981">
-                                    <path d="M8 1l2 5 5 .5-4 3.5 1.5 5L8 12l-4.5 2.5L5 9 1 5.5 6 5z"/>
-                                </svg>
-                                Pro Quality
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Social Proof -->
-            <div class="social-proof">
-                <div class="avatar-group">
-                    <div class="avatar"></div>
-                    <div class="avatar"></div>
-                    <div class="avatar"></div>
-                    <div class="avatar"></div>
-                    <div class="avatar-count">+1.2K</div>
-                </div>
-                <div class="proof-text">
-                    <div class="stars">★★★★★</div>
-                    <p>4.9/5 from 243 fashion sellers</p>
-                </div>
-            </div>
+          </div>
         </div>
-    </section>
 
-    <!-- How It Works -->
-    <section id="how" class="how-section">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Simple Process</span>
-                <h2>Three Steps to Professional Photos</h2>
-                <p>No skills. No equipment. Just results.</p>
-            </div>
-
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">01</div>
-                    <div class="step-icon">🔗</div>
-                    <h3>Paste Competitor URL</h3>
-                    <p>Find an Instagram post you love. Copy the link. Paste it in MirrorAI.</p>
-                    <div class="step-example">
-                        <code>instagram.com/p/xyz123...</code>
-                    </div>
-                </div>
-
-                <div class="step-connector"></div>
-
-                <div class="step">
-                    <div class="step-number">02</div>
-                    <div class="step-icon">🤖</div>
-                    <h3>AI Analyzes Technique</h3>
-                    <p>Our AI studies: camera angle, lighting setup, composition rules, color mood.</p>
-                    <div class="step-example">
-                        <div class="analysis-tags">
-                            <span>✓ Angle</span>
-                            <span>✓ Light</span>
-                            <span>✓ Mood</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step-connector"></div>
-
-                <div class="step">
-                    <div class="step-number">03</div>
-                    <div class="step-icon">📸</div>
-                    <h3>Upload Your Product</h3>
-                    <p>Drop your product photo. Get professional result in 30 seconds. Download.</p>
-                    <div class="step-example">
-                        <div class="timer-badge">⚡ 30 seconds</div>
-                    </div>
-                </div>
-            </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>آیا مشخص می‌شه عکس با AI ساخته شده؟ 🤖</span>
+            <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>
+              هدف ما خروجی «فروش‌محور و تمیز» است: بدون دست‌های عجیب، بدون آرتیفکت‌های واضح. کیفیت نهایی به عکس ورودی محصول و تنظیمات هم وابسته است.
+            </p>
+          </div>
         </div>
-    </section>
 
-    <!-- Trust Section -->
-    <section class="trust-section">
-        <div class="section-container">
-            <div class="trust-content">
-                <div class="trust-icon">
-                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                        <circle cx="32" cy="32" r="30" stroke="#10b981" stroke-width="3" fill="rgba(16, 185, 129, 0.1)"/>
-                        <path d="M32 16l-6 10 6 10 6-10z" fill="#10b981"/>
-                        <circle cx="32" cy="32" r="6" fill="#10b981"/>
-                    </svg>
-                </div>
-                <h2>100% Legal & Ethical</h2>
-                <p class="trust-lead">"Is this stealing? No. It's learning."</p>
-
-                <div class="trust-grid">
-                    <div class="trust-col">
-                        <h3>✅ What We DO</h3>
-                        <ul>
-                            <li>Analyze camera geometry</li>
-                            <li>Study lighting physics</li>
-                            <li>Learn composition rules</li>
-                            <li>Understand color theory</li>
-                        </ul>
-                    </div>
-                    <div class="trust-col">
-                        <h3>❌ What We DON'T</h3>
-                        <ul>
-                            <li>Copy their images</li>
-                            <li>Use their models</li>
-                            <li>Steal their branding</li>
-                            <li>Reproduce their products</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="trust-analogy">
-                    <p><strong>Think of it like YouTube cooking tutorials.</strong></p>
-                    <p>Gordon Ramsay teaches you <em>how</em> to sear a steak. You apply that technique to your own ingredients. That's learning, not stealing.</p>
-                    <p><strong>MirrorAI does the same for product photography.</strong></p>
-                </div>
-            </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>چه عکس ورودی بهتر جواب می‌ده؟ 📱</span>
+            <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>
+              عکس واضح با نور کافی، پس‌زمینه ساده و بدون برش شدید. اگر لباس روی مانکن/مدل باشد معمولاً نتیجه بهتر می‌شود چون فرم واقعی بهتر دیده می‌شود.
+            </p>
+          </div>
         </div>
-    </section>
 
-    <!-- Pricing -->
-    <section id="pricing" class="pricing-section">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-tag">Simple Pricing</span>
-                <h2>Pay Per Photo. Or Go Unlimited.</h2>
-                <p>Start free. Scale when ready. Cancel anytime.</p>
-            </div>
-
-            <div class="pricing-cards">
-                <!-- Starter -->
-                <div class="pricing-card">
-                    <div class="card-header">
-                        <h3>Starter</h3>
-                        <div class="price">
-                            <span class="amount">$29</span>
-                            <span class="period">/mo</span>
-                        </div>
-                        <p class="price-per">$0.97 per photo</p>
-                    </div>
-                    <ul class="features">
-                        <li><strong>30 photos/month</strong></li>
-                        <li>30-second generation</li>
-                        <li>iPhone quality OK</li>
-                        <li>Commercial license</li>
-                        <li>Email support</li>
-                    </ul>
-                    <button class="btn-card">Start Free Trial</button>
-                </div>
-
-                <!-- Growth (Popular) -->
-                <div class="pricing-card popular">
-                    <div class="popular-badge">Most Popular</div>
-                    <div class="card-header">
-                        <h3>Growth</h3>
-                        <div class="price">
-                            <span class="amount">$79</span>
-                            <span class="period">/mo</span>
-                        </div>
-                        <p class="price-per">$0.79 per photo</p>
-                    </div>
-                    <ul class="features">
-                        <li><strong>100 photos/month</strong></li>
-                        <li><strong>15-second</strong> priority queue</li>
-                        <li>Batch create (10 at once)</li>
-                        <li>Save favorite styles</li>
-                        <li>Priority support</li>
-                        <li>API access</li>
-                    </ul>
-                    <button class="btn-card btn-card-popular">Start Free Trial</button>
-                </div>
-
-                <!-- Scale -->
-                <div class="pricing-card">
-                    <div class="card-header">
-                        <h3>Scale</h3>
-                        <div class="price">
-                            <span class="amount">$199</span>
-                            <span class="period">/mo</span>
-                        </div>
-                        <p class="price-per">$0.66 per photo</p>
-                    </div>
-                    <ul class="features">
-                        <li><strong>300 photos/month</strong></li>
-                        <li><strong>10-second</strong> instant generation</li>
-                        <li>Unlimited batch creation</li>
-                        <li>White-label option</li>
-                        <li>Custom integrations</li>
-                        <li>Dedicated manager</li>
-                    </ul>
-                    <button class="btn-card">Start Free Trial</button>
-                </div>
-            </div>
-
-            <p class="pricing-note">All plans: No credit card for trial · 30-day money-back · Cancel anytime</p>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>واقعاً ۳۰ ثانیه؟ ⏱️</span>
+            <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>
+              در اکثر مواقع بله (بسته به ترافیک و پیچیدگی صحنه). پلن‌های بالاتر می‌توانند اولویت پردازش داشته باشند.
+            </p>
+          </div>
         </div>
-    </section>
 
-    <!-- FAQ -->
-    <section id="faq" class="faq-section">
-        <div class="section-container faq-container">
-            <div class="section-header">
-                <span class="section-tag">Questions?</span>
-                <h2>Everything You Need to Know</h2>
-            </div>
-
-            <div class="faq-list">
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <span>Is this actually legal? 🤔</span>
-                        <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="faq-answer">
-                        <p><strong>Yes, 100% legal.</strong> We analyze photographic techniques (angles, lighting, composition) — not copy copyrighted images. It's the same as watching a tutorial and applying what you learned.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <span>Will people know it's AI-generated? 🤖</span>
-                        <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="faq-answer">
-                        <p><strong>Nope.</strong> Our AI is trained specifically on fashion photography. No weird hands, no uncanny valley. Results look professionally photographed.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <span>Do I need photography skills? 📸</span>
-                        <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="faq-answer">
-                        <p><strong>Zero.</strong> If you can paste a URL and upload a photo from your phone, you can use MirrorAI. That's literally it.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <span>What quality photos do I need to upload? 📱</span>
-                        <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="faq-answer">
-                        <p>iPhone photos work perfectly. Even decent Android shots are fine. We enhance quality during generation. No professional camera needed.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <span>Can I cancel anytime? 🚪</span>
-                        <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="faq-answer">
-                        <p><strong>Yes.</strong> One-click cancel from your dashboard. No contracts. No penalties. Keep all photos you've created.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <span>How fast is "30 seconds" really? ⏱️</span>
-                        <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <div class="faq-answer">
-                        <p>Literally 30 seconds from upload to download. Growth plan gets 15s. Scale plan gets 10s. It's genuinely that fast.</p>
-                    </div>
-                </div>
-            </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>می‌تونم هر زمان کنسل کنم؟ 🚪</span>
+            <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>
+              بله، لغو ساده و شفاف است. عکس‌های ساخته‌شده برای شما باقی می‌ماند و می‌توانید از پروفایل خود دانلود کنید.
+            </p>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- CTA -->
-    <section class="cta-section">
-        <div class="cta-container">
-            <h2>Ready to Stop Feeling Outmatched?</h2>
-            <p>Join 1,200+ sellers who compete with confidence</p>
-            <button class="btn-cta">
-                Start Creating Free
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
-            <p class="cta-subtext">5 free photos · No credit card · Cancel anytime</p>
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-container">
+      <h2>حاضری دیگه جلوی رقیبت احساس ضعف نکنی؟</h2>
+      <p>با Fusion AI رقابت می‌کنی، نه تماشا.</p>
+
+      <a href="/mirror-creation.html" class="btn-cta" style="text-decoration: none;">
+        شروع رایگان
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M16 10H4M8 6l-4 4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </a>
+
+      <p class="cta-subtext">۵ عکس رایگان · بدون کارت · لغو هر زمان</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <div class="footer-logo">
+            <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+              <rect width="40" height="40" rx="12" fill="url(#gradient2)"/>
+              <path d="M20 10L12 18L20 26L28 18L20 10Z" fill="white" opacity="0.9"/>
+              <circle cx="20" cy="20" r="3" fill="white"/>
+              <defs>
+                <linearGradient id="gradient2" x1="0" y1="0" x2="40" y2="40">
+                  <stop offset="0%" stop-color="#667eea"/>
+                  <stop offset="100%" stop-color="#764ba2"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span>استودیو AI</span>
+          </div>
+          <p class="footer-description">
+            دستیار هوش مصنوعی شما برای تولید عکس‌های حرفه‌ای محصول.
+            ساده، سریع و با کیفیت استودیویی.
+          </p>
+          <div class="footer-social">
+            <a href="#" aria-label="اینستاگرام">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="none" stroke="white" stroke-width="2"/>
+                <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="تلگرام">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="لینکدین">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+              </svg>
+            </a>
+          </div>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <div class="footer-logo">
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <circle cx="16" cy="16" r="15" fill="url(#footer-gradient)"/>
-                        <circle cx="11" cy="16" r="5" fill="white" opacity="0.3"/>
-                        <circle cx="21" cy="16" r="5" fill="white" opacity="0.3"/>
-                        <defs>
-                            <linearGradient id="footer-gradient" x1="0" y1="0" x2="32" y2="32">
-                                <stop offset="0%" stop-color="#667eea"/>
-                                <stop offset="100%" stop-color="#764ba2"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span>MirrorAI</span>
-                </div>
-                <p>Learn from the best.<br>Compete with confidence.</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <h4>Product</h4>
-                    <a href="#how">How It Works</a>
-                    <a href="#pricing">Pricing</a>
-                    <a href="#faq">FAQ</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Legal</h4>
-                    <a href="/terms">Terms</a>
-                    <a href="/privacy">Privacy</a>
-                    <a href="/ethics">Ethics</a>
-                </div>
-                <div class="footer-col">
-                    <h4>Connect</h4>
-                    <a href="#">Instagram</a>
-                    <a href="#">Twitter</a>
-                    <a href="mailto:hello@mirrorai.com">Email</a>
-                </div>
-            </div>
+        <div class="footer-column">
+          <h4>محصول</h4>
+          <a href="#features">امکانات</a>
+          <a href="#showcase">نمونه‌کارها</a>
+          <a href="/pricing.html">قیمت‌گذاری</a>
+          <a href="#">به‌روزرسانی‌ها</a>
         </div>
-        <div class="footer-bottom">
-            <p>© 2024 MirrorAI. Built for small fashion brands.</p>
+
+        <div class="footer-column">
+          <h4>شرکت</h4>
+          <a href="/about.html">درباره ما</a>
+          <a href="#">وبلاگ</a>
+          <a href="/careers.html">فرصت‌های شغلی</a>
+          <a href="/contact.html">تماس با ما</a>
         </div>
-    </footer>
 
-    <script>
-        // FAQ Accordion
-        document.querySelectorAll('.faq-question').forEach(button => {
-            button.addEventListener('click', () => {
-                const item = button.parentElement;
-                const wasActive = item.classList.contains('active');
+        <div class="footer-column">
+          <h4>پشتیبانی</h4>
+          <a href="/help">مرکز راهنمایی</a>
+          <a href="/faq">سوالات متداول</a>
+          <a href="/api-docs">API Documentation</a>
+          <a href="/status">وضعیت سرویس</a>
+        </div>
 
-                // Close all items
-                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        <div class="footer-column">
+          <h4>قانونی</h4>
+          <a href="/privacy">حریم خصوصی</a>
+          <a href="/terms">شرایط استفاده</a>
+          <a href="/rules">قوانین</a>
+          <a href="#">لایسنس</a>
+        </div>
+      </div>
 
-                // Open clicked item if it wasn't active
-                if (!wasActive) {
-                    item.classList.add('active');
-                }
-            });
-        });
+      <div class="footer-bottom">
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <p>© ۱۴۰۳ استودیو AI. تمامی حقوق محفوظ است.</p>
+          <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=670086&Code=ZLEcnCGDIXkifNudBuJZHRUljrylCDxm'>
+            <img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=670086&Code=ZLEcnCGDIXkifNudBuJZHRUljrylCDxm' alt='enamad' style='cursor:pointer' code='ZLEcnCGDIXkifNudBuJZHRUljrylCDxm'>
+          </a>
+        </div>
+        <div class="footer-links">
+          <a href="/privacy">حریم خصوصی</a>
+          <span>•</span>
+          <a href="/terms">شرایط استفاده</a>
+          <span>•</span>
+          <a href="/rules">قوانین</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-    </script>
+  <script>
+    // FAQ Accordion
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.parentElement;
+        const wasActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        if (!wasActive) item.classList.add('active');
+      });
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    function scrollToStart() {
+      window.location.href = '/mirror-creation.html';
+    }
+    function scrollToDemo() {
+      const el = document.querySelector('#demo');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
 
 </body>
 </html>
