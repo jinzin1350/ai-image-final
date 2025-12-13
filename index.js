@@ -5977,74 +5977,85 @@ Be extremely specific and detailed - every detail will be copied exactly.`;
     // ============================================
     // BUILD GENERATION PROMPT
     // ============================================
-    const prompt = `Create a professional fashion photography image that EXACTLY replicates the reference photo's style with a new model wearing the provided garment.
+    const prompt = `You are creating a professional fashion photograph. You will receive 3 images in this EXACT order:
 
-IMAGES PROVIDED:
-- Image 1: Reference photo (competitor's photo to mirror EXACTLY)
-- Image 2: Model (the person who will wear the garment)
-- Image 3: Garment/Product (clothing item to place on model)
+IMAGE 1 (REFERENCE PHOTO): A competitor's photo that shows the STYLE to copy (lighting, angle, pose, hijab, accessories, background)
+IMAGE 2 (MODEL): The person's face/body who will appear in the final output
+IMAGE 3 (GARMENT): The clothing item that will be placed on the model from Image 2
 
-CRITICAL TASK:
-Copy EVERYTHING from the reference photo (Image 1) and apply it to the new model (Image 2) wearing the new garment (Image 3).
+⚠️ CRITICAL UNDERSTANDING:
+- Image 1 is ONLY a style reference - DO NOT modify it or place anything on it
+- Image 2 (model) is the person who will wear the garment
+- Image 3 (garment) goes ONLY on the model from Image 2
+- The garment NEVER goes on the reference photo
 
-REFERENCE PHOTO ANALYSIS - COPY ALL OF THESE EXACTLY:
+YOUR EXACT TASK:
+1. Take the MODEL from Image 2 (their face, body, identity)
+2. Dress them in the GARMENT from Image 3
+3. Apply ALL the style elements from Image 1 (reference):
 
-🎨 LIGHTING (Copy exactly from reference):
+STYLE ELEMENTS TO COPY FROM REFERENCE (IMAGE 1):
+
+🎨 LIGHTING:
 ${referenceAnalysis.lighting}
 
-📷 CAMERA ANGLE & FRAMING (Copy exactly from reference):
+📷 CAMERA ANGLE & FRAMING:
 ${referenceAnalysis.camera_angle}
 
-🧍 MODEL POSE (Copy exactly from reference):
+🧍 POSE:
 ${referenceAnalysis.pose}
 
-🧕 HIJAB/HEAD COVERING (CRITICAL - Copy exactly from reference):
+🧕 HIJAB/HEAD COVERING:
 ${referenceAnalysis.hijab}
-**IMPORTANT**: The hijab/head covering in the REFERENCE PHOTO is what matters, NOT what the model image shows. If reference has hijab, the output MUST have hijab. If reference has no hijab, the output MUST NOT have hijab.
+→ If reference photo has hijab, the MODEL must wear hijab in the same style
+→ If reference photo has NO hijab, the MODEL must have NO hijab
 
-👓 ACCESSORIES (CRITICAL - Copy ALL from reference):
+👓 ACCESSORIES:
 ${Array.isArray(referenceAnalysis.accessories) && referenceAnalysis.accessories.length > 0
   ? referenceAnalysis.accessories.join(', ')
   : 'No accessories'}
-**IMPORTANT**: Copy EVERY accessory from the reference photo (glasses, hat, jewelry, etc.). The accessories shown in the REFERENCE PHOTO must appear in the output, regardless of what the model image shows.
+→ The MODEL must wear ALL these accessories exactly as shown in reference
 
-🏞️ BACKGROUND (Copy exactly from reference):
+🏞️ BACKGROUND:
 ${referenceAnalysis.background}
 
-🎨 COLORS & MOOD (Copy exactly from reference):
+🎨 COLORS & MOOD:
 Colors: ${referenceAnalysis.colors}
 Mood: ${referenceAnalysis.mood}
 
-KEY REQUIREMENTS:
-1. Keep model's face EXACTLY the same from Image 2
-2. Place the garment from Image 3 naturally on the model
-3. Copy EVERY detail from reference photo:
-   - Exact same lighting direction and quality
-   - Exact same camera angle and framing
-   - Exact same pose and body position
-   - Exact same hijab style (if present in reference)
-   - ALL accessories from reference (glasses, hat, jewelry, etc.)
-   - Exact same background and setting
-   - Exact same color mood and atmosphere
+STEP-BY-STEP GENERATION:
+1. Start with the MODEL from Image 2
+2. Put the GARMENT from Image 3 on this model naturally
+3. Position the model in the EXACT POSE from reference
+4. Apply EXACT LIGHTING from reference
+5. Use EXACT CAMERA ANGLE from reference
+6. Add hijab if reference has it (same style)
+7. Add ALL accessories from reference
+8. Use EXACT BACKGROUND from reference
+9. Match color mood from reference
 
-4. The garment should look natural and realistic on the model
-5. Professional photography quality
-6. Natural skin texture (no plastic smoothing)
+ABSOLUTE RULES:
+✅ The GARMENT goes on the MODEL (Image 2), NEVER on the reference photo
+✅ Keep the MODEL's face identical to Image 2
+✅ The MODEL wears the GARMENT from Image 3
+✅ Copy ONLY the style (lighting, angle, pose, hijab, accessories, background) from Image 1
 
-CRITICAL RULES:
-❌ DO NOT change the model's face or identity
-❌ DO NOT ignore hijab from reference photo
-❌ DO NOT skip accessories from reference photo (glasses, hats, jewelry)
-❌ DO NOT add different lighting than reference
-❌ DO NOT use different camera angle than reference
-❌ DO NOT make the garment look pasted or fake
+❌ DO NOT place the garment on the reference photo (Image 1)
+❌ DO NOT modify the reference photo at all
+❌ DO NOT change the model's face from Image 2
+❌ DO NOT skip the hijab if reference has it
+❌ DO NOT skip accessories from reference
+❌ The garment ONLY appears on the MODEL from Image 2
 
-✅ DO copy the reference photo's style EXACTLY
-✅ DO maintain all accessories from reference
-✅ DO preserve hijab exactly as shown in reference (or lack thereof)
-✅ DO keep natural, realistic appearance
+OUTPUT REQUIREMENTS:
+- Professional fashion photography quality
+- Natural, realistic appearance
+- The garment looks naturally worn, not pasted
+- Proper fabric physics and draping
+- Natural skin texture
+- Sharp focus on model and garment
 
-Generate the exact copy of the reference photo's style with the new model and garment.`;
+Generate a photo of the MODEL (Image 2) wearing the GARMENT (Image 3) in the exact style of the REFERENCE PHOTO (Image 1).`;
 
     console.log('📝 Generation prompt created');
 
