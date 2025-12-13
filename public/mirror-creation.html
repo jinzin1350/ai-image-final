@@ -1,10 +1,31 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z17GE6LBS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-3Z17GE6LBS');
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mirror Creation - ساخت تصویر مشابه رقیب</title>
+    <title>کپی استایل عکس رقیب - Mirror Creation</title>
     <link rel="stylesheet" href="style.css">
+<!-- Hotjar Tracking Code for fusionaiteam -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:6581743,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
     <style>
         .mirror-wizard-container {
             max-width: 900px;
@@ -388,6 +409,21 @@
 </head>
 <body>
     <div class="container">
+        <!-- Header with Navigation -->
+        <header>
+            <div class="header-content">
+                <h1>🪞 کپی استایل عکس رقیب</h1>
+                <p class="subtitle">کپی دقیق زاویه، نور، حجاب و همه جزئیات عکس رقبا</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/app" class="gallery-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🏠 بازگشت به خانه</a>
+                <a href="/profile.html" class="gallery-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👤 پروفایل من</a>
+                <a href="/gallery.html" class="gallery-btn">🖼️ گالری تصاویر من</a>
+                <a href="/pricing.html" class="gallery-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">💎 خرید اشتراک</a>
+                <button onclick="handleLogout()" class="gallery-btn" style="background: #ef4444; cursor: pointer; border: none;">🚪 خروج</button>
+            </div>
+        </header>
+
         <div class="mirror-wizard-container">
             <!-- Progress Steps -->
             <div class="wizard-progress">
@@ -577,6 +613,13 @@
             }
             console.log('✅ User is authenticated');
         })();
+
+        // Logout function
+        function handleLogout() {
+            localStorage.removeItem('supabase_token');
+            localStorage.removeItem('supabase_session');
+            window.location.replace('/auth');
+        }
 
         let currentStep = 1;
         let wizardData = {
