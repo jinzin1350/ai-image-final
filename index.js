@@ -190,6 +190,11 @@ app.get('/profile', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
+// Webinar landing page route
+app.get('/webinar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'webinar.html'));
+});
+
 // Domain verification file route
 app.get('/43021824.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', '43021824.txt'));
@@ -987,6 +992,117 @@ app.delete('/api/user/content/:contentId', async (req, res) => {
   } catch (error) {
     console.error('Error deleting user content:', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ========================================
+// Webinar Registration Endpoint
+// ========================================
+
+// Register for Yalda webinar
+app.post('/api/webinar/register', async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+
+    // Validation
+    if (!name || !phone) {
+      return res.status(400).json({
+        success: false,
+        error: 'نام و شماره موبایل الزامی است'
+      });
+    }
+
+    // Validate phone format (09XXXXXXXXX)
+    const phoneRegex = /^09[0-9]{9}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        error: 'شماره موبایل باید به فرمت 09XXXXXXXXX باشد'
+      });
+    }
+
+    if (!supabase) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database connection error'
+      });
+    }
+
+    // Check if phone number is already registered
+    const { data: existingReg } = await supabase
+      .from('webinar_registrations')
+      .select('id')
+      .eq('phone', phone)
+      .single();
+
+    if (existingReg) {
+      return res.status(400).json({
+        success: false,
+        error: 'این شماره موبایل قبلاً ثبت‌نام کرده است'
+      });
+    }
+
+    // Insert registration
+    const { data, error } = await supabase
+      .from('webinar_registrations')
+      .insert([{ name, phone }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ Error registering for webinar:', error);
+      throw error;
+    }
+
+    console.log(`✅ Webinar registration: ${name} (${phone})`);
+
+    res.json({
+      success: true,
+      message: 'ثبت‌نام شما با موفقیت انجام شد',
+      data
+    });
+  } catch (error) {
+    console.error('Error in webinar registration:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطا در ثبت‌نام. لطفاً دوباره تلاش کنید'
+    });
+  }
+});
+
+// Get all webinar registrations (admin only)
+app.get('/api/admin/webinar/registrations', authenticateAdmin, async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database connection error'
+      });
+    }
+
+    const { data, error } = await supabase
+      .from('webinar_registrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Error fetching webinar registrations:', error);
+      throw error;
+    }
+
+    console.log(`📊 Retrieved ${data?.length || 0} webinar registrations`);
+
+    res.json({
+      success: true,
+      count: data?.length || 0,
+      registrations: data || []
+    });
+  } catch (error) {
+    console.error('Error fetching webinar registrations:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطا در دریافت لیست ثبت‌نام‌ها'
+    });
   }
 });
 
