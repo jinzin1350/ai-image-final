@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مدیریت ثبت‌نام‌های وبینار یلدا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-style.css">
+  <style>
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-card.primary {
+      background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+      color: white;
+      border: none;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+
+    .registrations-table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-header {
+      background: #f9fafb;
+      padding: 1rem 1.5rem;
+      border-bottom: 2px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .search-input {
+      padding: 0.5rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: 'Vazirmatn', sans-serif;
+      font-size: 0.875rem;
+      width: 250px;
+    }
+
+    .export-btn {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-family: 'Vazirmatn', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background 0.2s;
+    }
+
+    .export-btn:hover {
+      background: #7c3aed;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f9fafb;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    th {
+      padding: 1rem 1.5rem;
+      text-align: right;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      color: #1f2937;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .phone-number {
+      direction: ltr;
+      text-align: right;
+      font-family: monospace;
+      font-weight: 600;
+      color: #8b5cf6;
+    }
+
+    .timestamp {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .empty-state {
+      padding: 3rem;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #6b7280;
+    }
+
+    .error-message {
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+      color: #991b1b;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .refresh-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-family: 'Vazirmatn', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.875rem;
+      margin-left: 0.5rem;
+    }
+
+    .refresh-btn:hover {
+      background: #059669;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <h1>پنل مدیریت</h1>
+      </div>
+      <nav class="sidebar-nav" id="adminMenu"></nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <h1>مدیریت ثبت‌نام‌های وبینار یلدا</h1>
+          <p>مشاهده و مدیریت لیست ثبت‌نام‌ها</p>
+        </div>
+      </header>
+
+      <div class="admin-content">
+        <div id="errorContainer"></div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+          <div class="stat-card primary">
+            <div class="stat-number" id="totalRegistrations">-</div>
+            <div class="stat-label">کل ثبت‌نام‌ها</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="todayRegistrations">-</div>
+            <div class="stat-label">ثبت‌نام امروز</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="thisWeekRegistrations">-</div>
+            <div class="stat-label">ثبت‌نام این هفته</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="remainingCapacity">-</div>
+            <div class="stat-label">ظرفیت باقیمانده (از ۱۰۰)</div>
+          </div>
+        </div>
+
+        <!-- Registrations Table -->
+        <div class="registrations-table">
+          <div class="table-header">
+            <h2>لیست ثبت‌نام‌کنندگان</h2>
+            <div class="search-box">
+              <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="جستجو (نام یا شماره تلفن)..."
+              >
+              <button class="refresh-btn" onclick="loadRegistrations()">🔄 بروزرسانی</button>
+              <button class="export-btn" onclick="exportToCSV()">📥 دانلود Excel</button>
+            </div>
+          </div>
+
+          <div id="tableContainer">
+            <div class="loading">
+              <p>در حال بارگذاری...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="admin-common.js"></script>
+  <script src="admin-menu.js"></script>
+  <script>
+    let allRegistrations = [];
+    let filteredRegistrations = [];
+
+    // Load admin menu
+    if (typeof loadAdminMenu === 'function') {
+      loadAdminMenu('webinar');
+    }
+
+    // Load registrations on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRegistrations();
+
+      // Setup search
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        filterRegistrations(e.target.value);
+      });
+    });
+
+    async function loadRegistrations() {
+      const tableContainer = document.getElementById('tableContainer');
+      const errorContainer = document.getElementById('errorContainer');
+
+      tableContainer.innerHTML = '<div class="loading"><p>در حال بارگذاری...</p></div>';
+      errorContainer.innerHTML = '';
+
+      try {
+        const response = await fetch('/api/admin/webinar/registrations', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('خطا در دریافت اطلاعات');
+        }
+
+        const data = await response.json();
+        allRegistrations = data.registrations || [];
+        filteredRegistrations = [...allRegistrations];
+
+        updateStats();
+        renderTable();
+      } catch (error) {
+        console.error('Error loading registrations:', error);
+        errorContainer.innerHTML = `
+          <div class="error-message">
+            ❌ خطا در بارگذاری اطلاعات: ${error.message}
+          </div>
+        `;
+        tableContainer.innerHTML = '';
+      }
+    }
+
+    function updateStats() {
+      const total = allRegistrations.length;
+      const today = allRegistrations.filter(r => {
+        const regDate = new Date(r.created_at);
+        const todayDate = new Date();
+        return regDate.toDateString() === todayDate.toDateString();
+      }).length;
+
+      const thisWeek = allRegistrations.filter(r => {
+        const regDate = new Date(r.created_at);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return regDate >= weekAgo;
+      }).length;
+
+      const remaining = Math.max(0, 100 - total);
+
+      document.getElementById('totalRegistrations').textContent = total;
+      document.getElementById('todayRegistrations').textContent = today;
+      document.getElementById('thisWeekRegistrations').textContent = thisWeek;
+      document.getElementById('remainingCapacity').textContent = remaining;
+    }
+
+    function filterRegistrations(searchTerm) {
+      if (!searchTerm) {
+        filteredRegistrations = [...allRegistrations];
+      } else {
+        const term = searchTerm.toLowerCase();
+        filteredRegistrations = allRegistrations.filter(r =>
+          r.name.toLowerCase().includes(term) ||
+          r.phone.includes(term)
+        );
+      }
+      renderTable();
+    }
+
+    function renderTable() {
+      const tableContainer = document.getElementById('tableContainer');
+
+      if (filteredRegistrations.length === 0) {
+        tableContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>هنوز ثبت‌نامی وجود ندارد</p>
+          </div>
+        `;
+        return;
+      }
+
+      const tableHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>نام و نام خانوادگی</th>
+              <th>شماره موبایل</th>
+              <th>تاریخ ثبت‌نام</th>
+              <th>وضعیت</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredRegistrations.map((reg, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td><strong>${reg.name}</strong></td>
+                <td class="phone-number">${reg.phone}</td>
+                <td class="timestamp">${formatDate(reg.created_at)}</td>
+                <td><span class="badge">تایید شده</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      tableContainer.innerHTML = tableHTML;
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return 'همین الان';
+      if (diffMins < 60) return `${diffMins} دقیقه پیش`;
+      if (diffHours < 24) return `${diffHours} ساعت پیش`;
+      if (diffDays < 7) return `${diffDays} روز پیش`;
+
+      const persianDate = new Intl.DateTimeFormat('fa-IR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+
+      return persianDate;
+    }
+
+    function exportToCSV() {
+      if (allRegistrations.length === 0) {
+        alert('هیچ داده‌ای برای دانلود وجود ندارد!');
+        return;
+      }
+
+      // Create CSV content
+      let csv = '\uFEFF'; // UTF-8 BOM for Excel
+      csv += 'ردیف,نام و نام خانوادگی,شماره موبایل,تاریخ ثبت‌نام\n';
+
+      allRegistrations.forEach((reg, index) => {
+        csv += `${index + 1},"${reg.name}","${reg.phone}","${formatDate(reg.created_at)}"\n`;
+      });
+
+      // Create download link
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `webinar-registrations-${Date.now()}.csv`);
+      link.style.visibility = 'hidden';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

@@ -2108,6 +2108,10 @@ app.get('/admin/nanobanana', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin-nanobanana.html'));
 });
 
+app.get('/admin/webinar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-webinar.html'));
+});
+
 // Public blog page
 app.get('/blog', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'blog.html'));
