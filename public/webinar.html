@@ -12,11 +12,11 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>وبینار رایگان شب یلدا — فروش لباس و جزئیات با هوش مصنوعی</title>
+  <title>وبینار رایگان شب یلدا — راز‌های وایرال شدن و فروش میلیونی با هوش مصنوعی</title>
 
   <!-- Meta Tags -->
-  <meta name="description" content="وبینار رایگان بمناسبت شب یلدا - پیج‌های فروش لباس و جزئیات مطابق با آخرین ترندهای ۲۰۲۴ با استفاده از هوش مصنوعی">
-  <meta name="keywords" content="وبینار یلدا, فروش لباس, هوش مصنوعی, AI, یلدا ۱۴۰۳">
+  <meta name="description" content="وبینار رایگان ویژه شب یلدا - یاد بگیرید چطور با تکنیک‌های وایرال و هوش مصنوعی فروش پیج لباس و فروشگاه آنلاین خود را چند برابر کنید">
+  <meta name="keywords" content="وبینار یلدا, فروش لباس, هوش مصنوعی, وایرال شدن, محتوا سازی, فروشگاه آنلاین">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,6 +50,7 @@
         --secondary: #a855f7;
         --accent: #ec4899;
         --success: #10b981;
+        --warning: #f59e0b;
         --text-primary: #0f172a;
         --text-secondary: #64748b;
         --bg: #ffffff;
@@ -220,14 +221,26 @@
         letter-spacing: -0.02em;
         margin-bottom: var(--space-md);
         color: var(--text-primary);
+    }
+
+    .highlight-text {
         background: linear-gradient(135deg, var(--yalda-purple) 0%, var(--yalda-pink) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
 
+    .hero-subtitle {
+        font-size: 1.5rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        max-width: 900px;
+        margin: 0 auto var(--space-lg);
+        font-weight: 500;
+    }
+
     .hero-description {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         line-height: 1.7;
         color: var(--text-secondary);
         max-width: 800px;
@@ -259,10 +272,14 @@
         font-size: 1.5rem;
     }
 
-    /* Registration Form Section */
-    .registration-section {
+    /* Content Section */
+    .content-section {
         padding: var(--space-3xl) 0;
         background: white;
+    }
+
+    .content-section.alt {
+        background: var(--bg-subtle);
     }
 
     .section-header {
@@ -293,13 +310,206 @@
     .section-header p {
         font-size: 1.125rem;
         color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-lg);
+        max-width: 900px;
+        margin: 0 auto var(--space-2xl);
+    }
+
+    .stat-card {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-lg);
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--yalda-purple) 0%, var(--yalda-pink) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    /* Benefits Grid */
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .benefit-card {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-xl);
+        transition: var(--transition);
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+
+    .benefit-icon {
+        font-size: 2.5rem;
+        margin-bottom: var(--space-md);
+    }
+
+    .benefit-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+    }
+
+    .benefit-card p {
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+
+    /* Topics List */
+    .topics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .topic-item {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-md);
+        transition: var(--transition);
+    }
+
+    .topic-item:hover {
+        border-color: var(--primary);
+        background: var(--bg-subtle);
+    }
+
+    .topic-number {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--yalda-purple) 0%, var(--yalda-pink) 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+
+    .topic-content h4 {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .topic-content p {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Who Should Attend */
+    .audience-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-lg);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .audience-card {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-lg);
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .audience-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+
+    .audience-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-md);
+    }
+
+    .audience-card h3 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+    }
+
+    .audience-card p {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Registration Form Section */
+    .registration-section {
+        padding: var(--space-3xl) 0;
+        background: linear-gradient(135deg, var(--yalda-purple) 0%, var(--yalda-pink) 100%);
+        color: white;
+    }
+
+    .registration-section .section-header h2,
+    .registration-section .section-header p {
+        color: white;
+    }
+
+    .registration-section .section-tag {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
     }
 
     .form-container {
         max-width: 500px;
         margin: 0 auto;
         background: white;
-        border: 2px solid var(--border);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         border-radius: var(--radius-2xl);
         padding: var(--space-xl);
         box-shadow: var(--shadow-xl);
@@ -391,6 +601,30 @@
         display: block;
     }
 
+    /* CTA Box */
+    .cta-box {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+        border-radius: var(--radius-2xl);
+        padding: var(--space-xl);
+        text-align: center;
+        max-width: 800px;
+        margin: var(--space-2xl) auto 0;
+    }
+
+    .cta-box h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+    }
+
+    .cta-box p {
+        font-size: 1.0625rem;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-md);
+    }
+
     /* Footer */
     .footer {
         background: var(--text-primary);
@@ -403,7 +637,28 @@
         font-size: 0.9375rem;
     }
 
+    .footer a {
+        color: var(--yalda-purple);
+        text-decoration: none;
+    }
+
+    .footer a:hover {
+        text-decoration: underline;
+    }
+
     /* Responsive */
+    @media (max-width: 1024px) {
+        .benefits-grid,
+        .topics-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid,
+        .audience-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 768px) {
         .hero {
             padding: 6rem 0 3rem;
@@ -411,6 +666,10 @@
 
         .hero-title {
             font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
         }
 
         .hero-description {
@@ -428,6 +687,11 @@
         .form-container {
             padding: var(--space-lg);
         }
+
+        .stats-grid,
+        .audience-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 480px) {
@@ -437,6 +701,10 @@
 
         .section-header h2 {
             font-size: 1.75rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
         }
     }
   </style>
@@ -461,14 +729,20 @@
         وبینار رایگان · بمناسبت شب یلدا
       </div>
 
-      <img src="/aks/baner.PNG" alt="وبینار شب یلدا" class="banner-image">
-
       <h1 class="hero-title">
-        وبینار رایگان بمناسبت شب یلدا
+        از صفر تا <span class="highlight-text">صد میلیون فروش</span><br>
+        با تکنیک‌های وایرال و هوش مصنوعی
       </h1>
 
+      <p class="hero-subtitle">
+        راز‌های پست‌های میلیونی رو یاد بگیر و فروش پیج مُد خودت رو ۱۰ برابر کن!
+      </p>
+
+      <img src="/aks/baner.PNG" alt="وبینار شب یلدا" class="banner-image">
+
       <p class="hero-description">
-        پیج‌های فروش لباس و جزئیات مطابق با آخرین ترندهای ۲۰۲۴ با استفاده از هوش مصنوعی
+        اگه دلت می‌خواد بدونی چطور پیج‌های بزرگ لباس هر پستشون میلیون‌ها تومن فروش داره، این وبینار دقیقاً برای توئه!
+        با استفاده از تکنیک‌های محتوا سازی حرفه‌ای و قدرت هوش مصنوعی، یاد می‌گیری چطور محتوای وایرال بسازی که مشتری جذب می‌کنه و فروش می‌آره.
       </p>
 
       <div class="hero-details">
@@ -478,7 +752,7 @@
         </div>
         <div class="detail-item">
           <span class="detail-icon">⏰</span>
-          <span>ساعت ۱۸ تا ۲۰</span>
+          <span>ساعت ۱۸ تا ۲۰ (۲ ساعت)</span>
         </div>
         <div class="detail-item">
           <span class="detail-icon">💰</span>
@@ -486,19 +760,225 @@
         </div>
         <div class="detail-item">
           <span class="detail-icon">🎁</span>
-          <span>با استفاده از هوش مصنوعی</span>
+          <span>همراه با فایل‌های آموزشی رایگان</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="content-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">آمار و ارقام</span>
+        <h2>چرا باید توی این وبینار شرکت کنی؟</h2>
+        <p>نتایج واقعی از فروشنده‌هایی که از این تکنیک‌ها استفاده کردن</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">۳۰۰٪</div>
+          <div class="stat-label">افزایش فروش در ۳۰ روز</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">۱۰×</div>
+          <div class="stat-label">بیشتر بازدید و تعامل</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">۵۰٪</div>
+          <div class="stat-label">کاهش هزینه تولید محتوا</div>
+        </div>
+      </div>
+
+      <div class="cta-box">
+        <h3>⚡ ظرفیت محدود!</h3>
+        <p>فقط ۱۰۰ نفر می‌تونن توی این وبینار شرکت کنن. همین الان ثبت‌نام کن تا جات خالی بمونه!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What You'll Learn -->
+  <section class="content-section alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">محتوای وبینار</span>
+        <h2>توی این وبینار چی یاد می‌گیری؟</h2>
+        <p>همه چیز از صفر تا صد، گام به گام و کاملاً کاربردی</p>
+      </div>
+
+      <div class="topics-grid">
+        <div class="topic-item">
+          <div class="topic-number">۱</div>
+          <div class="topic-content">
+            <h4>تحلیل الگوریتم اینستاگرام ۲۰۲۴</h4>
+            <p>یاد بگیر الگوریتم چطور کار می‌کنه و چطور میتونی باهاش دوست باشی تا پست‌هات وایرال بشه</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۲</div>
+          <div class="topic-content">
+            <h4>فرمول طلایی محتوای وایرال</h4>
+            <p>ساختار دقیق پست‌هایی که میلیون‌ها نفر می‌بینن و ذهنشون رو درگیر می‌کنه</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۳</div>
+          <div class="topic-content">
+            <h4>روانشناسی فروش در محتوا</h4>
+            <p>چطور کپشن بنویسی که مخاطب رو مجبور کنه دکمه خرید رو بزنه</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۴</div>
+          <div class="topic-content">
+            <h4>هوش مصنوعی برای تولید محتوا</h4>
+            <p>ابزارهای AI که توی ۱۰ دقیقه محتوای یک هفته رو برات می‌سازن</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۵</div>
+          <div class="topic-content">
+            <h4>عکاسی محصول با موبایل</h4>
+            <p>تکنیک‌های ساده که با موبایلت عکس‌های استودیویی بگیری</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۶</div>
+          <div class="topic-content">
+            <h4>ترند‌های ۲۰۲۴ فشن و مُد</h4>
+          <p>چه سبک‌هایی داغه و چطور ازشون توی محتوات استفاده کنی</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۷</div>
+          <div class="topic-content">
+            <h4>استراتژی قیمت‌گذاری هوشمند</h4>
+            <p>چطور قیمت بذاری که هم فروش داشته باشی هم سود خوب</p>
+          </div>
+        </div>
+
+        <div class="topic-item">
+          <div class="topic-number">۸</div>
+          <div class="topic-content">
+            <h4>تبدیل فالوور به مشتری</h4>
+            <p>تکنیک‌های عملی برای اینکه فالوورات واقعاً ازت خرید کنن</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="content-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">مزایا</span>
+        <h2>بعد از این وبینار چه اتفاقی میفته؟</h2>
+        <p>تحول واقعی توی کسب و کارت</p>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">📈</div>
+          <h3>افزایش چشمگیر فروش</h3>
+          <p>با تکنیک‌های اثبات شده، فروشت رو تا ۳ برابر افزایش بده. یاد می‌گیری چطور هر پست تبدیل به یک فرصت فروش بشه.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">⚡</div>
+          <h3>صرفه‌جویی توی وقت</h3>
+          <p>با هوش مصنوعی، محتوای یک هفته رو در عرض چند دقیقه آماده کن. دیگه نیازی نیست ساعت‌ها سر محتوا فکر کنی.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">🎯</div>
+          <h3>محتوای حرفه‌ای بدون هزینه</h3>
+          <p>بدون اینکه پول عکاس و طراح بدی، محتوای استاندارد و حرفه‌ای تولید کن که رقیب‌هات رو شکست بده.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">💡</div>
+          <h3>دانش کاربردی و عملی</h3>
+          <p>نه تئوری، فقط تکنیک‌های عملی که همین فردا میتونی پیاده کنی و نتیجه ببینی.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">🚀</div>
+          <h3>رشد ارگانیک و پایدار</h3>
+          <p>یاد بگیر چطور بدون خرید فالوور و تبلیغات پرهزینه، به صورت ارگانیک رشد کنی.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">🎁</div>
+          <h3>فایل‌های رایگان و قالب‌های آماده</h3>
+          <p>قالب‌های آماده کپشن، چک‌لیست محتوا و راهنمای گام‌به‌گام رایگان دریافت کن.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who Should Attend -->
+  <section class="content-section alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">مخاطبین</span>
+        <h2>این وبینار برای کیه؟</h2>
+        <p>اگه یکی از این موارد رو داری، این وبینار دقیقاً برای توئه!</p>
+      </div>
+
+      <div class="audience-grid">
+        <div class="audience-card">
+          <div class="audience-icon">👔</div>
+          <h3>صاحبان فروشگاه لباس</h3>
+          <p>اگه فروشگاه آنلاین یا فیزیکی لباس داری و می‌خوای فروشت رو چند برابر کنی</p>
+        </div>
+
+        <div class="audience-card">
+          <div class="audience-icon">📱</div>
+          <h3>مدیران پیج اینستاگرام</h3>
+          <p>پیج مُد و فشن داری ولی محتواهات بازدید و فروش کافی نداره</p>
+        </div>
+
+        <div class="audience-card">
+          <div class="audience-icon">💼</div>
+          <h3>کسب و کارهای نوپا</h3>
+          <p>تازه شروع کردی و می‌خوای از همون اول درست پیش بری</p>
+        </div>
+
+        <div class="audience-card">
+          <div class="audience-icon">🎨</div>
+          <h3>طراحان و برندهای مُد</h3>
+          <p>برند لباس داری و می‌خوای با محتوای قوی شناخته بشی</p>
+        </div>
+
+        <div class="audience-card">
+          <div class="audience-icon">📊</div>
+          <h3>بازاریاب‌های دیجیتال</h3>
+          <p>می‌خوای مهارت‌های محتوا سازی و هوش مصنوعی رو یاد بگیری</p>
+        </div>
+
+        <div class="audience-card">
+          <div class="audience-icon">🌟</div>
+          <h3>علاقه‌مندان به کسب درآمد</h3>
+          <p>می‌خوای با فروش آنلاین لباس کسب درآمد کنی ولی نمی‌دونی از کجا شروع کنی</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Registration Form -->
-  <section class="registration-section">
+  <section class="registration-section" id="register">
     <div class="container">
       <div class="section-header">
         <span class="section-tag">ثبت‌نام رایگان</span>
-        <h2>همین الان ثبت‌نام کن!</h2>
-        <p>جای خودت رو توی این وبینار رایگان رزرو کن</p>
+        <h2>همین الان جات رو رزرو کن!</h2>
+        <p>ظرفیت محدوده و به زودی پر می‌شه. فقط یک قدم تا تحول توی کسب و کارت فاصله داری</p>
       </div>
 
       <div class="form-container">
@@ -536,7 +1016,7 @@
           </div>
 
           <button type="submit" class="btn-submit" id="submitBtn">
-            🎉 ثبت‌نام در وبینار رایگان
+            🎉 ثبت‌نام رایگان در وبینار
           </button>
         </form>
       </div>
@@ -546,7 +1026,10 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <p>© ۱۴۰۳ تمامی حقوق محفوظ است | <a href="/app" style="color: var(--yalda-purple);">بازگشت به صفحه اصلی</a></p>
+      <p>© ۱۴۰۳ تمامی حقوق محفوظ است | <a href="/app">بازگشت به صفحه اصلی</a></p>
+      <p style="margin-top: 1rem; font-size: 0.875rem;">
+        سوال داری؟ با ما در تماس باش: <a href="mailto:info@example.com">info@example.com</a>
+      </p>
     </div>
   </footer>
 
@@ -604,7 +1087,7 @@
       } finally {
         // Re-enable button
         submitBtn.disabled = false;
-        submitBtn.textContent = '🎉 ثبت‌نام در وبینار رایگان';
+        submitBtn.textContent = '🎉 ثبت‌نام رایگان در وبینار';
       }
     });
 
@@ -618,6 +1101,17 @@
       if (e.target.value.length > 11) {
         e.target.value = e.target.value.slice(0, 11);
       }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
     });
   </script>
 
