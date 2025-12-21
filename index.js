@@ -115,6 +115,12 @@ function sanitizeFilename(originalName) {
 // Serve attached_assets folder
 app.use('/attached_assets', express.static(path.join(__dirname, 'attached_assets')));
 
+// Serve aks folder (for images like banners)
+app.use('/aks', express.static(path.join(__dirname, 'aks')));
+
+// Handle favicon.ico to prevent 404 errors
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Landing page as homepage - MUST come before static files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
@@ -1021,19 +1027,19 @@ app.post('/api/webinar/register', async (req, res) => {
       });
     }
 
-    if (!supabase) {
+    if (!supabaseAdmin) {
       return res.status(500).json({
         success: false,
         error: 'Database connection error'
       });
     }
 
-    // Check if phone number is already registered
-    const { data: existingReg } = await supabase
+    // Check if phone number is already registered (using admin to bypass RLS)
+    const { data: existingReg } = await supabaseAdmin
       .from('webinar_registrations')
       .select('id')
       .eq('phone', phone)
-      .single();
+      .maybeSingle();
 
     if (existingReg) {
       return res.status(400).json({
@@ -1042,8 +1048,8 @@ app.post('/api/webinar/register', async (req, res) => {
       });
     }
 
-    // Insert registration
-    const { data, error } = await supabase
+    // Insert registration (using admin to bypass RLS for public form)
+    const { data, error } = await supabaseAdmin
       .from('webinar_registrations')
       .insert([{ name, phone }])
       .select()
