@@ -4222,23 +4222,23 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
 
     // Camera angle descriptions for scene-recreation
     const angleDescriptions = {
-      'front': 'FRONT VIEW - Camera positioned directly in front of the model at eye level. Show the complete front of the person facing the camera head-on. The model should be looking at the camera. This is a straight-on frontal shot showing the full front of the garment and the model\'s face directly.',
+      'front': 'CAMERA DIRECTION: FRONT - Position the camera directly in front of the model. The model should face the camera head-on, showing the full front of the garment and the model\'s face directly. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
 
-      'back': 'BACK VIEW - Camera positioned directly behind the model. Show the complete back of the person with their back facing the camera. The model is facing AWAY from camera. Show full back details of the garment, back of the head, and rear view of the person.',
+      'back': 'CAMERA DIRECTION: BACK - Position the camera directly behind the model. The model faces AWAY from the camera, showing the back of the garment, back of the head, and rear view. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
 
-      'left-side': 'LEFT SIDE PROFILE - Camera positioned to the LEFT side of the model at 90 degrees. The model stands sideways showing their LEFT SIDE ONLY to the camera. You should see the side profile: left shoulder, left side of face, left side of body, left side of garment. The model faces to their RIGHT (your left when viewing). This is a pure side view showing the garment\'s silhouette from the left.',
+      'left-side': 'CAMERA DIRECTION: LEFT SIDE PROFILE - Position the camera to the LEFT side of the model at 90 degrees. The model stands sideways showing their LEFT SIDE to the camera (left shoulder, left side of face, left side of garment). This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
 
-      'right-side': 'RIGHT SIDE PROFILE - Camera positioned to the RIGHT side of the model at 90 degrees. The model stands sideways showing their RIGHT SIDE ONLY to the camera. You should see the side profile: right shoulder, right side of face, right side of body, right side of garment. The model faces to their LEFT (your right when viewing). This is a pure side view showing the garment\'s silhouette from the right.',
+      'right-side': 'CAMERA DIRECTION: RIGHT SIDE PROFILE - Position the camera to the RIGHT side of the model at 90 degrees. The model stands sideways showing their RIGHT SIDE to the camera (right shoulder, right side of face, right side of garment). This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
 
-      'three-quarter-left': 'THREE-QUARTER LEFT (Over-Shoulder) - Camera positioned at 45-degree angle from the front-left. The model is positioned so you can see approximately 3/4 of their body - showing both the front and left side simultaneously. This captures an over-the-shoulder perspective showing partial face and left side.',
+      'three-quarter-left': 'CAMERA DIRECTION: THREE-QUARTER LEFT - Position the camera at 45-degree angle from the front-left. The model is angled so you see both the front and left side simultaneously, showing partial face and left side of the garment. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
 
-      'three-quarter-right': 'THREE-QUARTER RIGHT - Camera positioned at 45-degree angle from the front-right. The model is positioned so you can see approximately 3/4 of their body - showing both the front and right side simultaneously. This angle shows partial face and right side of the garment.',
+      'three-quarter-right': 'CAMERA DIRECTION: THREE-QUARTER RIGHT - Position the camera at 45-degree angle from the front-right. The model is angled so you see both the front and right side simultaneously, showing partial face and right side of the garment. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
 
-      'full-body': 'FULL BODY SHOT - CRITICAL: Show the COMPLETE person from HEAD TO TOES. The entire body must be visible in the frame including the head at top and feet at bottom. Camera positioned further back to capture the whole person standing. This is a full-length portrait showing every part of the body from top to bottom. The feet MUST be visible in the frame - do not crop them out.',
+      'full-body': 'CAMERA FRAMING: FULL BODY - Show the COMPLETE person from HEAD TO TOES. The entire body must be visible including head at top and feet at bottom. The feet MUST be visible — do not crop them out. Camera positioned further back to capture the whole person.',
 
-      'waist-up': 'WAIST-UP SHOT (Half-Length) - Show ONLY the upper body from the waist line upward to the head. Frame the shot so the bottom of the frame cuts at the waist/belt level. Focus on the upper garment, torso, arms, shoulders, and face. The lower body and legs should NOT be visible. This is a mid-shot cutting off at the waist.',
+      'waist-up': 'CAMERA FRAMING: WAIST-UP - Show ONLY the upper body from the waist upward to the head. The bottom of the frame cuts at the waist/belt level. Focus on upper garment, torso, arms, shoulders, and face. Lower body and legs should NOT be visible.',
 
-      'close-up': 'CLOSE-UP DETAILS - Tight framing focused on specific garment details. Zoom in close to show fabric texture, neckline design, collar details, buttons, embellishments, or embroidery. This is a detail shot showing the craftsmanship and material quality up close. The frame should be filled with garment details, not showing the full body.'
+      'close-up': 'CAMERA FRAMING: CLOSE-UP - Tight framing focused on garment details. Zoom in to show fabric texture, neckline, collar, buttons, embellishments. The frame should be filled with garment details, not showing the full body.'
     };
 
     const cameraAngleDescription = cameraAngle && angleDescriptions[cameraAngle]
@@ -5091,18 +5091,18 @@ ${hasTwoModels
 
       prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.${cameraAngleDescription ? `
 
-🎯🎯🎯 ABSOLUTE TOP PRIORITY #1 - CAMERA ANGLE REQUIREMENT 🎯🎯🎯
+🎯 CAMERA ANGLE REQUIREMENT 🎯
 ${cameraAngleDescription}
 
-⚠️ CRITICAL CAMERA ANGLE ENFORCEMENT:
-- This camera angle specification is MANDATORY and comes BEFORE all other instructions
-- Position the camera EXACTLY as described above - this is the FIRST requirement
-- Frame the shot PRECISELY according to these angle instructions
-- This camera angle requirement OVERRIDES any different angle shown in the reference photo
-- If reference photo shows a different angle, COMPLETELY IGNORE it and use the angle specified above
-- The angle description above is MORE IMPORTANT than matching the reference photo's angle
-- READ THE ANGLE REQUIREMENT 3 TIMES before generating
-🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯🎯
+📐 HOW TO COMBINE ANGLE + REFERENCE PHOTO:
+- The angle above specifies the CAMERA DIRECTION (front, back, side, etc.)
+- The REFERENCE PHOTO specifies the FRAMING and COMPOSITION (full-body, waist-up, distance, crop, etc.)
+- KEEP the reference photo's framing: if reference shows full-body (head to toes), your output MUST also be full-body. If reference shows waist-up, your output should be waist-up.
+- CHANGE only the camera direction to match the angle specified above
+- Think of it as: "Same framing/distance as reference photo, but rotate the model to face the specified direction"
+- Example: If reference = full-body front shot, and angle = back → produce a full-body BACK shot (same distance, same crop, just the model turned around)
+- Example: If reference = waist-up shot, and angle = left-side → produce a waist-up LEFT SIDE shot
+- NEVER change the framing/crop/distance just because you changed the direction
 
 ` : ''}${hijabDescription ? `
 🚨🚨🚨 ABSOLUTE TOP PRIORITY #2 - HIJAB OVERRIDE RULE 🚨🚨🚨
@@ -5198,7 +5198,7 @@ ${hasTwoModels
    - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}
    - Match the general composition approach
    - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}
-   - Remember: Camera angle was specified at the TOP of these instructions - follow it precisely
+   - Remember: Camera DIRECTION was specified at the top — adjust the model's facing direction accordingly, but KEEP the same framing/crop/distance as the reference photo
 
 4. **Garment Integration**:
 ${hasTwoModels
