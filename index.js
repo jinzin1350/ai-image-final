@@ -4221,31 +4221,7 @@ app.post('/api/generate', authenticateUser, async (req, res) => {
     console.log('🧕 Hijab type:', hijabType, hijabDescription);
 
     // Camera angle descriptions for scene-recreation
-    const angleDescriptions = {
-      'front': 'CAMERA DIRECTION: FRONT - Position the camera directly in front of the model. The model should face the camera head-on, showing the full front of the garment and the model\'s face directly. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
-
-      'back': 'CAMERA DIRECTION: BACK - Position the camera directly behind the model. The model faces AWAY from the camera, showing the back of the garment, back of the head, and rear view. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
-
-      'left-side': 'CAMERA DIRECTION: LEFT SIDE PROFILE - Position the camera to the LEFT side of the model at 90 degrees. The model stands sideways showing their LEFT SIDE to the camera (left shoulder, left side of face, left side of garment). This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
-
-      'right-side': 'CAMERA DIRECTION: RIGHT SIDE PROFILE - Position the camera to the RIGHT side of the model at 90 degrees. The model stands sideways showing their RIGHT SIDE to the camera (right shoulder, right side of face, right side of garment). This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
-
-      'three-quarter-left': 'CAMERA DIRECTION: THREE-QUARTER LEFT - Position the camera at 45-degree angle from the front-left. The model is angled so you see both the front and left side simultaneously, showing partial face and left side of the garment. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
-
-      'three-quarter-right': 'CAMERA DIRECTION: THREE-QUARTER RIGHT - Position the camera at 45-degree angle from the front-right. The model is angled so you see both the front and right side simultaneously, showing partial face and right side of the garment. This only specifies the DIRECTION — preserve the framing (full-body, waist-up, etc.) from the reference photo.',
-
-      'full-body': 'CAMERA FRAMING: FULL BODY - Show the COMPLETE person from HEAD TO TOES. The entire body must be visible including head at top and feet at bottom. The feet MUST be visible — do not crop them out. Camera positioned further back to capture the whole person.',
-
-      'waist-up': 'CAMERA FRAMING: WAIST-UP - Show ONLY the upper body from the waist upward to the head. The bottom of the frame cuts at the waist/belt level. Focus on upper garment, torso, arms, shoulders, and face. Lower body and legs should NOT be visible.',
-
-      'close-up': 'CAMERA FRAMING: CLOSE-UP - Tight framing focused on garment details. Zoom in to show fabric texture, neckline, collar, buttons, embellishments. The frame should be filled with garment details, not showing the full body.'
-    };
-
-    const cameraAngleDescription = cameraAngle && angleDescriptions[cameraAngle]
-      ? angleDescriptions[cameraAngle]
-      : null;
-
-    console.log('📸 Camera angle:', cameraAngle, cameraAngleDescription);
+    // Camera angle descriptions removed - angles feature disabled
 
     // ========================================
     // NEW: Mode-Specific Prompt Generation
@@ -5089,22 +5065,7 @@ ${hasTwoModels
 - Image ${currentImageIndex + garments.length + 1}: REFERENCE PHOTO - Use as inspiration for lighting, mood, pose, and style (NOT for the person's face)`;
       }
 
-      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.${cameraAngleDescription ? `
-
-🎯 CAMERA ANGLE REQUIREMENT 🎯
-${cameraAngleDescription}
-
-📐 HOW TO COMBINE ANGLE + REFERENCE PHOTO:
-- The angle above specifies the CAMERA DIRECTION (front, back, side, etc.)
-- The REFERENCE PHOTO specifies the FRAMING and COMPOSITION (full-body, waist-up, distance, crop, etc.)
-- KEEP the reference photo's framing: if reference shows full-body (head to toes), your output MUST also be full-body. If reference shows waist-up, your output should be waist-up.
-- CHANGE only the camera direction to match the angle specified above
-- Think of it as: "Same framing/distance as reference photo, but rotate the model to face the specified direction"
-- Example: If reference = full-body front shot, and angle = back → produce a full-body BACK shot (same distance, same crop, just the model turned around)
-- Example: If reference = waist-up shot, and angle = left-side → produce a waist-up LEFT SIDE shot
-- NEVER change the framing/crop/distance just because you changed the direction
-
-` : ''}${hijabDescription ? `
+      prompt = `Create a photorealistic fashion photo showing ${peopleText} wearing the GARMENT${hasTwoModels ? 'S' : ''}, INSPIRED BY the style, lighting, and mood of the reference photo.${hijabDescription ? `
 🚨🚨🚨 ABSOLUTE TOP PRIORITY #2 - HIJAB OVERRIDE RULE 🚨🚨🚨
 ${hijabDescription}
 🔥 THIS HIJAB REQUIREMENT IS NON-NEGOTIABLE AND OVERRIDES EVERYTHING 🔥
@@ -5198,7 +5159,7 @@ ${hasTwoModels
    - If reference has ${hasTwoModels ? 'people' : 'a person'} in ${hasTwoModels ? 'specific poses' : 'a specific pose'} → position MODEL${hasTwoModels ? 'S' : ''} in similar ${hasTwoModels ? 'poses' : 'pose'}
    - Match the general composition approach
    - But the face${hasTwoModels ? 's MUST be the MODELS' : ' MUST be the MODEL'} from ${hasTwoModels ? 'their respective images' : 'Image 1'}
-   - Remember: Camera DIRECTION was specified at the top — adjust the model's facing direction accordingly, but KEEP the same framing/crop/distance as the reference photo
+   - Match the camera angle, framing, and composition from the reference photo as closely as possible
 
 4. **Garment Integration**:
 ${hasTwoModels
@@ -7313,8 +7274,6 @@ The final image should look like a professional photography backdrop.`;
     }
 
     console.log('📝 Enhanced Prompt:', enhancedPrompt);
-    console.log('📸 Camera Angle Being Used:', cameraAngle);
-    console.log('📸 Camera Angle Description:', cameraAngleDescription ? cameraAngleDescription.substring(0, 100) + '...' : 'NONE');
 
     // Use Gemini 2.5 Flash Image for generation
     const model = genAI.getGenerativeModel({

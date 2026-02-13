@@ -978,11 +978,6 @@ function selectModel(modelId) {
         card.classList.toggle('selected', card.dataset.id === modelId);
     });
 
-    // Show angle selection section for scene-recreation mode
-    if (currentMode === 'scene-recreation' && typeof window.showAngleSection === 'function') {
-        window.showAngleSection();
-    }
-
     // نمایش بخش انتخاب حجاب فقط برای دسته‌های مناسب
     // Check if hijabSection exists first (not available on all pages)
     if (hijabSection) {
@@ -1778,9 +1773,6 @@ function checkGenerateButton() {
         // Check if brand reference photo is selected (new method)
         const hasReferencePhoto = window.selectedBrandReferencePhoto !== null && window.selectedBrandReferencePhoto !== undefined;
 
-        // Check if at least one angle is selected
-        const hasAngles = window.selectedAngles && window.selectedAngles.length > 0;
-
         // If 2+ people detected, require model 2 as well
         if (referencePhotoPeopleCount >= 2) {
             isValid = hasReferencePhoto &&
@@ -1788,14 +1780,12 @@ function checkGenerateButton() {
                       uploadedGarmentPaths2.length > 0 &&
                       selectedModelId &&
                       selectedModelId2 &&
-                      hijabCondition &&
-                      hasAngles;
+                      hijabCondition;
         } else {
             isValid = hasReferencePhoto &&
                       uploadedGarmentPaths.length > 0 &&
                       selectedModelId &&
-                      hijabCondition &&
-                      hasAngles;
+                      hijabCondition;
         }
 
     } else if (currentMode === 'style-transfer') {
@@ -2221,11 +2211,6 @@ function resetAllSelections() {
     if (brandSelect) brandSelect.selectedIndex = 0;
     if (brandPhotosContainer) brandPhotosContainer.style.display = 'none';
 
-    // Reset angle selection
-    if (typeof window.hideAngleSection === 'function') {
-        window.hideAngleSection();
-    }
-
     // Check generate button state (should be disabled now)
     checkGenerateButton();
 
@@ -2351,107 +2336,8 @@ if (generateBtn) {
 
         const token = localStorage.getItem('supabase_token');
 
-        // Check if this is scene-recreation with multiple angles
-        if (currentMode === 'scene-recreation' && window.selectedAngles && window.selectedAngles.length > 0) {
-            // MULTI-ANGLE GENERATION MODE
-            const generatedImages = [];
-            const totalAngles = window.selectedAngles.length;
-
-            // Get angle labels from scene-recreation.html
-            const angleLabels = {
-                'front': 'نمای جلو',
-                'back': 'نمای پشت',
-                'left-side': 'نمای چپ',
-                'right-side': 'نمای راست',
-                'three-quarter-left': 'سه‌ربع چپ',
-                'three-quarter-right': 'سه‌ربع راست',
-                'full-body': 'تمام قد',
-                'waist-up': 'نیم‌تنه',
-                'close-up': 'نمای نزدیک'
-            };
-
-            // Update loading overlay to show progress
-            const loadingText = document.querySelector('#loadingOverlay p');
-
-            // Debug: Log ALL selected angles before generation
-            console.log('📸 ALL SELECTED ANGLES:', window.selectedAngles);
-            console.log('📊 Total angles to generate:', totalAngles);
-
-            // Show result section immediately and prepare for progressive display
-            resultSection.style.display = 'block';
-            resultSection.scrollIntoView({ behavior: 'smooth' });
-
-            for (let i = 0; i < window.selectedAngles.length; i++) {
-                const angle = window.selectedAngles[i];
-
-                // Update progress message
-                if (loadingText) {
-                    loadingText.textContent = `در حال تولید تصویر ${i + 1} از ${totalAngles} (${angleLabels[angle]})...`;
-                }
-
-                // Add angle to request body
-                const angleRequestBody = { ...requestBody, cameraAngle: angle };
-
-                console.log(`🚀 Sending request ${i + 1}/${totalAngles} for angle:`, angle);
-                console.log(`📦 Request body cameraAngle:`, angleRequestBody.cameraAngle);
-
-                try {
-                    const response = await fetch('/api/generate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(angleRequestBody)
-                    });
-
-                    const data = await response.json();
-                    console.log(`📥 Response for angle ${angle}:`, data);
-
-                    if (data.success) {
-                        generatedImages.push({
-                            angle: angle,
-                            angleLabel: angleLabels[angle],
-                            data: data
-                        });
-                        // Save to localStorage
-                        saveToLocalStorage(data);
-
-                        // 🎯 PROGRESSIVE DISPLAY: Show image immediately as it's generated
-                        displayMultipleResults(generatedImages);
-                        loadingOverlay.style.display = 'none'; // Hide loading while showing results
-
-                        // Show loading again if there are more images to generate
-                        if (i < window.selectedAngles.length - 1) {
-                            setTimeout(() => {
-                                loadingOverlay.style.display = 'flex';
-                            }, 100);
-                        }
-                    } else {
-                        console.error(`❌ Failed to generate image for angle ${angle}:`, data.error);
-                    }
-                } catch (error) {
-                    console.error(`❌ Error generating image for angle ${angle}:`, error);
-                }
-            }
-
-            // Hide loading overlay when all done
-            loadingOverlay.style.display = 'none';
-
-            // Final check and cleanup
-            if (generatedImages.length > 0) {
-                displayMultipleResults(generatedImages);
-
-                // Reset all selections after successful generation
-                setTimeout(() => {
-                    resetAllSelections();
-                }, 1000);
-            } else {
-                alert('خطا در تولید تصاویر. لطفاً دوباره تلاش کنید.');
-            }
-
-        } else {
-            // SINGLE IMAGE GENERATION MODE (original logic)
+        {
+            // SINGLE IMAGE GENERATION MODE
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
